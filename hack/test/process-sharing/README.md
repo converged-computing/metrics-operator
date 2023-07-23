@@ -280,7 +280,7 @@ This looks to be the [virtual address space](https://www.baeldung.com/linux/proc
 ffffffffff600000-ffffffffff601000 --xp 00000000 00:00 0                  [vsyscall]
 ```
 
-<details>
+</details>
 
 THIS IS SO COOL! There is so much we can do with this! I need to pause to do some wonky experiments with Flux.
 
