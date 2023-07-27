@@ -42,7 +42,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        cp examples/dist/hyperqueue-operator.yaml /tmp/hyperqueue-operator.yaml
+        cp examples/dist/metrics-operator.yaml /tmp/metrics-operator.yaml
         make build-config
-        diff examples/dist/hyperqueue-operator.yaml /tmp/hyperqueue-operator.yaml
+        diff examples/dist/metrics-operator.yaml /tmp/metrics-operator.yaml
 
