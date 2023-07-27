@@ -73,7 +73,7 @@ kubectl delete -f pod.yaml
 Let's instead try running something more real, like ML training. We are going to use a similar strategy, but with a Jobset. You'll
 need to install it to your cluster.
 
-```
+```bash
 VERSION=v0.2.0
 kubectl apply --server-side -f https://github.com/kubernetes-sigs/jobset/releases/download/$VERSION/manifests.yaml
 ```
@@ -380,6 +380,154 @@ Moment of truth - can we connect?
 
 OH MAH GOSH!! My head just exploded. It is astounding. 🤯️🤣️ There is so much cool ideas we can try with this!
 
+## Testing Control
+
+I want to test having a shared socket, done via a process that is seen by both namepspaces. Create the go producer / consumer setup:
+
+```bash
+$ kubectl apply -f go.yaml
+```
+
+In the consumer container, start a bash shell (just so we know the process)
+
+```
+$ kubectl exec -it nginx-workers-0-0-p44bw -c producer bash
+```
+
+I saw this as pid "7" shared between the containers at `/proc/7`. I needed to install vim in both containers:
+
+```bash
+apt-get update && apt-get install -y vim
+```
+
+Then create the listener first (the consumer)
+
+```go
+package main
+
+# consumer.go
+
+import (
+	"fmt"
+	"net"
+	"net/http"
+	"os"
+)
+
+func main() {
+	if len(os.Args) < 2 {
+		fmt.Fprintln(os.Stderr, "usage:", os.Args[0], "/path.sock [wwwroot]")
+		return
+	}
+
+	fmt.Println("Unix HTTP server")
+
+	root := "."
+	if len(os.Args) > 2 {
+		root = os.Args[2]
+	}
+
+	os.Remove(os.Args[1])
+
+	server := http.Server{
+		Handler: http.FileServer(http.Dir(root)),
+	}
+
+	unixListener, err := net.Listen("unix", os.Args[1])
+	if err != nil {
+		panic(err)
+	}
+	server.Serve(unixListener)
+}
+```
+
+I ran this via:
+
+```
+# go run consumer.go /proc/7/root/socket.sock
+Unix HTTP server
+```
+
+And note that we are writing to the shared process folder. Now the producer can run, and issue a command.
+
+```go
+package main
+
+# producer.go
+
+import (
+	"context"
+	"flag"
+	"fmt"
+	"io"
+	"net"
+	"net/http"
+	"os"
+	"strings"
+)
+
+func main() {
+	post := flag.String("d", "", "data to POST")
+	help := flag.Bool("h", false, "usage help")
+	flag.Parse()
+
+	if *help || len(flag.Args()) != 2 {
+		fmt.Fprintln(os.Stderr, "usage:", os.Args[0], "[-d data] /path.socket /uri")
+		flag.PrintDefaults()
+		os.Exit(0)
+	}
+
+	fmt.Println("Unix HTTP client")
+
+	httpc := http.Client{
+		Transport: &http.Transport{
+			DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
+				return net.Dial("unix", flag.Args()[0])
+			},
+		},
+	}
+
+	var response *http.Response
+	var err error
+	if len(*post) == 0 {
+		response, err = httpc.Get("http://unix" + flag.Args()[1])
+	} else {
+		response, err = httpc.Post("http://unix"+flag.Args()[1], "application/octet-stream", strings.NewReader(*post))
+	}
+
+	if err != nil {
+		panic(err)
+	}
+	io.Copy(os.Stdout, response.Body)
+}
+```
+
+And
+
+```
+go run producer.go /proc/7/root/socket.sock /
+```
+
+This actually works to run the server:
+
+```
+# go run consumer.go /proc/7/root/socket.sock
+Unix HTTP server
+```
+
+and then send messages to it:
+
+```
+# go run producer.go /proc/7/root/socket.socket /    
+Unix HTTP client
+<pre>
+<a href="bin/">bin/</a>
+<a href="consumer.go">consumer.go</a>
+<a href="src/">src/</a>
+</pre>
+```
+
+I think I'm going to run with this idea and try some more things.
 Clean up when you are done, meaning the container and your exploded brains.
 
 ```

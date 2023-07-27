@@ -7,15 +7,15 @@ spec:
   - name: workers
     template:
       spec:
-        parallelism: 4
-        completions: 4
+        parallelism: 2
+        completions: 2
         backoffLimit: 0
         template:
           spec:
             shareProcessNamespace: true
             containers:
-            - name: nginx
-              image: nginx
+            - name: producer
+              image: golang:1.20
               ports:
               - containerPort: 80
               env:
@@ -25,8 +25,10 @@ spec:
                 valueFrom:
                   fieldRef:
                     fieldPath: metadata.annotations['batch.kubernetes.io/job-completion-index']
-            - name: shell
-              image: busybox:1.28
+              stdin: true
+              tty: true
+            - name: consumer
+              image: golang:1.20
               securityContext:
                 capabilities:
                   add:
