@@ -1,4 +1,4 @@
-name: build metric-containers
+name: build containers metrics-operator
 
 on:
   pull_request: []
