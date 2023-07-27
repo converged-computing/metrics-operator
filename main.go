@@ -30,11 +30,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
-	api "github.com/converged-computing/benchmark-operator/api/v1alpha1"
-	controllers "github.com/converged-computing/benchmark-operator/controllers/metric"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	controllers "github.com/converged-computing/metrics-operator/controllers/metric"
 
 	// Metrics are registered here! Importing registers once
-	_ "github.com/converged-computing/benchmark-operator/pkg/metrics/io"
+	_ "github.com/converged-computing/metrics-operator/pkg/metrics/perf"
 	//+kubebuilder:scaffold:imports
 )
 

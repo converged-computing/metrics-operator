@@ -28,8 +28,8 @@ BUNDLE_METADATA_OPTS ?= $(BUNDLE_CHANNELS) $(BUNDLE_DEFAULT_CHANNEL)
 # This variable is used to construct full image tags for bundle and catalog images.
 #
 # For example, running 'make bundle-build bundle-push catalog-build catalog-push' will build and push both
-# flux-framework.org/benchmark-operator-bundle:$VERSION and flux-framework.org/benchmark-operator-catalog:$VERSION.
-IMAGE_TAG_BASE ?= flux-framework.org/benchmark-operator
+# flux-framework.org/metrics-operator-bundle:$VERSION and flux-framework.org/metrics-operator-catalog:$VERSION.
+IMAGE_TAG_BASE ?= flux-framework.org/metrics-operator
 
 # BUNDLE_IMG defines the image:tag used for the bundle.
 # You can use it as an arg. (E.g make bundle-build BUNDLE_IMG=<some-registry>/<project-name-bundle>:<tag>)
@@ -47,8 +47,9 @@ ifeq ($(USE_IMAGE_DIGESTS), true)
 endif
 
 # Image URL to use all building/pushing image targets
-IMG ?= ghcr.io/converged-computing/benchmark-operator:latest
-ARMIMG ?= ghcr.io/converged-computing/benchmark-operator:arm
+IMG ?= ghcr.io/converged-computing/metrics-operator:latest
+ARMIMG ?= ghcr.io/converged-computing/metrics-operator:arm
+DEVIMG ?= ghcr.io/converged-computing/metrics-operator:test
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.26.0
@@ -249,6 +250,14 @@ ifneq ($(origin CATALOG_BASE_IMG), undefined)
 FROM_INDEX_OPT := --from-index $(CATALOG_BASE_IMG)
 endif
 
+# Build a test image, push to the registry at test, and apply the build-config
+.PHONY: test-deploy
+test-deploy: manifests kustomize
+	docker build --no-cache -t ${DEVIMG} .
+	docker push ${DEVIMG}
+	cd config/manager && $(KUSTOMIZE) edit set image controller=${DEVIMG}
+	$(KUSTOMIZE) build config/default > examples/dist/metrics-operator-dev.yaml
+
 # Build a catalog image by adding bundle images to an empty catalog using the operator package manager tool, 'opm'.
 # This recipe invokes 'opm' in 'semver' bundle add mode. For more information on add modes, see:
 # https://github.com/operator-framework/community-operators/blob/7f1438c/docs/packaging-operator.md#updating-your-existing-operator
@@ -265,7 +274,7 @@ catalog-push: ## Push a catalog image.
 .PHONY: build-config
 build-config: manifests kustomize ## Deploy controller to the K8s cluster specified in ~/.kube/config.
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
-	$(KUSTOMIZE) build config/default > examples/dist/benchmark-operator.yaml
+	$(KUSTOMIZE) build config/default > examples/dist/metrics-operator.yaml
 
 .PHONY: arm-build
 arm-build: test ## Build docker image with the manager.
@@ -274,13 +283,13 @@ arm-build: test ## Build docker image with the manager.
 .PHONY: build-config-arm
 build-config-arm: manifests kustomize ## Deploy controller to the K8s cluster specified in ~/.kube/config.
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${ARMIMG}
-	$(KUSTOMIZE) build config/default > examples/dist/benchmark-operator-arm.yaml
+	$(KUSTOMIZE) build config/default > examples/dist/metrics-operator-arm.yaml
 
 .PHONY: arm-deploy
 arm-deploy: manifests kustomize
 	docker buildx build --platform linux/arm64 --push -t ${ARMIMG} .
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${ARMIMG}
-	$(KUSTOMIZE) build config/default > examples/dist/benchmark-operator-arm.yaml
+	$(KUSTOMIZE) build config/default > examples/dist/metrics-operator-arm.yaml
 
 .PHONY: pre-push
 pre-push: generate build-config-arm build-config

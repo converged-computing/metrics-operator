@@ -1,0 +1,48 @@
+name: test metrics-operator
+
+on:
+  pull_request: []
+
+jobs:
+  formatting:
+    name: Formatting
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup black linter
+      run: conda create --quiet --name black pyflakes
+
+    - name: Check Spelling
+      uses: crate-ci/typos@7ad296c72fa8265059cc03d1eda562fbdfcd6df2 # v1.9.0
+      with:
+        files: ./README.md ./config/samples ./docs/*.md
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: ^1.18
+    - name: fmt check
+      run: make fmt
+
+    # These aren't written yet
+    - name: Run Unit tests
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: make test
+
+    # Ensure build-config is the same as the one we have
+    - name: Check Updated hyperqueue-operator.yaml
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cp examples/dist/metrics-operator.yaml /tmp/metrics-operator.yaml
+        make build-config
+        diff examples/dist/metrics-operator.yaml /tmp/metrics-operator.yaml
+

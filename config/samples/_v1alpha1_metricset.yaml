@@ -1,0 +1,12 @@
+apiVersion: flux-framework.org/v1alpha1
+kind: MetricSet
+metadata:
+  labels:
+    app.kubernetes.io/name: metricset
+    app.kubernetes.io/instance: metricset-sample
+    app.kubernetes.io/part-of: test
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: test
+  name: metricset-sample
+spec:
+  # TODO(user): Add fields here
