@@ -1,5 +1,5 @@
 # Build the manager binary
-FROM golang:1.19 as builder
+FROM golang:1.20 as builder
 ARG TARGETOS
 ARG TARGETARCH
 
@@ -14,6 +14,7 @@ RUN go mod download
 # Copy the go source
 COPY main.go main.go
 COPY api/ api/
+COPY pkg/ pkg/
 COPY controllers/ controllers/
 
 # Build

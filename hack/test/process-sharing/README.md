@@ -378,11 +378,16 @@ Moment of truth - can we connect?
    ƒ26MYGwXM fluxuser sleep       R      1      1   3.654m flux-flux-0-0
 ```
 
-OH MAH GOSH!! My head just exploded. It is astounding. 🤯️🤣️ There is so much cool ideas we can try with this!
+OH MAH GOSH!! My head just exploded. It is astounding. 🤯️🤣️ There is so much cool ideas we can try with this! Let's clean up.
+
+```bash
+kubectl delete -f flux.yaml
+```
+
 
 ## Testing Control
 
-I want to test having a shared socket, done via a process that is seen by both namepspaces. Create the go producer / consumer setup:
+I want to test having a shared socket, done via a process that is seen by both namespaces. Create the go producer / consumer setup:
 
 ```bash
 $ kubectl apply -f go.yaml
@@ -531,7 +536,86 @@ I think I'm going to run with this idea and try some more things.
 Clean up when you are done, meaning the container and your exploded brains.
 
 ```
-$ kubectl delete -f flux.yaml 
+$ kubectl delete -f go.yaml 
 ```
 
-:)
+# Multiple
+
+Let's test multiple - e.g., can we have process sharing between more than two containers?
+
+```bash
+VERSION=v0.2.0
+kubectl apply --server-side -f https://github.com/kubernetes-sigs/jobset/releases/download/$VERSION/manifests.yaml
+```
+```bash
+$ kubectl apply -f multiple.yaml
+```
+
+Let's start a flux instance in the first container
+
+```bash
+$ kubectl exec -it flux-flux-0-0-cjd96 -c flux1 bash
+```
+
+We can see the sockets in tmp - since we did flux start with test size 4, we see a bunch!
+
+```
+ fluxuser@flux-flux-0-0:~$ ls /tmp/flux-jhgpJK/
+content.sqlite  local-0         local-1         local-2         local-3         start           tbon-0          tbon-1
+```
+
+Note this for later - the other container won't have these. Let's proxy to one and run a job.
+
+```console
+$ flux proxy local:///tmp/flux-jhgpJK/local-1 
+$ flux resource list
+     STATE NNODES   NCORES    NGPUS NODELIST
+      free      4       16        0 flux-flux-0-[0,0,0,0]
+ allocated      0        0        0 
+      down      0        0        0 
+```
+
+Submit the same job:
+
+```
+flux submit sleep 900
+```
+```
+$ flux jobs -a
+       JOBID USER     NAME       ST NTASKS NNODES     TIME INFO
+   ƒ26MYGwXM fluxuser sleep       R      1      1   1.493s flux-flux-0-0
+```
+
+Exit from the instance and container and shell into flux2 and then flux3 and try finding the flux start process id with `ps aux` and then shelling to see the queue:
+
+```bash
+$ kubectl exec -it flux-flux-0-0-cjd96 -c flux2 bash
+$ flux proxy local:///proc/7/root/tmp/flux-jhgpJK/local-1 flux resource list
+```
+```console
+     STATE NNODES   NCORES    NGPUS NODELIST
+      free      4       15        0 flux-flux-0-[0,0,0,0]
+ allocated      1        1        0 flux-flux-0-0
+      down      0        0 
+```
+
+And flux3:
+
+```bash
+$ kubectl exec -it flux-flux-0-0-cjd96 -c flux3 bash
+$ flux proxy local:///proc/7/root/tmp/flux-jhgpJK/local-1 flux resource list
+```
+```console
+     STATE NNODES   NCORES    NGPUS NODELIST
+      free      4       15        0 flux-flux-0-[0,0,0,0]
+ allocated      1        1        0 flux-flux-0-0
+      down      0        0        0 
+```
+
+Yep seems to work, of course we will need to test other cases, not just interacting with a socket in the filesystem.
+
+```bash
+kubectl delete -f flux.yaml
+```
+
+

@@ -8,11 +8,13 @@ For details, see https://github.com/flux-framework.
 SPDX-License-Identifier: Apache-2.0
 */
 
-package metric
+package metrics
 
 import (
 	"fmt"
 	"log"
+
+	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 )
 
 var (
@@ -23,16 +25,30 @@ var (
 // The functionality of different metric types might vary based on the type
 // All metrics return a JobSet of some type (and potentially a replicated job)
 type Metric interface {
+
+	// Indicates that the metric requires an application to measure
+	RequiresApplication() bool
 	Description() string
 	Name() string
+	SetOptions(*api.Metric)
+
+	// Container specific attributes!
+	// Get the entrypoint script, intended to be written to a config map
+	EntrypointScript(*api.MetricSet) string
+	WorkingDir() string
+	Image() string
 }
 
 // GetMetric returns the Component specified by name from `Registry`.
-func GetMetric(name string) (Metric, error) {
-	if _, ok := Registry[name]; ok {
-		return Registry[name], nil
+func GetMetric(metric *api.Metric) (Metric, error) {
+	if _, ok := Registry[metric.Name]; ok {
+		m := Registry[metric.Name]
+
+		// Set global and custom options on the registry metric from the CRD
+		m.SetOptions(metric)
+		return m, nil
 	}
-	return nil, fmt.Errorf("%s is not a registered Metric type", name)
+	return nil, fmt.Errorf("%s is not a registered Metric type", metric.Name)
 }
 
 // Register a new Metric type, adding it to the Registry
