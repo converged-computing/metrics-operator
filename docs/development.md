@@ -1,5 +1,9 @@
 # Development
 
+## Writing Metric Containers
+
+- They should contain wget if they need to download the wait script in the entrypoint
+
 ## Creation
 
 ```bash

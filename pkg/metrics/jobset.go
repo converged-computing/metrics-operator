@@ -29,7 +29,7 @@ var (
 )
 
 // getBaseJobSet shared for either an application or isolated jobset
-func getBaseJobSet(set *api.MetricSet) *jobset.JobSet {
+func getBaseJobSet(set *api.MetricSet, successSet []string) *jobset.JobSet {
 
 	// When suspend is true we have a hard time debugging jobs, so keep false
 	suspend := false
@@ -41,11 +41,12 @@ func getBaseJobSet(set *api.MetricSet) *jobset.JobSet {
 			Namespace: set.Namespace,
 		},
 		Spec: jobset.JobSetSpec{
-
-			// We define success when all of the jobs are done
-			// This could be limited to the application in question
 			FailurePolicy: &jobset.FailurePolicy{
 				MaxRestarts: 0,
+			},
+			SuccessPolicy: &jobset.SuccessPolicy{
+				Operator:             "All",
+				TargetReplicatedJobs: successSet,
 			},
 
 			Network: &jobset.Network{
@@ -122,11 +123,11 @@ func getReplicatedJob(set *api.MetricSet, completionMode batchv1.CompletionMode)
 	return &job
 }
 
-// CreateJobSet creates a generic jobset to only run metrics.
+// GetJobSet creates a generic jobset to only run metrics.
 // We typically expect to just use our own containers or test storage, and might
 // extend the functions to be specific to that.
-func CreateJobSet(set *api.MetricSet, metrics *[]Metric) (*jobset.JobSet, error) {
-	js := getBaseJobSet(set)
+func GetJobSet(set *api.MetricSet, metrics *[]Metric) (*jobset.JobSet, error) {
+	js := getBaseJobSet(set, []string{replicatedJobName})
 
 	// TODO not written yet
 	// This will be for storage / etc metrics that need volumes but not application logic
@@ -136,11 +137,14 @@ func CreateJobSet(set *api.MetricSet, metrics *[]Metric) (*jobset.JobSet, error)
 // CreateApplicationJobSet creates the jobset for the metrics set given an application of interest.
 // Each replicated job corresponds to one application being run, and thus one Metrics set. We use a jobset to
 // store associated services alongside the job (TBA) and indexed mode to allow multiple replicas.
-func CreateApplicationJobSet(set *api.MetricSet, metrics *[]Metric) (*jobset.JobSet, error) {
-	js := getBaseJobSet(set)
+func GetApplicationJobSet(set *api.MetricSet, metrics *[]Metric) (*jobset.JobSet, error) {
+
+	// Done/successful when main application completed
+	// TODO when the jobset has customization for indexed completions, update here
+	js := getBaseJobSet(set, []string{replicatedJobName})
 
 	// We always create appliction jobsets with indexed completion
-	job := getReplicatedJob(set, batchv1.NonIndexedCompletion)
+	job := getReplicatedJob(set, batchv1.IndexedCompletion)
 
 	// Add volumes expecting an application (this could be general and moved up into function above)
 	job.Template.Spec.Template.Spec.Volumes = getVolumes(set, metrics)

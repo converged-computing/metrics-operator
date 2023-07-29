@@ -119,7 +119,7 @@ func (r *MetricSetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 			r.Log.Info("Metric %s requires an application.", metric.Name)
 			return ctrl.Result{}, nil
 		}
-		r.Log.Info("Found metric %s: %s", metric.Name, m.Description())
+		r.Log.Info("Found metric", metric.Name, m.Description())
 		metrics = append(metrics, m)
 	}
 

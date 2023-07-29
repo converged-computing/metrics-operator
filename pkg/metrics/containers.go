@@ -70,7 +70,7 @@ func getContainers(set *api.MetricSet, metrics *[]Metric) ([]corev1.Container, e
 
 	// If our metric set has an application, add it last
 	if set.HasApplication() {
-		command := []string{"/bin/bash", set.Spec.Application.Entrypoint}
+		command := []string{"/bin/bash", "-c", set.Spec.Application.Entrypoint}
 		appContainer := corev1.Container{
 			Name:            "app",
 			Image:           set.Spec.Application.Image,

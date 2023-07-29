@@ -43,6 +43,7 @@ spec:
                     description: command to execute and monitor
                     type: string
                   completions:
+                    default: 1
                     description: Do we need to run more than one completion (pod)?
                     format: int32
                     type: integer

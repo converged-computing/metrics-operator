@@ -65,6 +65,8 @@ type Application struct {
 	PullSecret string `json:"pullSecret"`
 
 	// Do we need to run more than one completion (pod)?
+	// +kubebuilder:default=1
+	// +default=1
 	//+optional
 	Completions int32 `json:"completions"`
 }
@@ -128,6 +130,10 @@ func (m *MetricSet) Validate() bool {
 	// Validation for application
 	if m.Spec.Application.Command == "" {
 		fmt.Printf("😥️ Application is missing a command.")
+		return false
+	}
+	if m.Spec.Application.Completions < 1 {
+		fmt.Printf("😥️ Completions must be >= 1.")
 		return false
 	}
 	if m.Spec.Application.Entrypoint == "" {

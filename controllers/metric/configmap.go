@@ -20,7 +20,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/cri-api/pkg/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
@@ -44,25 +43,16 @@ func (r *MetricSetReconciler) ensureConfigMaps(
 
 	if err != nil {
 
-		// Case 1: not found yet, and hostfile is ready (recreate)
-		if errors.IsNotFound(err) {
+		r.Log.Info("ConfigMaps", "Status", "Not found and creating")
 
-			// Prepare lookup of entrypoints, one per metric script.
-			data := map[string]string{}
-			for i, m := range *metrics {
-				key := fmt.Sprintf("entrypoint-%d", i)
-				data[key] = m.EntrypointScript(set)
-			}
-			cm, result, err := r.getConfigMap(ctx, set, data)
-			ctrl.SetControllerReference(set, cm, r.Scheme)
-			if err != nil {
-				return cm, result, err
-			}
-
-		} else if err != nil {
-			r.Log.Error(err, "Failed to get MetricSet ConfigMap")
-			return existing, ctrl.Result{}, err
+		// Prepare lookup of entrypoints, one per metric script.
+		data := map[string]string{}
+		for i, m := range *metrics {
+			key := fmt.Sprintf("entrypoint-%d", i)
+			data[key] = m.EntrypointScript(set)
 		}
+		cm, result, err := r.getConfigMap(ctx, set, data)
+		return cm, result, err
 
 	} else {
 		r.Log.Info(
@@ -71,6 +61,7 @@ func (r *MetricSetReconciler) ensureConfigMaps(
 			"Name", existing.Name,
 		)
 	}
+	ctrl.SetControllerReference(set, existing, r.Scheme)
 	return existing, ctrl.Result{}, err
 }
 
@@ -101,6 +92,7 @@ func (r *MetricSetReconciler) getConfigMap(
 
 	// Actually create it
 	err := r.Create(ctx, cm)
+	ctrl.SetControllerReference(set, cm, r.Scheme)
 	if err != nil {
 		r.Log.Error(
 			err, "❌ Failed to create MetricSet ConfigMap",
@@ -111,6 +103,5 @@ func (r *MetricSetReconciler) getConfigMap(
 	}
 
 	// Successful - return and requeue
-	ctrl.SetControllerReference(set, cm, r.Scheme)
 	return cm, ctrl.Result{Requeue: true}, nil
 }

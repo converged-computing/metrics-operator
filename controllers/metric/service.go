@@ -49,7 +49,7 @@ func (r *MetricSetReconciler) createHeadlessService(
 	selector map[string]string,
 ) (*corev1.Service, error) {
 
-	r.Log.Info("Creating headless service with: ", set.Spec.ServiceName, set.Namespace)
+	r.Log.Info("🤯️ Creating headless service with: ", set.Spec.ServiceName, set.Namespace)
 	service := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{Name: set.Spec.ServiceName, Namespace: set.Namespace},
 		Spec: corev1.ServiceSpec{

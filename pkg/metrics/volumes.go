@@ -17,15 +17,11 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-const (
-	entrypointSuffix = "-entrypoint"
-)
-
 // GetVolumeMounts returns read only volume for entrypoint scripts, etc.
 func getVolumeMounts(set *api.MetricSet) []corev1.VolumeMount {
 	mounts := []corev1.VolumeMount{
 		{
-			Name:      set.Name + entrypointSuffix,
+			Name:      set.Name,
 			MountPath: "/metrics_operator/",
 			ReadOnly:  true,
 		},
@@ -54,13 +50,13 @@ func getVolumes(set *api.MetricSet, metrics *[]Metric) []corev1.Volume {
 	// TODO will need to add volumes to here for storage requests / metrics
 	volumes := []corev1.Volume{
 		{
-			Name: set.Name + entrypointSuffix,
+			Name: set.Name,
 			VolumeSource: corev1.VolumeSource{
 				ConfigMap: &corev1.ConfigMapVolumeSource{
 
 					// Namespace based on the cluster
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: set.Name + entrypointSuffix,
+						Name: set.Name,
 					},
 					Items: runnerScripts,
 				},

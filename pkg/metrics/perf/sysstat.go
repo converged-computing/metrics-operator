@@ -49,14 +49,17 @@ func (m PidStat) SetOptions(metric *api.Metric) {
 // to extract metadata from elsewhere
 // TODO need to think of more clever way to export the values?
 // Save to somewhere?
+// TODO if the app is too fast we might miss it?
 func (m PidStat) EntrypointScript(set *api.MetricSet) string {
 
 	template := `#!/bin/bash
 
 # Download the wait binary
 wget https://github.com/converged-computing/goshare/releases/download/2023-07-27/wait
+chmod +x ./wait
+mv ./wait /usr/bin/goshare-wait
 echo "Waiting for application PID..."
-pid=$(wait -c "%s" -q)
+pid=$(goshare-wait -c "%s" -q)
 
 i=0
 while true
@@ -68,15 +71,21 @@ while true
     echo "POLICY TIMEPOINT ${i}
     pidstat -p ${pid} -R -h
     echo "PAGEFAULTS and MEMORY ${i}
-	pidstat -p 30 -r -h
+	pidstat -p ${pid} -r -h
     echo "STACK UTILIZATION ${i}
-	pidstat -p 30 -s -h
+	pidstat -p ${pid} -s -h
     echo "THREADS ${i}	
-	pidstat -p 30 -t -h
+	pidstat -p ${pid} -t -h
     echo "KERNEL TABLES ${i}	
-	34  pidstat -p 30 -v -h
+	pidstat -p ${pid} -v -h
     echo "TASK SWITCHING ${i}	
-	35  pidstat -p 30 -w -h
+	pidstat -p ${pid} -w -h
+	# Check if still running
+	ps -p ${pid} > /dev/null
+    retval=$?
+	if [[ $retval -ne 0 ]]; then
+	    exit 0
+    fi
 	sleep %d
 	let i=i+1 
 done
@@ -99,6 +108,6 @@ func init() {
 		name:                "perf-sysstat",
 		description:         "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
 		requiresApplication: true,
-		container:           "ghcr.io/converged-computing/benchmark-sysstat:latest",
+		container:           "ghcr.io/converged-computing/metric-sysstat:latest",
 	})
 }

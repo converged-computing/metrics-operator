@@ -50,6 +50,7 @@ spec:
                     description: command to execute and monitor
                     type: string
                   completions:
+                    default: 1
                     description: Do we need to run more than one completion (pod)?
                     format: int32
                     type: integer
@@ -625,6 +626,7 @@ spec:
         command:
         - /manager
         image: ghcr.io/converged-computing/metrics-operator:arm
+        imagePullPolicy: Always
         livenessProbe:
           httpGet:
             path: /healthz

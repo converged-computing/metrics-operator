@@ -11,6 +11,7 @@ See early documentation and notes in [docs](docs).
 - Add automated builds / deploys for the operator
 - Pretty / detailed docs
 - Need a strategy for storing metrics output / logs
+- Bug that config map not cleaning up with deletion
 - TBA
 
 ## License
