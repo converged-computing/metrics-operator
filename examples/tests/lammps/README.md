@@ -38,7 +38,7 @@ Wait until you see pods created by the job and then running (there should be one
 ```diff
 NAME                           READY   STATUS              RESTARTS   AGE
 - metricset-sample-m-0-0-mkwrh   0/2     ContainerCreating   0          2m20s
-+
++ metricset-sample-m-0-0-mkwrh   2/2     Running             0          3m10s
 ```
 
 You should always be able to get logs for the application container in a pod, which is named "app" ! Here we
