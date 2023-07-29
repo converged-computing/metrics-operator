@@ -30,14 +30,73 @@ type MetricSetSpec struct {
 
 	// The name of the metric (that will be associated with a flavor like storage)
 	Metrics []Metric `json:"metrics"`
+
+	// Service name for the JobSet (MetricsSet) cluster network
+	// +kubebuilder:default="ms"
+	// +default="ms"
+	// +optional
+	ServiceName string `json:"serviceName"`
+
+	// Should the job be limited to a particular number of seconds?
+	// Approximately one year. This cannot be zero or job won't start
+	// +kubebuilder:default=31500000
+	// +default=31500000
+	// +optional
+	DeadlineSeconds int64 `json:"deadlineSeconds,omitempty"`
+
+	// For metrics that require an application, we need a container and name (for now)
+	// +optional
+	Application Application `json:"application"`
 }
 
-// A benchmark is details for one metric
+// Application that will be monitored
+type Application struct {
+	Image string `json:"image"`
+
+	// command to execute and monitor
+	Command string `json:"command"`
+
+	// Entrypoint of container, if different from command
+	//+optional
+	Entrypoint string `json:"entrypoint"`
+
+	// A pull secret for the application container
+	//+optional
+	PullSecret string `json:"pullSecret"`
+
+	// Do we need to run more than one completion (pod)?
+	// +kubebuilder:default=1
+	// +default=1
+	//+optional
+	Completions int32 `json:"completions"`
+}
+
 // The difference between benchmark and metric is subtle.
 // A metric is more a measurment, and the benchmark is the comparison value.
-// I don't have strong opinions but I like exposing "metric/metrics" to the user
+// I don't have strong opinions but I think we are doing more measurment
+// not necessarily with benchmarks
 type Metric struct {
 	Name string `json:"name"`
+
+	// Global attributes shared by all metrics
+	// Sampling rate in seconds. Defaults to every 10 seconds
+	// +kubebuilder:default=10
+	// +default=10
+	// +optional
+	Rate int32 `json:"rate"`
+
+	// Custom attributes specific to metrics
+	// +optional
+	Attributes map[string]string `json:"attributes"`
+}
+
+// Get pod labels for a metric set
+func (m *MetricSet) GetPodLabels() map[string]string {
+	podLabels := map[string]string{}
+	podLabels["cluster-name"] = m.Name
+	podLabels["namespace"] = m.Namespace
+	podLabels["app.kubernetes.io/name"] = m.Name
+	return podLabels
 }
 
 // MetricStatus defines the observed state of Metric
@@ -55,7 +114,12 @@ type MetricSet struct {
 	Status MetricSetStatus `json:"status,omitempty"`
 }
 
-// Validate a requested metric
+// Determine if an application is present
+func (m *MetricSet) HasApplication() bool {
+	return m.Spec.Application.Image != ""
+}
+
+// Validate a requested metricset
 func (m *MetricSet) Validate() bool {
 
 	if len(m.Spec.Metrics) == 0 {
@@ -63,13 +127,21 @@ func (m *MetricSet) Validate() bool {
 		return false
 	}
 
-	// Validation for each metric
-	for i, metric := range m.Spec.Metrics {
-		if metric.Name == "" {
-			fmt.Printf("😥️ Metric in index %d is missing a name.\n", i)
-			return false
-		}
+	// Validation for application
+	if m.Spec.Application.Command == "" {
+		fmt.Printf("😥️ Application is missing a command.")
+		return false
 	}
+	if m.Spec.Application.Completions < 1 {
+		fmt.Printf("😥️ Completions must be >= 1.")
+		return false
+	}
+	if m.Spec.Application.Entrypoint == "" {
+		m.Spec.Application.Entrypoint = m.Spec.Application.Command
+	}
+
+	// Validation for each metric
+	//for i, metric := range m.Spec.Metrics {}
 	return true
 }
 

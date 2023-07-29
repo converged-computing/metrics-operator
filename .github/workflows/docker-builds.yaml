@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [["docker/sysstat", "ghcr.io/converged-computing/benchmark-sysstat:latest"]]
+        test: [["docker/sysstat", "ghcr.io/converged-computing/metric-sysstat:latest"]]
 
     steps:
     - name: Clone the code
@@ -21,7 +21,7 @@ jobs:
     - name: Setup Go
       uses: actions/setup-go@v3
       with:
-        go-version: ^1.18
+        go-version: ^1.20
 
     - name: GHCR Login
       if: (github.event_name != 'pull_request')

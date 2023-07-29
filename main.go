@@ -110,7 +110,7 @@ func main() {
 	}
 
 	// Create the new reconciler
-	if err = (&controllers.MetricReconciler{
+	if err = (&controllers.MetricSetReconciler{
 		Log:        ctrl.Log.WithName("metric-reconciler"),
 		Client:     mgr.GetClient(),
 		Scheme:     mgr.GetScheme(),

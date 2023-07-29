@@ -35,21 +35,66 @@ spec:
           spec:
             description: MetricSpec defines the desired state of Metric
             properties:
+              application:
+                description: For metrics that require an application, we need a container
+                  and name (for now)
+                properties:
+                  command:
+                    description: command to execute and monitor
+                    type: string
+                  completions:
+                    default: 1
+                    description: Do we need to run more than one completion (pod)?
+                    format: int32
+                    type: integer
+                  entrypoint:
+                    description: Entrypoint of container, if different from command
+                    type: string
+                  image:
+                    type: string
+                  pullSecret:
+                    description: A pull secret for the application container
+                    type: string
+                required:
+                - command
+                - image
+                type: object
+              deadlineSeconds:
+                default: 31500000
+                description: Should the job be limited to a particular number of seconds?
+                  Approximately one year. This cannot be zero or job won't start
+                format: int64
+                type: integer
               metrics:
                 description: The name of the metric (that will be associated with
                   a flavor like storage)
                 items:
-                  description: A benchmark is details for one metric The difference
-                    between benchmark and metric is subtle. A metric is more a measurment,
-                    and the benchmark is the comparison value. I don't have strong
-                    opinions but I like exposing "metric/metrics" to the user
+                  description: The difference between benchmark and metric is subtle.
+                    A metric is more a measurment, and the benchmark is the comparison
+                    value. I don't have strong opinions but I think we are doing more
+                    measurment not necessarily with benchmarks
                   properties:
+                    attributes:
+                      additionalProperties:
+                        type: string
+                      description: Custom attributes specific to metrics
+                      type: object
                     name:
                       type: string
+                    rate:
+                      default: 10
+                      description: Global attributes shared by all metrics Sampling
+                        rate in seconds. Defaults to every 10 seconds
+                      format: int32
+                      type: integer
                   required:
                   - name
                   type: object
                 type: array
+              serviceName:
+                default: ms
+                description: Service name for the JobSet (MetricsSet) cluster network
+                type: string
             required:
             - metrics
             type: object

@@ -1,17 +1,11 @@
 /*
-Copyright 2023.
+Copyright 2023 Lawrence Livermore National Security, LLC
+ (c.f. AUTHORS, NOTICE.LLNS, COPYING)
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+This is part of the Flux resource manager framework.
+For details, see https://github.com/flux-framework.
 
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+SPDX-License-Identifier: Apache-2.0
 */
 
 package controllers
@@ -31,12 +25,12 @@ import (
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
-	create "github.com/converged-computing/metrics-operator/pkg/metrics"
+	mctrl "github.com/converged-computing/metrics-operator/pkg/metrics"
 	"github.com/go-logr/logr"
 )
 
 // MetricReconciler reconciles a Metric object
-type MetricReconciler struct {
+type MetricSetReconciler struct {
 	client.Client
 	Scheme     *runtime.Scheme
 	Log        logr.Logger
@@ -81,7 +75,7 @@ type MetricReconciler struct {
 //
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.14.1/pkg/reconcile
-func (r *MetricReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+func (r *MetricSetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
 	// Create a new MetricSet
@@ -110,18 +104,31 @@ func (r *MetricReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		return ctrl.Result{}, nil
 	}
 
-	// Prepare a group of metrics. For now each will be creating a jobset
-	// But I'd like to test having more than one grouped together via
-	// a replicated job.
-	metrics := []api.Metric{}
+	// Verify that all metrics are valid.
+	// If the metric requires an application, the MetricSet CRD must have one!
+	metrics := []mctrl.Metric{}
 	for _, metric := range set.Spec.Metrics {
-		m, err := create.GetMetric(metric.Name)
+		m, err := mctrl.GetMetric(&metric)
 		if err != nil {
 			r.Log.Info("🧀️ We cannot find a metric named %s!", metric.Name)
 			return ctrl.Result{}, nil
 		}
-		r.Log.Info("Found metric %s: %s", metric.Name, m.Description())
-		metrics = append(metrics, metric)
+
+		// If the metric requires an application and we don't have one, no go
+		if m.RequiresApplication() && !set.HasApplication() {
+			r.Log.Info("Metric %s requires an application.", metric.Name)
+			return ctrl.Result{}, nil
+		}
+		r.Log.Info("Found metric", metric.Name, m.Description())
+		metrics = append(metrics, m)
+	}
+
+	// Ensure the metricset is mapped to a JobSet. For design:
+	// 1. If an application is provided, we pair the application at some scale with each metric as a contaienr
+	// 2. If an application is not provided, we assume only storage / others that don't require an application
+	result, err := r.ensureMetricSet(ctx, &set, &metrics)
+	if err != nil {
+		return result, err
 	}
 
 	// By the time we get here we have a Job + pods + config maps!
@@ -132,7 +139,7 @@ func (r *MetricReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *MetricReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *MetricSetReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&api.MetricSet{}).
 		Owns(&corev1.Secret{}).

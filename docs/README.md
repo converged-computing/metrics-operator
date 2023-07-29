@@ -6,6 +6,7 @@ we are keeping notes here:
 
  - [Metrics](metrics.md): we have planned to implement
  - [Design](design.md): early design thinking
+ - [Examples](../examples): See README.md alongside these
  - [Development](development.md): notes for developers
 
 Come back later as we work on this project!

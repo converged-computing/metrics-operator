@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/name: namespace
     app.kubernetes.io/part-of: test
     control-plane: controller-manager
-  name: test-system
+  name: metrics-system
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -43,17 +43,59 @@ spec:
           spec:
             description: MetricSpec defines the desired state of Metric
             properties:
+              application:
+                description: For metrics that require an application, we need a container and name (for now)
+                properties:
+                  command:
+                    description: command to execute and monitor
+                    type: string
+                  completions:
+                    default: 1
+                    description: Do we need to run more than one completion (pod)?
+                    format: int32
+                    type: integer
+                  entrypoint:
+                    description: Entrypoint of container, if different from command
+                    type: string
+                  image:
+                    type: string
+                  pullSecret:
+                    description: A pull secret for the application container
+                    type: string
+                required:
+                - command
+                - image
+                type: object
+              deadlineSeconds:
+                default: 31500000
+                description: Should the job be limited to a particular number of seconds? Approximately one year. This cannot be zero or job won't start
+                format: int64
+                type: integer
               metrics:
                 description: The name of the metric (that will be associated with a flavor like storage)
                 items:
-                  description: A benchmark is details for one metric The difference between benchmark and metric is subtle. A metric is more a measurment, and the benchmark is the comparison value. I don't have strong opinions but I like exposing "metric/metrics" to the user
+                  description: The difference between benchmark and metric is subtle. A metric is more a measurment, and the benchmark is the comparison value. I don't have strong opinions but I think we are doing more measurment not necessarily with benchmarks
                   properties:
+                    attributes:
+                      additionalProperties:
+                        type: string
+                      description: Custom attributes specific to metrics
+                      type: object
                     name:
                       type: string
+                    rate:
+                      default: 10
+                      description: Global attributes shared by all metrics Sampling rate in seconds. Defaults to every 10 seconds
+                      format: int32
+                      type: integer
                   required:
                   - name
                   type: object
                 type: array
+              serviceName:
+                default: ms
+                description: Service name for the JobSet (MetricsSet) cluster network
+                type: string
             required:
             - metrics
             type: object
@@ -76,8 +118,8 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name: serviceaccount
     app.kubernetes.io/part-of: test
-  name: test-controller-manager
-  namespace: test-system
+  name: metrics-controller-manager
+  namespace: metrics-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -89,8 +131,8 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name: role
     app.kubernetes.io/part-of: test
-  name: test-leader-election-role
-  namespace: test-system
+  name: metrics-leader-election-role
+  namespace: metrics-system
 rules:
 - apiGroups:
   - ""
@@ -128,7 +170,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   creationTimestamp: null
-  name: test-manager-role
+  name: metrics-manager-role
 rules:
 - apiGroups:
   - ""
@@ -397,7 +439,7 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name: clusterrole
     app.kubernetes.io/part-of: test
-  name: test-metrics-reader
+  name: metrics-metrics-reader
 rules:
 - nonResourceURLs:
   - /metrics
@@ -414,7 +456,7 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name: clusterrole
     app.kubernetes.io/part-of: test
-  name: test-proxy-role
+  name: metrics-proxy-role
 rules:
 - apiGroups:
   - authentication.k8s.io
@@ -439,16 +481,16 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name: rolebinding
     app.kubernetes.io/part-of: test
-  name: test-leader-election-rolebinding
-  namespace: test-system
+  name: metrics-leader-election-rolebinding
+  namespace: metrics-system
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: test-leader-election-role
+  name: metrics-leader-election-role
 subjects:
 - kind: ServiceAccount
-  name: test-controller-manager
-  namespace: test-system
+  name: metrics-controller-manager
+  namespace: metrics-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -460,15 +502,15 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name: clusterrolebinding
     app.kubernetes.io/part-of: test
-  name: test-manager-rolebinding
+  name: metrics-manager-rolebinding
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: test-manager-role
+  name: metrics-manager-role
 subjects:
 - kind: ServiceAccount
-  name: test-controller-manager
-  namespace: test-system
+  name: metrics-controller-manager
+  namespace: metrics-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -480,15 +522,15 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name: clusterrolebinding
     app.kubernetes.io/part-of: test
-  name: test-proxy-rolebinding
+  name: metrics-proxy-rolebinding
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: test-proxy-role
+  name: metrics-proxy-role
 subjects:
 - kind: ServiceAccount
-  name: test-controller-manager
-  namespace: test-system
+  name: metrics-controller-manager
+  namespace: metrics-system
 ---
 apiVersion: v1
 kind: Service
@@ -501,8 +543,8 @@ metadata:
     app.kubernetes.io/name: service
     app.kubernetes.io/part-of: test
     control-plane: controller-manager
-  name: test-controller-manager-metrics-service
-  namespace: test-system
+  name: metrics-controller-manager-metrics-service
+  namespace: metrics-system
 spec:
   ports:
   - name: https
@@ -523,8 +565,8 @@ metadata:
     app.kubernetes.io/name: deployment
     app.kubernetes.io/part-of: test
     control-plane: controller-manager
-  name: test-controller-manager
-  namespace: test-system
+  name: metrics-controller-manager
+  namespace: metrics-system
 spec:
   replicas: 1
   selector:
@@ -584,6 +626,7 @@ spec:
         command:
         - /manager
         image: ghcr.io/converged-computing/metrics-operator:arm
+        imagePullPolicy: Always
         livenessProbe:
           httpGet:
             path: /healthz
@@ -611,5 +654,5 @@ spec:
             - ALL
       securityContext:
         runAsNonRoot: true
-      serviceAccountName: test-controller-manager
+      serviceAccountName: metrics-controller-manager
       terminationGracePeriodSeconds: 10
