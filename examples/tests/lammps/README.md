@@ -169,7 +169,7 @@ of a better way to capture and save these! Also, right now we don't have a compl
 the metrics collector exit when the PID goes away. In the future we could use a success policy. Here they are
 side by side:
 
-![img/lammps.jpg](img/lammps.jpg)
+![lammps.jpg](lammps.jpg)
 
 The jobset, associated jobs, and pods will be completed:
 
