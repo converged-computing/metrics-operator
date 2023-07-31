@@ -11,7 +11,13 @@ the basic infrastructure for the different types!
 
 TBA
 
-## To Be Added
+## Apps to be Measured
+
+ - LAMMPS (already in tests)
+ - Laghos
+ - https://github.com/LLNL/Kripke
+
+## Metrics To Be Added
 
  -  https://github.com/glennklockwood/bioinformatics-profile
 

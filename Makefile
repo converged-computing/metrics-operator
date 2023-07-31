@@ -54,12 +54,15 @@ DEVIMG ?= ghcr.io/converged-computing/metrics-operator:test
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.26.0
 
+
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
 GOBIN=$(shell go env GOPATH)/bin
 else
 GOBIN=$(shell go env GOBIN)
 endif
+
+HELMIFY ?= $(LOCALBIN)/helmify
 
 # Setting SHELL to bash allows bash commands to be executed by recipes.
 # Options are set to exit when a recipe line exits non-zero or a piped command fails.
@@ -107,6 +110,7 @@ vet: ## Run go vet against code.
 .PHONY: test
 test: manifests generate fmt vet envtest ## Run tests.
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" go test ./... -coverprofile cover.out
+
 
 ##@ Build
 
@@ -290,6 +294,14 @@ arm-deploy: manifests kustomize
 	docker buildx build --platform linux/arm64 --push -t ${ARMIMG} .
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${ARMIMG}
 	$(KUSTOMIZE) build config/default > examples/dist/metrics-operator-arm.yaml
+
+.PHONY: helmify
+helmify: $(HELMIFY) ## Download helmify locally if necessary.
+$(HELMIFY): $(LOCALBIN)
+	test -s $(LOCALBIN)/helmify || GOBIN=$(LOCALBIN) go install github.com/arttor/helmify/cmd/helmify@latest
+    
+helm: manifests kustomize helmify
+	$(KUSTOMIZE) build config/default | $(HELMIFY)
 
 .PHONY: pre-push
 pre-push: generate build-config-arm build-config
