@@ -55,6 +55,38 @@ spec:
                   pullSecret:
                     description: A pull secret for the application container
                     type: string
+                  volumes:
+                    additionalProperties:
+                      description: 'A Volume should correspond with an existing volume,
+                        either: config map, secret, or claim name. This will be added
+                        soon.'
+                      properties:
+                        claimName:
+                          description: Claim name if the existing volume is a PVC
+                          type: string
+                        configMapName:
+                          description: Config map name if the existing volume is a
+                            config map You should also define items if you are using
+                            this
+                          type: string
+                        items:
+                          additionalProperties:
+                            type: string
+                          description: Items (key and paths) for the config map
+                          type: object
+                        path:
+                          description: Path and claim name are always required if
+                            a secret isn't defined
+                          type: string
+                        readOnly:
+                          default: false
+                          type: boolean
+                        secretName:
+                          description: An existing secret
+                          type: string
+                      type: object
+                    description: Existing Volumes for the application
+                    type: object
                 required:
                 - command
                 - image
