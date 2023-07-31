@@ -1,0 +1,52 @@
+{# Import the theme's layout. #}
+{% extends '!layout.html' %}
+
+{%- block extrahead %}
+{# Extra custom things to the head HTML tag #}
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+<!-- Social: Facebook / Open Graph -->
+<title>Metrics Operator </title>
+<link rel="canonical" href="https://converged-computing.github.io/metrics-operator/"/>
+<meta property="og:type" content="website">
+
+<meta property="og:url" content="https://converged-computing.github.io/metrics-operator/">
+<meta property="og:title" content="Metrics Operator">
+<meta property="og:image" content="https://raw.githubusercontent.com/converged-computing/metrics-operator/main/docs/images/the-metrics-operator.png">
+<meta property="og:description" content="Metrics Operator ">
+<meta property="og:site_name" content="Metrics Operator">
+<meta property="og:locale" content="en_US">
+
+<!-- Social: Twitter -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@vsoch">
+<meta name="twitter:title" content="Vanessasaurus">
+<meta name="twitter:description" content="Metrics Operator ">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/converged-computing/metrics-operator/main/docs/images/the-metrics-operator.png">
+
+<!-- Social: Google+ / Schema.org  -->
+<meta itemprop="name" content="Metrics Operator">
+<meta itemprop="description" content="Metrics Operator ">
+<meta itemprop="image" content="https://raw.githubusercontent.com/converged-computing/metrics-operator/main/docs/images/the-metrics-operator.png">
+<script type="application/ld+json">
+  {"@type":"WebSite","headline":"Metrics Operator","url":"https://converged-computing.github.io/flux-operator","description":"The Metrics Operator creates Flux MiniClusters on Kubernetes ","name":"Metrics Operator","@context":"https://schema.org"}
+</script>
+
+<style>
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 48
+}
+.sphx-glr-script-out .highlight pre {
+  background-color: #def0ff !important;
+}
+  </style>
+
+
+{# Call the parent block #}
+{{ super() }}
+{%- endblock %}

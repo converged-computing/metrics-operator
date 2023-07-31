@@ -3,7 +3,7 @@
 # To re-generate a bundle for another specific version without changing the standard setup, you can:
 # - use the VERSION as arg of the bundle target (e.g make bundle VERSION=0.0.2)
 # - use environment variables to overwrite this value (e.g export VERSION=0.0.2)
-VERSION ?= 0.0.1
+VERSION ?= 0.1.0
 
 # CHANNELS define the bundle channels used in the bundle.
 # Add a new line here if you would like to change its default config. (E.g CHANNELS = "candidate,fast,stable")
@@ -294,6 +294,15 @@ arm-deploy: manifests kustomize
 	docker buildx build --platform linux/arm64 --push -t ${ARMIMG} .
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${ARMIMG}
 	$(KUSTOMIZE) build config/default > examples/dist/metrics-operator-arm.yaml
+
+# Build a local test image, load into minikube or kind and apply the build-config
+.PHONY: deploy-local
+deploy-local: manifests kustomize build
+	kubectl delete -f examples/dist/flux-operator-local.yaml || true
+	docker build -t ${DEVIMG} .
+	cd config/manager && $(KUSTOMIZE) edit set image controller=${DEVIMG}
+	$(KUSTOMIZE) build config/default > examples/dist/flux-operator-local.yaml
+	sed -i 's/        imagePullPolicy: Always/        imagePullPolicy: Never/' examples/dist/metrics-operator-local.yaml
 
 .PHONY: helmify
 helmify: $(HELMIFY) ## Download helmify locally if necessary.
