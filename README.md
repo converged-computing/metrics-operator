@@ -2,10 +2,11 @@
 
 ![docs/images/metrics-operator-banner.png](docs/images/metrics-operator-banner.png)
 
-Developing metrics to assess different kinds of Kubernetes performance.
+Developing metrics and a catalog of applications to assess different kinds of Kubernetes performance.
 We likely will choose different metrics that are important for HPC.
 Note that I haven't started the operator yet because I'm [testing ideas for the design](hack/test).
-See early documentation and notes in [docs](docs).
+
+View our ⭐️ [Documentation](https://converged-computing.github.io/metrics-operator/) ⭐️
 
 ## Dinosaur TODO
 
