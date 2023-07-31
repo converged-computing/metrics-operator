@@ -19,7 +19,11 @@ import (
 )
 
 // getContainers gets containers for a Hyperqueue node
-func getContainers(set *api.MetricSet, metrics *[]Metric) ([]corev1.Container, error) {
+func getContainers(
+	set *api.MetricSet,
+	metrics *[]Metric,
+	volumes map[string]api.Volume,
+) ([]corev1.Container, error) {
 
 	// Assume we can pull once for now, this could be changed to allow
 	// corev2.PullAlways
@@ -27,7 +31,7 @@ func getContainers(set *api.MetricSet, metrics *[]Metric) ([]corev1.Container, e
 	containers := []corev1.Container{}
 
 	// Currently we share the same mounts across containers, makes life easier!
-	mounts := getVolumeMounts(set)
+	mounts := getVolumeMounts(set, volumes)
 
 	// Create one container per metric!
 	// Each needs to have the sys trace capability to see the application pids

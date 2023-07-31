@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	"fmt"
+	"reflect"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -44,9 +45,27 @@ type MetricSetSpec struct {
 	// +optional
 	DeadlineSeconds int64 `json:"deadlineSeconds,omitempty"`
 
+	// A storage setup that we want to measure performance for.
+	// and binding to storage metrics
+	// +optional
+	Storage Storage `json:"storage"`
+
 	// For metrics that require an application, we need a container and name (for now)
 	// +optional
 	Application Application `json:"application"`
+
+	// Number of job completions (e.g., pods)
+	// +kubebuilder:default=1
+	// +default=1
+	// +optional
+	Completions int32 `json:"completions"`
+}
+
+// Storage that will be monitored
+type Storage struct {
+
+	// Volume type to test
+	Volume Volume `json:"volume"`
 }
 
 // Application that will be monitored
@@ -67,12 +86,6 @@ type Application struct {
 	// Existing Volumes for the application
 	// +optional
 	Volumes map[string]Volume `json:"volumes"`
-
-	// Do we need to run more than one completion (pod)?
-	// +kubebuilder:default=1
-	// +default=1
-	//+optional
-	Completions int32 `json:"completions"`
 }
 
 // A Volume should correspond with an existing volume, either:
@@ -120,6 +133,12 @@ type Metric struct {
 	// +optional
 	Rate int32 `json:"rate"`
 
+	// Completions
+	// Number of completions to do, more relevant for service type applications
+	// that run forever, or a storage metric. If not set (0) then don't set a limit
+	// +optional
+	Completions int32 `json:"completions"`
+
 	// Custom attributes specific to metrics
 	// +optional
 	Attributes map[string]string `json:"attributes"`
@@ -151,33 +170,96 @@ type MetricSet struct {
 
 // Determine if an application is present
 func (m *MetricSet) HasApplication() bool {
-	return m.Spec.Application.Image != ""
+	return !reflect.DeepEqual(m.Spec.Application, Application{})
+}
+
+func (m *MetricSet) HasStorage() bool {
+	return !reflect.DeepEqual(m.Spec.Storage, Storage{})
 }
 
 // Validate a requested metricset
 func (m *MetricSet) Validate() bool {
+
+	// An application or storage setup is required
+	if !m.HasApplication() && !m.HasStorage() {
+		fmt.Printf("😥️ An application OR storage entry is required.\n")
+		return false
+	}
+
+	// We don't currently support running both at once
+	if m.HasApplication() && m.HasStorage() {
+		fmt.Printf("😥️ An application OR storage entry is required, not both.\n")
+		return false
+	}
 
 	if len(m.Spec.Metrics) == 0 {
 		fmt.Printf("😥️ One or more metrics are required.\n")
 		return false
 	}
 
-	// Validation for application
-	if m.Spec.Application.Command == "" {
-		fmt.Printf("😥️ Application is missing a command.")
-		return false
-	}
-	if m.Spec.Application.Completions < 1 {
+	// Storage or an application can have completions (replicas)
+	if m.Spec.Completions < 1 {
 		fmt.Printf("😥️ Completions must be >= 1.")
 		return false
 	}
-	if m.Spec.Application.Entrypoint == "" {
-		m.Spec.Application.Entrypoint = m.Spec.Application.Command
+
+	// Validation for application
+	if m.HasApplication() {
+		if m.Spec.Application.Command == "" {
+			fmt.Printf("😥️ Application is missing a command.")
+			return false
+		}
+		if m.Spec.Application.Entrypoint == "" {
+			m.Spec.Application.Entrypoint = m.Spec.Application.Command
+		}
+
+		// For existing volumes, if it's a claim, a path is required.
+		if !m.validateVolumes(m.Spec.Application.Volumes) {
+			fmt.Printf("😥️ Application container volumes are not valid\n")
+			return false
+		}
+
+	}
+
+	// Validate for storage
+	if m.HasStorage() && !m.validateVolumes(map[string]Volume{"storage": m.Spec.Storage.Volume}) {
+		fmt.Printf("😥️ Storage volumes are not valid\n")
+		return false
 	}
 
 	// Validation for each metric
 	//for i, metric := range m.Spec.Metrics {}
 	return true
+}
+
+// validateExistingVolumes ensures secret names vs. volume paths are valid
+func (m *MetricSet) validateVolumes(volumes map[string]Volume) bool {
+
+	valid := true
+	for key, volume := range volumes {
+
+		// Case 1: it's a secret and we only need that
+		if volume.SecretName != "" {
+			continue
+		}
+
+		// Case 2: it's a config map (and will have items too, but we don't hard require them)
+		if volume.ConfigMapName != "" {
+			continue
+		}
+
+		// Case 3: claim desired without path
+		if volume.ClaimName == "" && volume.Path != "" {
+			fmt.Printf("😥️ Found existing volume %s with path %s that is missing a claim name\n", key, volume.Path)
+			valid = false
+		}
+		// Case 4: reverse of the above
+		if volume.ClaimName != "" && volume.Path == "" {
+			fmt.Printf("😥️ Found existing volume %s with claimName %s that is missing a path\n", key, volume.ClaimName)
+			valid = false
+		}
+	}
+	return valid
 }
 
 //+kubebuilder:object:root=true

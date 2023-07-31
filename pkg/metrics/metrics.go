@@ -28,6 +28,7 @@ type Metric interface {
 
 	// Indicates that the metric requires an application to measure
 	RequiresApplication() bool
+	RequiresStorage() bool
 	Description() string
 	Name() string
 	SetOptions(*api.Metric)
@@ -44,6 +45,10 @@ func GetMetric(metric *api.Metric) (Metric, error) {
 	if _, ok := Registry[metric.Name]; ok {
 		m := Registry[metric.Name]
 
+		// Validate it's for storage OR application
+		if m.RequiresApplication() && m.RequiresStorage() {
+			return nil, fmt.Errorf("%s cannot be for an application and storage", metric.Name)
+		}
 		// Set global and custom options on the registry metric from the CRD
 		m.SetOptions(metric)
 		return m, nil

@@ -62,10 +62,18 @@ func getBaseJobSet(set *api.MetricSet, successSet []string) *jobset.JobSet {
 }
 
 // getReplicatedJob returns the base of the replicated job
-func getReplicatedJob(set *api.MetricSet, completionMode batchv1.CompletionMode) *jobset.ReplicatedJob {
+func getReplicatedJob(
+	set *api.MetricSet,
+	shareProcessNamespace bool,
+) *jobset.ReplicatedJob {
 
 	// Pod labels from the MetricSet
 	podLabels := set.GetPodLabels()
+
+	completionMode := batchv1.NonIndexedCompletion
+	if set.Spec.Completions > 1 {
+		completionMode = batchv1.IndexedCompletion
+	}
 
 	// We only expect one replicated job (for now) so give it a short name for DNS
 	job := jobset.ReplicatedJob{
@@ -80,14 +88,11 @@ func getReplicatedJob(set *api.MetricSet, completionMode batchv1.CompletionMode)
 		Replicas: 1,
 	}
 
-	// We want to share the process namespace between containers
-	shareProcessNamespace := true
-
 	// Create the JobSpec for the job -> Template -> Spec
 	jobspec := batchv1.JobSpec{
 		BackoffLimit:          &backoffLimit,
-		Completions:           &set.Spec.Application.Completions,
-		Parallelism:           &set.Spec.Application.Completions,
+		Completions:           &set.Spec.Completions,
+		Parallelism:           &set.Spec.Completions,
 		CompletionMode:        &completionMode,
 		ActiveDeadlineSeconds: &set.Spec.DeadlineSeconds,
 
@@ -115,43 +120,59 @@ func getReplicatedJob(set *api.MetricSet, completionMode batchv1.CompletionMode)
 		}
 	}
 
-	// TODO we will vary here by resources, mounts, and contianers
-	// Also - should we add resources back?
+	// Should we add resources back?
 	// jobspec.Template.Spec.Overhead = resources
 	// Tie the jobspec to the job
 	job.Template.Spec = jobspec
 	return &job
 }
 
-// GetJobSet creates a generic jobset to only run metrics.
-// We typically expect to just use our own containers or test storage, and might
-// extend the functions to be specific to that.
-func GetJobSet(set *api.MetricSet, metrics *[]Metric) (*jobset.JobSet, error) {
+// GetStorageJobSet creates a jobset intending to mount storage.
+// For a storage metric, the metrics are the main containers, at some
+// replica level (completions) with shared volumes
+func GetStorageJobSet(set *api.MetricSet, metrics *[]Metric) (*jobset.JobSet, error) {
 	js := getBaseJobSet(set, []string{replicatedJobName})
 
-	// TODO not written yet
-	// This will be for storage / etc metrics that need volumes but not application logic
+	// We don't need a shared process namespace here
+	job := getReplicatedJob(set, false)
+
+	// Volumes for job template and containers
+	volumes := map[string]api.Volume{"storage": set.Spec.Storage.Volume}
+
+	// Add volumes for storage
+	job.Template.Spec.Template.Spec.Volumes = getVolumes(set, metrics, volumes)
+
+	// Derive the containers, one per metric, and volumes are included
+	containers, err := getContainers(set, metrics, volumes)
+	if err != nil {
+		return js, err
+	}
+
+	job.Template.Spec.Template.Spec.Containers = containers
+	js.Spec.ReplicatedJobs = []jobset.ReplicatedJob{*job}
 	return js, nil
 }
 
 // CreateApplicationJobSet creates the jobset for the metrics set given an application of interest.
-// Each replicated job corresponds to one application being run, and thus one Metrics set. We use a jobset to
-// store associated services alongside the job (TBA) and indexed mode to allow multiple replicas.
+// Each replicated job corresponds to one application being run, and thus one Metrics set.
+// For an application, the metrics are sidecar containers to the application
 func GetApplicationJobSet(set *api.MetricSet, metrics *[]Metric) (*jobset.JobSet, error) {
 
 	// Done/successful when main application completed
 	// TODO when the jobset has customization for indexed completions, update here
 	js := getBaseJobSet(set, []string{replicatedJobName})
 
-	// We always create appliction jobsets with indexed completion
-	job := getReplicatedJob(set, batchv1.IndexedCompletion)
+	// true indicates a shareProcessNamespace
+	job := getReplicatedJob(set, true)
 
-	// Add volumes expecting an application (this could be general and moved up into function above)
-	job.Template.Spec.Template.Spec.Volumes = getVolumes(set, metrics)
+	// Add volumes expecting an application.
+	job.Template.Spec.Template.Spec.Volumes = getVolumes(
+		set, metrics, set.Spec.Application.Volumes,
+	)
 
 	// Derive the containers, one per metric
 	// This will also include mounts for volumes
-	containers, err := getContainers(set, metrics)
+	containers, err := getContainers(set, metrics, set.Spec.Application.Volumes)
 	if err != nil {
 		return js, err
 	}

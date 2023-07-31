@@ -49,11 +49,6 @@ spec:
                   command:
                     description: command to execute and monitor
                     type: string
-                  completions:
-                    default: 1
-                    description: Do we need to run more than one completion (pod)?
-                    format: int32
-                    type: integer
                   entrypoint:
                     description: Entrypoint of container, if different from command
                     type: string
@@ -93,6 +88,11 @@ spec:
                 - command
                 - image
                 type: object
+              completions:
+                default: 1
+                description: Number of job completions (e.g., pods)
+                format: int32
+                type: integer
               deadlineSeconds:
                 default: 31500000
                 description: Should the job be limited to a particular number of seconds? Approximately one year. This cannot be zero or job won't start
@@ -108,6 +108,10 @@ spec:
                         type: string
                       description: Custom attributes specific to metrics
                       type: object
+                    completions:
+                      description: Completions Number of completions to do, more relevant for service type applications that run forever, or a storage metric. If not set (0) then don't set a limit
+                      format: int32
+                      type: integer
                     name:
                       type: string
                     rate:
@@ -123,6 +127,36 @@ spec:
                 default: ms
                 description: Service name for the JobSet (MetricsSet) cluster network
                 type: string
+              storage:
+                description: A storage setup that we want to measure performance for. and binding to storage metrics
+                properties:
+                  volume:
+                    description: Volume type to test
+                    properties:
+                      claimName:
+                        description: Claim name if the existing volume is a PVC
+                        type: string
+                      configMapName:
+                        description: Config map name if the existing volume is a config map You should also define items if you are using this
+                        type: string
+                      items:
+                        additionalProperties:
+                          type: string
+                        description: Items (key and paths) for the config map
+                        type: object
+                      path:
+                        description: Path and claim name are always required if a secret isn't defined
+                        type: string
+                      readOnly:
+                        default: false
+                        type: boolean
+                      secretName:
+                        description: An existing secret
+                        type: string
+                    type: object
+                required:
+                - volume
+                type: object
             required:
             - metrics
             type: object

@@ -93,9 +93,16 @@ func (r *MetricSetReconciler) ensureJobSet(
 		if set.HasApplication() {
 			r.Log.Info("Creating application JobSet for MetricSet")
 			js, err = mctrl.GetApplicationJobSet(set, metrics)
+
+		} else if set.HasStorage() {
+			r.Log.Info("Creating storage JobSet for MetricSet")
+			js, err = mctrl.GetStorageJobSet(set, metrics)
+
 		} else {
-			r.Log.Info("Creating generic JobSet for MetricSet")
-			js, err = mctrl.GetJobSet(set, metrics)
+
+			// We shouldn't get here
+			r.Log.Info("A MetricSet must be for an application or storage.")
+			return js, ctrl.Result{}, err
 		}
 		ctrl.SetControllerReference(set, js, r.Scheme)
 		if err != nil {

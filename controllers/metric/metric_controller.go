@@ -114,13 +114,19 @@ func (r *MetricSetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 			return ctrl.Result{}, nil
 		}
 
-		// If the metric requires an application and we don't have one, no go
-		if m.RequiresApplication() && !set.HasApplication() {
-			r.Log.Info("Metric %s requires an application.", metric.Name)
-			return ctrl.Result{}, nil
+		// We can only use the metric if it matches application or storage
+		// Ensure we give verbose output if we don't intend to use something
+		if m.RequiresApplication() && set.HasApplication() {
+			r.Log.Info("Found application metric", metric.Name, m.Description())
+			metrics = append(metrics, m)
+		} else if m.RequiresStorage() && set.HasStorage() {
+			r.Log.Info("Found storage metric", metric.Name, m.Description())
+			metrics = append(metrics, m)
+		} else if m.RequiresApplication() && set.HasStorage() {
+			r.Log.Info("Metric %s is for storage, but found application. Skipping.", metric.Name)
+		} else if m.RequiresStorage() && set.HasApplication() {
+			r.Log.Info("Metric %s is for application, but found storage. Skipping.", metric.Name)
 		}
-		r.Log.Info("Found metric", metric.Name, m.Description())
-		metrics = append(metrics, m)
 	}
 
 	// Ensure the metricset is mapped to a JobSet. For design:
@@ -146,7 +152,7 @@ func (r *MetricSetReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&corev1.Service{}).
 		Owns(&corev1.Pod{}).
 		Owns(&corev1.ConfigMap{}).
-		Owns(&jobset.JobSet{}).
 		Owns(&batchv1.Job{}).
+		Owns(&jobset.JobSet{}).
 		Complete(r)
 }

@@ -10,9 +10,10 @@ View our ⭐️ [Documentation](https://converged-computing.github.io/metrics-op
 
 ## Dinosaur TODO
 
-- Basic design for each of perf, and storage metrics
+- Metrics containers should be build in separate repository
 - Need a strategy for storing metrics output / logs
 - Bug that config map not cleaning up with deletion
+- For services we are measuring, we likely need to be able to kill after N seconds
 - TBA
 
 ## License

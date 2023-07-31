@@ -14,9 +14,11 @@ import (
 type PidStat struct {
 	name                string
 	rate                int32
+	completions         int32
 	description         string
 	container           string
 	requiresApplication bool
+	requiresStorage     bool
 }
 
 // Name returns the metric name
@@ -42,6 +44,7 @@ func (m PidStat) WorkingDir() string {
 // Set custom options / attributes for the metric
 func (m PidStat) SetOptions(metric *api.Metric) {
 	m.rate = metric.Rate
+	m.completions = metric.Completions
 }
 
 // Generate the replicated job for measuring the application
@@ -62,6 +65,7 @@ echo "Waiting for application PID..."
 pid=$(goshare-wait -c "%s" -q)
 
 i=0
+completions=%d
 while true
   do
     echo "CPU STATISTICS TIMEPOINT ${i}
@@ -86,6 +90,9 @@ while true
 	if [[ $retval -ne 0 ]]; then
 	    exit 0
     fi
+	if [[ $completions -ne 0 ]] && [[ $i -eq $completions ]]; then
+    	exit 0
+    fi
 	sleep %d
 	let i=i+1 
 done
@@ -93,14 +100,15 @@ done
 	// NOTE: the entrypoint is the entrypoint for the container, while
 	// the command is expected to be what we are monitoring. Often
 	// they are the same thing.
-	return fmt.Sprintf(template, set.Spec.Application.Command, m.rate)
+	return fmt.Sprintf(template, set.Spec.Application.Command, m.completions, m.rate)
 }
-
-// ghcr.io/converged-computing/benchmark-sysstat:latest
 
 // Does the metric require an application container?
 func (m PidStat) RequiresApplication() bool {
 	return m.requiresApplication
+}
+func (m PidStat) RequiresStorage() bool {
+	return m.requiresStorage
 }
 
 func init() {
@@ -108,6 +116,7 @@ func init() {
 		name:                "perf-sysstat",
 		description:         "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
 		requiresApplication: true,
+		requiresStorage:     false,
 		container:           "ghcr.io/converged-computing/metric-sysstat:latest",
 	})
 }

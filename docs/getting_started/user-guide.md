@@ -71,4 +71,14 @@ REVISION: 1
 TEST SUITE: None
 ```
 
-We will be adding more getting started examples and tutorials after we develop the core operator.
+## Usage
+
+Generally, you'll be defining an application container with one or more metrics to assess performance, or a storage solution with the same, but metrics to assess IO. There are several modes of operation, depending on your choice of metrics.
+
+### Application Metrics
+
+An application with metrics will allow 
+A storage or IO metric will simply create the volume of interest that you request, and run the tool there. Read/write is important here - e.g., if the metric needs to write to the volume, a read only volume won't work.
+
+For storage metrics, you aren't required to 
+
