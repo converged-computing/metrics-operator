@@ -295,6 +295,15 @@ arm-deploy: manifests kustomize
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${ARMIMG}
 	$(KUSTOMIZE) build config/default > examples/dist/metrics-operator-arm.yaml
 
+# Build a local test image, load into minikube or kind and apply the build-config
+.PHONY: deploy-local
+deploy-local: manifests kustomize build
+	kubectl delete -f examples/dist/metrics-operator-local.yaml || true
+	docker build -t ${DEVIMG} .
+	cd config/manager && $(KUSTOMIZE) edit set image controller=${DEVIMG}
+	$(KUSTOMIZE) build config/default > examples/dist/metrics-operator-local.yaml
+	sed -i 's/        imagePullPolicy: Always/        imagePullPolicy: Never/' examples/dist/metrics-operator-local.yaml
+
 .PHONY: helmify
 helmify: $(HELMIFY) ## Download helmify locally if necessary.
 $(HELMIFY): $(LOCALBIN)

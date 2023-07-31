@@ -64,11 +64,46 @@ type Application struct {
 	//+optional
 	PullSecret string `json:"pullSecret"`
 
+	// Existing Volumes for the application
+	// +optional
+	Volumes map[string]Volume `json:"volumes"`
+
 	// Do we need to run more than one completion (pod)?
 	// +kubebuilder:default=1
 	// +default=1
 	//+optional
 	Completions int32 `json:"completions"`
+}
+
+// A Volume should correspond with an existing volume, either:
+// config map, secret, or claim name. This will be added soon.
+type Volume struct {
+
+	// Path and claim name are always required if a secret isn't defined
+	// +optional
+	Path string `json:"path,omitempty"`
+
+	// Config map name if the existing volume is a config map
+	// You should also define items if you are using this
+	// +optional
+	ConfigMapName string `json:"configMapName,omitempty"`
+
+	// Items (key and paths) for the config map
+	// +optional
+	Items map[string]string `json:"items"`
+
+	// Claim name if the existing volume is a PVC
+	// +optional
+	ClaimName string `json:"claimName,omitempty"`
+
+	// An existing secret
+	// +optional
+	SecretName string `json:"secretName,omitempty"`
+
+	// +kubebuilder:default=false
+	// +default=false
+	// +optional
+	ReadOnly bool `json:"readOnly,omitempty"`
 }
 
 // The difference between benchmark and metric is subtle.
