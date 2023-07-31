@@ -1,5 +1,7 @@
 # metrics-operator
 
+![docs/images/metrics-operator-banner.png](docs/images/metrics-operator-banner.png)
+
 Developing metrics to assess different kinds of Kubernetes performance.
 We likely will choose different metrics that are important for HPC.
 Note that I haven't started the operator yet because I'm [testing ideas for the design](hack/test).
