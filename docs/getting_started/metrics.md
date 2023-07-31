@@ -28,8 +28,7 @@ The following metrics are under development (or being planned). These will be ea
 The following examples are provided alongside the operator. Each directory has a README with complete instructions for usage.
 
  - [perf-lammps](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-lammps)
- - [io-lammps](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/io-lammps)
-
+ 
 ## Containers
 
 The following tools are folded into the metrics above. Often, one tool can be built into one container and used across multiple metrics.

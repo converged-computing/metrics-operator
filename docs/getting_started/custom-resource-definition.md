@@ -31,7 +31,7 @@ spec:
 
 ### Spec
 
-Under the spec, there are several variables to define. Descriptions are included below, and we reccommend that you look at [examples](https://github.com/converged-computing/metrics-operator/tree/main/examples) in the repository for more.
+Under the spec, there are several variables to define. Descriptions are included below, and we recommend that you look at [examples](https://github.com/converged-computing/metrics-operator/tree/main/examples) in the repository for more.
 Specifically, you must choose ONE of:
 
  - application
