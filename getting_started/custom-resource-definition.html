@@ -459,8 +459,35 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#completions" class="md-nav__link">
+    <span title="/getting_started/custom-resource-definition.md#completions (reference label)" class="md-ellipsis">completions</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#application" class="md-nav__link">
     <span title="/getting_started/custom-resource-definition.md#application (reference label)" class="md-ellipsis">application</span>
+  </a>
+  
+    <nav class="md-nav" aria-label="application">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#volumes" class="md-nav__link">
+    <span title="/getting_started/custom-resource-definition.md#volumes (reference label)" class="md-ellipsis">volumes</span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#storage" class="md-nav__link">
+    <span title="/getting_started/custom-resource-definition.md#storage (reference label)" class="md-ellipsis">storage</span>
   </a>
   
 </li>
@@ -468,6 +495,67 @@
           <li class="md-nav__item">
   <a href="#metrics" class="md-nav__link">
     <span title="/getting_started/custom-resource-definition.md#metrics (reference label)" class="md-ellipsis">metrics</span>
+  </a>
+  
+    <nav class="md-nav" aria-label="metrics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rate" class="md-nav__link">
+    <span title="/getting_started/custom-resource-definition.md#rate (reference label)" class="md-ellipsis">rate</span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#id1" class="md-nav__link">
+    <span title="/getting_started/custom-resource-definition.md#id1 (reference label)" class="md-ellipsis">completions</span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#existing-volumes" class="md-nav__link">
+    <span title="/getting_started/custom-resource-definition.md#existing-volumes (reference label)" class="md-ellipsis">Existing Volumes</span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Existing Volumes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#persistent-volume-claim-example" class="md-nav__link">
+    <span title="/getting_started/custom-resource-definition.md#persistent-volume-claim-example (reference label)" class="md-ellipsis">persistent volume claim example</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config-map-example" class="md-nav__link">
+    <span title="/getting_started/custom-resource-definition.md#config-map-example (reference label)" class="md-ellipsis">config map example</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#secret-example" class="md-nav__link">
+    <span title="/getting_started/custom-resource-definition.md#secret-example (reference label)" class="md-ellipsis">secret example</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hostpath-volume-example" class="md-nav__link">
+    <span title="/getting_started/custom-resource-definition.md#hostpath-volume-example (reference label)" class="md-ellipsis">hostpath volume example</span>
   </a>
   
 </li>
@@ -611,10 +699,18 @@ a name and (optionally, a namespace) to identify the custom resource definition 
 </code></pre></div>
 </div>
 <h3 id="spec">Spec<a class="headerlink" href="#spec" title="Permalink to this heading">¶</a></h3>
-<p>Under the spec, there are several variables to define. Descriptions are included below, and we
-recommend that you look at <a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples">examples</a> in the repository for more examples.</p>
+<p>Under the spec, there are several variables to define. Descriptions are included below, and we recommend that you look at <a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples">examples</a> in the repository for more.
+Specifically, you must choose ONE of:</p>
+<ul class="simple">
+<li><p>application</p></li>
+<li><p>storage</p></li>
+</ul>
+<p>Where an application will be run for some number of pods (completions) and measured by metrics pods (separate pods) OR a storage metric will run directly, and with some
+number of pods (completions) to bind to the storage and measure.</p>
+<h3 id="completions">completions<a class="headerlink" href="#completions" title="Permalink to this heading">¶</a></h3>
+<p>The number of completions for an application or storage metric test will correspond with the number of indexed job completions (pods) for the storage or application JobSet. This defaults to 1, meaning we run in a non-indexed mode. The indexed mode is determined automatically by this variable, where “1” indicates non-indexed, and &gt;1 is indexed.</p>
 <h3 id="application">application<a class="headerlink" href="#application" title="Permalink to this heading">¶</a></h3>
-<p>The core of a MetricSet is an application. This is the container that houses some application that you want to measure performance for. This means that minimally, you are required to define the application container image and command:</p>
+<p>When you want to measure application performance, you’ll need to add an “application” section to your MetricSet. This is the container that houses some application that you want to measure performance for. This means that minimally, you are required to define the application container image and command:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">application</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/rse-ops/vanilla-lammps:tag-latest</span>
@@ -623,6 +719,11 @@ recommend that you look at <a class="reference external" href="https://github.co
 </div>
 <p>In the above example, we target a container with LAMMPS and mpi, and we are going to run MPIrun.
 The command will be used by the metrics sidecar containers to find the PID of interest to measure.</p>
+<h4 id="volumes">volumes<a class="headerlink" href="#volumes" title="Permalink to this heading">¶</a></h4>
+<p>An application is allowed to have one or more existing volumes. An existing volume can be any of the types described in <a class="reference internal" href="#existing-volumes"><span class="std std-ref">existing volumes</span></a></p>
+<h3 id="storage">storage<a class="headerlink" href="#storage" title="Permalink to this heading">¶</a></h3>
+<p>When you want to measure some storage performance, you’ll want to add a “storage” section to your MetricSet. This will typically just be a reference to some existing storage (see <a class="reference internal" href="#existing-volumes"><span class="std std-ref">existing volumes</span></a>) that we want to measure, and can
+also be done for some number of completions and metrics for storage.</p>
 <h3 id="metrics">metrics<a class="headerlink" href="#metrics" title="Permalink to this heading">¶</a></h3>
 <p>The core of the MetricSet of course is the metrics! Since we can measure more than one thing at once, this is a list of named metrics known to the operator. As an example, here is how to run the <code class="docutils literal notranslate"><span class="pre">perf-sysstat</span></code> metric:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
@@ -631,6 +732,133 @@ The command will be used by the metrics sidecar containers to find the PID of in
 </code></pre></div>
 </div>
 <p>To see all the metrics available, see <a class="reference internal" href="metrics.html"><span class="std std-doc">metrics</span></a>. We will be adding many more as the operator is developed.</p>
+<h4 id="rate">rate<a class="headerlink" href="#rate" title="Permalink to this heading">¶</a></h4>
+<p>A metric will be collected at some rate (in seconds) and this defaults to 10.
+To change the rate for a metric:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">metrics</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">perf-sysstat</span>
+<span class="w">      </span><span class="nt">rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span>
+</code></pre></div>
+</div>
+<h3 id="id1">completions<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
+<p>Completions for a metric are relevant if you are assessing storage (which doesn’t have an application runtime) or a service application that will continue to run forever. When this value is set to 0, it essentially indicates no set number of completions (meaning we run forever). Any non-zero value will ensure the metric
+runs for that many completions before exiting.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">metrics</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">io-sysstat</span>
+<span class="w">      </span><span class="nt">completions</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span>
+</code></pre></div>
+</div>
+<p>This is usually suggested to provide for a storage metric.</p>
+<h2 id="existing-volumes">Existing Volumes<a class="headerlink" href="#existing-volumes" title="Permalink to this heading">¶</a></h2>
+<p>An existing volume can be provided to support an application (multiple) or one can be provided for assessing its performance (single).</p>
+<ul class="simple">
+<li><p>a persistent volume claim (PVC) and persistent volume (PV) that you’ve created</p></li>
+<li><p>a secret that you’ve created</p></li>
+<li><p>a config map that you’ve created</p></li>
+<li><p>a host volume (typically for testing)</p></li>
+</ul>
+<p>and for all of the above, you want to provide it to the operator, which will ensure the volume is available for your application or storage. For an application, you’d define your volumes as such:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">application</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/rse-ops/vanilla-lammps:tag-latest</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx -g daemon off;</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">data</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/workflow</span>
+<span class="w">        </span><span class="nt">claimName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data</span><span class="w"> </span>
+</code></pre></div>
+</div>
+<p>The use case above, for an application, is that it requires some kind of data or storage alongside it to function. The volumes spec above is a key value (e.g., “data” is the key) to ensure that names are unique. For storage, you’ll only be defining one volume:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">storage</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">volume</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/workflow</span>
+<span class="w">      </span><span class="nt">claimName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data</span><span class="w"> </span>
+</code></pre></div>
+</div>
+<p>And the implicit name would be “storage” (although it’s probably not important for you to know that). For the remaining examples, we will provide examples for application volumes, however know that the examples are also valid for the second
+storage format.</p>
+<h3 id="persistent-volume-claim-example">persistent volume claim example<a class="headerlink" href="#persistent-volume-claim-example" title="Permalink to this heading">¶</a></h3>
+<p>As an example, here is how to provide the name of an existing claim (you created separately) to a container:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">application</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/rse-ops/vanilla-lammps:tag-latest</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx -g daemon off;</span>
+
+<span class="w">    </span><span class="c1"># This is an existing PVC (and associated PV) we created before the MetricSet</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">data</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/workflow</span>
+<span class="w">        </span><span class="nt">claimName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data</span><span class="w"> </span>
+</code></pre></div>
+</div>
+<p>The above would add a claim named “data” to the application container(s).</p>
+<h3 id="config-map-example">config map example<a class="headerlink" href="#config-map-example" title="Permalink to this heading">¶</a></h3>
+<p>Here is an example of providing a config map to an application container In layman’s terms, we are deploying vanilla nginx, but adding a configuration file
+to <code class="docutils literal notranslate"><span class="pre">/etc/nginx/conf.d</span></code></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">application</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx -g daemon off;</span>
+
+<span class="w">    </span><span class="c1"># This is an existing PVC (and associated PV) we created before the MetricSet</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">nginx-conf</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">configMapName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx-conf</span><span class="w"> </span>
+<span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/nginx/conf.d</span>
+<span class="w">        </span><span class="nt">items</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">flux.conf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flux.conf</span>
+</code></pre></div>
+</div>
+<p>You would have created this config map first, before the MetricSet. Here is an example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ConfigMap</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx-conf</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">metrics-operator</span>
+<span class="nt">data</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">flux.conf</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">    </span><span class="no">server {</span>
+<span class="w">        </span><span class="no">listen       80;</span>
+<span class="w">        </span><span class="no">server_name  localhost;</span>
+<span class="w">        </span><span class="no">location / {</span>
+<span class="w">          </span><span class="no">root   /usr/share/nginx/html;</span>
+<span class="w">          </span><span class="no">index  index.html index.htm;</span>
+<span class="w">        </span><span class="no">}        </span>
+<span class="w">    </span><span class="no">}</span>
+</code></pre></div>
+</div>
+<h3 id="secret-example">secret example<a class="headerlink" href="#secret-example" title="Permalink to this heading">¶</a></h3>
+<p>Here is an example of providing an existing secret (in the metrics-operator namespace)
+to the application container(s):</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">application</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx -g daemon off;</span>
+
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">certs</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/certs</span>
+<span class="w">        </span><span class="nt">secretName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">certs</span>
+</code></pre></div>
+</div>
+<p>The above shows an existing secret named “certs” that we will mount into <code class="docutils literal notranslate"><span class="pre">/etc/certs</span></code>.</p>
+<h3 id="hostpath-volume-example">hostpath volume example<a class="headerlink" href="#hostpath-volume-example" title="Permalink to this heading">¶</a></h3>
+<p>Here is how to use a host path:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">application</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/rse-ops/vanilla-lammps:tag-latest</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx -g daemon off;</span>
+
+<span class="w">    </span><span class="c1"># This is an existing PVC (and associated PV) we created before the MetricSet</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">data</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">hostPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/workflow</span>
+</code></pre></div>
+</div>
 
 
   <hr>
@@ -638,7 +866,7 @@ The command will be used by the metrics sidecar containers to find the PID of in
   <small>
     
       Last update:
-      Jul 31, 2023
+      Aug 01, 2023
     
   </small>
 </div>

@@ -422,32 +422,79 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#implemented-metrics" class="md-nav__link">
+    <span title="/getting_started/metrics.md#implemented-metrics (reference label)" class="md-ellipsis">Implemented Metrics</span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implemented Metrics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#performance" class="md-nav__link">
     <span title="/getting_started/metrics.md#performance (reference label)" class="md-ellipsis">Performance</span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#storage" class="md-nav__link">
     <span title="/getting_started/metrics.md#storage (reference label)" class="md-ellipsis">Storage</span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#apps-to-be-measured" class="md-nav__link">
     <span title="/getting_started/metrics.md#apps-to-be-measured (reference label)" class="md-ellipsis">Apps to be Measured</span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#metrics-to-be-added" class="md-nav__link">
     <span title="/getting_started/metrics.md#metrics-to-be-added (reference label)" class="md-ellipsis">Metrics To Be Added</span>
   </a>
   
-    <nav class="md-nav" aria-label="Metrics To Be Added">
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span title="/getting_started/metrics.md#examples (reference label)" class="md-ellipsis">Examples</span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-lammps" class="md-nav__link">
+    <span class="md-ellipsis">perf-<wbr>lammps</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/io-host-volume" class="md-nav__link">
+    <span class="md-ellipsis">io-<wbr>host-<wbr>volume</span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#containers" class="md-nav__link">
+    <span title="/getting_started/metrics.md#containers (reference label)" class="md-ellipsis">Containers</span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Containers">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -455,10 +502,30 @@
     <span title="/getting_started/metrics.md#sysstat (reference label)" class="md-ellipsis">Sysstat</span>
   </a>
   
+    <nav class="md-nav" aria-label="Sysstat">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="https://github.com/converged-computing/metrics-operator/pkgs/container/metric-sysstat" class="md-nav__link">
+    <span class="md-ellipsis">ghcr.<wbr>io/converged-<wbr>computing/metric-<wbr>sysstat</span>
+  </a>
+  
 </li>
         
       </ul>
     </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#llnl-storage-filesystems" class="md-nav__link">
+    <span title="/getting_started/metrics.md#llnl-storage-filesystems (reference label)" class="md-ellipsis">LLNL Storage / Filesystems</span>
+  </a>
   
 </li>
       
@@ -585,33 +652,55 @@
   </a>
 
 <h1 id="metrics">Metrics<a class="headerlink" href="#metrics" title="Permalink to this heading">¶</a></h1>
-<p>The following metrics are under development (or being planned). These will be easier to add once I have
-the basic infrastructure for the different types!</p>
-<h2 id="performance">Performance<a class="headerlink" href="#performance" title="Permalink to this heading">¶</a></h2>
+<p>The following metrics are under development (or being planned). These will be easier to add once I have the basic infrastructure for the different types!</p>
+<h2 id="implemented-metrics">Implemented Metrics<a class="headerlink" href="#implemented-metrics" title="Permalink to this heading">¶</a></h2>
+<h3 id="performance">Performance<a class="headerlink" href="#performance" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><em>perf-sysstat</em>: the “pidstat” executable of the sysstat library.</p></li>
 </ul>
-<h2 id="storage">Storage<a class="headerlink" href="#storage" title="Permalink to this heading">¶</a></h2>
-<p>TBA</p>
-<h2 id="apps-to-be-measured">Apps to be Measured<a class="headerlink" href="#apps-to-be-measured" title="Permalink to this heading">¶</a></h2>
+<h3 id="storage">Storage<a class="headerlink" href="#storage" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><em>io-sysstat</em>: the “iostat” executable of the sysstat library.</p></li>
+</ul>
+<h3 id="apps-to-be-measured">Apps to be Measured<a class="headerlink" href="#apps-to-be-measured" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>LAMMPS (already in tests)</p></li>
 <li><p>Laghos</p></li>
 <li><p>https://github.com/LLNL/Kripke</p></li>
 </ul>
-<h2 id="metrics-to-be-added">Metrics To Be Added<a class="headerlink" href="#metrics-to-be-added" title="Permalink to this heading">¶</a></h2>
+<h3 id="metrics-to-be-added">Metrics To Be Added<a class="headerlink" href="#metrics-to-be-added" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>https://github.com/glennklockwood/bioinformatics-profile</p></li>
 </ul>
+<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permalink to this heading">¶</a></h2>
+<p>The following examples are provided alongside the operator. Each directory has a README with complete instructions for usage.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-lammps">perf-lammps</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/io-host-volume">io-host-volume</a></li>
+</ul>
+</div>
+<h2 id="containers">Containers<a class="headerlink" href="#containers" title="Permalink to this heading">¶</a></h2>
+<p>The following tools are folded into the metrics above. Often, one tool can be built into one container and used across multiple metrics.</p>
 <h3 id="sysstat">Sysstat<a class="headerlink" href="#sysstat" title="Permalink to this heading">¶</a></h3>
-<p>Sysstat is stored as a general metrics analyzer, as it provides several different metric types;
-It generally provides utils to monitor system performance and usage, including:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/converged-computing/metrics-operator/pkgs/container/metric-sysstat">ghcr.io/converged-computing/metric-sysstat</a></li>
+</ul>
+</div>
+<p>Sysstat is stored as a general metrics analyzer, as it provides several different metric types; It generally provides utils to monitor system performance and usage, including:</p>
 <ul class="simple">
 <li><p><em>iostat</em> reports CPU statistics and input/output statistics for block devices and partitions.</p></li>
 <li><p><em>mpstat</em> reports individual or combined processor related statistics.</p></li>
 <li><p><em>pidstat</em> reports statistics for Linux tasks (processes) : I/O, CPU, memory, etc.</p></li>
 <li><p><em>tapestat</em> reports statistics for tape drives connected to the system.</p></li>
 <li><p><em>cifsiostat</em> reports CIFS statistics.</p></li>
+</ul>
+<h2 id="llnl-storage-filesystems">LLNL Storage / Filesystems<a class="headerlink" href="#llnl-storage-filesystems" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>NFS</p></li>
+<li><p>Vast</p></li>
+<li><p>Lustre</p></li>
 </ul>
 
 
@@ -620,7 +709,7 @@ It generally provides utils to monitor system performance and usage, including:<
   <small>
     
       Last update:
-      Jul 31, 2023
+      Aug 01, 2023
     
   </small>
 </div>
