@@ -46,9 +46,8 @@ There are likely others (and I need to think about it)
 
 ## Database for Metric Storage
 
-I want to try creating a consistent database that can be used to store metrics across runs. In the space of an operator,
-this means we can't clean it up when the specific metric is deleted, but rather it should be owned by the namespace.
-I'm not sure how to do that but will think about ideas. Worst case, we have the user deploy the database in the same namespace
+I want to try creating a consistent database that can be used to store metrics across runs. In the space of an operator, this means we can't clean it up when the specific metric is deleted, but rather it should be owned by the namespace. I'm not sure how to do that but will think about ideas. Worst case, we have the user deploy the database in the same namespace
 separately. Best case, we can manage it for them, or (better) not require it at all.
 I don't want anything complicated (I don't want to re-create prometheus or a monitoring service!)
 
+ - Original diagrams are available on [Excalidraw](https://excalidraw.com/#json=U1quv0he2C1VpqenUBpa6,Rk-sw8Ku5iqdsSC49aJOBw)
