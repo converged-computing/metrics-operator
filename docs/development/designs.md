@@ -31,6 +31,13 @@ That looks like this:
 
 ![img/storage-pod.png](img/storage-pod.png)
 
+
+### Networking
+
+**not implemented yet**
+
+For this I am planning a similar design to the above two, except we won't need a shared process namespace or a volume. We can simply create an indexed job with the tool, and then (already implemented) use the shared network (headless service) for the tool to test communication between pods. This will likely need resources exposed to ensure one pod / hostname, so we will add that. I am first going to test this with Netmark, and then look into other HPC network testing tools.
+
 ### Others
 
 

@@ -11,10 +11,11 @@ View our ⭐️ [Documentation](https://converged-computing.github.io/metrics-op
 ## Dinosaur TODO
 
 - Metrics containers should be build in separate repository
+- Add networking implementation and test netmark
+- Add tests as proper tests in CI
+- **Bug that config map not cleaning up with deletion**
 - Need a strategy for storing metrics output / logs
-- Bug that config map not cleaning up with deletion
-- Bug with interface values taking, defaults are set to be nonzero for now
-- For services we are measuring, we likely need to be able to kill after N seconds
+- For services we are measuring, we likely need to be able to kill after N seconds (to complete job) or to specify the success policy on the metrics containers instead of the application
 - TBA
 
 ## License
