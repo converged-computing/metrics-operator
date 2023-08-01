@@ -113,6 +113,7 @@ An existing volume can be provided to support an application (multiple) or one c
  - a persistent volume claim (PVC) and persistent volume (PV) that you've created
  - a secret that you've created
  - a config map that you've created
+ - a host volume (typically for testing)
 
 and for all of the above, you want to provide it to the operator, which will ensure the volume is available for your application or storage. For an application, you'd define your volumes as such:
 
@@ -218,3 +219,20 @@ spec:
 ```
 
 The above shows an existing secret named "certs" that we will mount into `/etc/certs`.
+
+#### hostpath volume example
+
+Here is how to use a host path:
+
+```yaml
+spec:
+  application:
+    image: ghcr.io/rse-ops/vanilla-lammps:tag-latest
+    command: nginx -g daemon off;
+
+    # This is an existing PVC (and associated PV) we created before the MetricSet
+    volumes:
+      data:
+        hostPath: true
+        path: /workflow
+```

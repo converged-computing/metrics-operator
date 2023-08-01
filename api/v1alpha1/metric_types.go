@@ -96,6 +96,10 @@ type Volume struct {
 	// +optional
 	Path string `json:"path,omitempty"`
 
+	// Hostpath volume on the host to bind to path
+	// +optional
+	HostPath string `json:"hostPath"`
+
 	// Config map name if the existing volume is a config map
 	// You should also define items if you are using this
 	// +optional
@@ -218,7 +222,6 @@ func (m *MetricSet) Validate() bool {
 			fmt.Printf("😥️ Application container volumes are not valid\n")
 			return false
 		}
-
 	}
 
 	// Validate for storage
@@ -228,7 +231,11 @@ func (m *MetricSet) Validate() bool {
 	}
 
 	// Validation for each metric
-	//for i, metric := range m.Spec.Metrics {}
+	for _, metric := range m.Spec.Metrics {
+		if metric.Rate <= 0 {
+			metric.Rate = 10
+		}
+	}
 	return true
 }
 
@@ -248,12 +255,17 @@ func (m *MetricSet) validateVolumes(volumes map[string]Volume) bool {
 			continue
 		}
 
-		// Case 3: claim desired without path
+		// Case 3: Hostpath volume (mostly for testing)
+		if volume.HostPath != "" {
+			continue
+		}
+
+		// Case 4: claim desired without path
 		if volume.ClaimName == "" && volume.Path != "" {
 			fmt.Printf("😥️ Found existing volume %s with path %s that is missing a claim name\n", key, volume.Path)
 			valid = false
 		}
-		// Case 4: reverse of the above
+		// Case 5: reverse of the above
 		if volume.ClaimName != "" && volume.Path == "" {
 			fmt.Printf("😥️ Found existing volume %s with claimName %s that is missing a path\n", key, volume.ClaimName)
 			valid = false

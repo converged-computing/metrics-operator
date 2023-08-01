@@ -95,7 +95,18 @@ func getExistingVolumes(existing map[string]api.Volume) []corev1.Volume {
 	for volumeName, volumeMeta := range existing {
 
 		var newVolume corev1.Volume
-		if volumeMeta.SecretName != "" {
+		if volumeMeta.HostPath != "" {
+
+			newVolume = corev1.Volume{
+				Name: volumeName,
+				VolumeSource: corev1.VolumeSource{
+					HostPath: &corev1.HostPathVolumeSource{
+						Path: volumeMeta.HostPath,
+					},
+				},
+			}
+
+		} else if volumeMeta.SecretName != "" {
 			newVolume = corev1.Volume{
 				Name: volumeName,
 				VolumeSource: corev1.VolumeSource{

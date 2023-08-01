@@ -12,6 +12,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -92,6 +93,8 @@ func (r *MetricSetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		// Create it, doesn't exist yet
 		if errors.IsNotFound(err) {
 			r.Log.Info("🧀️ MetricSet not found. Ignoring since object must be deleted.")
+
+			// This should not be necessary, but the config map isn't owned by the operator
 			return ctrl.Result{}, nil
 		}
 		r.Log.Info("🧀️ Failed to get MetricSet. Re-running reconcile.")
@@ -107,10 +110,11 @@ func (r *MetricSetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	// Verify that all metrics are valid.
 	// If the metric requires an application, the MetricSet CRD must have one!
 	metrics := []mctrl.Metric{}
+
 	for _, metric := range set.Spec.Metrics {
 		m, err := mctrl.GetMetric(&metric)
 		if err != nil {
-			r.Log.Info("🧀️ We cannot find a metric named %s!", metric.Name)
+			r.Log.Info(fmt.Sprintf("🧀️ We cannot find a metric named %s!", metric.Name))
 			return ctrl.Result{}, nil
 		}
 

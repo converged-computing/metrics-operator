@@ -35,6 +35,9 @@ kubectl apply -f metrics.yaml
 
 Wait until you see pods created by the job and then running (there should be one with two containers, one for the app lammps and the other for the stats):
 
+```
+kubectl get pods
+```
 ```diff
 NAME                           READY   STATUS              RESTARTS   AGE
 - metricset-sample-m-0-0-mkwrh   0/2     ContainerCreating   0          2m20s

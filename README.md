@@ -13,6 +13,7 @@ View our ⭐️ [Documentation](https://converged-computing.github.io/metrics-op
 - Metrics containers should be build in separate repository
 - Need a strategy for storing metrics output / logs
 - Bug that config map not cleaning up with deletion
+- Bug with interface values taking, defaults are set to be nonzero for now
 - For services we are measuring, we likely need to be able to kill after N seconds
 - TBA
 

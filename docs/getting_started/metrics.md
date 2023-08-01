@@ -28,6 +28,7 @@ The following metrics are under development (or being planned). These will be ea
 The following examples are provided alongside the operator. Each directory has a README with complete instructions for usage.
 
  - [perf-lammps](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-lammps)
+ - [io-host-volume](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/io-host-volume)
  
 ## Containers
 

@@ -67,6 +67,9 @@ spec:
                         configMapName:
                           description: Config map name if the existing volume is a config map You should also define items if you are using this
                           type: string
+                        hostPath:
+                          description: Hostpath volume on the host to bind to path
+                          type: string
                         items:
                           additionalProperties:
                             type: string
@@ -138,6 +141,9 @@ spec:
                         type: string
                       configMapName:
                         description: Config map name if the existing volume is a config map You should also define items if you are using this
+                        type: string
+                      hostPath:
+                        description: Hostpath volume on the host to bind to path
                         type: string
                       items:
                         additionalProperties:
