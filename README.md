@@ -10,7 +10,6 @@ View our ⭐️ [Documentation](https://converged-computing.github.io/metrics-op
 
 ## Dinosaur TODO
 
-- Metrics containers should be build in separate repository
 - Add networking implementation and test netmark
 - Add tests as proper tests in CI
 - **Bug that config map not cleaning up with deletion**
