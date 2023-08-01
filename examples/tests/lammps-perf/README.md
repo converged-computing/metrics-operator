@@ -1,7 +1,7 @@
-# LAMMPS Example
+# LAMMPS Perf Example
 
 This is (our first!) example to run a simple LAMMPS application in one container, and with one metric
-to dump out a bunch of stats. Note that we don't yet have an intelligent way to store these, we are
+to dump out a bunch of stats. This is a performance metric setup, so we will be defining an application (LAMMPS). Note that we don't yet have an intelligent way to store these, we are
 just seeing them in logs.
 
 ## Usage
@@ -35,6 +35,9 @@ kubectl apply -f metrics.yaml
 
 Wait until you see pods created by the job and then running (there should be one with two containers, one for the app lammps and the other for the stats):
 
+```
+kubectl get pods
+```
 ```diff
 NAME                           READY   STATUS              RESTARTS   AGE
 - metricset-sample-m-0-0-mkwrh   0/2     ContainerCreating   0          2m20s
@@ -134,6 +137,9 @@ The sidecar metrics containers will output their metrics for the lifetime of the
 and (currently) also to their logs:
 
 ```bash
+kubectl logs metricset-sample-m-0-czxrq -c perf-sysstat
+```
+```console
 05:39:24        0        20         -    0.00    0.00    0.00    0.00    0.00     4  mpirun
 05:39:24        0         -        20    0.00    0.00    0.00    0.00    0.00     4  |__mpirun
 KERNEL TABLES 2176

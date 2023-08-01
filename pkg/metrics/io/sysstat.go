@@ -1,4 +1,4 @@
-package perf
+package io
 
 import (
 	"fmt"
@@ -8,10 +8,10 @@ import (
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 
-// sysstat provides a tool "pidstat" that can monitor a PID (along with others)
+// sysstat provides a tool "iostat" to assess a storage mount
 // https://github.com/sysstat/sysstat
 
-type PidStat struct {
+type IOStat struct {
 	name                string
 	rate                int32
 	completions         int32
@@ -22,27 +22,27 @@ type PidStat struct {
 }
 
 // Name returns the metric name
-func (m PidStat) Name() string {
+func (m IOStat) Name() string {
 	return m.name
 }
 
 // Description returns the metric description
-func (m PidStat) Description() string {
+func (m IOStat) Description() string {
 	return m.description
 }
 
 // Container
-func (m PidStat) Image() string {
+func (m IOStat) Image() string {
 	return m.container
 }
 
 // WorkingDir does not matter
-func (m PidStat) WorkingDir() string {
+func (m IOStat) WorkingDir() string {
 	return ""
 }
 
 // Set custom options / attributes for the metric
-func (m *PidStat) SetOptions(metric *api.Metric) {
+func (m *IOStat) SetOptions(metric *api.Metric) {
 	m.rate = metric.Rate
 	m.completions = metric.Completions
 }
@@ -53,43 +53,16 @@ func (m *PidStat) SetOptions(metric *api.Metric) {
 // TODO need to think of more clever way to export the values?
 // Save to somewhere?
 // TODO if the app is too fast we might miss it?
-func (m PidStat) EntrypointScript(set *api.MetricSet) string {
+func (m IOStat) EntrypointScript(set *api.MetricSet) string {
 
 	template := `#!/bin/bash
-
-# Download the wait binary
-wget https://github.com/converged-computing/goshare/releases/download/2023-07-27/wait
-chmod +x ./wait
-mv ./wait /usr/bin/goshare-wait
-echo "Waiting for application PID..."
-pid=$(goshare-wait -c "%s" -q)
-
 i=0
 completions=%d
 while true
   do
-    echo "CPU STATISTICS TIMEPOINT ${i}
-    pidstat -p ${pid} -u -h
-    echo "KERNEL STATISTICS TIMEPOINT ${i}
-    pidstat -p ${pid} -d -h
-    echo "POLICY TIMEPOINT ${i}
-    pidstat -p ${pid} -R -h
-    echo "PAGEFAULTS and MEMORY ${i}
-	pidstat -p ${pid} -r -h
-    echo "STACK UTILIZATION ${i}
-	pidstat -p ${pid} -s -h
-    echo "THREADS ${i}	
-	pidstat -p ${pid} -t -h
-    echo "KERNEL TABLES ${i}	
-	pidstat -p ${pid} -v -h
-    echo "TASK SWITCHING ${i}	
-	pidstat -p ${pid} -w -h
-	# Check if still running
-	ps -p ${pid} > /dev/null
-    retval=$?
-	if [[ $retval -ne 0 ]]; then
-	    exit 0
-    fi
+    echo "IOSTAT TIMEPOINT ${i}"
+    iostat 
+	# Note we can do iostat -o JSON
 	if [[ $completions -ne 0 ]] && [[ $i -eq $completions ]]; then
     	exit 0
     fi
@@ -100,24 +73,24 @@ done
 	// NOTE: the entrypoint is the entrypoint for the container, while
 	// the command is expected to be what we are monitoring. Often
 	// they are the same thing.
-	return fmt.Sprintf(template, set.Spec.Application.Command, m.completions, m.rate)
+	return fmt.Sprintf(template, m.completions, m.rate)
 }
 
 // Does the metric require an application container?
-func (m PidStat) RequiresApplication() bool {
+func (m IOStat) RequiresApplication() bool {
 	return m.requiresApplication
 }
-func (m PidStat) RequiresStorage() bool {
+func (m IOStat) RequiresStorage() bool {
 	return m.requiresStorage
 }
 
 func init() {
 	metrics.Register(
-		&PidStat{
-			name:                "perf-sysstat",
+		&IOStat{
+			name:                "io-sysstat",
 			description:         "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
-			requiresApplication: true,
-			requiresStorage:     false,
+			requiresApplication: false,
+			requiresStorage:     true,
 			container:           "ghcr.io/converged-computing/metric-sysstat:latest",
 		})
 }
