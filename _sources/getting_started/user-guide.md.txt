@@ -77,8 +77,15 @@ Generally, you'll be defining an application container with one or more metrics 
 
 ### Application Metrics
 
-An application with metrics will allow 
+An application with metrics will allow you to run the application, and measure one or more metrics alongside it. This is done via sidecar containers.
+
+### Storage Metric
+
 A storage or IO metric will simply create the volume of interest that you request, and run the tool there. Read/write is important here - e.g., if the metric needs to write to the volume, a read only volume won't work.
 
-For storage metrics, you aren't required to 
+### Standalone Metric
 
+A standalone metric does not require special storage or an application! As an example,
+a networking metric can simply be run with some number of pods (via the indexed jobs).
+
+For more detail about this design, see the [developer docs](../development/index.md).

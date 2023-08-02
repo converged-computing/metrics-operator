@@ -455,6 +455,20 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#storage-metric" class="md-nav__link">
+    <span title="/getting_started/user-guide.md#storage-metric (reference label)" class="md-ellipsis">Storage Metric</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#standalone-metric" class="md-nav__link">
+    <span title="/getting_started/user-guide.md#standalone-metric (reference label)" class="md-ellipsis">Standalone Metric</span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -652,9 +666,13 @@ $ helm pull oci://ghcr.io/converged-computing/metrics-operator-helm/chart
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
 <p>Generally, you’ll be defining an application container with one or more metrics to assess performance, or a storage solution with the same, but metrics to assess IO. There are several modes of operation, depending on your choice of metrics.</p>
 <h3 id="application-metrics">Application Metrics<a class="headerlink" href="#application-metrics" title="Permalink to this heading">¶</a></h3>
-<p>An application with metrics will allow
-A storage or IO metric will simply create the volume of interest that you request, and run the tool there. Read/write is important here - e.g., if the metric needs to write to the volume, a read only volume won’t work.</p>
-<p>For storage metrics, you aren’t required to</p>
+<p>An application with metrics will allow you to run the application, and measure one or more metrics alongside it. This is done via sidecar containers.</p>
+<h3 id="storage-metric">Storage Metric<a class="headerlink" href="#storage-metric" title="Permalink to this heading">¶</a></h3>
+<p>A storage or IO metric will simply create the volume of interest that you request, and run the tool there. Read/write is important here - e.g., if the metric needs to write to the volume, a read only volume won’t work.</p>
+<h3 id="standalone-metric">Standalone Metric<a class="headerlink" href="#standalone-metric" title="Permalink to this heading">¶</a></h3>
+<p>A standalone metric does not require special storage or an application! As an example,
+a networking metric can simply be run with some number of pods (via the indexed jobs).</p>
+<p>For more detail about this design, see the <a class="reference internal" href="../development/index.html"><span class="std std-doc">developer docs</span></a>.</p>
 
 
   <hr>
@@ -662,7 +680,7 @@ A storage or IO metric will simply create the volume of interest that you reques
   <small>
     
       Last update:
-      Aug 01, 2023
+      Aug 02, 2023
     
   </small>
 </div>

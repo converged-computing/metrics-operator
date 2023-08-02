@@ -40,9 +40,9 @@ Specifically, you must choose ONE of:
 Where an application will be run for some number of pods (completions) and measured by metrics pods (separate pods) OR a storage metric will run directly, and with some
 number of pods (completions) to bind to the storage and measure.
 
-### completions
+### pods
 
-The number of completions for an application or storage metric test will correspond with the number of indexed job completions (pods) for the storage or application JobSet. This defaults to 1, meaning we run in a non-indexed mode. The indexed mode is determined automatically by this variable, where "1" indicates non-indexed, and >1 is indexed.
+The number of pods for an application or storage metric test will correspond with the number of indexed job completions (which comes down to pods) for the storage or application JobSet. This defaults to 1, meaning we run in a non-indexed mode. The indexed mode is determined automatically by this variable, where "1" indicates non-indexed, and >1 is indexed.
 
 ### application
 
