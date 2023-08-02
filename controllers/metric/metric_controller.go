@@ -126,10 +126,11 @@ func (r *MetricSetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		} else if m.RequiresStorage() && set.HasStorage() {
 			r.Log.Info("Found storage metric", metric.Name, m.Description())
 			metrics = append(metrics, m)
-		} else if m.RequiresApplication() && set.HasStorage() {
-			r.Log.Info("Metric %s is for storage, but found application. Skipping.", metric.Name)
-		} else if m.RequiresStorage() && set.HasApplication() {
-			r.Log.Info("Metric %s is for application, but found storage. Skipping.", metric.Name)
+		} else if m.Standalone() && set.IsStandalone() {
+			r.Log.Info("Found standalone metric", metric.Name, m.Description())
+			metrics = append(metrics, m)
+		} else {
+			r.Log.Info("Metric %s is mismatched for expected MetricSet, skipping.", metric.Name)
 		}
 	}
 

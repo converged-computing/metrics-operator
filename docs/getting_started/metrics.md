@@ -12,6 +12,10 @@ The following metrics are under development (or being planned). These will be ea
 
  - *io-sysstat*: the "iostat" executable of the sysstat library.
 
+### Standalone
+
+ - *network-netmark*: this is currently a private container/software, but we have support for it when it's ready to be made public.
+
 ### Apps to be Measured
 
  - LAMMPS (already in tests)
@@ -20,7 +24,12 @@ The following metrics are under development (or being planned). These will be ea
 
 ### Metrics To Be Added
 
- -  https://github.com/glennklockwood/bioinformatics-profile
+ - https://github.com/glennklockwood/bioinformatics-profile
+ - HPCToolkit
+ - https://dl.acm.org/doi/pdf/10.1145/3611007
+ - https://hpc.fau.de/research/tools/likwid/
+ - https://www.vi-hps.org/tools/tools.html
+ - https://open.xdmod.org/10.0/index.html
 
 
 ## Examples

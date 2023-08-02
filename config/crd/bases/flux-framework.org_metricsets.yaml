@@ -89,11 +89,6 @@ spec:
                 - command
                 - image
                 type: object
-              completions:
-                default: 1
-                description: Number of job completions (e.g., pods)
-                format: int32
-                type: integer
               deadlineSeconds:
                 default: 31500000
                 description: Should the job be limited to a particular number of seconds?
@@ -122,6 +117,14 @@ spec:
                       type: integer
                     name:
                       type: string
+                    options:
+                      additionalProperties:
+                        anyOf:
+                        - type: integer
+                        - type: string
+                        x-kubernetes-int-or-string: true
+                      description: Metric Options Metric specific options
+                      type: object
                     rate:
                       default: 10
                       description: Global attributes shared by all metrics Sampling
@@ -132,6 +135,11 @@ spec:
                   - name
                   type: object
                 type: array
+              pods:
+                default: 1
+                description: Number of job completions (e.g., pods)
+                format: int32
+                type: integer
               serviceName:
                 default: ms
                 description: Service name for the JobSet (MetricsSet) cluster network
@@ -172,8 +180,6 @@ spec:
                 required:
                 - volume
                 type: object
-            required:
-            - metrics
             type: object
           status:
             description: MetricStatus defines the observed state of Metric
