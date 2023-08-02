@@ -51,7 +51,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [["per-hello-world", "ghcr.io/converged-computing/metric-sysstat:latest", 60]]
+        test: [["perf-hello-world", "ghcr.io/converged-computing/metric-sysstat:latest", 60]]
 
     steps:
     - name: Clone the code
