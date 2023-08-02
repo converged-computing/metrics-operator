@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
-
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 

@@ -52,6 +52,13 @@ func (r *MetricSetReconciler) ensureConfigMaps(
 			data[key] = m.EntrypointScript(set)
 		}
 		cm, result, err := r.getConfigMap(ctx, set, data)
+		if err != nil {
+			r.Log.Error(
+				err, "❌ Failed to get config map",
+				"Namespace", cm.Namespace,
+				"Name", (*cm).Name,
+			)
+		}
 		return cm, result, err
 
 	} else {
@@ -61,7 +68,6 @@ func (r *MetricSetReconciler) ensureConfigMaps(
 			"Name", existing.Name,
 		)
 	}
-	ctrl.SetControllerReference(set, existing, r.Scheme)
 	return existing, ctrl.Result{}, err
 }
 
@@ -91,8 +97,8 @@ func (r *MetricSetReconciler) getConfigMap(
 	fmt.Println(cm.Data)
 
 	// Actually create it
-	err := r.Create(ctx, cm)
 	ctrl.SetControllerReference(set, cm, r.Scheme)
+	err := r.Create(ctx, cm)
 	if err != nil {
 		r.Log.Error(
 			err, "❌ Failed to create MetricSet ConfigMap",
@@ -101,7 +107,6 @@ func (r *MetricSetReconciler) getConfigMap(
 		)
 		return cm, ctrl.Result{}, err
 	}
-
 	// Successful - return and requeue
 	return cm, ctrl.Result{Requeue: true}, nil
 }

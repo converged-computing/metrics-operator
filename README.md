@@ -10,9 +10,7 @@ View our ⭐️ [Documentation](https://converged-computing.github.io/metrics-op
 
 ## Dinosaur TODO
 
-- Add hello world example performance metric
-- Add tests as proper tests in CI
-- **Bug that config map not cleaning up with deletion**
+- osu-benchmark example
 - Need a strategy for storing metrics output / logs
 - For services we are measuring, we likely need to be able to kill after N seconds (to complete job) or to specify the success policy on the metrics containers instead of the application
 - TBA

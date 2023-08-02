@@ -136,6 +136,14 @@ func getReplicatedJob(
 func GetStorageJobSet(set *api.MetricSet, metrics *[]Metric) (*jobset.JobSet, error) {
 	js := getBaseJobSet(set, []string{replicatedJobName})
 
+	// TODO move this function + the getContainers into a common one -
+	// we should loop over each metric to make a jobset / containers
+	// Perhaps we can have a "set" level function that yields the replicatedJobs?
+	// If each metric can define its own jobset, and indexed by size, then
+	// we can create a replicated job named by the size, and then add
+	// containers to it.
+	// each replicated job still needs a completions / indexed mode.
+	// Perhaps we allow a metric to create one off replicated Jobs?
 	// We don't need a shared process namespace here
 	job := getReplicatedJob(set, false)
 
