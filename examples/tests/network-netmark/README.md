@@ -64,6 +64,14 @@ whoami
 # Show ourselves!
 cat ${0}
 
+# If we have zero tasks, default to workers * nproc
+np=2
+pods=2
+if [[ $np -eq 0 ]]; then
+    np=$(nproc)
+    np=$(( $pods*$np ))
+fi
+
 # Write the hosts file
 cat <<EOF > ./hostlist.txt
 metricset-sample-m-0-0.ms.default.svc.cluster.local
@@ -76,12 +84,11 @@ echo "Sleeping for 10 seconds waiting for network..."
 sleep 10
 
 if [ $JOB_COMPLETION_INDEX = 0 ]; then
-   mpirun -f ./hostlist.txt -np 2 /usr/local/bin/netmark.x -w 10 -t 20 -c 20 -b 0 -s     
+   mpirun -f ./hostlist.txt -np $np /usr/local/bin/netmark.x -w 10 -t 20 -c 20 -b 0 -s
 else
    sleep infinity
 fi
 Sleeping for 10 seconds waiting for network...
-size 2 rank 1 on host metricset-sample-m-0-1.ms.default.svc.cluster.local ip 10.244.0.32
 =========== SETUP ===========
 warmups                  10
 trials                   20
@@ -89,7 +96,8 @@ send_recv_cycles         20
 bytes                     0
 store_per_trial           1
 =============================
-size 2 rank 0 on host metricset-sample-m-0-0.ms.default.svc.cluster.local ip 10.244.0.31
+size 2 rank 1 on host metricset-sample-m-0-1.ms.default.svc.cluster.local ip 10.244.0.43
+size 2 rank 0 on host metricset-sample-m-0-0.ms.default.svc.cluster.local ip 10.244.0.42
 Rank 0 sends to rank 1
 Rank 0 sends to rank 1
 Rank 0 sends to rank 1
@@ -101,45 +109,45 @@ Rank 0 sends to rank 1
 Rank 0 sends to rank 1
 Rank 0 sends to rank 1
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 30.801 micro-seconds
+RTT between rank 0 and rank 1 is 25.250 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 31.778 micro-seconds
+RTT between rank 0 and rank 1 is 25.632 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 32.152 micro-seconds
+RTT between rank 0 and rank 1 is 25.849 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 32.356 micro-seconds
+RTT between rank 0 and rank 1 is 25.824 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 31.308 micro-seconds
+RTT between rank 0 and rank 1 is 25.651 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 31.311 micro-seconds
+RTT between rank 0 and rank 1 is 25.801 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 31.020 micro-seconds
+RTT between rank 0 and rank 1 is 25.572 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 30.661 micro-seconds
+RTT between rank 0 and rank 1 is 25.048 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 30.670 micro-seconds
+RTT between rank 0 and rank 1 is 24.780 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 30.625 micro-seconds
+RTT between rank 0 and rank 1 is 24.627 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 31.342 micro-seconds
+RTT between rank 0 and rank 1 is 24.506 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 31.160 micro-seconds
+RTT between rank 0 and rank 1 is 24.293 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 30.879 micro-seconds
+RTT between rank 0 and rank 1 is 24.758 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 30.523 micro-seconds
+RTT between rank 0 and rank 1 is 24.687 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 30.734 micro-seconds
+RTT between rank 0 and rank 1 is 24.592 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 30.849 micro-seconds
+RTT between rank 0 and rank 1 is 24.488 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 30.857 micro-seconds
+RTT between rank 0 and rank 1 is 24.391 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 30.907 micro-seconds
+RTT between rank 0 and rank 1 is 24.093 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 30.931 micro-seconds
+RTT between rank 0 and rank 1 is 23.828 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 31.246 micro-seconds
+RTT between rank 0 and rank 1 is 23.643 micro-seconds
 Rank 1 sends to rank 0
 Rank 1 sends to rank 0
 Rank 1 sends to rank 0
@@ -151,49 +159,49 @@ Rank 1 sends to rank 0
 Rank 1 sends to rank 0
 Rank 1 sends to rank 0
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 29.244 micro-seconds
+RTT between rank 1 and rank 0 is 17.500 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 27.696 micro-seconds
+RTT between rank 1 and rank 0 is 17.252 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 29.390 micro-seconds
+RTT between rank 1 and rank 0 is 17.728 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 30.313 micro-seconds
+RTT between rank 1 and rank 0 is 17.488 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 30.798 micro-seconds
+RTT between rank 1 and rank 0 is 17.410 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 32.261 micro-seconds
+RTT between rank 1 and rank 0 is 17.358 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 32.378 micro-seconds
+RTT between rank 1 and rank 0 is 17.264 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 32.359 micro-seconds
+RTT between rank 1 and rank 0 is 17.222 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 32.598 micro-seconds
+RTT between rank 1 and rank 0 is 17.438 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 32.370 micro-seconds
+RTT between rank 1 and rank 0 is 17.485 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 32.478 micro-seconds
+RTT between rank 1 and rank 0 is 17.474 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 32.423 micro-seconds
+RTT between rank 1 and rank 0 is 17.477 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 32.268 micro-seconds
+RTT between rank 1 and rank 0 is 17.422 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 32.459 micro-seconds
+RTT between rank 1 and rank 0 is 17.341 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 32.754 micro-seconds
+RTT between rank 1 and rank 0 is 17.321 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 32.828 micro-seconds
+RTT between rank 1 and rank 0 is 17.313 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 33.008 micro-seconds
+RTT between rank 1 and rank 0 is 17.262 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 33.039 micro-seconds
+RTT between rank 1 and rank 0 is 17.190 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 32.989 micro-seconds
+RTT between rank 1 and rank 0 is 17.111 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 32.692 micro-seconds
+RTT between rank 1 and rank 0 is 17.079 micro-seconds
 ```
 
 We are currently still adding support for custom completion, so the jobset/pods
-won't be completed.
+won't be completed - the main pod will finish but not the workers.
 
 When you are done, cleanup!
 

@@ -66,7 +66,7 @@ func (m *Netmark) SetOptions(metric *api.Metric) {
 
 	// Set user defined values or fall back to defaults
 	// If we have tasks defined, use it! Otherwise fall back to 2 (likely demo)
-	m.tasks = 2
+	m.tasks = 0
 	m.warmups = 10
 	m.trials = 20
 	m.sendReceiveCycles = 20
@@ -128,6 +128,14 @@ whoami
 # Show ourselves!
 cat ${0}
 
+# If we have zero tasks, default to workers * nproc
+np=%d
+pods=%d
+if [[ $np -eq 0 ]]; then
+    np=$(nproc)
+    np=$(( $pods*$np ))
+fi
+
 # Write the hosts file
 cat <<EOF > ./hostlist.txt
 %s
@@ -138,15 +146,16 @@ echo "Sleeping for 10 seconds waiting for network..."
 sleep 10
 
 if [ $JOB_COMPLETION_INDEX = 0 ]; then
-   mpirun -f ./hostlist.txt -np %d /usr/local/bin/netmark.x -w %d -t %d -c %d -b %d %s     
+   mpirun -f ./hostlist.txt -np $np /usr/local/bin/netmark.x -w %d -t %d -c %d -b %d %s
 else
    sleep infinity
 fi
 `
 	return fmt.Sprintf(
 		template,
-		hosts,
 		m.tasks,
+		set.Spec.Pods,
+		hosts,
 		m.warmups,
 		m.trials,
 		m.sendReceiveCycles,

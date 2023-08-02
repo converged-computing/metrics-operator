@@ -45,4 +45,3 @@ jobs:
         cp examples/dist/metrics-operator.yaml /tmp/metrics-operator.yaml
         make build-config
         diff examples/dist/metrics-operator.yaml /tmp/metrics-operator.yaml
-

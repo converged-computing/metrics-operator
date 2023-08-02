@@ -56,11 +56,16 @@ type MetricSetSpec struct {
 	// +optional
 	Application Application `json:"application"`
 
-	// Number of job completions (e.g., pods)
+	// Parallelism (e.g., pods)
 	// +kubebuilder:default=1
 	// +default=1
 	// +optional
 	Pods int32 `json:"pods"`
+
+	// Single pod completion, meaning the jobspec completions is unset
+	// and we only require one main completion
+	// +optional
+	Completions int32 `json:"completions"`
 }
 
 // Storage that will be monitored
@@ -242,6 +247,10 @@ func (m *MetricSet) Validate() bool {
 		return false
 	}
 
+	// If completions unset, set to parallelism
+	if m.Spec.Completions == 0 {
+		m.Spec.Completions = m.Spec.Pods
+	}
 	// Validation for each metric
 	for _, metric := range m.Spec.Metrics {
 		if metric.Rate <= 0 {
