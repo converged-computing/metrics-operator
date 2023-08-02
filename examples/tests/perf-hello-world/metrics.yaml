@@ -1,0 +1,14 @@
+apiVersion: flux-framework.org/v1alpha1
+kind: MetricSet
+metadata:
+  labels:
+    app.kubernetes.io/name: metricset
+    app.kubernetes.io/instance: metricset-sample
+  name: metricset-sample
+spec:
+  # We don't have support currently for bash commands with -c quotes - hence the simple commands
+  application:
+    image: ubuntu
+    command: sleep 10
+  metrics:
+    - name: perf-sysstat
