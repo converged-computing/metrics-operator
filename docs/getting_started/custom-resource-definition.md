@@ -42,7 +42,12 @@ number of pods (completions) to bind to the storage and measure.
 
 ### pods
 
-The number of pods for an application or storage metric test will correspond with the number of indexed job completions (which comes down to pods) for the storage or application JobSet. This defaults to 1, meaning we run in a non-indexed mode. The indexed mode is determined automatically by this variable, where "1" indicates non-indexed, and >1 is indexed.
+The number of pods for an application or storage metric test will correspond with the parallelism of the indexed job (which comes down to pods) for the storage or application JobSet. This defaults to 1, meaning we run in a non-indexed mode. The indexed mode is determined automatically by this variable, where "1" indicates non-indexed, and >1 is indexed.
+
+### completions
+
+When running as an indexed job, indicate the number of successful pods (completions) for the Job to be successful.  Note that if you set 1, your parallelism will default to 1 too, which isn't ideal. I've opened an issue [here](https://github.com/kubernetes-sigs/jobset).
+
 
 ### application
 

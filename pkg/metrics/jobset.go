@@ -93,8 +93,8 @@ func getReplicatedJob(
 	// Create the JobSpec for the job -> Template -> Spec
 	jobspec := batchv1.JobSpec{
 		BackoffLimit:          &backoffLimit,
-		Completions:           &set.Spec.Pods,
 		Parallelism:           &set.Spec.Pods,
+		Completions:           &set.Spec.Completions,
 		CompletionMode:        &completionMode,
 		ActiveDeadlineSeconds: &set.Spec.DeadlineSeconds,
 

@@ -10,3 +10,8 @@ spec:
   pods: 2
   metrics:
    - name: network-netmark
+
+     # Custom options for netmark
+     # see pkg/metrics/network/netmark.go
+     options:
+       tasks: 2

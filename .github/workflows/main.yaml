@@ -46,3 +46,47 @@ jobs:
         make build-config
         diff examples/dist/metrics-operator.yaml /tmp/metrics-operator.yaml
 
+  test-metrics:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test: [["io-host-volume", "ghcr.io/converged-computing/metric-sysstat:latest", 60]], 
+    steps:
+    - name: Clone the code
+      uses: actions/checkout@v3
+
+    - name: Setup Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: ^1.18
+
+    - name: Install zeromq
+      run: sudo apt-get update && sudo apt-get install -y libsodium-dev libzmq3-dev libczmq-dev
+
+    - name: Start minikube
+      uses: medyagh/setup-minikube@697f2b7aaed5f70bf2a94ee21a4ec3dde7b12f92 # v0.0.9
+
+    - name: Pull Docker Containers to MiniKube
+      env:
+        container: ${{ matrix.test[1] }}
+        test: ${{ matrix[0] }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        export SHELL=/bin/bash
+        eval $(minikube -p minikube docker-env)
+        minikube ssh docker pull ${container}
+        make deploy-local
+        minikube image load ghcr.io/converged-computing/metrics-operator:test
+        kubectl apply -f examples/dist/metrics-operator-local.yaml
+
+    - name: Install JobSet
+      run: |
+        VERSION=v0.2.0
+        kubectl apply --server-side -f https://github.com/kubernetes-sigs/jobset/releases/download/$VERSION/manifests.yaml
+
+    - name: Test ${{ matrix.test[0] }}
+      env:
+        name: ${{ matrix.test[0] }}
+        jobtime: ${{ matrix.test[2] }}
+      run: /bin/bash ./script/test.sh ${name} ${jobtime}

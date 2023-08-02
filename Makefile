@@ -308,7 +308,14 @@ deploy-local: manifests kustomize build
 helmify: $(HELMIFY) ## Download helmify locally if necessary.
 $(HELMIFY): $(LOCALBIN)
 	test -s $(LOCALBIN)/helmify || GOBIN=$(LOCALBIN) go install github.com/arttor/helmify/cmd/helmify@latest
-    
+
+.PHONY: clean
+clean:
+	kubectl delete svc ms --grace-period=0 --force || true
+	# kubectl delete -n flux-operator secret --all --grace-period=0 --force
+	kubectl delete cm metricset-sample --grace-period=0 --force
+	kubectl delete MetricSet --all --grace-period=0 --force
+
 helm: manifests kustomize helmify
 	$(KUSTOMIZE) build config/default | $(HELMIFY)
 

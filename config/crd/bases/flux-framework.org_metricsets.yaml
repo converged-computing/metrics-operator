@@ -89,6 +89,11 @@ spec:
                 - command
                 - image
                 type: object
+              completions:
+                description: Single pod completion, meaning the jobspec completions
+                  is unset and we only require one main completion
+                format: int32
+                type: integer
               deadlineSeconds:
                 default: 31500000
                 description: Should the job be limited to a particular number of seconds?
@@ -137,7 +142,7 @@ spec:
                 type: array
               pods:
                 default: 1
-                description: Number of job completions (e.g., pods)
+                description: Parallelism (e.g., pods)
                 format: int32
                 type: integer
               serviceName:
