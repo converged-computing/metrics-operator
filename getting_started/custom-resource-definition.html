@@ -466,6 +466,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#completions" class="md-nav__link">
+    <span title="/getting_started/custom-resource-definition.md#completions (reference label)" class="md-ellipsis">completions</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#application" class="md-nav__link">
     <span title="/getting_started/custom-resource-definition.md#application (reference label)" class="md-ellipsis">application</span>
   </a>
@@ -513,8 +520,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#completions" class="md-nav__link">
-    <span title="/getting_started/custom-resource-definition.md#completions (reference label)" class="md-ellipsis">completions</span>
+  <a href="#id1" class="md-nav__link">
+    <span title="/getting_started/custom-resource-definition.md#id1 (reference label)" class="md-ellipsis">completions</span>
   </a>
   
 </li>
@@ -708,7 +715,9 @@ Specifically, you must choose ONE of:</p>
 <p>Where an application will be run for some number of pods (completions) and measured by metrics pods (separate pods) OR a storage metric will run directly, and with some
 number of pods (completions) to bind to the storage and measure.</p>
 <h3 id="pods">pods<a class="headerlink" href="#pods" title="Permalink to this heading">¶</a></h3>
-<p>The number of pods for an application or storage metric test will correspond with the number of indexed job completions (which comes down to pods) for the storage or application JobSet. This defaults to 1, meaning we run in a non-indexed mode. The indexed mode is determined automatically by this variable, where “1” indicates non-indexed, and &gt;1 is indexed.</p>
+<p>The number of pods for an application or storage metric test will correspond with the parallelism of the indexed job (which comes down to pods) for the storage or application JobSet. This defaults to 1, meaning we run in a non-indexed mode. The indexed mode is determined automatically by this variable, where “1” indicates non-indexed, and &gt;1 is indexed.</p>
+<h3 id="completions">completions<a class="headerlink" href="#completions" title="Permalink to this heading">¶</a></h3>
+<p>When running as an indexed job, indicate the number of successful pods (completions) for the Job to be successful.  Note that if you set 1, your parallelism will default to 1 too, which isn’t ideal. I’ve opened an issue <a class="reference external" href="https://github.com/kubernetes-sigs/jobset">here</a>.</p>
 <h3 id="application">application<a class="headerlink" href="#application" title="Permalink to this heading">¶</a></h3>
 <p>When you want to measure application performance, you’ll need to add an “application” section to your MetricSet. This is the container that houses some application that you want to measure performance for. This means that minimally, you are required to define the application container image and command:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
@@ -741,7 +750,7 @@ To change the rate for a metric:</p>
 <span class="w">      </span><span class="nt">rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span>
 </code></pre></div>
 </div>
-<h3 id="completions">completions<a class="headerlink" href="#completions" title="Permalink to this heading">¶</a></h3>
+<h3 id="id1">completions<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
 <p>Completions for a metric are relevant if you are assessing storage (which doesn’t have an application runtime) or a service application that will continue to run forever. When this value is set to 0, it essentially indicates no set number of completions (meaning we run forever). Any non-zero value will ensure the metric
 runs for that many completions before exiting.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>

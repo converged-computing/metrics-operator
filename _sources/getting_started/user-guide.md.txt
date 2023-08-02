@@ -6,8 +6,7 @@ on new functionality or features, see our [Developer Guides](../development/inde
 
 ## Containers Available
 
-All containers are provided under [ghcr.io/converged-computing/metrics-operator](https://github.com/converged-computing/metrics-operator/pkgs/container/metrics-operator). The latest tag is the current main branch, a "bleeding edge" version,
-and we will provide releases when the operator is more stable.
+All containers are provided under [ghcr.io/converged-computing/metrics-operator](https://github.com/converged-computing/metrics-operator/pkgs/container/metrics-operator). The latest tag is the current main branch, a "bleeding edge" version, and we will provide releases when the operator is more stable.
 
 ## Install
 
