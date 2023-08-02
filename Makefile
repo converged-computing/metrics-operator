@@ -312,7 +312,6 @@ $(HELMIFY): $(LOCALBIN)
 .PHONY: clean
 clean:
 	kubectl delete svc ms --grace-period=0 --force || true
-	# kubectl delete -n flux-operator secret --all --grace-period=0 --force
 	kubectl delete cm metricset-sample --grace-period=0 --force
 	kubectl delete MetricSet --all --grace-period=0 --force
 
