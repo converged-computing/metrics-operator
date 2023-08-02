@@ -21,6 +21,7 @@ import (
 	"reflect"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -30,6 +31,7 @@ import (
 type MetricSetSpec struct {
 
 	// The name of the metric (that will be associated with a flavor like storage)
+	// +optional
 	Metrics []Metric `json:"metrics"`
 
 	// Service name for the JobSet (MetricsSet) cluster network
@@ -58,7 +60,7 @@ type MetricSetSpec struct {
 	// +kubebuilder:default=1
 	// +default=1
 	// +optional
-	Completions int32 `json:"completions"`
+	Pods int32 `json:"pods"`
 }
 
 // Storage that will be monitored
@@ -137,6 +139,11 @@ type Metric struct {
 	// +optional
 	Rate int32 `json:"rate"`
 
+	// Metric Options
+	// Metric specific options
+	// +optional
+	Options map[string]intstr.IntOrString `json:"options"`
+
 	// Completions
 	// Number of completions to do, more relevant for service type applications
 	// that run forever, or a storage metric. If not set (0) then don't set a limit
@@ -152,6 +159,8 @@ type Metric struct {
 func (m *MetricSet) GetPodLabels() map[string]string {
 	podLabels := map[string]string{}
 	podLabels["cluster-name"] = m.Name
+	// This is for the headless service
+	podLabels["metricset-name"] = m.Name
 	podLabels["namespace"] = m.Namespace
 	podLabels["app.kubernetes.io/name"] = m.Name
 	return podLabels
@@ -172,25 +181,28 @@ type MetricSet struct {
 	Status MetricSetStatus `json:"status,omitempty"`
 }
 
-// Determine if an application is present
+// Determine if an application or storage is present, or standalone
 func (m *MetricSet) HasApplication() bool {
 	return !reflect.DeepEqual(m.Spec.Application, Application{})
 }
-
 func (m *MetricSet) HasStorage() bool {
 	return !reflect.DeepEqual(m.Spec.Storage, Storage{})
+}
+func (m *MetricSet) IsStandalone() bool {
+	return !m.HasStorage() && !m.HasApplication()
 }
 
 // Validate a requested metricset
 func (m *MetricSet) Validate() bool {
 
 	// An application or storage setup is required
-	if !m.HasApplication() && !m.HasStorage() {
-		fmt.Printf("😥️ An application OR storage entry is required.\n")
+	if !m.HasApplication() && !m.HasStorage() && !m.IsStandalone() {
+		fmt.Printf("😥️ An application OR storage OR standalone entry is required.\n")
 		return false
 	}
 
 	// We don't currently support running both at once
+	// (but should be fine to allow extra standalone)
 	if m.HasApplication() && m.HasStorage() {
 		fmt.Printf("😥️ An application OR storage entry is required, not both.\n")
 		return false
@@ -202,7 +214,7 @@ func (m *MetricSet) Validate() bool {
 	}
 
 	// Storage or an application can have completions (replicas)
-	if m.Spec.Completions < 1 {
+	if m.Spec.Pods < 1 {
 		fmt.Printf("😥️ Completions must be >= 1.")
 		return false
 	}

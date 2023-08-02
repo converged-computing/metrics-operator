@@ -91,7 +91,7 @@ func (r *MetricSetReconciler) ensureJobSet(
 
 		var js *jobset.JobSet
 		if set.HasApplication() {
-			r.Log.Info("Creating application JobSet for MetricSet")
+			r.Log.Info("Creating application or standalone JobSet for MetricSet")
 			js, err = mctrl.GetApplicationJobSet(set, metrics)
 
 		} else if set.HasStorage() {
@@ -99,15 +99,18 @@ func (r *MetricSetReconciler) ensureJobSet(
 			js, err = mctrl.GetStorageJobSet(set, metrics)
 
 		} else {
-
-			// We shouldn't get here
-			r.Log.Info("A MetricSet must be for an application or storage.")
-			return js, ctrl.Result{}, err
+			r.Log.Info("Assuming standalone MetricSet.")
+			js, err = mctrl.GetStandaloneJobSet(set, metrics, map[string]api.Volume{}, false)
 		}
 		ctrl.SetControllerReference(set, js, r.Scheme)
 		if err != nil {
 			return js, ctrl.Result{}, err
 		}
+		r.Log.Info(
+			"🎉 Creating Metrics JobSet 🎉",
+			"Namespace:", js.Namespace,
+			"Name:", js.Name,
+		)
 		err = r.Client.Create(ctx, js)
 		if err != nil {
 			r.Log.Error(

@@ -17,6 +17,7 @@ type IOStat struct {
 	completions         int32
 	description         string
 	container           string
+	standalone          bool
 	requiresApplication bool
 	requiresStorage     bool
 }
@@ -34,6 +35,10 @@ func (m IOStat) Description() string {
 // Container
 func (m IOStat) Image() string {
 	return m.container
+}
+
+func (m IOStat) Standalone() bool {
+	return m.standalone
 }
 
 // WorkingDir does not matter
@@ -91,6 +96,7 @@ func init() {
 			description:         "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
 			requiresApplication: false,
 			requiresStorage:     true,
+			standalone:          false,
 			container:           "ghcr.io/converged-computing/metric-sysstat:latest",
 		})
 }

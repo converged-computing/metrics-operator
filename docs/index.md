@@ -1,7 +1,5 @@
 # The Metrics Operator
 
-<img style="width:50%" alt="Coming Soon" src="_static/images/coming-soon.png">
-
 Welcome to the Metrics Operator Documentation!
 
 The Metrics Operator is a Kubernetes Cluster [Operator](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/)

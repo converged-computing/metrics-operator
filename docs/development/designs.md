@@ -32,16 +32,17 @@ That looks like this:
 ![img/storage-pod.png](img/storage-pod.png)
 
 
-### Networking
+### Standalone
 
-**not implemented yet**
+A standalone metric does not require an application container or a storage specification, but rather uses a "standalone" setting that indicates it runs on its own. As an example, for a networking tool that uses MPI to run across nodes, we can set the number of pods (via the indexed job) to a number greater than 1, and then we will be making an indexed job with that many pods to run the command.  That might look like this:
 
-For this I am planning a similar design to the above two, except we won't need a shared process namespace or a volume. We can simply create an indexed job with the tool, and then (already implemented) use the shared network (headless service) for the tool to test communication between pods. This will likely need resources exposed to ensure one pod / hostname, so we will add that. I am first going to test this with Netmark, and then look into other HPC network testing tools.
+![img/standalone-metric.png](img/standalone-metric.png)
 
-### Others
-
-
-There are likely others (and I need to think about it)
+We don't technically need a shared process space, a storage setup, or an application. 
+And actually, that headless service that provides the network is available for storage
+or applications as well - we just don't use them in the previous example! The ability
+to scale (via a number of pods > 1) is also a feature of storage and services if your
+tool requires that.
 
 
 ## Database for Metric Storage
@@ -50,4 +51,4 @@ I want to try creating a consistent database that can be used to store metrics a
 separately. Best case, we can manage it for them, or (better) not require it at all.
 I don't want anything complicated (I don't want to re-create prometheus or a monitoring service!)
 
- - Original diagrams are available on [Excalidraw](https://excalidraw.com/#json=U1quv0he2C1VpqenUBpa6,Rk-sw8Ku5iqdsSC49aJOBw)
+ - Original diagrams are available on [Excalidraw](https://excalidraw.com/#json=GSpMds50rqhuwMARRNcgA,m3HHKWx2hwNnWoS8GxoTzg)

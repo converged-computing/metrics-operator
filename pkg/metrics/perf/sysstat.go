@@ -19,6 +19,7 @@ type PidStat struct {
 	container           string
 	requiresApplication bool
 	requiresStorage     bool
+	standalone          bool
 }
 
 // Name returns the metric name
@@ -39,6 +40,10 @@ func (m PidStat) Image() string {
 // WorkingDir does not matter
 func (m PidStat) WorkingDir() string {
 	return ""
+}
+
+func (m PidStat) Standalone() bool {
+	return m.standalone
 }
 
 // Set custom options / attributes for the metric
@@ -118,6 +123,7 @@ func init() {
 			description:         "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
 			requiresApplication: true,
 			requiresStorage:     false,
+			standalone:          false,
 			container:           "ghcr.io/converged-computing/metric-sysstat:latest",
 		})
 }

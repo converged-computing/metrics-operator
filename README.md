@@ -10,7 +10,6 @@ View our ⭐️ [Documentation](https://converged-computing.github.io/metrics-op
 
 ## Dinosaur TODO
 
-- Add networking implementation and test netmark
 - Add tests as proper tests in CI
 - **Bug that config map not cleaning up with deletion**
 - Need a strategy for storing metrics output / logs

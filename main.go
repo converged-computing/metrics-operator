@@ -35,6 +35,7 @@ import (
 
 	// Metrics are registered here! Importing registers once
 	_ "github.com/converged-computing/metrics-operator/pkg/metrics/io"
+	_ "github.com/converged-computing/metrics-operator/pkg/metrics/network"
 	_ "github.com/converged-computing/metrics-operator/pkg/metrics/perf"
 	//+kubebuilder:scaffold:imports
 )

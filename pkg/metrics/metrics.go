@@ -29,6 +29,7 @@ type Metric interface {
 	// Indicates that the metric requires an application to measure
 	RequiresApplication() bool
 	RequiresStorage() bool
+	Standalone() bool
 	Description() string
 	Name() string
 	SetOptions(*api.Metric)
