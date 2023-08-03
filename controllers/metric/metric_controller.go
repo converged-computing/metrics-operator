@@ -112,7 +112,7 @@ func (r *MetricSetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	metrics := []mctrl.Metric{}
 
 	for _, metric := range set.Spec.Metrics {
-		m, err := mctrl.GetMetric(&metric)
+		m, err := mctrl.GetMetric(&metric, &set)
 		if err != nil {
 			r.Log.Info(fmt.Sprintf("🧀️ We cannot find a metric named %s!", metric.Name))
 			return ctrl.Result{}, nil

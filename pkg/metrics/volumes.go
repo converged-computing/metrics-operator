@@ -43,7 +43,7 @@ func getVolumeMounts(
 }
 
 // getVolumes adds expected entrypoints along with addedvolumes (storage or applications)
-func getVolumes(
+func GetVolumes(
 	set *api.MetricSet,
 	metrics *[]Metric,
 	addedVolumes map[string]api.Volume,

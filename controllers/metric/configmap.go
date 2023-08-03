@@ -45,11 +45,17 @@ func (r *MetricSetReconciler) ensureConfigMaps(
 
 		r.Log.Info("ConfigMaps", "Status", "Not found and creating")
 
-		// Prepare lookup of entrypoints, one per metric script.
+		// Prepare lookup of entrypoints, one per application/storage,
+		// or possible multiple for a standalone metric
 		data := map[string]string{}
 		for i, m := range *metrics {
-			key := fmt.Sprintf("entrypoint-%d", i)
-			data[key] = m.EntrypointScript(set)
+			for _, es := range m.EntrypointScripts(set) {
+				key := es.Name
+				if key == "" {
+					key = fmt.Sprintf("entrypoint-%d", i)
+				}
+				data[key] = es.Script
+			}
 		}
 		cm, result, err := r.getConfigMap(ctx, set, data)
 		if err != nil {

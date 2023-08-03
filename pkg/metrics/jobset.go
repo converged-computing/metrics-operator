@@ -62,10 +62,18 @@ func getBaseJobSet(set *api.MetricSet, successSet []string) *jobset.JobSet {
 }
 
 // getReplicatedJob returns the base of the replicated job
-func getReplicatedJob(
+func GetReplicatedJob(
 	set *api.MetricSet,
 	shareProcessNamespace bool,
+	pods int32,
+	completions int32,
+	jobname string,
 ) *jobset.ReplicatedJob {
+
+	// Default replicated job name, if not set
+	if jobname == "" {
+		jobname = replicatedJobName
+	}
 
 	// Pod labels from the MetricSet
 	podLabels := set.GetPodLabels()
@@ -77,7 +85,7 @@ func getReplicatedJob(
 
 	// We only expect one replicated job (for now) so give it a short name for DNS
 	job := jobset.ReplicatedJob{
-		Name: replicatedJobName,
+		Name: jobname,
 		Template: batchv1.JobTemplateSpec{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      set.Name,
@@ -93,8 +101,8 @@ func getReplicatedJob(
 	// Create the JobSpec for the job -> Template -> Spec
 	jobspec := batchv1.JobSpec{
 		BackoffLimit:          &backoffLimit,
-		Parallelism:           &set.Spec.Pods,
-		Completions:           &set.Spec.Completions,
+		Parallelism:           &pods,
+		Completions:           &completions,
 		CompletionMode:        &completionMode,
 		ActiveDeadlineSeconds: &set.Spec.DeadlineSeconds,
 
@@ -134,24 +142,18 @@ func getReplicatedJob(
 // For a storage metric, the metrics are the main containers, at some
 // replica level (completions) with shared volumes
 func GetStorageJobSet(set *api.MetricSet, metrics *[]Metric) (*jobset.JobSet, error) {
+
+	// A base JobSet can hold one or more replicated jobs
 	js := getBaseJobSet(set, []string{replicatedJobName})
 
-	// TODO move this function + the getContainers into a common one -
-	// we should loop over each metric to make a jobset / containers
-	// Perhaps we can have a "set" level function that yields the replicatedJobs?
-	// If each metric can define its own jobset, and indexed by size, then
-	// we can create a replicated job named by the size, and then add
-	// containers to it.
-	// each replicated job still needs a completions / indexed mode.
-	// Perhaps we allow a metric to create one off replicated Jobs?
 	// We don't need a shared process namespace here
-	job := getReplicatedJob(set, false)
+	job := GetReplicatedJob(set, false, set.Spec.Pods, set.Spec.Completions, "")
 
 	// Volumes for job template and containers
 	volumes := map[string]api.Volume{"storage": set.Spec.Storage.Volume}
 
 	// Add volumes for storage
-	job.Template.Spec.Template.Spec.Volumes = getVolumes(set, metrics, volumes)
+	job.Template.Spec.Template.Spec.Volumes = GetVolumes(set, metrics, volumes)
 
 	// Derive the containers, one per metric, and volumes are included
 	containers, err := getContainers(set, metrics, volumes)
@@ -177,6 +179,7 @@ func GetApplicationJobSet(set *api.MetricSet, metrics *[]Metric) (*jobset.JobSet
 }
 
 // Create a standalone JobSet, one without volumes or application
+// This will be definition be a JobSet for only one metric
 func GetStandaloneJobSet(
 	set *api.MetricSet,
 	metrics *[]Metric,
@@ -184,19 +187,32 @@ func GetStandaloneJobSet(
 	shareProcessNamespace bool,
 ) (*jobset.JobSet, error) {
 
-	js := getBaseJobSet(set, []string{replicatedJobName})
-	job := getReplicatedJob(set, shareProcessNamespace)
+	m := (*metrics)[0]
 
-	// Add volumes expecting an application.
-	job.Template.Spec.Template.Spec.Volumes = getVolumes(set, metrics, volumes)
-
-	// Derive the containers, one per metric
-	// This will also include mounts for volumes
-	containers, err := getContainers(set, metrics, volumes)
+	// Create JobSet container
+	js := getBaseJobSet(set, m.SuccessJobs())
+	rjs, err := m.ReplicatedJobs(set, metrics)
 	if err != nil {
 		return js, err
 	}
-	job.Template.Spec.Template.Spec.Containers = containers
-	js.Spec.ReplicatedJobs = []jobset.ReplicatedJob{*job}
-	return js, err
+
+	// If we return no replicated jobs, fall back to default
+	if len(rjs) == 0 {
+		job := GetReplicatedJob(set, shareProcessNamespace, set.Spec.Pods, set.Spec.Completions, "")
+
+		// Add volumes expecting an application.
+		job.Template.Spec.Template.Spec.Volumes = GetVolumes(set, metrics, volumes)
+		rjs = []jobset.ReplicatedJob{*job}
+
+		// Derive the containers, one per metric
+		// This will also include mounts for volumes
+		containers, err := getContainers(set, metrics, volumes)
+		if err != nil {
+			return js, err
+		}
+		job.Template.Spec.Template.Spec.Containers = containers
+	}
+
+	js.Spec.ReplicatedJobs = rjs
+	return js, nil
 }

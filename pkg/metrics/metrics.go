@@ -15,11 +15,20 @@ import (
 	"log"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 )
 
 var (
 	Registry = make(map[string]Metric)
 )
+
+// A StorageMetric is intended to measure a storage interface
+type StorageMetric interface {
+	Description() string
+	Name() string
+	SetOptions(*api.Metric)
+	Validate(*api.MetricSet) bool
+}
 
 // A Metric defines a generic interface for the operator to interact with
 // The functionality of different metric types might vary based on the type
@@ -33,16 +42,21 @@ type Metric interface {
 	Description() string
 	Name() string
 	SetOptions(*api.Metric)
+	Validate(*api.MetricSet) bool
+
+	// Functions for standalone metrics
+	ReplicatedJobs(*api.MetricSet, *[]Metric) ([]jobset.ReplicatedJob, error)
+	SuccessJobs() []string
 
 	// Container specific attributes!
-	// Get the entrypoint script, intended to be written to a config map
-	EntrypointScript(*api.MetricSet) string
+	// Entrypoint scripts, with
+	EntrypointScripts(*api.MetricSet) []EntrypointScript
 	WorkingDir() string
 	Image() string
 }
 
 // GetMetric returns the Component specified by name from `Registry`.
-func GetMetric(metric *api.Metric) (Metric, error) {
+func GetMetric(metric *api.Metric, set *api.MetricSet) (Metric, error) {
 	if _, ok := Registry[metric.Name]; ok {
 		m := Registry[metric.Name]
 
@@ -50,6 +64,10 @@ func GetMetric(metric *api.Metric) (Metric, error) {
 		if m.RequiresApplication() && m.RequiresStorage() {
 			return nil, fmt.Errorf("%s cannot be for an application and storage", metric.Name)
 		}
+		if !m.Validate(set) {
+			return nil, fmt.Errorf("%s is not valid", metric.Name)
+		}
+
 		// Set global and custom options on the registry metric from the CRD
 		m.SetOptions(metric)
 		return m, nil

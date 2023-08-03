@@ -9,7 +9,10 @@ of interest, for which we currently support application and storage (discussed b
 
 ### Metrics
 
-We provide support to measure the following types of metrics:
+TODO if the design of these is separate, maybe make a separate top level class for each?
+That would be better organized...
+We provide support to measure three types of metrics, "performance", "storage", and "standalone.
+" For each of "performance" and "storage" are assumed to be 
 
 ### Performance
 
@@ -34,7 +37,8 @@ That looks like this:
 
 ### Standalone
 
-A standalone metric does not require an application container or a storage specification, but rather uses a "standalone" setting that indicates it runs on its own. As an example, for a networking tool that uses MPI to run across nodes, we can set the number of pods (via the indexed job) to a number greater than 1, and then we will be making an indexed job with that many pods to run the command.  That might look like this:
+A standalone metric does not require an application container or a storage specification, but rather uses a "standalone" setting that indicates it runs on its own. This is also enforced in design - since a standalone metric has finer control of the underlying JobSet, as a metric
+it must be run on its own. As an example, for a networking tool that uses MPI to run across nodes, we can set the number of pods (via the indexed job) to a number greater than 1, and then we will be making an indexed job with that many pods to run the command.  That might look like this:
 
 ![img/standalone-metric.png](img/standalone-metric.png)
 
