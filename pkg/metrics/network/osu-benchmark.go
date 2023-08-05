@@ -154,11 +154,23 @@ func (m OSUBenchmark) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJo
 	return js, nil
 }
 
+// Determine if the command is poised to run
+func (m *OSUBenchmark) hasCommand(command string) bool {
+	_, exists := m.lookup[command]
+	return exists
+}
+
+func (m *OSUBenchmark) addCommand(command string) {
+	m.commands = append(m.commands, command)
+	m.lookup[command] = true
+}
+
 // Set custom options / attributes for the metric
 func (m *OSUBenchmark) SetOptions(metric *api.Metric) {
 	m.rate = metric.Rate
 	m.completions = metric.Completions
 	m.lookup = map[string]bool{}
+	m.commands = []string{}
 
 	// We are allowed to specify just one command
 	opts, ok := metric.ListOptions["commands"]
@@ -166,16 +178,16 @@ func (m *OSUBenchmark) SetOptions(metric *api.Metric) {
 		// Parse list options that are valid
 		for _, opt := range opts {
 			_, ok := osuBenchmarkCommands[opt.StrVal]
-			_, exists := m.lookup[opt.StrVal]
-			if ok && !exists {
-				m.commands = append(m.commands, opt.StrVal)
-				m.lookup[opt.StrVal] = true
+			if ok && !m.hasCommand(opt.StrVal) {
+				m.addCommand(opt.StrVal)
 			}
 		}
 	}
 	if len(m.commands) == 0 {
 		for command := range osuBenchmarkCommands {
-			m.commands = append(m.commands, command)
+			if !m.hasCommand(command) {
+				m.addCommand(command)
+			}
 		}
 	}
 }
