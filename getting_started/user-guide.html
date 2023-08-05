@@ -407,6 +407,60 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span title="/getting_started/user-guide.md#usage (reference label)" class="md-ellipsis">Usage</span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span title="/getting_started/user-guide.md#overview (reference label)" class="md-ellipsis">Overview</span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metrics" class="md-nav__link">
+    <span title="/getting_started/user-guide.md#metrics (reference label)" class="md-ellipsis">Metrics</span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Metrics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#application-metric-set" class="md-nav__link">
+    <span title="/getting_started/user-guide.md#application-metric-set (reference label)" class="md-ellipsis">Application Metric Set</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#storage-metric" class="md-nav__link">
+    <span title="/getting_started/user-guide.md#storage-metric (reference label)" class="md-ellipsis">Storage Metric</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#standalone-metric" class="md-nav__link">
+    <span title="/getting_started/user-guide.md#standalone-metric (reference label)" class="md-ellipsis">Standalone Metric</span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#containers-available" class="md-nav__link">
     <span title="/getting_started/user-guide.md#containers-available (reference label)" class="md-ellipsis">Containers Available</span>
   </a>
@@ -431,40 +485,6 @@
           <li class="md-nav__item">
   <a href="#helm-install" class="md-nav__link">
     <span title="/getting_started/user-guide.md#helm-install (reference label)" class="md-ellipsis">Helm Install</span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#usage" class="md-nav__link">
-    <span title="/getting_started/user-guide.md#usage (reference label)" class="md-ellipsis">Usage</span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Usage">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#application-metrics" class="md-nav__link">
-    <span title="/getting_started/user-guide.md#application-metrics (reference label)" class="md-ellipsis">Application Metrics</span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#storage-metric" class="md-nav__link">
-    <span title="/getting_started/user-guide.md#storage-metric (reference label)" class="md-ellipsis">Storage Metric</span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#standalone-metric" class="md-nav__link">
-    <span title="/getting_started/user-guide.md#standalone-metric (reference label)" class="md-ellipsis">Standalone Metric</span>
   </a>
   
 </li>
@@ -613,8 +633,162 @@
 
 <h1 id="user-guide">User Guide<a class="headerlink" href="#user-guide" title="Permalink to this heading">¶</a></h1>
 <p>Welcome to the Metrics Operator user guide! If you come here, we are assuming you have a cluster
-with the Metrics Operator installed and are interested to submit your own <a class="reference internal" href="custom-resource-definition.html"><span class="std std-doc">custom resource</span></a> to create a MetricSet, or that someone has already done it for you. If you are a developer wanting to work
-on new functionality or features, see our <a class="reference internal" href="../development/index.html"><span class="std std-doc">Developer Guides</span></a> instead.</p>
+with the Metrics Operator installed and are interested to submit your own <a class="reference internal" href="custom-resource-definition.html"><span class="std std-doc">custom resource</span></a> to create a MetricSet, or that someone has already done it for you. If you are a developer wanting to work on new functionality or features, see our <a class="reference internal" href="../development/index.html"><span class="std std-doc">Developer Guides</span></a> instead.</p>
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
+<h3 id="overview">Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h3>
+<p>Our “MetricSet” is mirroring the design of a <a class="reference external" href="https://github.com/kubernetes-sigs/jobset/">JobSet</a>, which can combine multiple different things (i.e., metrics) into a cohesive unit.
+When you create a MetricSet using this operator, we assume that you are primarily interested in measuring an application performance, collecting storage metrics, or
+using a custom metric provided by the operator that has less stringent requirements.</p>
+<details>
+<summary>Logic Flow of Metrics Operator</summary>
+<p>Given the above assumption, the logic flow of the operator works as follows:</p>
+<ol class="arabic simple">
+<li><p>You write a metrics.yaml file that optionally includes an application OR storage description or neither for a custom metric. Typically, you’d provide an application for performance metrics, and storage for IO/filesystem metrics, and neither for a custom metric. In simpler terms, we have three types of MetricSet - Application Metric Sets, Storage Metric Sets, and Standalone Metric Sets.</p></li>
+<li><p>You also include a list of metrics. Each metric you choose is associated with a type (internal to the operator) that can match to an Application, Storage, or Standalone Metric set. Don’t worry, this is checked for you, and you can use our <strong>TBA</strong> metrics registry to find metrics of interest.</p></li>
+<li><p>The operator will create a JobSet for your metrics set. The structure of this JobSet depends on the type (see more below under <a class="reference internal" href="#metrics"><span class="std std-ref">metrics</span></a>). Generally:</p></li>
+</ol>
+<ul class="simple">
+<li><p>Application metrics create a JobSet with each metric as a sidecar container sharing the process namespace to monitor (they can be given volumes if needed)</p></li>
+<li><p>Storage metrics deploy the metrics as containers and give them access to the volume</p></li>
+<li><p>Standalone metrics can do any custom design needed, and do not require application or storage (but can be provided storage volumes)</p></li>
+</ul>
+</details>
+<p>Generally, you’ll be defining an application container with one or more metrics to assess performance, or a storage solution with the same, but metrics to assess IO. There are several modes of operation, depending on your choice of metrics.</p>
+<h2 id="metrics">Metrics<a class="headerlink" href="#metrics" title="Permalink to this heading">¶</a></h2>
+<p>For all metric types, the following applies:</p>
+<ol class="arabic simple">
+<li><p>You can create more than one pod (scale the metric) as you see fit.</p></li>
+<li><p>There is always a headless service provided for metrics within the JobSet to make use of</p></li>
+<li><p>The definition of metrics in your metrics.yaml file is consistent across types</p></li>
+<li><p>Each metric type in the list can take a rate, completions, and custom options.</p></li>
+</ol>
+<p>For another overview of these designs, please see the <a class="reference internal" href="../development/index.html"><span class="std std-doc">developer docs</span></a>.</p>
+<h3 id="application-metric-set">Application Metric Set<a class="headerlink" href="#application-metric-set" title="Permalink to this heading">¶</a></h3>
+<blockquote>
+<div><p>An application metric set includes one or more metrics for measuring application performance.</p>
+</div></blockquote>
+<p>Let’s walk through an example. In the image below, you want to run one or more custom metrics to measure performance for your application of choice.</p>
+<p><img alt="img/application-metric-set-diagram.png" src="../_images/application-metric-set-diagram.png" /></p>
+<p>You’ll do this by writing a metrics.yaml file (left panel) that defines the application of interest, which in this case in LAMMPS.
+This will be handed to the metrics operator (middle panel) that will validate your MetricSet and prepare to deploy, and
+the result is a JobSet (right panel) that includes a Job with one or more containers alongside your application.
+Let’s look at this process in more detail. Here is what the metrics.yaml file might look like.
+Note that the image above defines two metrics, but the YAML file below only shows a list of one.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flux-framework.org/v1alpha1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MetricSet</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">labels</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">app.kubernetes.io/name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">metricset</span>
+<span class="w">    </span><span class="nt">app.kubernetes.io/instance</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">metricset-sample</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">metricset-sample</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">application</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/rse-ops/vanilla-lammps:tag-latest</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun lmp -v x 1 -v y 1 -v z 1 -in in.reaxc.hns -nocite</span>
+<span class="w">  </span><span class="nt">metrics</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">perf-sysstat</span>
+</code></pre></div>
+</div>
+<p>It was a design choice that using an application container in this context requires no changes to the container itself.
+You simply need to know what the entrypoint command is, and this will allow the metric sidecar containers to monitor it.
+In our case, for our command we are issuing <code class="docutils literal notranslate"><span class="pre">mpirun</span></code>, and that’s what we want to monitor. Thus, the <code class="docutils literal notranslate"><span class="pre">image</span></code> and <code class="docutils literal notranslate"><span class="pre">command</span></code> attributes are the
+only two required for a basic application setup. For the next section, “metrics” we’ve found an application metric (so it can be used for an
+Application Metric Set) that we like called <code class="docutils literal notranslate"><span class="pre">perf-sysstat</span></code>, and we add it to the list. We could easily have added more, because one
+application run can be monitored by several tools, but we will keep it simple for this example. Next, let’s submit this to the metrics operator.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>metrics.yaml
+</code></pre></div>
+</div>
+<p>When the operator receives the custom resource, it will do some obvious validation, like did you provide application metrics for an application?
+Did you provide all the required fields? Did you only provide a definition for one metric type? Any errors will result in not creating the MetricSet,
+and an error in the operator logs. Given that you’ve provided a valid custom resource YAML and one or more application metrics
+that the operator knows, it will then select your metrics from the set it has internally defined (middle panel). This panel shows that
+the operator knows about several application (green), storage (yellow), and standalone (red) metrics, and it’s going
+to combine them into a JobSet that includes your application container to allow each metric to assess performance.</p>
+<p><img alt="img/application-metric-set.png" src="../_images/application-metric-set1.png" /></p>
+<p>Focusing on the third panel, the way this works is that we create a JobSet with a single replicated job with multiple containers.
+One container is for your application, and the others are sidecar containers that are running the metrics. Again, because of this design
+you don’t need to customize or tweak your application container! By way of the shared process namespace and knowing the command you’ve
+executed, the sidecar containers can easily “peek in” to your application container to monitor the process and save metrics.
+For this application metric set design, all containers should complete to determine success of the JobSet, and we currently
+rely on pod logs to get output, however we hope to have a more solid solution for this in the future.</p>
+<h3 id="storage-metric">Storage Metric<a class="headerlink" href="#storage-metric" title="Permalink to this heading">¶</a></h3>
+<blockquote>
+<div><p>A storage metric set includes one or more metrics for assessing one or more volumes</p>
+</div></blockquote>
+<p>If you are interested in measuring the goodness of different kinds of volumes, you might be interested in creating a storage metric set! The design is similar
+to an application metrics set, however instead of an application of interest, you provide one or more storage volumes of interest. Here is a small
+example that assumes a host volume:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flux-framework.org/v1alpha1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MetricSet</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">labels</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">app.kubernetes.io/name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">metricset</span>
+<span class="w">    </span><span class="nt">app.kubernetes.io/instance</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">metricset-sample</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">metricset-sample</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">storage</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">volume</span><span class="p">:</span><span class="w"> </span>
+<span class="w">      </span><span class="c1"># This is the path on the host (e.g., inside kind container)</span>
+<span class="w">      </span><span class="nt">hostPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/tmp/workflow</span>
+
+<span class="w">      </span><span class="c1"># This is the path in the container</span>
+<span class="w">      </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/workflow</span>
+
+<span class="w">  </span><span class="nt">metrics</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">io-sysstat</span>
+<span class="w">      </span><span class="nt">rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span>
+<span class="w">      </span><span class="nt">completions</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+</code></pre></div>
+</div>
+<p>In the above, we want to use the storage metric called “io-sysstat” to assess a host volume at <code class="docutils literal notranslate"><span class="pre">/tmp/workflow</span></code> that is mounted to <code class="docutils literal notranslate"><span class="pre">/workflow</span></code> in the container. Since a volume
+could last forever (hypothetically) we ask for two completions 10 seconds apart each. This means we will get data for two timepoints from the metric, and after that,
+the assessment will be complete. We can also look at this visually:</p>
+<p><img alt="img/storage-metric-set-diagram.png" src="../_images/storage-metric-set-diagram.png" /></p>
+<p>In the above, we are providing storage metrics (the image has two despite the yaml above showing one) that the operator knows about, along with a storage volume that we want to test.
+The operator will prepare a JobSet with one replicated job and several containers, where one container is created per storage metric, and the volume bound to each.</p>
+<p><img alt="img/storage-metric-set.png" src="../_images/storage-metric-set1.png" /></p>
+<p>In simple terms, a storage metric set will use the volume of interest that you request, and run the tool there.
+Read/write is important here - e.g., if the metric needs to write to the volume, a read only volume won’t work. Setting up storage
+is complex, so it’s typically up for you to create the PVC and then the operator will create the volume for it. Keep in mind that you should
+honor RWX (read write many) vs just RW (read write) depending on the design you choose. Also note that by default, we only create one pod,
+but if appropriate you can scale up to more.</p>
+<h3 id="standalone-metric">Standalone Metric<a class="headerlink" href="#standalone-metric" title="Permalink to this heading">¶</a></h3>
+<blockquote>
+<div><p>A custom, standalone metric that doesn’t abide by any rules!</p>
+</div></blockquote>
+<p>The standalone metric is the most interesting of the set, as it doesn’t have a strict requirement for a storage or application definition.
+By definition, it is “standalone” because it’s going to create a custom JobSet setup for a metric of interest. Because we cannot be
+certain of how to combine different jobs within this JobSet, we currently only allow one standalone metric to be defined at once.
+This means that in the diagram below, you see online one standalone metric in the metrics.yaml</p>
+<p><img alt="img/standalone-metric-set-diagram.png" src="../_images/standalone-metric-set-diagram.png" /></p>
+<p>As an example, we can look at a standalone metric to run a tool called netmark.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flux-framework.org/v1alpha1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MetricSet</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">labels</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">app.kubernetes.io/name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">metricset</span>
+<span class="w">    </span><span class="nt">app.kubernetes.io/instance</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">metricset-sample</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">metricset-sample</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># Number of indexed jobs to run netmark on</span>
+<span class="w">  </span><span class="nt">pods</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">  </span><span class="nt">metrics</span><span class="p">:</span>
+<span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">network-netmark</span>
+
+<span class="w">     </span><span class="c1"># Custom options for netmark</span>
+<span class="w">     </span><span class="c1"># see pkg/metrics/network/netmark.go</span>
+<span class="w">     </span><span class="nt">options</span><span class="p">:</span>
+<span class="w">       </span><span class="nt">tasks</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+</code></pre></div>
+</div>
+<p>This is a standalone metric because it creates a JobSet with not one replicated job, but two! There is a launcher container
+to issue an <code class="docutils literal notranslate"><span class="pre">mpirun</span></code> command, and one or more worker containers that interact via MPI. This is a simple example, but any design
+for a JobSet could work here, and hence why the metric is standalone. However, it’s neat that the interface presented to you
+is consistent - it’s simply a matter of asking for the metric that is known to the operator to be a standalone.
+The image below also demonstrates that this standalone metric (along with storage or application) can be scaled to more
+than one pod, if appropriate.</p>
+<p><img alt="img/standalone-metric-set.png" src="../_images/standalone-metric-set1.png" /></p>
+<p>This metrics operator is early in design and subject to change! In the meantime, for more detail about this design, see the <a class="reference internal" href="../development/index.html"><span class="std std-doc">developer docs</span></a>.</p>
 <h2 id="containers-available">Containers Available<a class="headerlink" href="#containers-available" title="Permalink to this heading">¶</a></h2>
 <p>All containers are provided under <a class="reference external" href="https://github.com/converged-computing/metrics-operator/pkgs/container/metrics-operator">ghcr.io/converged-computing/metrics-operator</a>. The latest tag is the current main branch, a “bleeding edge” version, and we will provide releases when the operator is more stable.</p>
 <h2 id="install">Install<a class="headerlink" href="#install" title="Permalink to this heading">¶</a></h2>
@@ -662,16 +836,6 @@ $ helm pull oci://ghcr.io/converged-computing/metrics-operator-helm/chart
 <span class="go">TEST SUITE: None</span>
 </code></pre></div>
 </div>
-<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
-<p>Generally, you’ll be defining an application container with one or more metrics to assess performance, or a storage solution with the same, but metrics to assess IO. There are several modes of operation, depending on your choice of metrics.</p>
-<h3 id="application-metrics">Application Metrics<a class="headerlink" href="#application-metrics" title="Permalink to this heading">¶</a></h3>
-<p>An application with metrics will allow you to run the application, and measure one or more metrics alongside it. This is done via sidecar containers.</p>
-<h3 id="storage-metric">Storage Metric<a class="headerlink" href="#storage-metric" title="Permalink to this heading">¶</a></h3>
-<p>A storage or IO metric will simply create the volume of interest that you request, and run the tool there. Read/write is important here - e.g., if the metric needs to write to the volume, a read only volume won’t work.</p>
-<h3 id="standalone-metric">Standalone Metric<a class="headerlink" href="#standalone-metric" title="Permalink to this heading">¶</a></h3>
-<p>A standalone metric does not require special storage or an application! As an example,
-a networking metric can simply be run with some number of pods (via the indexed jobs).</p>
-<p>For more detail about this design, see the <a class="reference internal" href="../development/index.html"><span class="std std-doc">developer docs</span></a>.</p>
 
 
   <hr>
@@ -679,7 +843,7 @@ a networking metric can simply be run with some number of pods (via the indexed 
   <small>
     
       Last update:
-      Aug 02, 2023
+      Aug 05, 2023
     
   </small>
 </div>
