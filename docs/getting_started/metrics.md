@@ -38,6 +38,10 @@ These metrics are intended to assess storage volumes.
 
 This is the "iostat" executable of the sysstat library.
 
+|Name | Description | Type | Default |
+|-----|-------------|------------|------|
+| human | Show tabular, human-readable output inside of json | string "true" or "false" | "false" |
+
 ### Standalone
 
 #### network-netmark

@@ -53,6 +53,94 @@ If you peek at logs, you'll see the storage metric running once every 10 seconds
 ```bash
 $ kubectl logs metricset-sample-m-0-9pq6w 
 ```
+
+By default, non human readable output is presented in blocks of json:
+
+<details>
+
+<summary>Default output in JSON</summary>
+
+```console
+IOSTAT TIMEPOINT 2
+{"sysstat": {
+        "hosts": [
+                {
+                        "nodename": "metricset-sample-m-0-vht9l.ms.default.svc.cluster.local",
+                        "sysname": "Linux",
+                        "release": "5.15.0-78-generic",
+                        "machine": "x86_64",
+                        "number-of-cpus": 8,
+                        "date": "08/05/23",
+                        "statistics": [
+                                {
+                                        "disk": [
+                                                {"disk_device": "loop0", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.17, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 19.81, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop1", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.29, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 15.26, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop10", "r/s": 0.07, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.29, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 29.14, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.02},
+                                                {"disk_device": "loop11", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.15, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 17.01, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop12", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.47, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 30.58, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop13", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.17, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 17.12, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop14", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.17, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 17.69, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop15", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.30, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 18.67, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop16", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.25, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 12.75, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop17", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.29, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 19.47, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop18", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.24, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 14.75, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop19", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.24, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 19.98, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop2", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.00, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 1.21, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop20", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.32, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 14.83, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop21", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.17, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 20.83, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop22", "r/s": 0.30, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.01, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.16, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 22.91, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.02},
+                                                {"disk_device": "loop23", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.20, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 19.47, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop24", "r/s": 0.01, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.33, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 36.41, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop25", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.14, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 3.31, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop26", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.07, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 2.84, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop27", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.15, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 1.91, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop28", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.11, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 2.58, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop29", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.16, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 18.67, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop3", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.11, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 12.48, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop30", "r/s": 0.01, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.03, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 5.45, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop31", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.15, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 20.81, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop32", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.32, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 14.91, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop33", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.12, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 8.08, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop34", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.56, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 29.21, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop35", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.05, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 2.70, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop36", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.10, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 10.85, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop37", "r/s": 0.69, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.04, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.27, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 55.50, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.08},
+                                                {"disk_device": "loop4", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.23, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 15.54, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop5", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.19, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 20.85, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop6", "r/s": 0.06, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.19, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 37.32, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.02},
+                                                {"disk_device": "loop7", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.14, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 8.12, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop8", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.24, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 6.02, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "loop9", "r/s": 0.00, "w/s": 0.00, "d/s": 0.00, "f/s": 0.00, "rMB/s": 0.00, "wMB/s": 0.00, "dMB/s": 0.00, "rrqm/s": 0.00, "wrqm/s": 0.00, "drqm/s": 0.00, "rrqm": 0.00, "wrqm": 0.00, "drqm": 0.00, "r_await": 0.16, "w_await": 0.00, "d_await": 0.00, "f_await": 0.00, "rareq-sz": 7.76, "wareq-sz": 0.00, "dareq-sz": 0.00, "aqu-sz": 0.00, "util": 0.00},
+                                                {"disk_device": "nvme0n1", "r/s": 34.53, "w/s": 38.88, "d/s": 0.00, "f/s": 4.12, "rMB/s": 0.73, "wMB/s": 0.88, "dMB/s": 0.00, "rrqm/s": 17.17, "wrqm/s": 31.12, "drqm/s": 0.00, "rrqm": 33.21, "wrqm": 44.45, "drqm": 0.00, "r_await": 0.33, "w_await": 5.25, "d_await": 0.00, "f_await": 0.38, "rareq-sz": 21.51, "wareq-sz": 23.11, "dareq-sz": 0.00, "aqu-sz": 0.22, "util": 3.54}
+                                        ]
+                                }
+                        ]
+                }
+        ]
+}}
+```
+
+</details>
+
+
+But if you add an option for human readable, e.g.,
+
+```yaml
+metrics:
+  - name: io-sysstat
+    rate: 10
+    completions: 2
+    options:
+      human: true
+```
+
+You'll see a more tabular format:
+
+<details>
+
+<summary>Output with options->human set to "true"</summary>
+
 ```console
 IOSTAT TIMEPOINT 10
 Linux 5.15.0-76-generic (metricset-sample-m-0-c9gqj)    08/01/23        _x86_64_        (8 CPU)
@@ -102,6 +190,9 @@ loop8             0.00         0.03         0.00         0.00      63564        
 loop9             0.02         0.96         0.00         0.00    2318794          0          0
 nvme0n1          53.05       512.13       640.93       109.00 1232624135 1542636186  262339888
 ```
+
+</details>
+
 
 The jobset, associated jobs, and pods will be completed:
 
