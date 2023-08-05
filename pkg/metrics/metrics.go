@@ -24,8 +24,10 @@ var (
 
 // A general metric produces a JobSet with one or more replicated Jobs
 type Metric interface {
-	Description() string
 	Name() string
+	Description() string
+	Url() string
+
 	SetOptions(*api.Metric)
 	Validate(*api.MetricSet) bool
 

@@ -17,3 +17,28 @@ div.sphx-glr-download a {
 div.sphx-glr-download a:hover {
   background-color: gold !important;
 }
+
+.docutils table {
+  font-family: Arial, Helvetica, sans-serif;
+  width: 100%;
+  border: 0px !important;
+}
+
+.docutils td, .docutils th {
+  border: 1px solid black;
+  padding: 8px;
+}
+
+.docutils tr:hover {background-color: #8e39be;}
+
+.docutils td, th {
+  border: none!important;
+}
+
+.docutils th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #7e56c2;
+  color: white;
+}

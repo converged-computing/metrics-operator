@@ -59,6 +59,9 @@ type Netmark struct {
 func (m Netmark) Name() string {
 	return m.name
 }
+func (m Netmark) Url() string {
+	return ""
+}
 
 // Description returns the metric description
 func (m Netmark) Description() string {

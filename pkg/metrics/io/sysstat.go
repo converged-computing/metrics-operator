@@ -34,6 +34,9 @@ type IOStat struct {
 func (m IOStat) Name() string {
 	return m.name
 }
+func (m IOStat) Url() string {
+	return "https://github.com/sysstat/sysstat"
+}
 
 // Description returns the metric description
 func (m IOStat) Description() string {

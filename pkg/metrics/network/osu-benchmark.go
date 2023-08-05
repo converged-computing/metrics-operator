@@ -62,6 +62,9 @@ func (m OSUBenchmark) Name() string {
 func (m OSUBenchmark) Description() string {
 	return m.description
 }
+func (m OSUBenchmark) Url() string {
+	return "https://mvapich.cse.ohio-state.edu/benchmarks/"
+}
 
 // Jobs required for success condition (l is the osu benchmark launcher)
 func (m OSUBenchmark) SuccessJobs() []string {
@@ -267,7 +270,7 @@ func init() {
 	metrics.Register(
 		&OSUBenchmark{
 			name:              "network-osu-benchmark",
-			description:       "point to point MPI benchmarks, see https://mvapich.cse.ohio-state.edu/benchmarks/",
+			description:       "point to point MPI benchmarks",
 			container:         "ghcr.io/converged-computing/metric-osu-benchmark:latest",
 			workerScript:      "/metrics_operator/osu-worker.sh",
 			launcherScript:    "/metrics_operator/osu-launcher.sh",
