@@ -51,6 +51,9 @@ func (m PidStat) Image() string {
 func (m PidStat) WorkingDir() string {
 	return ""
 }
+func (m PidStat) Url() string {
+	return "https://github.com/sysstat/sysstat"
+}
 
 // Set custom options / attributes for the metric
 func (m *PidStat) SetOptions(metric *api.Metric) {

@@ -316,6 +316,10 @@ clean:
 helm: manifests kustomize helmify
 	$(KUSTOMIZE) build config/default | $(HELMIFY)
 
+.PHONY: docs-data
+docs-data: 
+	go run hack/docs-gen/main.go docs/_static/data/metrics.json
+
 .PHONY: pre-push
-pre-push: generate build-config-arm build-config
+pre-push: generate build-config-arm build-config docs-data
 	git status

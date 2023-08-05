@@ -11,9 +11,9 @@ View our ⭐️ [Documentation](https://converged-computing.github.io/metrics-op
 ## Dinosaur TODO
 
 - Find better logging library for logging outside of controller
+- We should have Python SDK with parsers for output (e.g., run metric, parse output meaningfully)
 - Need a strategy for storing metrics output / logs
 - For services we are measuring, we likely need to be able to kill after N seconds (to complete job) or to specify the success policy on the metrics containers instead of the application
-- We should have a metrics registry that clearly shows metrics available and their types.
 - Start releasing earlier this time :)
 - TBA
 

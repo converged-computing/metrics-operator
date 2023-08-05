@@ -23,16 +23,20 @@ import (
 // https://github.com/sysstat/sysstat
 
 type IOStat struct {
-	name        string
-	rate        int32
-	completions int32
-	description string
-	container   string
+	name          string
+	rate          int32
+	completions   int32
+	description   string
+	container     string
+	humanReadable bool
 }
 
 // Name returns the metric name
 func (m IOStat) Name() string {
 	return m.name
+}
+func (m IOStat) Url() string {
+	return "https://github.com/sysstat/sysstat"
 }
 
 // Description returns the metric description
@@ -59,6 +63,14 @@ func (m IOStat) Validate(set *api.MetricSet) bool {
 func (m *IOStat) SetOptions(metric *api.Metric) {
 	m.rate = metric.Rate
 	m.completions = metric.Completions
+
+	// Does the person want human readable instead of table?
+	value, ok := metric.Options["human"]
+	if ok {
+		if value.StrVal == "true" {
+			m.humanReadable = true
+		}
+	}
 }
 
 // Generate the replicated job for measuring the application
@@ -69,13 +81,17 @@ func (m *IOStat) SetOptions(metric *api.Metric) {
 // TODO if the app is too fast we might miss it?
 func (m IOStat) EntrypointScripts(set *api.MetricSet) []metrics.EntrypointScript {
 
+	command := "iostat -dxm -o JSON"
+	if m.humanReadable {
+		command = "iostat -dxm"
+	}
 	template := `#!/bin/bash
 i=0
 completions=%d
 while true
   do
     echo "IOSTAT TIMEPOINT ${i}"
-    iostat 
+	%s
 	# Note we can do iostat -o JSON
 	if [[ $completions -ne 0 ]] && [[ $i -eq $completions ]]; then
     	exit 0
@@ -89,7 +105,7 @@ done
 	// they are the same thing. We return an empty Name so it's automatically
 	// assigned
 	return []metrics.EntrypointScript{
-		{Script: fmt.Sprintf(template, m.completions, m.rate)},
+		{Script: fmt.Sprintf(template, m.completions, command, m.rate)},
 	}
 
 }
