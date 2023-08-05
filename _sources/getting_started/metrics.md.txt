@@ -1,20 +1,26 @@
 # Metrics
 
 The following metrics are under development (or being planned). These will be easier to add once I have the basic infrastructure for the different types!
+We will also be adding a better, more descriptive interface (registry) soon.
 
 ## Implemented Metrics
 
 ### Performance
 
+These metrics are intended to assess application performance.
+
  - *perf-sysstat*: the "pidstat" executable of the sysstat library.
 
 ### Storage
+
+These metrics are intended to assess storage volumes.
 
  - *io-sysstat*: the "iostat" executable of the sysstat library.
 
 ### Standalone
 
- - *network-netmark*: this is currently a private container/software, but we have support for it when it's ready to be made public.
+ - *network-netmark*: this is currently a private container/software, but we have support for it when it's ready to be made public (networking)
+ - *network-osu-benchmark*: point to point benchmarks for MPI (networking). If listOptions->commands not set, will use all one-point commands.
 
 ### Apps to be Measured
 

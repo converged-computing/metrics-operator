@@ -639,19 +639,23 @@
   </a>
 
 <h1 id="metrics">Metrics<a class="headerlink" href="#metrics" title="Permalink to this heading">¶</a></h1>
-<p>The following metrics are under development (or being planned). These will be easier to add once I have the basic infrastructure for the different types!</p>
+<p>The following metrics are under development (or being planned). These will be easier to add once I have the basic infrastructure for the different types!
+We will also be adding a better, more descriptive interface (registry) soon.</p>
 <h2 id="implemented-metrics">Implemented Metrics<a class="headerlink" href="#implemented-metrics" title="Permalink to this heading">¶</a></h2>
 <h3 id="performance">Performance<a class="headerlink" href="#performance" title="Permalink to this heading">¶</a></h3>
+<p>These metrics are intended to assess application performance.</p>
 <ul class="simple">
 <li><p><em>perf-sysstat</em>: the “pidstat” executable of the sysstat library.</p></li>
 </ul>
 <h3 id="storage">Storage<a class="headerlink" href="#storage" title="Permalink to this heading">¶</a></h3>
+<p>These metrics are intended to assess storage volumes.</p>
 <ul class="simple">
 <li><p><em>io-sysstat</em>: the “iostat” executable of the sysstat library.</p></li>
 </ul>
 <h3 id="standalone">Standalone<a class="headerlink" href="#standalone" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><em>network-netmark</em>: this is currently a private container/software, but we have support for it when it’s ready to be made public.</p></li>
+<li><p><em>network-netmark</em>: this is currently a private container/software, but we have support for it when it’s ready to be made public (networking)</p></li>
+<li><p><em>network-osu-benchmark</em>: point to point benchmarks for MPI (networking). If listOptions-&gt;commands not set, will use all one-point commands.</p></li>
 </ul>
 <h3 id="apps-to-be-measured">Apps to be Measured<a class="headerlink" href="#apps-to-be-measured" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">

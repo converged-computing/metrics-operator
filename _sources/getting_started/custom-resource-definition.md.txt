@@ -111,6 +111,10 @@ spec:
 
 This is usually suggested to provide for a storage metric.
 
+### options
+
+Metrics can take custom options, which are key value pairs of a string key and either string or integer value.
+
 ## Existing Volumes
 
 An existing volume can be provided to support an application (multiple) or one can be provided for assessing its performance (single).
