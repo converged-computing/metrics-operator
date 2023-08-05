@@ -75,4 +75,6 @@ I want to try creating a consistent database that can be used to store metrics a
 separately. Best case, we can manage it for them, or (better) not require it at all.
 I don't want anything complicated (I don't want to re-create prometheus or a monitoring service!)
 
- - Original diagrams are available on [Excalidraw](https://excalidraw.com/#json=3fEKWHnA1XydVxzlSpYc-,brAM5LOSg_bTcKcrBrYYwg)
+## Design Links
+
+ - Original diagrams (August 2023) are available on [Excalidraw](https://excalidraw.com/#json=ldENW1vScvb123alpXeHm,Q8k9VqoRGQSPrP23CztV5Q)
