@@ -37,7 +37,6 @@ func (r *MetricSetReconciler) exposeServices(
 		if errors.IsNotFound(err) {
 			_, err = r.createHeadlessService(ctx, set, selector)
 		}
-		return ctrl.Result{}, err
 	}
 	return ctrl.Result{}, err
 }

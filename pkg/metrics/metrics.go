@@ -48,9 +48,6 @@ type Metric interface {
 func GetMetric(metric *api.Metric, set *api.MetricSet) (Metric, error) {
 	if _, ok := Registry[metric.Name]; ok {
 		m := Registry[metric.Name]
-		if !m.Validate(set) {
-			return nil, fmt.Errorf("%s did not validate", metric.Name)
-		}
 
 		// Ensure the type is one acceptable
 		if !(m.Type() == ApplicationMetric || m.Type() == StorageMetric || m.Type() == StandaloneMetric) {
@@ -59,6 +56,12 @@ func GetMetric(metric *api.Metric, set *api.MetricSet) (Metric, error) {
 
 		// Set global and custom options on the registry metric from the CRD
 		m.SetOptions(metric)
+
+		// After options are set, final validation
+		if !m.Validate(set) {
+			return nil, fmt.Errorf("%s did not validate", metric.Name)
+		}
+
 		return m, nil
 	}
 	return nil, fmt.Errorf("%s is not a registered Metric type", metric.Name)

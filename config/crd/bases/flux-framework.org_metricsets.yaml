@@ -120,6 +120,16 @@ spec:
                         metric. If not set (0) then don't set a limit
                       format: int32
                       type: integer
+                    listOptions:
+                      additionalProperties:
+                        items:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          x-kubernetes-int-or-string: true
+                        type: array
+                      description: Metric List Options Metric specific options
+                      type: object
                     name:
                       type: string
                     options:

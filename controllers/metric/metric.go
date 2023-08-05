@@ -52,9 +52,7 @@ func (r *MetricSetReconciler) ensureMetricSet(
 	if err != nil {
 		return result, err
 	}
-
-	// And we re-queue so the Ready condition triggers next steps!
-	return ctrl.Result{Requeue: true}, nil
+	return ctrl.Result{}, nil
 }
 
 // getExistingJob gets an existing job that matches our CRD
@@ -86,6 +84,7 @@ func (r *MetricSetReconciler) ensureJobSet(
 	// We only care about the set Name/Namespace matched to one
 	// This can eventually update to support > 1 if needed
 	existing, err := r.getExistingJob(ctx, spec)
+	jobsets := []*jobset.JobSet{existing}
 
 	// Create a new job if it does not exist
 	if err != nil {
@@ -107,7 +106,7 @@ func (r *MetricSetReconciler) ensureJobSet(
 				return jobsets, ctrl.Result{}, err
 			}
 		}
-		return jobsets, ctrl.Result{}, nil
+		return jobsets, ctrl.Result{}, err
 
 	} else {
 		r.Log.Info(
@@ -116,7 +115,7 @@ func (r *MetricSetReconciler) ensureJobSet(
 			"Name:", existing.Name,
 		)
 	}
-	return []*jobset.JobSet{existing}, ctrl.Result{}, err
+	return jobsets, ctrl.Result{}, err
 }
 
 // createJobSet handles the creation operator

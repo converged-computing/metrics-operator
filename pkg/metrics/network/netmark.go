@@ -1,3 +1,13 @@
+/*
+Copyright 2023 Lawrence Livermore National Security, LLC
+ (c.f. AUTHORS, NOTICE.LLNS, COPYING)
+
+This is part of the Flux resource manager framework.
+For details, see https://github.com/flux-framework.
+
+SPDX-License-Identifier: Apache-2.0
+*/
+
 package network
 
 import (
@@ -14,14 +24,11 @@ import (
 // This library is currently private
 
 type Netmark struct {
-	name                string
-	rate                int32
-	completions         int32
-	description         string
-	container           string
-	standalone          bool
-	requiresApplication bool
-	requiresStorage     bool
+	name        string
+	rate        int32
+	completions int32
+	description string
+	container   string
 
 	// Scripts
 	workerScript      string
@@ -142,8 +149,6 @@ func (m Netmark) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, er
 		fmt.Printf("issue creating worker containers %s", err)
 		return js, err
 	}
-	fmt.Printf("workerContainers: %s", &workerContainers[0])
-	fmt.Printf("launcherContainers: %s", &launcherContainers[0])
 	launcher.Template.Spec.Template.Spec.Containers = launcherContainers
 	workers.Template.Spec.Template.Spec.Containers = workerContainers
 	js = []jobset.ReplicatedJob{*launcher, *workers}
@@ -281,29 +286,15 @@ mpirun -f ./hostlist.txt -np $np /usr/local/bin/netmark.x -w %d -t %d -c %d -b %
 	}
 }
 
-// Does the metric require an application container?
-func (m Netmark) RequiresApplication() bool {
-	return m.requiresApplication
-}
-func (m Netmark) RequiresStorage() bool {
-	return m.requiresStorage
-}
-func (m Netmark) Standalone() bool {
-	return m.standalone
-}
-
 func init() {
 	metrics.Register(
 		&Netmark{
-			name:                "network-netmark",
-			description:         "point to point networking tool",
-			requiresApplication: false,
-			requiresStorage:     false,
-			standalone:          true,
-			container:           "vanessa/netmark:latest",
-			workerScript:        "/metrics_operator/netmark-worker.sh",
-			launcherScript:      "/metrics_operator/netmark-launcher.sh",
-			workerScriptKey:     "netmark-worker",
-			launcherScriptKey:   "netmark-launcher",
+			name:              "network-netmark",
+			description:       "point to point networking tool",
+			container:         "vanessa/netmark:latest",
+			workerScript:      "/metrics_operator/netmark-worker.sh",
+			launcherScript:    "/metrics_operator/netmark-launcher.sh",
+			workerScriptKey:   "netmark-worker",
+			launcherScriptKey: "netmark-launcher",
 		})
 }

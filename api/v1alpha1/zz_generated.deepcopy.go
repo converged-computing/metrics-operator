@@ -58,6 +58,21 @@ func (in *Metric) DeepCopyInto(out *Metric) {
 			(*out)[key] = val
 		}
 	}
+	if in.ListOptions != nil {
+		in, out := &in.ListOptions, &out.ListOptions
+		*out = make(map[string][]intstr.IntOrString, len(*in))
+		for key, val := range *in {
+			var outVal []intstr.IntOrString
+			if val == nil {
+				(*out)[key] = nil
+			} else {
+				in, out := &val, &outVal
+				*out = make([]intstr.IntOrString, len(*in))
+				copy(*out, *in)
+			}
+			(*out)[key] = outVal
+		}
+	}
 	if in.Attributes != nil {
 		in, out := &in.Attributes, &out.Attributes
 		*out = make(map[string]string, len(*in))
