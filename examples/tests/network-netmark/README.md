@@ -45,15 +45,16 @@ kubectl get pods
 ```
 ```diff
 NAME                           READY   STATUS    RESTARTS   AGE
-metricset-sample-m-0-0-mwjns   1/1     Running   0          4s
-metricset-sample-m-0-1-tlknf   1/1     Running   0          4s
+metricset-sample-n-0-0-lt782   1/1     Running   0          3s
+metricset-sample-w-0-0-4s5p9   1/1     Running   0          3s
 ```
 
-If you inspect the log, you'll see a short sleep (the network isn't up immediately)
+In the above, "w" is a worker pod, and "n" is the netmark launcher.
+If you inspect the log for the launcher you'll see a short sleep (the network isn't up immediately)
 and then netmark running.
 
 ```bash
-kubectl logs metricset-sample-m-0-0-mwjns -f
+kubectl logs metricset-sample-n-0-0-lt782 -f
 ```
 ```console
 root
@@ -199,13 +200,86 @@ RTT between rank 1 and rank 0 is 17.111 micro-seconds
 Rank 1 sends to rank 0
 RTT between rank 1 and rank 0 is 17.079 micro-seconds
 ```
+The worker will only be alive long enough for the main job to
+finish, and once it does, the worker goes away! Here is what you'll see in its brief life:
 
-We are currently still adding support for custom completion, so the jobset/pods
-won't be completed - the main pod will finish but not the workers.
+```console
+#!/bin/bash
+# Start ssh daemon
+/usr/sbin/sshd -D &
+whoami
+# Show ourselves!
+cat ${0}
 
-When you are done, cleanup!
+# If we have zero tasks, default to workers * nproc
+np=2
+pods=2
+if [[ $np -eq 0 ]]; then
+        np=$(nproc)
+        np=$(( $pods*$np ))
+fi
+
+# Write the hosts file
+cat <<EOF > ./hostlist.txt
+metricset-sample-n-0-0.ms.default.svc.cluster.local
+metricset-sample-w-0-0.ms.default.svc.cluster.local
+
+EOF
+
+# Allow network to ready
+echo "Sleeping for 10 seconds waiting for network..."
+sleep 10
+
+sleep infinity
+Sleeping for 10 seconds waiting for network...
+```
+
+We can do this with JobSet logic that the entire set is done when the launcher is done.
+
+```bash
+$ kubectl get pods
+```
+```console
+NAME                           READY   STATUS        RESTARTS   AGE
+metricset-sample-n-0-0-bqqf4   0/1     Completed     0          49s
+metricset-sample-w-0-0-97h2g   1/1     Terminating   0          49s
+```
+
+When you are done, the job and jobset will be completed.
+
+```bash
+$ kubectl get jobset
+```
+```console
+NAME               RESTARTS   COMPLETED   AGE
+metricset-sample              True        82s
+```
+```bash
+$ kubectl get jobs
+```
+```console
+NAME                   COMPLETIONS   DURATION   AGE
+metricset-sample-n-0   1/1           18s        84s
+```
+
+And then you can cleanup!
 
 ```bash
 kubectl delete -f metrics.yaml
-kubectl delete cm metricset-sample
 ```
+
+If you want to see how it scales, try increasing the number of pods for Netmark. You
+might want to change the ranks too. Here is an example with 4 pods total (so one launcher
+and 3 workers):
+
+```bash
+$ kubectl get pods
+NAME                           READY   STATUS        RESTARTS   AGE
+metricset-sample-n-0-0-2zprc   0/1     Completed     0          23s
+metricset-sample-w-0-0-76wx9   1/1     Terminating   0          23s
+metricset-sample-w-0-1-5j2kh   1/1     Terminating   0          23s
+metricset-sample-w-0-2-lxg7w   1/1     Terminating   0          23s
+```
+
+Again, the worker jobs clean up nicely! We will next need to figure out a good strategy
+for saving the outside, aside from parsing the main pod logs.

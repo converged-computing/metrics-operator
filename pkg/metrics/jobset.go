@@ -24,9 +24,61 @@ import (
 
 var (
 	// Keep this short so DNS doesn't risk overflow
-	replicatedJobName = "m"
+	// This is the default Replicated Job Name optional for use
+	ReplicatedJobName = "m"
 	backoffLimit      = int32(100)
 )
+
+// GetJobSet is called by the controller to return some JobSet based
+// on the type: application, storage, or standalone
+func GetJobSet(
+	spec *api.MetricSet,
+	sets *map[string]MetricSet,
+) ([]*jobset.JobSet, error) {
+
+	// Assume we can eventually support >1 jobset
+	jobsets := []*jobset.JobSet{}
+
+	// Assume we have one jobset type
+	for _, set := range *sets {
+		// For a standalone, we expect one JobSet with 1+ replicatedJobs, and a custom
+		// Success Set we expect some subset of the replicated job names
+		successJobs := getSuccessJobs(set.Metrics())
+
+		// A base JobSet can hold one or more replicated jobs
+		js := getBaseJobSet(spec, successJobs)
+
+		// Get one or more replicated jobs, depending on the type
+		rjs, err := set.ReplicatedJobs(spec)
+		if err != nil {
+			return jobsets, err
+		}
+
+		// Get those replicated Jobs.
+		js.Spec.ReplicatedJobs = rjs
+		jobsets = append(jobsets, js)
+	}
+	return jobsets, nil
+}
+
+// Get list of strings that define successful for a jobset.
+// Since these are from replicatedJobs in metrics, we collect from there
+func getSuccessJobs(metrics []*Metric) []string {
+
+	// Success jobs are always the default replicatedJobName for storage and application
+	// Use a map akin to a set
+	successJobs := map[string]bool{}
+	for _, m := range metrics {
+		for _, sj := range (*m).SuccessJobs() {
+			successJobs[sj] = true
+		}
+	}
+	onSuccess := []string{}
+	for sj, _ := range successJobs {
+		onSuccess = append(onSuccess, sj)
+	}
+	return onSuccess
+}
 
 // getBaseJobSet shared for either an application or isolated jobset
 func getBaseJobSet(set *api.MetricSet, successSet []string) *jobset.JobSet {
@@ -72,7 +124,7 @@ func GetReplicatedJob(
 
 	// Default replicated job name, if not set
 	if jobname == "" {
-		jobname = replicatedJobName
+		jobname = ReplicatedJobName
 	}
 
 	// Pod labels from the MetricSet
@@ -136,83 +188,4 @@ func GetReplicatedJob(
 	// Tie the jobspec to the job
 	job.Template.Spec = jobspec
 	return &job
-}
-
-// GetStorageJobSet creates a jobset intending to mount storage.
-// For a storage metric, the metrics are the main containers, at some
-// replica level (completions) with shared volumes
-func GetStorageJobSet(set *api.MetricSet, metrics *[]Metric) (*jobset.JobSet, error) {
-
-	// A base JobSet can hold one or more replicated jobs
-	js := getBaseJobSet(set, []string{replicatedJobName})
-
-	// We don't need a shared process namespace here
-	job := GetReplicatedJob(set, false, set.Spec.Pods, set.Spec.Completions, "")
-
-	// Volumes for job template and containers
-	volumes := map[string]api.Volume{"storage": set.Spec.Storage.Volume}
-
-	// Add volumes for storage
-	job.Template.Spec.Template.Spec.Volumes = GetVolumes(set, metrics, volumes)
-
-	// Derive the containers, one per metric, and volumes are included
-	containers, err := getContainers(set, metrics, volumes)
-	if err != nil {
-		return js, err
-	}
-
-	job.Template.Spec.Template.Spec.Containers = containers
-	js.Spec.ReplicatedJobs = []jobset.ReplicatedJob{*job}
-	return js, nil
-}
-
-// CreateApplicationJobSet creates the jobset for the metrics set given an application of interest.
-// Each replicated job corresponds to one application being run, and thus one Metrics set.
-// For an application, the metrics are sidecar containers to the application
-func GetApplicationJobSet(set *api.MetricSet, metrics *[]Metric) (*jobset.JobSet, error) {
-	return GetStandaloneJobSet(
-		set,
-		metrics,
-		set.Spec.Application.Volumes,
-		true,
-	)
-}
-
-// Create a standalone JobSet, one without volumes or application
-// This will be definition be a JobSet for only one metric
-func GetStandaloneJobSet(
-	set *api.MetricSet,
-	metrics *[]Metric,
-	volumes map[string]api.Volume,
-	shareProcessNamespace bool,
-) (*jobset.JobSet, error) {
-
-	m := (*metrics)[0]
-
-	// Create JobSet container
-	js := getBaseJobSet(set, m.SuccessJobs())
-	rjs, err := m.ReplicatedJobs(set, metrics)
-	if err != nil {
-		return js, err
-	}
-
-	// If we return no replicated jobs, fall back to default
-	if len(rjs) == 0 {
-		job := GetReplicatedJob(set, shareProcessNamespace, set.Spec.Pods, set.Spec.Completions, "")
-
-		// Add volumes expecting an application.
-		job.Template.Spec.Template.Spec.Volumes = GetVolumes(set, metrics, volumes)
-		rjs = []jobset.ReplicatedJob{*job}
-
-		// Derive the containers, one per metric
-		// This will also include mounts for volumes
-		containers, err := getContainers(set, metrics, volumes)
-		if err != nil {
-			return js, err
-		}
-		job.Template.Spec.Template.Spec.Containers = containers
-	}
-
-	js.Spec.ReplicatedJobs = rjs
-	return js, nil
 }

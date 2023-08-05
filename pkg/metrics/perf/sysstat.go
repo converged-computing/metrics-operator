@@ -12,14 +12,11 @@ import (
 // https://github.com/sysstat/sysstat
 
 type PidStat struct {
-	name                string
-	rate                int32
-	completions         int32
-	description         string
-	container           string
-	requiresApplication bool
-	requiresStorage     bool
-	standalone          bool
+	name        string
+	rate        int32
+	completions int32
+	description string
+	container   string
 }
 
 // Name returns the metric name
@@ -32,23 +29,17 @@ func (m PidStat) Description() string {
 	return m.description
 }
 
-// Container
-func (m PidStat) Image() string {
-	return m.container
-}
-
 // Validation
-func (m PidStat) Validate(set *api.MetricSet) bool {
+func (m PidStat) Validate(spec *api.MetricSet) bool {
 	return true
 }
 
-// WorkingDir does not matter
+// Container variables
+func (m PidStat) Image() string {
+	return m.container
+}
 func (m PidStat) WorkingDir() string {
 	return ""
-}
-
-func (m PidStat) Standalone() bool {
-	return m.standalone
 }
 
 // Set custom options / attributes for the metric
@@ -57,10 +48,7 @@ func (m *PidStat) SetOptions(metric *api.Metric) {
 	m.completions = metric.Completions
 }
 
-func (m PidStat) ReplicatedJobs(
-	set *api.MetricSet,
-	mlist *[]metrics.Metric,
-) ([]jobset.ReplicatedJob, error) {
+func (m PidStat) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, error) {
 	return []jobset.ReplicatedJob{}, nil
 }
 
@@ -70,7 +58,7 @@ func (m PidStat) ReplicatedJobs(
 // TODO need to think of more clever way to export the values?
 // Save to somewhere?
 // TODO if the app is too fast we might miss it?
-func (m PidStat) EntrypointScripts(set *api.MetricSet) []metrics.EntrypointScript {
+func (m PidStat) EntrypointScripts(spec *api.MetricSet) []metrics.EntrypointScript {
 
 	template := `#!/bin/bash
 
@@ -118,29 +106,23 @@ done
 	// the command is expected to be what we are monitoring. Often
 	// they are the same thing.
 	return []metrics.EntrypointScript{
-		{Script: fmt.Sprintf(template, set.Spec.Application.Command, m.completions, m.rate)},
+		{Script: fmt.Sprintf(template, spec.Spec.Application.Command, m.completions, m.rate)},
 	}
 }
 
-// Does the metric require an application container?
-func (m PidStat) RequiresApplication() bool {
-	return m.requiresApplication
-}
-func (m PidStat) RequiresStorage() bool {
-	return m.requiresStorage
-}
 func (m PidStat) SuccessJobs() []string {
 	return []string{}
+}
+
+func (m PidStat) Type() string {
+	return metrics.ApplicationMetric
 }
 
 func init() {
 	metrics.Register(
 		&PidStat{
-			name:                "perf-sysstat",
-			description:         "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
-			requiresApplication: true,
-			requiresStorage:     false,
-			standalone:          false,
-			container:           "ghcr.io/converged-computing/metric-sysstat:latest",
+			name:        "perf-sysstat",
+			description: "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
+			container:   "ghcr.io/converged-computing/metric-sysstat:latest",
 		})
 }

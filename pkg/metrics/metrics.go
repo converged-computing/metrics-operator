@@ -22,50 +22,39 @@ var (
 	Registry = make(map[string]Metric)
 )
 
-// A StorageMetric is intended to measure a storage interface
-type StorageMetric interface {
-	Description() string
-	Name() string
-	SetOptions(*api.Metric)
-	Validate(*api.MetricSet) bool
-}
-
-// A Metric defines a generic interface for the operator to interact with
-// The functionality of different metric types might vary based on the type
-// All metrics return a JobSet of some type (and potentially a replicated job)
+// A general metric produces a JobSet with one or more replicated Jobs
 type Metric interface {
-
-	// Indicates that the metric requires an application to measure
-	RequiresApplication() bool
-	RequiresStorage() bool
-	Standalone() bool
 	Description() string
 	Name() string
 	SetOptions(*api.Metric)
 	Validate(*api.MetricSet) bool
 
-	// Functions for standalone metrics
-	ReplicatedJobs(*api.MetricSet, *[]Metric) ([]jobset.ReplicatedJob, error)
-	SuccessJobs() []string
-
-	// Container specific attributes!
-	// Entrypoint scripts, with
-	EntrypointScripts(*api.MetricSet) []EntrypointScript
+	// Attributes to expose for containers
 	WorkingDir() string
 	Image() string
+
+	// One or more replicated jobs to populate a JobSet
+	ReplicatedJobs(*api.MetricSet) ([]jobset.ReplicatedJob, error)
+	SuccessJobs() []string
+
+	// Metric type to know how to add to MetricSet
+	Type() string
+
+	// EntrypointScripts are required to generate ConfigMaps
+	EntrypointScripts(*api.MetricSet) []EntrypointScript
 }
 
 // GetMetric returns the Component specified by name from `Registry`.
 func GetMetric(metric *api.Metric, set *api.MetricSet) (Metric, error) {
 	if _, ok := Registry[metric.Name]; ok {
 		m := Registry[metric.Name]
-
-		// Validate it's for storage OR application
-		if m.RequiresApplication() && m.RequiresStorage() {
-			return nil, fmt.Errorf("%s cannot be for an application and storage", metric.Name)
-		}
 		if !m.Validate(set) {
-			return nil, fmt.Errorf("%s is not valid", metric.Name)
+			return nil, fmt.Errorf("%s did not validate", metric.Name)
+		}
+
+		// Ensure the type is one acceptable
+		if !(m.Type() == ApplicationMetric || m.Type() == StorageMetric || m.Type() == StandaloneMetric) {
+			return nil, fmt.Errorf("%s is not a valid type", metric.Name)
 		}
 
 		// Set global and custom options on the registry metric from the CRD

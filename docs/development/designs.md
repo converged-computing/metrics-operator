@@ -1,24 +1,44 @@
 # Design Thinking
 
 Our "MetricSet" is mirroring the design of a JobSet, which can combine multiple different things (i.e., metrics) into a cohesive unit. 
+With this design, we assume that you are primarily interested in measuring an application performance, collecting storage metrics, or 
+"rolling your own" design with a custom metric (e.g., a networking metric that has a special setup with a launcher and other customizations to the JobSet)
+
+## Overview
+
+Given the above assumption, the logic flow of the operator works as follows:
+
+ - The user writes a metrics.yaml file that optionally includes an application OR storage description or neither for a custom metric. Typically, you'd provide an application for performance metrics, and storage for IO/filesystem metrics, and neither for a custom metric.  
+ - Each metric in the list is also associated with a type (internal to the operator) that is checked. This means if you define an `Application`
+ - The operator will create a JobSet that runs one or more metrics per MetricSet type:
+   - Application metrics create a JobSet with each metric as a sidecar container sharing the process namespace to monitor (they can be given volumes if needed)
+   - Storage metrics deploy the metrics as containers and give them access to the volume
+   - Standalone metrics can do any custom design needed, and do not require application or storage (but can be provided storage volumes)
+
+The current design allows only one JobSet per metrics.yaml, but this can be relaxed to allow up to three JobSets per metrics.yaml (one for each of the types specified above).
+We will write this into more detail in the usage docs.
 
 ## Kubernetes Abstractions
 
-We use a JobSet on the top level with Replica set to 1, and within that set, we create a ReplcatedJob that can hold one or more containers. The containers and design depend on the metric
-of interest, for which we currently support application and storage (discussed below).
+We use a JobSet on the top level with Replica set to 1, and within that set, for each metric type we create one or more ReplcatedJob that can hold one or more containers. The containers and design depend on the metric of interest, for which we currently support application (performance), storage, and standalone metrics (discussed below).
 
 ### Metrics
 
-TODO if the design of these is separate, maybe make a separate top level class for each?
-That would be better organized...
-We provide support to measure three types of metrics, "performance", "storage", and "standalone.
-" For each of "performance" and "storage" are assumed to be 
+For our initial design, we allowed metrics of different types to be combined (e.g., running an application performance metric
+alongside a storage one within the same JobSet) but for our second design we decided to enforce separation of concerns.
+More specifically, if you are benchmarking storage, you are unlikely to also be benchmarking an application, and vice
+versa. The design of the operator was updates to reflect this preference. Thus, the three groups of metrics we believe
+are most strongly assessed together are:
+
+- **performance**: measuring an application performance through time via a shared process namespace
+- **storage**: measuring storage read/write or general IO for one or more mounted volumes
+- **standalone** a more complex metric that might require custom JobSet logic, and is intended to be run in isolation.
 
 ### Performance
 
 For a performance metric, we create a separate container for each metric (these are pre-built and provided alongside the operator) and then add the application container to the set. This means that the set of metrics containers and application containers serve as sidecars in the same pod:
 
-![img/application-pod.png](img/application-pod.png)
+![img/application-metric.png](img/application-metric.png)
 
 In the above, the metrics pods have `SYS_PTRACE` added and a flag is set to share the process
 namespace, so we can read and write to the application container from a metrics pod. We should
@@ -32,7 +52,7 @@ monitor it at some frequency (rate) for some number of times (completions) or un
 Setting up storage, typically by way of a persistent volume claim that turns into a persistent volume, is complex. This means that we require that the user (likely you) creates the PVC on your own, and then you can provide information about it to the operator. The operator will then request a volume, measure something on it for some rate and length of time, and then clean up.
 That looks like this:
 
-![img/storage-pod.png](img/storage-pod.png)
+![img/storage-metric.png](img/storage-metric.png)
 
 
 ### Standalone
@@ -55,4 +75,4 @@ I want to try creating a consistent database that can be used to store metrics a
 separately. Best case, we can manage it for them, or (better) not require it at all.
 I don't want anything complicated (I don't want to re-create prometheus or a monitoring service!)
 
- - Original diagrams are available on [Excalidraw](https://excalidraw.com/#json=GSpMds50rqhuwMARRNcgA,m3HHKWx2hwNnWoS8GxoTzg)
+ - Original diagrams are available on [Excalidraw](https://excalidraw.com/#json=3fEKWHnA1XydVxzlSpYc-,brAM5LOSg_bTcKcrBrYYwg)

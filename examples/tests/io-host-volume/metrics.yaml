@@ -17,4 +17,4 @@ spec:
   metrics:
     - name: io-sysstat
       rate: 10
-      completions: 10
+      completions: 2

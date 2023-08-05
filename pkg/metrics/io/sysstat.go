@@ -91,32 +91,30 @@ done
 
 }
 
+// Jobs required for success condition (n is the netmark run)
+func (m IOStat) SuccessJobs() []string {
+	return []string{}
+}
+
 // Does the metric require an application container?
 func (m IOStat) RequiresApplication() bool {
 	return m.requiresApplication
 }
+func (m IOStat) Type() string {
+	return metrics.StorageMetric
+}
 func (m IOStat) RequiresStorage() bool {
 	return m.requiresStorage
 }
-func (m IOStat) ReplicatedJobs(
-	set *api.MetricSet,
-	mlist *[]metrics.Metric,
-) ([]jobset.ReplicatedJob, error) {
+func (m IOStat) ReplicatedJobs(set *api.MetricSet) ([]jobset.ReplicatedJob, error) {
 	return []jobset.ReplicatedJob{}, nil
-}
-
-func (m IOStat) SuccessJobs() []string {
-	return []string{}
 }
 
 func init() {
 	metrics.Register(
 		&IOStat{
-			name:                "io-sysstat",
-			description:         "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
-			requiresApplication: false,
-			requiresStorage:     true,
-			standalone:          false,
-			container:           "ghcr.io/converged-computing/metric-sysstat:latest",
+			name:        "io-sysstat",
+			description: "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
+			container:   "ghcr.io/converged-computing/metric-sysstat:latest",
 		})
 }
