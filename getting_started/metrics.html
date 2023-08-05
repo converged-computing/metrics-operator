@@ -34,7 +34,7 @@
       
     
         <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.9dcb20399d0097661.min.css?v=09738cfd" />
-        <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=d68d0989" />
+        <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1c7521b1" />
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -422,6 +422,34 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#examples" class="md-nav__link">
+    <span class="md-ellipsis">Examples</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#storage" class="md-nav__link">
+    <span class="md-ellipsis">Storage Metrics</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#application" class="md-nav__link">
+    <span class="md-ellipsis">Application Metrics</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#standalone" class="md-nav__link">
+    <span class="md-ellipsis">Standalone Metrics</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#implemented-metrics" class="md-nav__link">
     <span title="/getting_started/metrics.md#implemented-metrics (reference label)" class="md-ellipsis">Implemented Metrics</span>
   </a>
@@ -434,12 +462,38 @@
     <span title="/getting_started/metrics.md#performance (reference label)" class="md-ellipsis">Performance</span>
   </a>
   
+    <nav class="md-nav" aria-label="Performance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#perf-sysstat" class="md-nav__link">
+    <span title="/getting_started/metrics.md#perf-sysstat (reference label)" class="md-ellipsis">perf-<wbr>sysstat</span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
   <a href="#storage" class="md-nav__link">
     <span title="/getting_started/metrics.md#storage (reference label)" class="md-ellipsis">Storage</span>
   </a>
+  
+    <nav class="md-nav" aria-label="Storage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#io-sysstat" class="md-nav__link">
+    <span title="/getting_started/metrics.md#io-sysstat (reference label)" class="md-ellipsis">io-<wbr>sysstat</span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -448,7 +502,40 @@
     <span title="/getting_started/metrics.md#standalone (reference label)" class="md-ellipsis">Standalone</span>
   </a>
   
+    <nav class="md-nav" aria-label="Standalone">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#network-netmark" class="md-nav__link">
+    <span title="/getting_started/metrics.md#network-netmark (reference label)" class="md-ellipsis">network-<wbr>netmark</span>
+  </a>
+  
 </li>
+        
+          <li class="md-nav__item">
+  <a href="#network-osu-benchmark" class="md-nav__link">
+    <span title="/getting_started/metrics.md#network-osu-benchmark (reference label)" class="md-ellipsis">network-<wbr>osu-<wbr>benchmark</span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span title="/getting_started/metrics.md#examples (reference label)" class="md-ellipsis">Examples</span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#apps-to-be-measured" class="md-nav__link">
@@ -466,13 +553,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#examples" class="md-nav__link">
-    <span title="/getting_started/metrics.md#examples (reference label)" class="md-ellipsis">Examples</span>
-  </a>
   
 </li>
       
@@ -639,27 +719,170 @@
   </a>
 
 <h1 id="metrics">Metrics<a class="headerlink" href="#metrics" title="Permalink to this heading">¶</a></h1>
-<p>The following metrics are under development (or being planned). These will be easier to add once I have the basic infrastructure for the different types!
-We will also be adding a better, more descriptive interface (registry) soon.</p>
+<p>The following metrics are under development (or being planned).</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#examples">Examples</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#storage">Storage Metrics</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#application">Application Metrics</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#standalone">Standalone Metrics</a></li>
+</ul>
+</div>
+<iframe src="../_static/data/table.html" style="width:100%; height:400px;" frameBorder="0"></iframe>
+<p>All metrics can be customized with the following variables</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>completions</td>
+<td>Number of times to run metric</td>
+<td>int32</td>
+<td>unset (runs for lifetime of application or indefinitely)</td>
+</tr>
+<tr>
+<td>rate</td>
+<td>Seconds to pause between measurements</td>
+<td>int32</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
 <h2 id="implemented-metrics">Implemented Metrics<a class="headerlink" href="#implemented-metrics" title="Permalink to this heading">¶</a></h2>
 <h3 id="performance">Performance<a class="headerlink" href="#performance" title="Permalink to this heading">¶</a></h3>
 <p>These metrics are intended to assess application performance.</p>
+<h4 id="perf-sysstat">perf-sysstat<a class="headerlink" href="#perf-sysstat" title="Permalink to this heading">¶</a></h4>
 <ul class="simple">
-<li><p><em>perf-sysstat</em>: the “pidstat” executable of the sysstat library.</p></li>
+<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Application Metric Set</span></a></p></li>
 </ul>
+<p>This metric provides the “pidstat” executable of the sysstat library.</p>
 <h3 id="storage">Storage<a class="headerlink" href="#storage" title="Permalink to this heading">¶</a></h3>
 <p>These metrics are intended to assess storage volumes.</p>
+<h4 id="io-sysstat">io-sysstat<a class="headerlink" href="#io-sysstat" title="Permalink to this heading">¶</a></h4>
 <ul class="simple">
-<li><p><em>io-sysstat</em>: the “iostat” executable of the sysstat library.</p></li>
+<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Storage Metric Set</span></a></p></li>
 </ul>
+<p>This is the “iostat” executable of the sysstat library.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>human</td>
+<td>Show tabular, human-readable output inside of json</td>
+<td>string "true" or "false"</td>
+<td>"false"</td>
+</tr>
+</tbody>
+</table>
 <h3 id="standalone">Standalone<a class="headerlink" href="#standalone" title="Permalink to this heading">¶</a></h3>
+<h4 id="network-netmark">network-netmark<a class="headerlink" href="#network-netmark" title="Permalink to this heading">¶</a></h4>
 <ul class="simple">
-<li><p><em>network-netmark</em>: this is currently a private container/software, but we have support for it when it’s ready to be made public (networking)</p></li>
-<li><p><em>network-osu-benchmark</em>: point to point benchmarks for MPI (networking). If listOptions-&gt;commands not set, will use all one-point commands.</p></li>
+<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
+</ul>
+<p>This is currently a private container/software, but we have support for it when it’s ready to be made public (networking)
+Variables to customize include:</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Option Key</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tasks</td>
+<td>Total number of tasks across pods</td>
+<td>options-&gt;tasks</td>
+<td>string</td>
+<td>nproc * pods</td>
+</tr>
+<tr>
+<td>warmups</td>
+<td>Number of warmups</td>
+<td>options-&gt;warmups</td>
+<td>int32</td>
+<td>10</td>
+</tr>
+<tr>
+<td>trials</td>
+<td>Number of trials</td>
+<td>options-&gt;trials</td>
+<td>int32</td>
+<td>20</td>
+</tr>
+<tr>
+<td>sendReceiveCycles</td>
+<td>Number of send-receive cycles</td>
+<td>options-sendReceiveCycles</td>
+<td>int32</td>
+<td>20</td>
+</tr>
+<tr>
+<td>messageSize</td>
+<td>Message size in bytes</td>
+<td>options-&gt;messageSize</td>
+<td>int32</td>
+<td>0</td>
+</tr>
+<tr>
+<td>storeEachTrial</td>
+<td>Flag to indicate storing each trial data</td>
+<td>options-&gt;storeEachTrial</td>
+<td>string (true/false)</td>
+<td>"true"</td>
+</tr>
+</tbody>
+</table>
+<h4 id="network-osu-benchmark">network-osu-benchmark<a class="headerlink" href="#network-osu-benchmark" title="Permalink to this heading">¶</a></h4>
+<p>Point to point benchmarks for MPI (networking). If listOptions-&gt;commands not set, will use all one-point commands.
+Variables to customize include:</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Option Key</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>commands</td>
+<td>Custom list of osu-benchmark one-sided commands to run</td>
+<td>listOptions-&gt;commands</td>
+<td>array</td>
+<td>unset uses default set</td>
+</tr>
+</tbody>
+</table>
+<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permalink to this heading">¶</a></h2>
+<p>The following examples are provided alongside the operator. Each directory has a README with complete instructions for usage.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-hello-world">perf-hello-world</a></p></li>
+<li><p><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-lammps">perf-lammps</a></p></li>
+<li><p><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/io-host-volume">io-host-volume</a></p></li>
+<li><p><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-netmark">network-netmark</a> (code still private)</p></li>
+<li><p><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-osubenchmarks">network-osu-benchmarks</a> (code still private)</p></li>
 </ul>
 <h3 id="apps-to-be-measured">Apps to be Measured<a class="headerlink" href="#apps-to-be-measured" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
-<li><p>LAMMPS (already in tests)</p></li>
 <li><p>Laghos</p></li>
 <li><p>https://github.com/LLNL/Kripke</p></li>
 </ul>
@@ -672,13 +895,6 @@ We will also be adding a better, more descriptive interface (registry) soon.</p>
 <li><p>https://www.vi-hps.org/tools/tools.html</p></li>
 <li><p>https://open.xdmod.org/10.0/index.html</p></li>
 </ul>
-<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permalink to this heading">¶</a></h2>
-<p>The following examples are provided alongside the operator. Each directory has a README with complete instructions for usage.</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-lammps">perf-lammps</a></p></li>
-<li><p><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/io-host-volume">io-host-volume</a></p></li>
-<li><p><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-netmark">network-netmark</a> (code still private)</p></li>
-</ul>
 <h2 id="containers">Containers<a class="headerlink" href="#containers" title="Permalink to this heading">¶</a></h2>
 <p>The following tools are folded into the metrics above. Often, one tool can be built into one container and used across multiple metrics.</p>
 <h3 id="sysstat">Sysstat<a class="headerlink" href="#sysstat" title="Permalink to this heading">¶</a></h3>
@@ -687,6 +903,7 @@ We will also be adding a better, more descriptive interface (registry) soon.</p>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/converged-computing/metrics-operator/pkgs/container/metric-sysstat">ghcr.io/converged-computing/metric-sysstat</a></li>
 </ul>
 </div>
+<p>text.startsWith(“Hello”);</p>
 <p>Sysstat is stored as a general metrics analyzer, as it provides several different metric types; It generally provides utils to monitor system performance and usage, including:</p>
 <ul class="simple">
 <li><p><em>iostat</em> reports CPU statistics and input/output statistics for block devices and partitions.</p></li>
