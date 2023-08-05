@@ -38,7 +38,7 @@ are most strongly assessed together are:
 
 For a performance metric, we create a separate container for each metric (these are pre-built and provided alongside the operator) and then add the application container to the set. This means that the set of metrics containers and application containers serve as sidecars in the same pod:
 
-![img/application-metric.png](img/application-metric.png)
+![img/application-metric-set.png](img/application-metric-set.png)
 
 In the above, the metrics pods have `SYS_PTRACE` added and a flag is set to share the process
 namespace, so we can read and write to the application container from a metrics pod. We should
@@ -52,7 +52,7 @@ monitor it at some frequency (rate) for some number of times (completions) or un
 Setting up storage, typically by way of a persistent volume claim that turns into a persistent volume, is complex. This means that we require that the user (likely you) creates the PVC on your own, and then you can provide information about it to the operator. The operator will then request a volume, measure something on it for some rate and length of time, and then clean up.
 That looks like this:
 
-![img/storage-metric.png](img/storage-metric.png)
+![img/storage-metric-set.png](img/storage-metric-set.png)
 
 
 ### Standalone
@@ -60,7 +60,7 @@ That looks like this:
 A standalone metric does not require an application container or a storage specification, but rather uses a "standalone" setting that indicates it runs on its own. This is also enforced in design - since a standalone metric has finer control of the underlying JobSet, as a metric
 it must be run on its own. As an example, for a networking tool that uses MPI to run across nodes, we can set the number of pods (via the indexed job) to a number greater than 1, and then we will be making an indexed job with that many pods to run the command.  That might look like this:
 
-![img/standalone-metric.png](img/standalone-metric.png)
+![img/standalone-metric-set.png](img/standalone-metric-set.png)
 
 We don't technically need a shared process space, a storage setup, or an application. 
 And actually, that headless service that provides the network is available for storage

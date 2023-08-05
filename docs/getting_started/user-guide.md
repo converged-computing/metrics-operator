@@ -11,6 +11,10 @@ Our "MetricSet" is mirroring the design of a [JobSet](https://github.com/kuberne
 When you create a MetricSet using this operator, we assume that you are primarily interested in measuring an application performance, collecting storage metrics, or 
 using a custom metric provided by the operator that has less stringent requirements.
 
+<details>
+
+<summary>Logic Flow of Metrics Operator</summary>
+
 Given the above assumption, the logic flow of the operator works as follows:
 
 1. You write a metrics.yaml file that optionally includes an application OR storage description or neither for a custom metric. Typically, you'd provide an application for performance metrics, and storage for IO/filesystem metrics, and neither for a custom metric. In simpler terms, we have three types of MetricSet - Application Metric Sets, Storage Metric Sets, and Standalone Metric Sets.
@@ -19,6 +23,8 @@ Given the above assumption, the logic flow of the operator works as follows:
  - Application metrics create a JobSet with each metric as a sidecar container sharing the process namespace to monitor (they can be given volumes if needed)
  - Storage metrics deploy the metrics as containers and give them access to the volume
  - Standalone metrics can do any custom design needed, and do not require application or storage (but can be provided storage volumes)
+
+</details>
 
 Generally, you'll be defining an application container with one or more metrics to assess performance, or a storage solution with the same, but metrics to assess IO. There are several modes of operation, depending on your choice of metrics.
 
@@ -39,9 +45,12 @@ For another overview of these designs, please see the [developer docs](../develo
 
 Let's walk through an example. In the image below, you want to run one or more custom metrics to measure performance for your application of choice.
 
-![img/application-metric-set-0.png](img/application-metric-set-0.png)
+![img/application-metric-set-diagram.png](img/application-metric-set-diagram.png)
 
 You'll do this by writing a metrics.yaml file (left panel) that defines the application of interest, which in this case in LAMMPS. 
+This will be handed to the metrics operator (middle panel) that will validate your MetricSet and prepare to deploy, and
+the result is a JobSet (right panel) that includes a Job with one or more containers alongside your application.
+Let's look at this process in more detail. Here is what the metrics.yaml file might look like.
 Note that the image above defines two metrics, but the YAML file below only shows a list of one.
 
 ```yaml
@@ -60,8 +69,9 @@ spec:
     - name: perf-sysstat
 ```
 
-Note that this usage requires no changes to your application container, beyond you knowing what the entrypoint command is to monitor.
-In our case, we are issuing an mpirun command, and that's what we want to monitor. Thus, the `image` and `command` attributes are the
+It was a design choice that using an application container in this context requires no changes to the container itself.
+You simply need to know what the entrypoint command is, and this will allow the metric sidecar containers to monitor it.
+In our case, for our command we are issuing `mpirun`, and that's what we want to monitor. Thus, the `image` and `command` attributes are the
 only two required for a basic application setup. For the next section, "metrics" we've found an application metric (so it can be used for an 
 Application Metric Set) that we like called `perf-sysstat`, and we add it to the list. We could easily have added more, because one
 application run can be monitored by several tools, but we will keep it simple for this example. Next, let's submit this to the metrics operator.
@@ -72,15 +82,12 @@ $ kubectl apply -f metrics.yaml
 
 When the operator receives the custom resource, it will do some obvious validation, like did you provide application metrics for an application?
 Did you provide all the required fields? Did you only provide a definition for one metric type? Any errors will result in not creating the MetricSet,
-and an error in the operator logs. Given that you've provided a valid custom resource YAML, the operator will then select your metrics
-from the set it has internally defined:
-
-![img/application-metric-set-1.png](img/application-metric-set-1.png)
-
-The above image shows that the operator knows about several application (green), storage (yellow), and standalone (red) metrics, and it's going
+and an error in the operator logs. Given that you've provided a valid custom resource YAML and one or more application metrics
+that the operator knows, it will then select your metrics from the set it has internally defined (middle panel). This panel shows that
+the operator knows about several application (green), storage (yellow), and standalone (red) metrics, and it's going
 to combine them into a JobSet that includes your application container to allow each metric to assess performance.
 
-![img/application-metric-set-2.png](img/application-metric-set-2.png)
+![img/application-metric-set.png](img/application-metric-set.png)
 
 Focusing on the third panel, the way this works is that we create a JobSet with a single replicated job with multiple containers.
 One container is for your application, and the others are sidecar containers that are running the metrics. Again, because of this design
@@ -124,10 +131,13 @@ In the above, we want to use the storage metric called "io-sysstat" to assess a 
 could last forever (hypothetically) we ask for two completions 10 seconds apart each. This means we will get data for two timepoints from the metric, and after that,
 the assessment will be complete. We can also look at this visually:
 
-![img/storage-metric-set.png](img/storage-metric-set.png)
+![img/storage-metric-set-diagram.png](img/storage-metric-set-diagram.png)
 
 In the above, we are providing storage metrics (the image has two despite the yaml above showing one) that the operator knows about, along with a storage volume that we want to test. 
 The operator will prepare a JobSet with one replicated job and several containers, where one container is created per storage metric, and the volume bound to each.
+
+![img/storage-metric-set.png](img/storage-metric-set.png)
+
 In simple terms, a storage metric set will use the volume of interest that you request, and run the tool there. 
 Read/write is important here - e.g., if the metric needs to write to the volume, a read only volume won't work. Setting up storage
 is complex, so it's typically up for you to create the PVC and then the operator will create the volume for it. Keep in mind that you should
@@ -143,7 +153,7 @@ By definition, it is "standalone" because it's going to create a custom JobSet s
 certain of how to combine different jobs within this JobSet, we currently only allow one standalone metric to be defined at once.
 This means that in the diagram below, you see online one standalone metric in the metrics.yaml
 
-![img/standalone-metric-set.png](img/standalone-metric-set.png)
+![img/standalone-metric-set-diagram.png](img/standalone-metric-set-diagram.png)
 
 As an example, we can look at a standalone metric to run a tool called netmark.
 
@@ -171,6 +181,10 @@ This is a standalone metric because it creates a JobSet with not one replicated 
 to issue an `mpirun` command, and one or more worker containers that interact via MPI. This is a simple example, but any design
 for a JobSet could work here, and hence why the metric is standalone. However, it's neat that the interface presented to you
 is consistent - it's simply a matter of asking for the metric that is known to the operator to be a standalone.
+The image below also demonstrates that this standalone metric (along with storage or application) can be scaled to more
+than one pod, if appropriate.
+
+![img/standalone-metric-set.png](img/standalone-metric-set.png)
 
 This metrics operator is early in design and subject to change! In the meantime, for more detail about this design, see the [developer docs](../development/index.md).
 
