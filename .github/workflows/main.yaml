@@ -53,7 +53,7 @@ jobs:
       matrix:
         test: [["perf-hello-world", "ghcr.io/converged-computing/metric-sysstat:latest", 60],          # performance test
                ["io-host-volume", "ghcr.io/converged-computing/metric-sysstat:latest", 60],            # storage test
-               ["network-osu-benchmark", "ghcr.io/converged-computing/metric-osu-bench:latest", 60]]   # standalone test
+               ["network-osu-benchmark", "ghcr.io/converged-computing/metric-osu-benchmark:latest", 60]]   # standalone test
 
     steps:
     - name: Clone the code
