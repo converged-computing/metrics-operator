@@ -42,10 +42,60 @@ func getVolumeMounts(
 	return mounts
 }
 
+// Get MetricsKeyToPath assumes we have a predictible listing of metrics
+// scripts. This is applicable for storage and application metrics
+func GetMetricsKeyToPath(metrics []*Metric) []corev1.KeyToPath {
+	// Runner start scripts
+	makeExecutable := int32(0777)
+
+	// Each metric has an entrypoint script
+	runnerScripts := []corev1.KeyToPath{}
+	for i, _ := range metrics {
+		key := fmt.Sprintf("entrypoint-%d", i)
+		runnerScript := corev1.KeyToPath{
+			Key:  key,
+			Path: key + ".sh",
+			Mode: &makeExecutable,
+		}
+		runnerScripts = append(runnerScripts, runnerScript)
+	}
+	return runnerScripts
+}
+
 // getVolumes adds expected entrypoints along with addedvolumes (storage or applications)
-func getVolumes(
+// This function is intended for a set with a listing of metrics
+func GetVolumes(
 	set *api.MetricSet,
-	metrics *[]Metric,
+	runnerScripts []corev1.KeyToPath,
+	addedVolumes map[string]api.Volume,
+) []corev1.Volume {
+
+	// TODO will need to add volumes to here for storage requests / metrics
+	volumes := []corev1.Volume{
+		{
+			Name: set.Name,
+			VolumeSource: corev1.VolumeSource{
+				ConfigMap: &corev1.ConfigMapVolumeSource{
+
+					// Namespace based on the cluster
+					LocalObjectReference: corev1.LocalObjectReference{
+						Name: set.Name,
+					},
+					Items: runnerScripts,
+				},
+			},
+		},
+	}
+	existingVolumes := getExistingVolumes(addedVolumes)
+	volumes = append(volumes, existingVolumes...)
+	return volumes
+}
+
+// GetStandaloneVolumes is intended for a single metric, where the volumes
+// are provided as custom EntrypointScripts
+func GetStandaloneVolumes(
+	set *api.MetricSet,
+	scripts []EntrypointScript,
 	addedVolumes map[string]api.Volume,
 ) []corev1.Volume {
 
@@ -54,8 +104,11 @@ func getVolumes(
 
 	// Each metric has an entrypoint script
 	runnerScripts := []corev1.KeyToPath{}
-	for i, _ := range *metrics {
-		key := fmt.Sprintf("entrypoint-%d", i)
+	for i, script := range scripts {
+		key := script.Name
+		if key == "" {
+			key = fmt.Sprintf("entrypoint-%d", i)
+		}
 		runnerScript := corev1.KeyToPath{
 			Key:  key,
 			Path: key + ".sh",

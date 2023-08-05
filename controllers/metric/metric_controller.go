@@ -80,73 +80,101 @@ func (r *MetricSetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	_ = log.FromContext(ctx)
 
 	// Create a new MetricSet
-	var set api.MetricSet
+	var spec api.MetricSet
 
 	// Keep developer informed what is going on.
 	r.Log.Info("🧀️ Event received by Metric controller!")
 	r.Log.Info("Request: ", "req", req)
 
 	// Does the metric exist yet (based on name and namespace)
-	err := r.Get(ctx, req.NamespacedName, &set)
+	err := r.Get(ctx, req.NamespacedName, &spec)
 	if err != nil {
 
 		// Create it, doesn't exist yet
 		if errors.IsNotFound(err) {
-			r.Log.Info("🧀️ MetricSet not found. Ignoring since object must be deleted.")
+			r.Log.Info("🟥️ MetricSet not found. Ignoring since object must be deleted.")
 
 			// This should not be necessary, but the config map isn't owned by the operator
 			return ctrl.Result{}, nil
 		}
-		r.Log.Info("🧀️ Failed to get MetricSet. Re-running reconcile.")
+		r.Log.Info("🟥️ Failed to get MetricSet. Re-running reconcile.")
 		return ctrl.Result{Requeue: true}, err
 	}
 
 	// Show parameters provided and validate one flux runner
-	if !set.Validate() {
-		r.Log.Info("🧀️ Your MetricSet config did not validate.")
+	if !spec.Validate() {
+		r.Log.Info("🟥️ Your MetricSet config did not validate.")
 		return ctrl.Result{}, nil
 	}
 
 	// Verify that all metrics are valid.
 	// If the metric requires an application, the MetricSet CRD must have one!
+	// If the metric requires storage, the MetricSet CRD must defined storage
+	// Only one of application, storage, and standalone is required until
+	// we see a use case that warrants this be done differently.
 	metrics := []mctrl.Metric{}
 
-	for _, metric := range set.Spec.Metrics {
-		m, err := mctrl.GetMetric(&metric)
+	// We are allowed to create more that one MetricSet (JobSet)
+	sets := map[string]mctrl.MetricSet{}
+	for _, metric := range spec.Spec.Metrics {
+
+		// Get the individual metric, the type will determine the set we add it to
+		m, err := mctrl.GetMetric(&metric, &spec)
 		if err != nil {
-			r.Log.Info(fmt.Sprintf("🧀️ We cannot find a metric named %s!", metric.Name))
+			r.Log.Error(err, fmt.Sprintf("🟥️ We had an issue loading that metric %s!", metric.Name))
 			return ctrl.Result{}, nil
 		}
+		metricType := m.Type()
 
-		// We can only use the metric if it matches application or storage
-		// Ensure we give verbose output if we don't intend to use something
-		if m.RequiresApplication() && set.HasApplication() {
-			r.Log.Info("Found application metric", metric.Name, m.Description())
-			metrics = append(metrics, m)
-		} else if m.RequiresStorage() && set.HasStorage() {
-			r.Log.Info("Found storage metric", metric.Name, m.Description())
-			metrics = append(metrics, m)
-		} else if m.Standalone() && set.IsStandalone() {
-			r.Log.Info("Found standalone metric", metric.Name, m.Description())
-			metrics = append(metrics, m)
-		} else {
-			r.Log.Info("Metric %s is mismatched for expected MetricSet, skipping.", metric.Name)
+		// Determine if we've seen the MetricSet type yet, and add either way.
+		_, ok := sets[metricType]
+		if !ok {
+			ms, err := mctrl.GetMetricSet(metricType)
+			if err != nil {
+				r.Log.Info(fmt.Sprintf("🟥️ We cannot find a metricset type called %s!", metricType))
+				return ctrl.Result{}, nil
+			}
+			sets[metricType] = ms
 		}
+		sets[metricType].Add(&m)
+	}
+
+	// Ensure sets all have one or more metrics
+	for setName, set := range sets {
+		count := len(set.Metrics())
+		if count == 0 {
+			r.Log.Info(fmt.Sprintf("🟥️ Metric set %s does not have any validated metrics.", setName))
+			return ctrl.Result{}, nil
+		}
+		r.Log.Info(fmt.Sprintf("🟦️ Metric set %s has %d metrics.", setName, count))
+	}
+	// Currently just support one JobSet per MetricSet
+	if len(sets) != 1 {
+		r.Log.Info(fmt.Sprintf("🟥️ Found %d metric sets, but exactly one is allowed to correspond to a final JobSet.", len(sets)))
+		return ctrl.Result{}, nil
+	}
+
+	// Currently just support one jobset for standalone
+	_, ok := sets[mctrl.StandaloneMetric]
+	if ok && len(metrics) > 1 {
+		r.Log.Info("🟥️ The standalone type metric, by definition, must be measured on its own and not with other metrics.")
+		return ctrl.Result{}, nil
 	}
 
 	// Ensure the metricset is mapped to a JobSet. For design:
 	// 1. If an application is provided, we pair the application at some scale with each metric as a contaienr
-	// 2. If an application is not provided, we assume only storage / others that don't require an application
-	result, err := r.ensureMetricSet(ctx, &set, &metrics)
+	// 2. If storage is provided, we create the volumes for the metric containers
+	// 3. If standalone is required, we create a JobSet with custom logic
+	result, err := r.ensureMetricSet(ctx, &spec, &sets)
 	if err != nil {
+		r.Log.Error(err, "🟥️ Issue ensuring metric set")
 		return result, err
 	}
 
 	// By the time we get here we have a Job + pods + config maps!
 	// What else do we want to do?
 	r.Log.Info("🧀️ MetricSet is Ready!")
-
-	return ctrl.Result{}, nil
+	return ctrl.Result{Requeue: false}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.

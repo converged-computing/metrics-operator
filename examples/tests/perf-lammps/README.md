@@ -35,7 +35,7 @@ kubectl apply -f metrics.yaml
 
 Wait until you see pods created by the job and then running (there should be one with two containers, one for the app lammps and the other for the stats):
 
-```
+```bash
 kubectl get pods
 ```
 ```diff

@@ -23,27 +23,32 @@ import (
 // ensureMetricsSet creates a JobSet and associated configs
 func (r *MetricSetReconciler) ensureMetricSet(
 	ctx context.Context,
-	set *api.MetricSet,
-	metrics *[]mctrl.Metric,
+	spec *api.MetricSet,
+	sets *map[string]mctrl.MetricSet,
 ) (ctrl.Result, error) {
 
 	// First ensure config maps, typically entrypoints for custom metrics containers.
-	// They are all bound to the same config map (read only volume) and named by metric index
-	_, result, err := r.ensureConfigMaps(ctx, set, metrics)
+	// They are all bound to the same config map (read only volume)
+	// and named by metric index or custom metric script key name
+	// We could theoretically allow creating more than one JobSet here
+	// and change the name to include the group type.
+	_, result, err := r.ensureConfigMaps(ctx, spec, sets)
 	if err != nil {
 		return result, err
 	}
 
 	// Create headless service for the metrics set (which is a JobSet)
-	selector := map[string]string{"metricset-name": set.Name}
-	result, err = r.exposeServices(ctx, set, selector)
+	// If we create > 1 JobSet, this should be updated
+	selector := map[string]string{"metricset-name": spec.Name}
+	result, err = r.exposeServices(ctx, spec, selector)
 	if err != nil {
 		return result, err
 	}
 
 	// Ensure we create the JobSet for the MetricSet
-	// either application or generic based
-	_, result, err = r.ensureJobSet(ctx, set, metrics)
+	// either application, storage, or standalone based
+	// This could be updated to support > 1
+	_, result, err = r.ensureJobSet(ctx, spec, sets)
 	if err != nil {
 		return result, err
 	}
@@ -73,55 +78,36 @@ func (r *MetricSetReconciler) getExistingJob(
 // getCluster does an actual check if we have a jobset in the namespace
 func (r *MetricSetReconciler) ensureJobSet(
 	ctx context.Context,
-	set *api.MetricSet,
-	metrics *[]mctrl.Metric,
-) (*jobset.JobSet, ctrl.Result, error) {
+	spec *api.MetricSet,
+	sets *map[string]mctrl.MetricSet,
+) ([]*jobset.JobSet, ctrl.Result, error) {
 
 	// Look for an existing job
-	existing, err := r.getExistingJob(ctx, set)
+	// We only care about the set Name/Namespace matched to one
+	// This can eventually update to support > 1 if needed
+	existing, err := r.getExistingJob(ctx, spec)
 
 	// Create a new job if it does not exist
 	if err != nil {
 
 		r.Log.Info(
 			"✨ Creating a new Metrics JobSet ✨",
-			"Namespace:", set.Namespace,
-			"Name:", set.Name,
+			"Namespace:", spec.Namespace,
+			"Name:", spec.Name,
 		)
 
-		var js *jobset.JobSet
-		if set.HasApplication() {
-			r.Log.Info("Creating application or standalone JobSet for MetricSet")
-			js, err = mctrl.GetApplicationJobSet(set, metrics)
-
-		} else if set.HasStorage() {
-			r.Log.Info("Creating storage JobSet for MetricSet")
-			js, err = mctrl.GetStorageJobSet(set, metrics)
-
-		} else {
-			r.Log.Info("Assuming standalone MetricSet.")
-			js, err = mctrl.GetStandaloneJobSet(set, metrics, map[string]api.Volume{}, false)
-		}
-		ctrl.SetControllerReference(set, js, r.Scheme)
+		// Get one JobSet to create (can eventually support > 1)
+		jobsets, err := mctrl.GetJobSet(spec, sets)
 		if err != nil {
-			return js, ctrl.Result{}, err
+			return jobsets, ctrl.Result{}, err
 		}
-		r.Log.Info(
-			"🎉 Creating Metrics JobSet 🎉",
-			"Namespace:", js.Namespace,
-			"Name:", js.Name,
-		)
-		err = r.Client.Create(ctx, js)
-		if err != nil {
-			r.Log.Error(
-				err,
-				"Failed to create new Metrics JobSet",
-				"Namespace:", js.Namespace,
-				"Name:", js.Name,
-			)
-			return existing, ctrl.Result{}, err
+		for _, js := range jobsets {
+			err = r.createJobSet(ctx, spec, js)
+			if err != nil {
+				return jobsets, ctrl.Result{}, err
+			}
 		}
-		return js, ctrl.Result{}, err
+		return jobsets, ctrl.Result{}, nil
 
 	} else {
 		r.Log.Info(
@@ -130,6 +116,32 @@ func (r *MetricSetReconciler) ensureJobSet(
 			"Name:", existing.Name,
 		)
 	}
-	ctrl.SetControllerReference(set, existing, r.Scheme)
-	return existing, ctrl.Result{}, err
+	return []*jobset.JobSet{existing}, ctrl.Result{}, err
+}
+
+// createJobSet handles the creation operator
+func (r *MetricSetReconciler) createJobSet(
+	ctx context.Context,
+	spec *api.MetricSet,
+	js *jobset.JobSet,
+) error {
+	r.Log.Info(
+		"🎉 Creating Metrics JobSet 🎉",
+		"Namespace:", js.Namespace,
+		"Name:", js.Name,
+	)
+
+	// Controller reference always needs to be set before creation
+	ctrl.SetControllerReference(spec, js, r.Scheme)
+	err := r.Client.Create(ctx, js)
+	if err != nil {
+		r.Log.Error(
+			err,
+			"Failed to create new Metrics JobSet",
+			"Namespace:", js.Namespace,
+			"Name:", js.Name,
+		)
+		return err
+	}
+	return nil
 }

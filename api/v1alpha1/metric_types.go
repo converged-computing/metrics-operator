@@ -68,7 +68,7 @@ type MetricSetSpec struct {
 	Completions int32 `json:"completions"`
 }
 
-// Storage that will be monitored
+// Storage that will be monitored, or storage alongside a standalone metric
 type Storage struct {
 
 	// Volume type to test
@@ -257,6 +257,13 @@ func (m *MetricSet) Validate() bool {
 			metric.Rate = 10
 		}
 	}
+
+	// A standalone metric by definition runs alone
+	if len(m.Spec.Metrics) > 1 && m.IsStandalone() {
+		fmt.Printf("😥️ A standalone metric by definition runs on its own\n")
+		return false
+	}
+
 	return true
 }
 

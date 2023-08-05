@@ -41,13 +41,17 @@ Note that the metrics.yaml is asking to run a sysstat io metric for 10 completio
 
 ```bash
 kubectl get pods 
-NAME                           READY   STATUS              RESTARTS   AGE
+```
+```diff
+NAME                         READY   STATUS              RESTARTS   AGE
+metricset-sample-m-0-tjxsj   0/1     ContainerCreating   0          25s
+metricset-sample-m-0-tjxsj   1/1     Running             0          70s
 ```
 
 If you peek at logs, you'll see the storage metric running once every 10 seconds, and for a total of 10 times.
 
 ```bash
-host-volume-io$ kubectl logs metricset-sample-m-0-9pq6w 
+$ kubectl logs metricset-sample-m-0-9pq6w 
 ```
 ```console
 IOSTAT TIMEPOINT 10
@@ -127,5 +131,4 @@ When you are done, cleanup!
 
 ```bash
 kubectl delete -f metrics.yaml
-kubectl delete cm metricset-sample
 ```

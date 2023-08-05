@@ -51,7 +51,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [["perf-hello-world", "ghcr.io/converged-computing/metric-sysstat:latest", 60]]
+        test: [["perf-hello-world", "ghcr.io/converged-computing/metric-sysstat:latest", 60], # performance test
+               ["io-host-volume", "ghcr.io/converged-computing/metric-sysstat:latest", 60]]   # storage test
 
     steps:
     - name: Clone the code

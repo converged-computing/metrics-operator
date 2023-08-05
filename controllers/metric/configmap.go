@@ -27,7 +27,7 @@ import (
 func (r *MetricSetReconciler) ensureConfigMaps(
 	ctx context.Context,
 	set *api.MetricSet,
-	metrics *[]mctrl.Metric,
+	sets *map[string]mctrl.MetricSet,
 ) (*corev1.ConfigMap, ctrl.Result, error) {
 
 	// Look for the config map by name
@@ -45,11 +45,19 @@ func (r *MetricSetReconciler) ensureConfigMaps(
 
 		r.Log.Info("ConfigMaps", "Status", "Not found and creating")
 
-		// Prepare lookup of entrypoints, one per metric script.
+		// Prepare lookup of entrypoints, one per application/storage,
+		// or possible multiple for a standalone metric
 		data := map[string]string{}
-		for i, m := range *metrics {
-			key := fmt.Sprintf("entrypoint-%d", i)
-			data[key] = m.EntrypointScript(set)
+		count := 0
+		for _, s := range *sets {
+			for _, es := range s.EntrypointScripts(set) {
+				key := es.Name
+				if key == "" {
+					key = fmt.Sprintf("entrypoint-%d", count)
+				}
+				data[key] = es.Script
+			}
+			count += 1
 		}
 		cm, result, err := r.getConfigMap(ctx, set, data)
 		if err != nil {

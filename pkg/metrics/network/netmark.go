@@ -2,8 +2,11 @@ package network
 
 import (
 	"fmt"
+	"path"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
+	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
@@ -19,6 +22,12 @@ type Netmark struct {
 	standalone          bool
 	requiresApplication bool
 	requiresStorage     bool
+
+	// Scripts
+	workerScript      string
+	launcherScript    string
+	workerScriptKey   string
+	launcherScriptKey string
 
 	// Options
 	tasks int32
@@ -49,14 +58,96 @@ func (m Netmark) Description() string {
 	return m.description
 }
 
-// Container
-func (m Netmark) Image() string {
-	return m.container
+// Jobs required for success condition (n is the netmark run)
+func (m Netmark) SuccessJobs() []string {
+	return []string{"n"}
 }
 
-// WorkingDir does not matter
-func (m Netmark) WorkingDir() string {
+// Container variables
+func (n Netmark) Type() string {
+	return metrics.StandaloneMetric
+}
+func (n Netmark) Image() string {
+	return n.container
+}
+func (n Netmark) WorkingDir() string {
 	return ""
+}
+
+func (n Netmark) getMetricsKeyToPath() []corev1.KeyToPath {
+	// Runner start scripts
+	makeExecutable := int32(0777)
+
+	// Each metric has an entrypoint script
+	return []corev1.KeyToPath{
+		{
+			Key:  n.launcherScriptKey,
+			Path: path.Base(n.launcherScript),
+			Mode: &makeExecutable,
+		},
+		{
+			Key:  n.workerScriptKey,
+			Path: path.Base(n.workerScript),
+			Mode: &makeExecutable,
+		},
+	}
+}
+
+// Replicated Jobs are custom for this standalone metric
+func (m Netmark) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, error) {
+
+	// Generate a replicated job for the launcher (netmark) and workers
+	launcher := metrics.GetReplicatedJob(spec, false, 1, 1, "n")
+	workers := metrics.GetReplicatedJob(spec, false, spec.Spec.Pods-1, spec.Spec.Pods-1, "w")
+
+	// Add volumes defined under storage.
+	v := map[string]api.Volume{}
+	if spec.HasStorage() {
+		v["storage"] = spec.Spec.Storage.Volume
+	}
+
+	// runnerScripts are custom for a netmark jobset
+	runnerScripts := m.getMetricsKeyToPath()
+
+	volumes := metrics.GetVolumes(spec, runnerScripts, v)
+	launcher.Template.Spec.Template.Spec.Volumes = volumes
+	workers.Template.Spec.Template.Spec.Volumes = volumes
+
+	// Prepare container specs, one for launcher and one for workers
+	launcherSpec := []metrics.ContainerSpec{
+		{
+			Image:   m.container,
+			Name:    "launcher",
+			Command: []string{"/bin/bash", m.launcherScript},
+		},
+	}
+	workerSpec := []metrics.ContainerSpec{
+		{
+			Image:   m.container,
+			Name:    "workers",
+			Command: []string{"/bin/bash", m.workerScript},
+		},
+	}
+	js := []jobset.ReplicatedJob{}
+
+	// Derive the containers, one per metric
+	// This will also include mounts for volumes
+	launcherContainers, err := metrics.GetContainers(spec, launcherSpec, v, false)
+	if err != nil {
+		fmt.Printf("issue creating launcher containers %s", err)
+		return js, err
+	}
+	workerContainers, err := metrics.GetContainers(spec, workerSpec, v, false)
+	if err != nil {
+		fmt.Printf("issue creating worker containers %s", err)
+		return js, err
+	}
+	fmt.Printf("workerContainers: %s", &workerContainers[0])
+	fmt.Printf("launcherContainers: %s", &launcherContainers[0])
+	launcher.Template.Spec.Template.Spec.Containers = launcherContainers
+	workers.Template.Spec.Template.Spec.Containers = workerContainers
+	js = []jobset.ReplicatedJob{*launcher, *workers}
+	return js, nil
 }
 
 // Set custom options / attributes for the metric
@@ -105,63 +196,89 @@ func (m *Netmark) SetOptions(metric *api.Metric) {
 	}
 }
 
-// Setup Netmark with ssh and a hostlist.txt for hostnames
-// TODO we need a way to specify done with index 0
-func (m Netmark) EntrypointScript(set *api.MetricSet) string {
+// Validate that we can run Netmark
+func (n Netmark) Validate(spec *api.MetricSet) bool {
+	return spec.Spec.Pods >= 2
+}
+
+// Return lookup of entrypoint scripts
+func (m Netmark) EntrypointScripts(spec *api.MetricSet) []metrics.EntrypointScript {
 
 	// Generate hostlists
-	hosts := ""
-	for i := 0; i < int(set.Spec.Pods); i++ {
-		hosts += fmt.Sprintf("%s-m-0-%d.%s.%s.svc.cluster.local\n",
-			set.Name, i, set.Spec.ServiceName, set.Namespace)
+	// The launcher has a different hostname, n for netmark
+	hosts := fmt.Sprintf("%s-n-0-0.%s.%s.svc.cluster.local\n",
+		spec.Name, spec.Spec.ServiceName, spec.Namespace,
+	)
+	// Add number of workers
+	for i := 0; i < int(spec.Spec.Pods-1); i++ {
+		hosts += fmt.Sprintf("%s-w-0-%d.%s.%s.svc.cluster.local\n",
+			spec.Name, i, spec.Spec.ServiceName, spec.Namespace)
 	}
-
 	storeTrial := ""
 	if m.storeEachTrial {
 		storeTrial = "-s"
 	}
 
-	template := `#!/bin/bash
+	prefixTemplate := `#!/bin/bash
 # Start ssh daemon
 /usr/sbin/sshd -D &
 whoami
 # Show ourselves!
 cat ${0}
-
+	
 # If we have zero tasks, default to workers * nproc
 np=%d
 pods=%d
 if [[ $np -eq 0 ]]; then
-    np=$(nproc)
-    np=$(( $pods*$np ))
+	np=$(nproc)
+	np=$(( $pods*$np ))
 fi
-
+	
 # Write the hosts file
 cat <<EOF > ./hostlist.txt
 %s
 EOF
-
+	
 # Allow network to ready
 echo "Sleeping for 10 seconds waiting for network..."
 sleep 10
-
-if [ $JOB_COMPLETION_INDEX = 0 ]; then
-   mpirun -f ./hostlist.txt -np $np /usr/local/bin/netmark.x -w %d -t %d -c %d -b %d %s
-else
-   sleep infinity
-fi
-`
-	return fmt.Sprintf(
-		template,
+	`
+	prefix := fmt.Sprintf(
+		prefixTemplate,
 		m.tasks,
-		set.Spec.Pods,
+		spec.Spec.Pods,
 		hosts,
+	)
+
+	// Template for the launcher
+	template := `
+mpirun -f ./hostlist.txt -np $np /usr/local/bin/netmark.x -w %d -t %d -c %d -b %d %s
+`
+	launcherTemplate := prefix + fmt.Sprintf(
+		template,
 		m.warmups,
 		m.trials,
 		m.sendReceiveCycles,
 		m.messageSize,
 		storeTrial,
 	)
+
+	// The worker just has sleep infinity added
+	workerTemplate := prefix + "\nsleep infinity"
+
+	// Return the script templates for each of launcher and worker
+	return []metrics.EntrypointScript{
+		{
+			Name:   m.launcherScriptKey,
+			Path:   m.launcherScript,
+			Script: launcherTemplate,
+		},
+		{
+			Name:   m.workerScriptKey,
+			Path:   m.workerScript,
+			Script: workerTemplate,
+		},
+	}
 }
 
 // Does the metric require an application container?
@@ -184,5 +301,9 @@ func init() {
 			requiresStorage:     false,
 			standalone:          true,
 			container:           "vanessa/netmark:latest",
+			workerScript:        "/metrics_operator/netmark-worker.sh",
+			launcherScript:      "/metrics_operator/netmark-launcher.sh",
+			workerScriptKey:     "netmark-worker",
+			launcherScriptKey:   "netmark-launcher",
 		})
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
@@ -46,6 +47,11 @@ func (m IOStat) WorkingDir() string {
 	return ""
 }
 
+// Validation
+func (m IOStat) Validate(set *api.MetricSet) bool {
+	return true
+}
+
 // Set custom options / attributes for the metric
 func (m *IOStat) SetOptions(metric *api.Metric) {
 	m.rate = metric.Rate
@@ -58,7 +64,7 @@ func (m *IOStat) SetOptions(metric *api.Metric) {
 // TODO need to think of more clever way to export the values?
 // Save to somewhere?
 // TODO if the app is too fast we might miss it?
-func (m IOStat) EntrypointScript(set *api.MetricSet) string {
+func (m IOStat) EntrypointScripts(set *api.MetricSet) []metrics.EntrypointScript {
 
 	template := `#!/bin/bash
 i=0
@@ -75,28 +81,40 @@ while true
 	let i=i+1 
 done
 `
-	// NOTE: the entrypoint is the entrypoint for the container, while
+	// The entrypoint is the entrypoint for the container, while
 	// the command is expected to be what we are monitoring. Often
-	// they are the same thing.
-	return fmt.Sprintf(template, m.completions, m.rate)
+	// they are the same thing. We return an empty Name so it's automatically
+	// assigned
+	return []metrics.EntrypointScript{
+		{Script: fmt.Sprintf(template, m.completions, m.rate)},
+	}
+
+}
+
+// Jobs required for success condition (n is the netmark run)
+func (m IOStat) SuccessJobs() []string {
+	return []string{}
 }
 
 // Does the metric require an application container?
 func (m IOStat) RequiresApplication() bool {
 	return m.requiresApplication
 }
+func (m IOStat) Type() string {
+	return metrics.StorageMetric
+}
 func (m IOStat) RequiresStorage() bool {
 	return m.requiresStorage
+}
+func (m IOStat) ReplicatedJobs(set *api.MetricSet) ([]jobset.ReplicatedJob, error) {
+	return []jobset.ReplicatedJob{}, nil
 }
 
 func init() {
 	metrics.Register(
 		&IOStat{
-			name:                "io-sysstat",
-			description:         "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
-			requiresApplication: false,
-			requiresStorage:     true,
-			standalone:          false,
-			container:           "ghcr.io/converged-computing/metric-sysstat:latest",
+			name:        "io-sysstat",
+			description: "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
+			container:   "ghcr.io/converged-computing/metric-sysstat:latest",
 		})
 }
