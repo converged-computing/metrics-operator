@@ -62,12 +62,12 @@ func (r *MetricSetReconciler) ensureConfigMaps(
 		cm, result, err := r.getConfigMap(ctx, set, data)
 		if err != nil {
 			r.Log.Error(
-				err, "❌ Failed to get config map",
+				err, "🟥️ Failed to get config map",
 				"Namespace", cm.Namespace,
 				"Name", (*cm).Name,
 			)
 		}
-		return cm, result, err
+		return existing, result, err
 
 	} else {
 		r.Log.Info(
@@ -109,12 +109,10 @@ func (r *MetricSetReconciler) getConfigMap(
 	err := r.Create(ctx, cm)
 	if err != nil {
 		r.Log.Error(
-			err, "❌ Failed to create MetricSet ConfigMap",
+			err, "🟥️ Failed to create MetricSet ConfigMap",
 			"Namespace", cm.Namespace,
 			"Name", (*cm).Name,
 		)
-		return cm, ctrl.Result{}, err
 	}
-	// Successful - return and requeue
-	return cm, ctrl.Result{Requeue: true}, nil
+	return cm, ctrl.Result{}, err
 }

@@ -1,0 +1,21 @@
+apiVersion: flux-framework.org/v1alpha1
+kind: MetricSet
+metadata:
+  labels:
+    app.kubernetes.io/name: metricset
+    app.kubernetes.io/instance: metricset-sample
+  name: metricset-sample
+spec:
+  # OSU benchmark is point to point and MUST be run with 2 pods
+  pods: 2
+  metrics:
+   - name: network-osu-benchmark
+
+     # Custom list of commands to run
+#     listOptions:
+#       commands:
+#         - osu_acc_latency
+#         - osu_fop_latency
+#         - osu_get_acc_latency
+#         - osu_get_latency 
+#         - osu_put_latency

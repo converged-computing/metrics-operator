@@ -149,6 +149,11 @@ type Metric struct {
 	// +optional
 	Options map[string]intstr.IntOrString `json:"options"`
 
+	// Metric List Options
+	// Metric specific options
+	// +optional
+	ListOptions map[string][]intstr.IntOrString `json:"listOptions"`
+
 	// Completions
 	// Number of completions to do, more relevant for service type applications
 	// that run forever, or a storage metric. If not set (0) then don't set a limit

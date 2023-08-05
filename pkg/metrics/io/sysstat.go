@@ -1,3 +1,13 @@
+/*
+Copyright 2023 Lawrence Livermore National Security, LLC
+ (c.f. AUTHORS, NOTICE.LLNS, COPYING)
+
+This is part of the Flux resource manager framework.
+For details, see https://github.com/flux-framework.
+
+SPDX-License-Identifier: Apache-2.0
+*/
+
 package io
 
 import (
@@ -13,14 +23,11 @@ import (
 // https://github.com/sysstat/sysstat
 
 type IOStat struct {
-	name                string
-	rate                int32
-	completions         int32
-	description         string
-	container           string
-	standalone          bool
-	requiresApplication bool
-	requiresStorage     bool
+	name        string
+	rate        int32
+	completions int32
+	description string
+	container   string
 }
 
 // Name returns the metric name
@@ -36,10 +43,6 @@ func (m IOStat) Description() string {
 // Container
 func (m IOStat) Image() string {
 	return m.container
-}
-
-func (m IOStat) Standalone() bool {
-	return m.standalone
 }
 
 // WorkingDir does not matter
@@ -96,15 +99,8 @@ func (m IOStat) SuccessJobs() []string {
 	return []string{}
 }
 
-// Does the metric require an application container?
-func (m IOStat) RequiresApplication() bool {
-	return m.requiresApplication
-}
 func (m IOStat) Type() string {
 	return metrics.StorageMetric
-}
-func (m IOStat) RequiresStorage() bool {
-	return m.requiresStorage
 }
 func (m IOStat) ReplicatedJobs(set *api.MetricSet) ([]jobset.ReplicatedJob, error) {
 	return []jobset.ReplicatedJob{}, nil
