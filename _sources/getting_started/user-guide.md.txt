@@ -7,8 +7,8 @@ with the Metrics Operator installed and are interested to submit your own [custo
 
 ### Overview
 
-Our "MetricSet" is mirroring the design of a [JobSet](https://github.com/kubernetes-sigs/jobset/), which can combine multiple different things (i.e., metrics) into a cohesive unit. 
-When you create a MetricSet using this operator, we assume that you are primarily interested in measuring an application performance, collecting storage metrics, or 
+Our "MetricSet" is mirroring the design of a [JobSet](https://github.com/kubernetes-sigs/jobset/), which can combine multiple different things (i.e., metrics) into a cohesive unit.
+When you create a MetricSet using this operator, we assume that you are primarily interested in measuring an application performance, collecting storage metrics, or
 using a custom metric provided by the operator that has less stringent requirements.
 
 <details>
@@ -27,6 +27,92 @@ Given the above assumption, the logic flow of the operator works as follows:
 </details>
 
 Generally, you'll be defining an application container with one or more metrics to assess performance, or a storage solution with the same, but metrics to assess IO. There are several modes of operation, depending on your choice of metrics.
+
+### Install
+
+#### Quick Install
+
+This works best for production Kubernetes clusters, and comes down to first installing JobSet (not yet part of Kubernetes)
+
+```bash
+kind create cluster
+VERSION=v0.2.0
+kubectl apply --server-side -f https://github.com/kubernetes-sigs/jobset/releases/download/$VERSION/manifests.yaml
+```
+
+and then downloading the latest Metrics Operator yaml config, and applying it.
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/converged-computing/metrics-operator/main/examples/dist/metrics-operator.yaml
+```
+
+Note that from the repository, this config is generated with:
+
+```bash
+$ make build-config
+```
+
+and then saved to the main branch where you retrieve it from.
+
+#### Helm Install
+
+We optionally provide an install with helm, which you can do either from the charts in the repository:
+
+```bash
+$ git clone https://github.com/converged-computing/metrics-operator
+$ cd metrics-operator
+$ helm install ./chart
+```
+
+Or directly from GitHub packages (an OCI registry):
+
+```
+# helm prior to v3.8.0
+$ export HELM_EXPERIMENTAL_OCI=1
+$ helm pull oci://ghcr.io/converged-computing/metrics-operator-helm/chart
+```
+```console
+Pulled: ghcr.io/converged-computing/metrics-operator-helm/chart:0.1.0
+```
+
+And install!
+
+```bash
+$ helm install chart-0.1.0.tgz
+```
+```console
+NAME: metrics-operator
+LAST DEPLOYED: Fri Mar 24 18:36:18 2023
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+```
+
+### Getting Started
+
+Let's first review how this works.
+
+1. We provide metrics here to assess performance, storage, networking, and other custom cases (called standalone).
+2. You can choose one or more metrics to run alongside your application or storage (volumes) and measure.
+3. The metric output is printed in pod logs with a standard packaging (e.g., sections and headers) to distinguish output sections.
+4. We provide a Python module [metricsoperator](https://pypi.org/project/metricsoperator/) that can help you run an experiment, applying the metrics.yaml and then retrieving and parsing logs.
+
+For the last step, this is important because every metric tool is a special snowflake, outputting some custom format that is hard to parse and then plot. We hope to provide
+an easy means to do this so you can go from data collection to results more quickly. Now let's review a suggested set of steps for you as a new user! You can:
+
+1. First choose one or more [metrics](metrics.md), [request a metric be added](https://github.com/converged-computing/metrics-operator/issues), or start with a pre-created [examples](https://github.com/converged-computing/metrics-operator/tree/main/examples). Often if you want to measure an application or storage or "other" (e.g., networking) we already have a metrics.yaml and associated parser suited for your needs.
+2. Run the metric directly from the metrics.yaml, or use the Python module [metricsoperator](https://pypi.org/project/metricsoperator/) to run and collect output.
+3. Plot the results, and you're done!
+
+For step 2, you can always store output logs and then parse them later if desired.
+For a quick start, you can likely explore our [examples](https://github.com/converged-computing/metrics-operator/tree/main/examples) directory,
+which has both examples we use in [testing](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests) along with full
+[Python examples](https://github.com/converged-computing/metrics-operator/tree/main/examples/python) that will use the associated metrics.yaml files, but also submit and parse the output.
+Once you are comfortable with the basics, you can browse our [available metrics](metrics.md) and either design your
+own, or [request a metric be added](https://github.com/converged-computing/metrics-operator/issues). Our goals are to
+make these easy to deploy with minimal complexity for you, so we are happy to help. We also encourage you to share examples
+and experiments that you put together here for others to use.
 
 ## Metrics
 
@@ -47,7 +133,7 @@ Let's walk through an example. In the image below, you want to run one or more c
 
 ![img/application-metric-set-diagram.png](img/application-metric-set-diagram.png)
 
-You'll do this by writing a metrics.yaml file (left panel) that defines the application of interest, which in this case in LAMMPS. 
+You'll do this by writing a metrics.yaml file (left panel) that defines the application of interest, which in this case in LAMMPS.
 This will be handed to the metrics operator (middle panel) that will validate your MetricSet and prepare to deploy, and
 the result is a JobSet (right panel) that includes a Job with one or more containers alongside your application.
 Let's look at this process in more detail. Here is what the metrics.yaml file might look like.
@@ -72,7 +158,7 @@ spec:
 It was a design choice that using an application container in this context requires no changes to the container itself.
 You simply need to know what the entrypoint command is, and this will allow the metric sidecar containers to monitor it.
 In our case, for our command we are issuing `mpirun`, and that's what we want to monitor. Thus, the `image` and `command` attributes are the
-only two required for a basic application setup. For the next section, "metrics" we've found an application metric (so it can be used for an 
+only two required for a basic application setup. For the next section, "metrics" we've found an application metric (so it can be used for an
 Application Metric Set) that we like called `perf-sysstat`, and we add it to the list. We could easily have added more, because one
 application run can be monitored by several tools, but we will keep it simple for this example. Next, let's submit this to the metrics operator.
 
@@ -114,7 +200,7 @@ metadata:
   name: metricset-sample
 spec:
   storage:
-    volume: 
+    volume:
       # This is the path on the host (e.g., inside kind container)
       hostPath: /tmp/workflow
 
@@ -133,12 +219,12 @@ the assessment will be complete. We can also look at this visually:
 
 ![img/storage-metric-set-diagram.png](img/storage-metric-set-diagram.png)
 
-In the above, we are providing storage metrics (the image has two despite the yaml above showing one) that the operator knows about, along with a storage volume that we want to test. 
+In the above, we are providing storage metrics (the image has two despite the yaml above showing one) that the operator knows about, along with a storage volume that we want to test.
 The operator will prepare a JobSet with one replicated job and several containers, where one container is created per storage metric, and the volume bound to each.
 
 ![img/storage-metric-set.png](img/storage-metric-set.png)
 
-In simple terms, a storage metric set will use the volume of interest that you request, and run the tool there. 
+In simple terms, a storage metric set will use the volume of interest that you request, and run the tool there.
 Read/write is important here - e.g., if the metric needs to write to the volume, a read only volume won't work. Setting up storage
 is complex, so it's typically up for you to create the PVC and then the operator will create the volume for it. Keep in mind that you should
 honor RWX (read write many) vs just RW (read write) depending on the design you choose. Also note that by default, we only create one pod,
@@ -191,65 +277,3 @@ This metrics operator is early in design and subject to change! In the meantime,
 ## Containers Available
 
 All containers are provided under [ghcr.io/converged-computing/metrics-operator](https://github.com/converged-computing/metrics-operator/pkgs/container/metrics-operator). The latest tag is the current main branch, a "bleeding edge" version, and we will provide releases when the operator is more stable.
-
-## Install
-
-### Quick Install
-
-This works best for production Kubernetes clusters, and comes down to first installing JobSet (not yet part of Kubernetes)
-
-```bash
-kind create cluster
-VERSION=v0.2.0
-kubectl apply --server-side -f https://github.com/kubernetes-sigs/jobset/releases/download/$VERSION/manifests.yaml
-```
-
-and then downloading the latest Metrics Operator yaml config, and applying it.
-
-```bash
-kubectl apply -f https://raw.githubusercontent.com/converged-computing/metrics-operator/main/examples/dist/metrics-operator.yaml
-```
-
-Note that from the repository, this config is generated with:
-
-```bash
-$ make build-config
-```
-
-and then saved to the main branch where you retrieve it from.
-
-
-### Helm Install
-
-We optionally provide an install with helm, which you can do either from the charts in the repository:
-
-```bash
-$ git clone https://github.com/converged-computing/metrics-operator
-$ cd metrics-operator
-$ helm install ./chart
-```
-
-Or directly from GitHub packages (an OCI registry):
-
-```
-# helm prior to v3.8.0
-$ export HELM_EXPERIMENTAL_OCI=1
-$ helm pull oci://ghcr.io/converged-computing/metrics-operator-helm/chart
-```
-```console
-Pulled: ghcr.io/converged-computing/metrics-operator-helm/chart:0.1.0
-```
-
-And install!
-
-```bash
-$ helm install chart-0.1.0.tgz 
-```
-```console
-NAME: metrics-operator
-LAST DEPLOYED: Fri Mar 24 18:36:18 2023
-NAMESPACE: default
-STATUS: deployed
-REVISION: 1
-TEST SUITE: None
-```

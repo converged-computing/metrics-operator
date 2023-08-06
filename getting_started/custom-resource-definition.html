@@ -34,7 +34,7 @@
       
     
         <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.9dcb20399d0097661.min.css?v=09738cfd" />
-        <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1c7521b1" />
+        <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=8eadf0a8" />
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -70,7 +70,7 @@
 <meta itemprop="description" content="Metrics Operator ">
 <meta itemprop="image" content="https://raw.githubusercontent.com/converged-computing/metrics-operator/main/docs/images/the-metrics-operator.png">
 <script type="application/ld+json">
-  {"@type":"WebSite","headline":"Metrics Operator","url":"https://converged-computing.github.io/flux-operator","description":"The Metrics Operator creates Flux MiniClusters on Kubernetes ","name":"Metrics Operator","@context":"https://schema.org"}
+  {"@type":"WebSite","headline":"Metrics Operator","url":"https://converged-computing.github.io/flux-operator","description":"The Metrics Operator creates MetricSets on Kubernetes ","name":"Metrics Operator","@context":"https://schema.org"}
 </script>
 
 <style>
@@ -785,7 +785,7 @@ runs for that many completions before exiting.</p>
 <span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">data</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/workflow</span>
-<span class="w">        </span><span class="nt">claimName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data</span><span class="w"> </span>
+<span class="w">        </span><span class="nt">claimName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data</span>
 </code></pre></div>
 </div>
 <p>The use case above, for an application, is that it requires some kind of data or storage alongside it to function. The volumes spec above is a key value (e.g., “data” is the key) to ensure that names are unique. For storage, you’ll only be defining one volume:</p>
@@ -793,7 +793,7 @@ runs for that many completions before exiting.</p>
 <span class="w">  </span><span class="nt">storage</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">volume</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/workflow</span>
-<span class="w">      </span><span class="nt">claimName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">claimName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data</span>
 </code></pre></div>
 </div>
 <p>And the implicit name would be “storage” (although it’s probably not important for you to know that). For the remaining examples, we will provide examples for application volumes, however know that the examples are also valid for the second
@@ -809,7 +809,7 @@ storage format.</p>
 <span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">data</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/workflow</span>
-<span class="w">        </span><span class="nt">claimName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data</span><span class="w"> </span>
+<span class="w">        </span><span class="nt">claimName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data</span>
 </code></pre></div>
 </div>
 <p>The above would add a claim named “data” to the application container(s).</p>
@@ -824,7 +824,7 @@ to <code class="docutils literal notranslate"><span class="pre">/etc/nginx/conf.
 <span class="w">    </span><span class="c1"># This is an existing PVC (and associated PV) we created before the MetricSet</span>
 <span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">nginx-conf</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">configMapName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx-conf</span><span class="w"> </span>
+<span class="w">        </span><span class="nt">configMapName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx-conf</span>
 <span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/nginx/conf.d</span>
 <span class="w">        </span><span class="nt">items</span><span class="p">:</span>
 <span class="w">          </span><span class="nt">flux.conf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flux.conf</span>
@@ -844,7 +844,7 @@ to <code class="docutils literal notranslate"><span class="pre">/etc/nginx/conf.
 <span class="w">        </span><span class="no">location / {</span>
 <span class="w">          </span><span class="no">root   /usr/share/nginx/html;</span>
 <span class="w">          </span><span class="no">index  index.html index.htm;</span>
-<span class="w">        </span><span class="no">}        </span>
+<span class="w">        </span><span class="no">}</span>
 <span class="w">    </span><span class="no">}</span>
 </code></pre></div>
 </div>
@@ -884,7 +884,7 @@ to the application container(s):</p>
   <small>
     
       Last update:
-      Aug 05, 2023
+      Aug 06, 2023
     
   </small>
 </div>

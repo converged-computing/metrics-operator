@@ -134,7 +134,7 @@ spec:
     volumes:
       data:
         path: /workflow
-        claimName: data 
+        claimName: data
 ```
 
 The use case above, for an application, is that it requires some kind of data or storage alongside it to function. The volumes spec above is a key value (e.g., "data" is the key) to ensure that names are unique. For storage, you'll only be defining one volume:
@@ -144,7 +144,7 @@ spec:
   storage:
     volume:
       path: /workflow
-      claimName: data 
+      claimName: data
 ```
 
 And the implicit name would be "storage" (although it's probably not important for you to know that). For the remaining examples, we will provide examples for application volumes, however know that the examples are also valid for the second
@@ -164,10 +164,10 @@ spec:
     volumes:
       data:
         path: /workflow
-        claimName: data 
+        claimName: data
 ```
 
-The above would add a claim named "data" to the application container(s). 
+The above would add a claim named "data" to the application container(s).
 
 #### config map example
 
@@ -183,7 +183,7 @@ spec:
     # This is an existing PVC (and associated PV) we created before the MetricSet
     volumes:
       nginx-conf:
-        configMapName: nginx-conf 
+        configMapName: nginx-conf
         path: /etc/nginx/conf.d
         items:
           flux.conf: flux.conf
@@ -206,7 +206,7 @@ data:
         location / {
           root   /usr/share/nginx/html;
           index  index.html index.htm;
-        }        
+        }
     }
 ```
 

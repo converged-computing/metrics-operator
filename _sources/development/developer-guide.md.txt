@@ -40,9 +40,9 @@ $ minikube start
 # OR kind
 $ kind create cluster
 
-# Make a flux operator namespace
-$ kubectl create namespace flux-operator
-namespace/flux-operator created
+# Make a metrics operator namespace
+$ kubectl create namespace metrics-operator
+namespace/metrics-operator created
 ```
 
 Here is how to build and install the operator - we recommend you build and load into MiniKube with this command:
@@ -125,10 +125,6 @@ WIP
 
 The documentation is provided in the `docs` folder of the repository, and generally most content that you might want to add is under `getting_started`. For ease of contribution, files that are likely to be updated by contributors (e.g., mostly everything but the module generated files)
 are written in markdown. If you need to use [toctree](https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#table-of-contents) you should not use extra newlines or spaces (see index.md files for examples). The documentation is also provided in Markdown (instead of rst or restructured syntax) to make contribution easier for the community.
-
-Finally, we recommend you use the same development environment also to build and work on
-documentation. The reason is because we import the app to derive docstrings,
-and this will require having Flux.
 
 ### Install Dependencies and Build
 

@@ -34,7 +34,7 @@
       
     
         <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.9dcb20399d0097661.min.css?v=09738cfd" />
-        <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1c7521b1" />
+        <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=8eadf0a8" />
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -70,7 +70,7 @@
 <meta itemprop="description" content="Metrics Operator ">
 <meta itemprop="image" content="https://raw.githubusercontent.com/converged-computing/metrics-operator/main/docs/images/the-metrics-operator.png">
 <script type="application/ld+json">
-  {"@type":"WebSite","headline":"Metrics Operator","url":"https://converged-computing.github.io/flux-operator","description":"The Metrics Operator creates Flux MiniClusters on Kubernetes ","name":"Metrics Operator","@context":"https://schema.org"}
+  {"@type":"WebSite","headline":"Metrics Operator","url":"https://converged-computing.github.io/flux-operator","description":"The Metrics Operator creates MetricSets on Kubernetes ","name":"Metrics Operator","@context":"https://schema.org"}
 </script>
 
 <style>
@@ -696,9 +696,9 @@ $<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>metri
 <span class="gp"># </span>OR<span class="w"> </span>kind
 <span class="gp">$ </span>kind<span class="w"> </span>create<span class="w"> </span>cluster
 
-<span class="gp"># </span>Make<span class="w"> </span>a<span class="w"> </span>flux<span class="w"> </span>operator<span class="w"> </span>namespace
-<span class="gp">$ </span>kubectl<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span>flux-operator
-<span class="go">namespace/flux-operator created</span>
+<span class="gp"># </span>Make<span class="w"> </span>a<span class="w"> </span>metrics<span class="w"> </span>operator<span class="w"> </span>namespace
+<span class="gp">$ </span>kubectl<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span>metrics-operator
+<span class="go">namespace/metrics-operator created</span>
 </code></pre></div>
 </div>
 <p>Here is how to build and install the operator - we recommend you build and load into MiniKube with this command:</p>
@@ -757,9 +757,6 @@ and have access to the PID namespace of the application container.</p>
 <h2 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading">¶</a></h2>
 <p>The documentation is provided in the <code class="docutils literal notranslate"><span class="pre">docs</span></code> folder of the repository, and generally most content that you might want to add is under <code class="docutils literal notranslate"><span class="pre">getting_started</span></code>. For ease of contribution, files that are likely to be updated by contributors (e.g., mostly everything but the module generated files)
 are written in markdown. If you need to use <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#table-of-contents">toctree</a> you should not use extra newlines or spaces (see index.md files for examples). The documentation is also provided in Markdown (instead of rst or restructured syntax) to make contribution easier for the community.</p>
-<p>Finally, we recommend you use the same development environment also to build and work on
-documentation. The reason is because we import the app to derive docstrings,
-and this will require having Flux.</p>
 <h3 id="install-dependencies-and-build">Install Dependencies and Build<a class="headerlink" href="#install-dependencies-and-build" title="Permalink to this heading">¶</a></h3>
 <p>The documentation is built using sphinx, and generally you can
 create a virtual environment:</p>
@@ -789,7 +786,7 @@ server to preview:</p>
   <small>
     
       Last update:
-      Aug 05, 2023
+      Aug 06, 2023
     
   </small>
 </div>
