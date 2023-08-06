@@ -108,6 +108,13 @@ I run this before I push to a GitHub branch.
 $ make pre-push
 ```
 
+We also use pre-commit for Python formatting:
+
+```bash
+pip install -r .github/dev-requirements.txt
+pre-commit run --all-files
+```
+
 ## Writing Metric Containers
 
 This section will include instructions for how to write a metrics container.

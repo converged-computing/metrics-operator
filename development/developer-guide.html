@@ -745,6 +745,11 @@ should do it before opening.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>make<span class="w"> </span>pre-push
 </code></pre></div>
 </div>
+<p>We also use pre-commit for Python formatting:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>.github/dev-requirements.txt
+pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
+</code></pre></div>
+</div>
 <h2 id="writing-metric-containers">Writing Metric Containers<a class="headerlink" href="#writing-metric-containers" title="Permalink to this heading">¶</a></h2>
 <p>This section will include instructions for how to write a metrics container.</p>
 <h3 id="performance-via-pid">Performance via PID<a class="headerlink" href="#performance-via-pid" title="Permalink to this heading">¶</a></h3>

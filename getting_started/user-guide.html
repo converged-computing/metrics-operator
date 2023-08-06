@@ -714,8 +714,7 @@ $ helm pull oci://ghcr.io/converged-computing/metrics-operator-helm/chart
 <li><p>The metric output is printed in pod logs with a standard packaging (e.g., sections and headers) to distinguish output sections.</p></li>
 <li><p>We provide a Python module <a class="reference external" href="https://pypi.org/project/metricsoperator/">metricsoperator</a> that can help you run an experiment, applying the metrics.yaml and then retrieving and parsing logs.</p></li>
 </ol>
-<p>For the last step, this is important because every metric tool is a special snowflake, outputting some custom format that is hard to parse and then plot. We hope to provide
-an easy means to do this so you can go from data collection to results more quickly. Now let’s review a suggested set of steps for you as a new user! You can:</p>
+<p>For the last step, this is important because every metric tool is a special snowflake, outputting some custom format that is hard to parse and then plot. By providing a parser paired with each metric, we hope to provide an easy means to do this so you can go from data collection to results more quickly. Now let’s review a suggested set of steps for you as a new user! You can:</p>
 <ol class="arabic simple">
 <li><p>First choose one or more <a class="reference internal" href="metrics.html"><span class="std std-doc">metrics</span></a>, <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues">request a metric be added</a>, or start with a pre-created <a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples">examples</a>. Often if you want to measure an application or storage or “other” (e.g., networking) we already have a metrics.yaml and associated parser suited for your needs.</p></li>
 <li><p>Run the metric directly from the metrics.yaml, or use the Python module <a class="reference external" href="https://pypi.org/project/metricsoperator/">metricsoperator</a> to run and collect output.</p></li>
@@ -733,8 +732,8 @@ and experiments that you put together here for others to use.</p>
 <p>For all metric types, the following applies:</p>
 <ol class="arabic simple">
 <li><p>You can create more than one pod (scale the metric) as you see fit.</p></li>
-<li><p>There is always a headless service provided for metrics within the JobSet to make use of</p></li>
-<li><p>The definition of metrics in your metrics.yaml file is consistent across types</p></li>
+<li><p>There is always a headless service provided for metrics within the JobSet to make use of.</p></li>
+<li><p>The definition of metrics in your metrics.yaml file is consistent across types.</p></li>
 <li><p>Each metric type in the list can take a rate, completions, and custom options.</p></li>
 </ol>
 <p>For another overview of these designs, please see the <a class="reference internal" href="../development/index.html"><span class="std std-doc">developer docs</span></a>.</p>
