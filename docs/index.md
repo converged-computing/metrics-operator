@@ -7,12 +7,12 @@ that you can install to your cluster to easily measure different aspects of perf
 
  - I/O metrics to assess storage options
  - system performance metrics (memory, cpu, etc.)
- - timings
+ - network or other custom metrics / timings
 
-For this project, we aim to provide both of the following:
+For this project, we aim to provide the following:
 
 1. A catalog of pre-defined metrics and associated containers you can quickly use
-2. A number of containerized HPC applications to demonstrate using the operator.
+2. A number of containerized HPC applications and experiments to demonstrate using the operator.
 
 We wanted to create this operator because we didn't have a solid understanding
 of our application performance (typically from the high performance computing space)

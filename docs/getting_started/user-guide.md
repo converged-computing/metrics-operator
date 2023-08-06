@@ -98,8 +98,7 @@ Let's first review how this works.
 3. The metric output is printed in pod logs with a standard packaging (e.g., sections and headers) to distinguish output sections.
 4. We provide a Python module [metricsoperator](https://pypi.org/project/metricsoperator/) that can help you run an experiment, applying the metrics.yaml and then retrieving and parsing logs.
 
-For the last step, this is important because every metric tool is a special snowflake, outputting some custom format that is hard to parse and then plot. We hope to provide
-an easy means to do this so you can go from data collection to results more quickly. Now let's review a suggested set of steps for you as a new user! You can:
+For the last step, this is important because every metric tool is a special snowflake, outputting some custom format that is hard to parse and then plot. By providing a parser paired with each metric, we hope to provide an easy means to do this so you can go from data collection to results more quickly. Now let's review a suggested set of steps for you as a new user! You can:
 
 1. First choose one or more [metrics](metrics.md), [request a metric be added](https://github.com/converged-computing/metrics-operator/issues), or start with a pre-created [examples](https://github.com/converged-computing/metrics-operator/tree/main/examples). Often if you want to measure an application or storage or "other" (e.g., networking) we already have a metrics.yaml and associated parser suited for your needs.
 2. Run the metric directly from the metrics.yaml, or use the Python module [metricsoperator](https://pypi.org/project/metricsoperator/) to run and collect output.
@@ -119,8 +118,8 @@ and experiments that you put together here for others to use.
 For all metric types, the following applies:
 
 1. You can create more than one pod (scale the metric) as you see fit.
-2. There is always a headless service provided for metrics within the JobSet to make use of
-3. The definition of metrics in your metrics.yaml file is consistent across types
+2. There is always a headless service provided for metrics within the JobSet to make use of.
+3. The definition of metrics in your metrics.yaml file is consistent across types.
 4. Each metric type in the list can take a rate, completions, and custom options.
 
 For another overview of these designs, please see the [developer docs](../development/index.md).
