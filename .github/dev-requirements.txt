@@ -1,5 +1,6 @@
 pre-commit
-black
+black==23.3.0
 isort
 flake8
-pytest
+mypy==0.961
+types-requests
