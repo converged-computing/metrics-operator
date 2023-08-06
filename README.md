@@ -5,18 +5,17 @@
 Developing metrics and a catalog of applications to assess different kinds of Kubernetes performance.
 We likely will choose different metrics that are important for HPC.
 Note that I haven't started the operator yet because I'm [testing ideas for the design](hack/test).
+To learn more:
 
-View our ⭐️ [Documentation](https://converged-computing.github.io/metrics-operator/) ⭐️
+- ⭐️ [Documentation](https://converged-computing.github.io/metrics-operator/) ⭐️
+- 🐯️ [Python module](https://pypi.org/project/metricsoperator/0.0.0/) 🐯️
 
 ## Dinosaur TODO
 
 - Find better logging library for logging outside of controller
-- Python function to save entire spec to yaml (for MetricSet and JobSet)
-- When first metric ready for use with Python (storage) do first releases
-- We should have Python SDK with parsers for output (e.g., run metric, parse output meaningfully)
-- Need a strategy for storing metrics output / logs
+- For larger metric collections, we should have a log streaming mode (and not wait for Completed/Successful)
 - For services we are measuring, we likely need to be able to kill after N seconds (to complete job) or to specify the success policy on the metrics containers instead of the application
-- TBA
+- Python function to save entire spec to yaml (for MetricSet and JobSet)?
 - Metrics parsers to do (need to add separators, formatting, python parser):
   - perf-sysstat
   - netmark / osu-benchmark
