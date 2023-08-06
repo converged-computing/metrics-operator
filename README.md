@@ -11,11 +11,16 @@ View our ⭐️ [Documentation](https://converged-computing.github.io/metrics-op
 ## Dinosaur TODO
 
 - Find better logging library for logging outside of controller
+- Python function to save entire spec to yaml (for MetricSet and JobSet)
+- When first metric ready for use with Python (storage) do first releases
 - We should have Python SDK with parsers for output (e.g., run metric, parse output meaningfully)
 - Need a strategy for storing metrics output / logs
 - For services we are measuring, we likely need to be able to kill after N seconds (to complete job) or to specify the success policy on the metrics containers instead of the application
-- Start releasing earlier this time :)
 - TBA
+- Metrics parsers to do (need to add separators, formatting, python parser):
+  - perf-sysstat
+  - netmark / osu-benchmark
+
 
 ## License
 

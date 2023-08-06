@@ -45,7 +45,7 @@ type MetricSet interface {
 func consolidateEntrypointScripts(metrics []*Metric, set *api.MetricSet) []EntrypointScript {
 	scripts := []EntrypointScript{}
 	for _, metric := range metrics {
-		for _, script := range (*metric).EntrypointScripts(set) {
+		for _, script := range (*metric).EntrypointScripts(set, metric) {
 			scripts = append(scripts, script)
 		}
 	}

@@ -28,11 +28,11 @@ jobs:
     - name: Install Helm
       run: |
         export HELM_EXPERIMENTAL_OCI=1
-        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash        
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
     - name: Build chart
       run: make helm
-      
+
     - name: Login to Helm
       if: (github.event_name != 'pull_request')
       env:
@@ -40,8 +40,8 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        echo "${password}" | helm registry login -u ${username} --password-stdin ${registry} 
+        echo "${password}" | helm registry login -u ${username} --password-stdin ${registry}
         PKG_RESPONSE=$(helm package ./chart)
         echo "$PKG_RESPONSE"
-        CHART_TAR_GZ=$(basename "$PKG_RESPONSE") 
+        CHART_TAR_GZ=$(basename "$PKG_RESPONSE")
         helm push "$CHART_TAR_GZ" oci://ghcr.io/converged-computing/metrics-operator-helm

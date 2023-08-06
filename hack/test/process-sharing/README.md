@@ -130,7 +130,7 @@ STOPPED HERE - will add more later, want to make bad life decisions :)
 ```
 
 
-Here is the [man page](https://man7.org/linux/man-pages/man5/proc.5.html) that I found useful for learning about the below. 
+Here is the [man page](https://man7.org/linux/man-pages/man5/proc.5.html) that I found useful for learning about the below.
 
 ### Filesystem
 
@@ -152,7 +152,7 @@ And in "status" there are metrics from cpu to memor to pretty much everything I 
 <summary>Contents of /proc/7/status</summary>
 
 ```
-/ # cat /proc/7/status 
+/ # cat /proc/7/status
 Name:   nginx
 Umask:  0022
 State:  S (sleeping)
@@ -164,7 +164,7 @@ TracerPid:      0
 Uid:    0       0       0       0
 Gid:    0       0       0       0
 FDSize: 64
-Groups:  
+Groups:
 NStgid: 7
 NSpid:  7
 NSpgid: 7
@@ -231,15 +231,15 @@ This looks to be the [virtual address space](https://www.baeldung.com/linux/proc
 55e5eae3e000-55e5eae7c000 r--p 00117000 00:309 28874585                  /usr/sbin/nginx
 55e5eae7c000-55e5eae7f000 r--p 00155000 00:309 28874585                  /usr/sbin/nginx
 55e5eae7f000-55e5eae9d000 rw-p 00158000 00:309 28874585                  /usr/sbin/nginx
-55e5eae9d000-55e5eaf5d000 rw-p 00000000 00:00 0 
+55e5eae9d000-55e5eaf5d000 rw-p 00000000 00:00 0
 55e5eb047000-55e5eb0ca000 rw-p 00000000 00:00 0                          [heap]
-7fd91b12d000-7fd91b130000 rw-p 00000000 00:00 0 
+7fd91b12d000-7fd91b130000 rw-p 00000000 00:00 0
 7fd91b130000-7fd91b156000 r--p 00000000 00:309 28871052                  /usr/lib/x86_64-linux-gnu/libc.so.6
 7fd91b156000-7fd91b2ab000 r-xp 00026000 00:309 28871052                  /usr/lib/x86_64-linux-gnu/libc.so.6
 7fd91b2ab000-7fd91b2fe000 r--p 0017b000 00:309 28871052                  /usr/lib/x86_64-linux-gnu/libc.so.6
 7fd91b2fe000-7fd91b302000 r--p 001ce000 00:309 28871052                  /usr/lib/x86_64-linux-gnu/libc.so.6
 7fd91b302000-7fd91b304000 rw-p 001d2000 00:309 28871052                  /usr/lib/x86_64-linux-gnu/libc.so.6
-7fd91b304000-7fd91b313000 rw-p 00000000 00:00 0 
+7fd91b304000-7fd91b313000 rw-p 00000000 00:00 0
 7fd91b313000-7fd91b316000 r--p 00000000 00:309 28871151                  /usr/lib/x86_64-linux-gnu/libz.so.1.2.13
 7fd91b316000-7fd91b329000 r-xp 00003000 00:309 28871151                  /usr/lib/x86_64-linux-gnu/libz.so.1.2.13
 7fd91b329000-7fd91b330000 r--p 00016000 00:309 28871151                  /usr/lib/x86_64-linux-gnu/libz.so.1.2.13
@@ -250,7 +250,7 @@ This looks to be the [virtual address space](https://www.baeldung.com/linux/proc
 7fd91b66f000-7fd91b74c000 r--p 0033d000 00:309 28874495                  /usr/lib/x86_64-linux-gnu/libcrypto.so.3
 7fd91b74c000-7fd91b7ad000 r--p 0041a000 00:309 28874495                  /usr/lib/x86_64-linux-gnu/libcrypto.so.3
 7fd91b7ad000-7fd91b7b0000 rw-p 0047b000 00:309 28874495                  /usr/lib/x86_64-linux-gnu/libcrypto.so.3
-7fd91b7b0000-7fd91b7b3000 rw-p 00000000 00:00 0 
+7fd91b7b0000-7fd91b7b3000 rw-p 00000000 00:00 0
 7fd91b7b3000-7fd91b7d2000 r--p 00000000 00:309 28874567                  /usr/lib/x86_64-linux-gnu/libssl.so.3
 7fd91b7d2000-7fd91b82f000 r-xp 0001f000 00:309 28874567                  /usr/lib/x86_64-linux-gnu/libssl.so.3
 7fd91b82f000-7fd91b84e000 r--p 0007c000 00:309 28874567                  /usr/lib/x86_64-linux-gnu/libssl.so.3
@@ -266,9 +266,9 @@ This looks to be the [virtual address space](https://www.baeldung.com/linux/proc
 7fd91b90e000-7fd91b928000 r--p 00018000 00:309 28871061                  /usr/lib/x86_64-linux-gnu/libcrypt.so.1.1.0
 7fd91b928000-7fd91b929000 r--p 00031000 00:309 28871061                  /usr/lib/x86_64-linux-gnu/libcrypt.so.1.1.0
 7fd91b929000-7fd91b92a000 rw-p 00032000 00:309 28871061                  /usr/lib/x86_64-linux-gnu/libcrypt.so.1.1.0
-7fd91b92a000-7fd91b932000 rw-p 00000000 00:00 0 
+7fd91b92a000-7fd91b932000 rw-p 00000000 00:00 0
 7fd91b935000-7fd91b936000 rw-s 00000000 00:01 2090488                    /dev/zero (deleted)
-7fd91b936000-7fd91b938000 rw-p 00000000 00:00 0 
+7fd91b936000-7fd91b938000 rw-p 00000000 00:00 0
 7fd91b938000-7fd91b939000 r--p 00000000 00:309 28871034                  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
 7fd91b939000-7fd91b95e000 r-xp 00001000 00:309 28871034                  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
 7fd91b95e000-7fd91b968000 r--p 00026000 00:309 28871034                  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
@@ -310,12 +310,12 @@ content.sqlite  local-0         local-1         local-2         local-3         
 Note this for later - the other container won't have these. Let's proxy to one and run a job.
 
 ```console
-$ flux proxy local:///tmp/flux-jhgpJK/local-1 
+$ flux proxy local:///tmp/flux-jhgpJK/local-1
 $ flux resource list
      STATE NNODES   NCORES    NGPUS NODELIST
       free      4       16        0 flux-flux-0-[0,0,0,0]
- allocated      0        0        0 
-      down      0        0        0 
+ allocated      0        0        0
+      down      0        0        0
 ```
 
 Let's submit a very useless job.
@@ -523,7 +523,7 @@ Unix HTTP server
 and then send messages to it:
 
 ```
-# go run producer.go /proc/7/root/socket.socket /    
+# go run producer.go /proc/7/root/socket.socket /
 Unix HTTP client
 <pre>
 <a href="bin/">bin/</a>
@@ -536,7 +536,7 @@ I think I'm going to run with this idea and try some more things.
 Clean up when you are done, meaning the container and your exploded brains.
 
 ```
-$ kubectl delete -f go.yaml 
+$ kubectl delete -f go.yaml
 ```
 
 # Multiple
@@ -567,12 +567,12 @@ content.sqlite  local-0         local-1         local-2         local-3         
 Note this for later - the other container won't have these. Let's proxy to one and run a job.
 
 ```console
-$ flux proxy local:///tmp/flux-jhgpJK/local-1 
+$ flux proxy local:///tmp/flux-jhgpJK/local-1
 $ flux resource list
      STATE NNODES   NCORES    NGPUS NODELIST
       free      4       16        0 flux-flux-0-[0,0,0,0]
- allocated      0        0        0 
-      down      0        0        0 
+ allocated      0        0        0
+      down      0        0        0
 ```
 
 Submit the same job:
@@ -596,7 +596,7 @@ $ flux proxy local:///proc/7/root/tmp/flux-jhgpJK/local-1 flux resource list
      STATE NNODES   NCORES    NGPUS NODELIST
       free      4       15        0 flux-flux-0-[0,0,0,0]
  allocated      1        1        0 flux-flux-0-0
-      down      0        0 
+      down      0        0
 ```
 
 And flux3:
@@ -609,7 +609,7 @@ $ flux proxy local:///proc/7/root/tmp/flux-jhgpJK/local-1 flux resource list
      STATE NNODES   NCORES    NGPUS NODELIST
       free      4       15        0 flux-flux-0-[0,0,0,0]
  allocated      1        1        0 flux-flux-0-0
-      down      0        0        0 
+      down      0        0        0
 ```
 
 Yep seems to work, of course we will need to test other cases, not just interacting with a socket in the filesystem.
@@ -617,5 +617,3 @@ Yep seems to work, of course we will need to test other cases, not just interact
 ```bash
 kubectl delete -f flux.yaml
 ```
-
-

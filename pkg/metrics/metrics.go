@@ -15,6 +15,7 @@ import (
 	"log"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 )
 
@@ -42,8 +43,12 @@ type Metric interface {
 	// Metric type to know how to add to MetricSet
 	Type() string
 
+	// Exportable attributes
+	Options() map[string]intstr.IntOrString
+	ListOptions() map[string][]intstr.IntOrString
+
 	// EntrypointScripts are required to generate ConfigMaps
-	EntrypointScripts(*api.MetricSet) []EntrypointScript
+	EntrypointScripts(*api.MetricSet, *Metric) []EntrypointScript
 }
 
 // GetMetric returns the Component specified by name from `Registry`.

@@ -15,6 +15,7 @@ import (
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 )
 
@@ -65,13 +66,23 @@ func (m PidStat) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, er
 	return []jobset.ReplicatedJob{}, nil
 }
 
+// Exported options and list options
+func (m PidStat) Options() map[string]intstr.IntOrString {
+	return map[string]intstr.IntOrString{
+		"rate":        intstr.FromInt(int(m.rate)),
+		"completions": intstr.FromInt(int(m.completions)),
+	}
+}
+func (m PidStat) ListOptions() map[string][]intstr.IntOrString {
+	return map[string][]intstr.IntOrString{}
+}
+
 // Generate the replicated job for measuring the application
-// We provide the entire Metrics Set (including the application) if we need
-// to extract metadata from elsewhere
-// TODO need to think of more clever way to export the values?
-// Save to somewhere?
 // TODO if the app is too fast we might miss it?
-func (m PidStat) EntrypointScripts(spec *api.MetricSet) []metrics.EntrypointScript {
+func (m PidStat) EntrypointScripts(
+	spec *api.MetricSet,
+	metric *metrics.Metric,
+) []metrics.EntrypointScript {
 
 	template := `#!/bin/bash
 
@@ -96,11 +107,11 @@ while true
 	pidstat -p ${pid} -r -h
     echo "STACK UTILIZATION ${i}
 	pidstat -p ${pid} -s -h
-    echo "THREADS ${i}	
+    echo "THREADS ${i}
 	pidstat -p ${pid} -t -h
-    echo "KERNEL TABLES ${i}	
+    echo "KERNEL TABLES ${i}
 	pidstat -p ${pid} -v -h
-    echo "TASK SWITCHING ${i}	
+    echo "TASK SWITCHING ${i}
 	pidstat -p ${pid} -w -h
 	# Check if still running
 	ps -p ${pid} > /dev/null
@@ -112,7 +123,7 @@ while true
     	exit 0
     fi
 	sleep %d
-	let i=i+1 
+	let i=i+1
 done
 `
 	// NOTE: the entrypoint is the entrypoint for the container, while

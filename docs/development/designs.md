@@ -1,14 +1,14 @@
 # Design Thinking
 
-Our "MetricSet" is mirroring the design of a JobSet, which can combine multiple different things (i.e., metrics) into a cohesive unit. 
-With this design, we assume that you are primarily interested in measuring an application performance, collecting storage metrics, or 
+Our "MetricSet" is mirroring the design of a JobSet, which can combine multiple different things (i.e., metrics) into a cohesive unit.
+With this design, we assume that you are primarily interested in measuring an application performance, collecting storage metrics, or
 "rolling your own" design with a custom metric (e.g., a networking metric that has a special setup with a launcher and other customizations to the JobSet)
 
 ## Overview
 
 Given the above assumption, the logic flow of the operator works as follows:
 
- - The user writes a metrics.yaml file that optionally includes an application OR storage description or neither for a custom metric. Typically, you'd provide an application for performance metrics, and storage for IO/filesystem metrics, and neither for a custom metric.  
+ - The user writes a metrics.yaml file that optionally includes an application OR storage description or neither for a custom metric. Typically, you'd provide an application for performance metrics, and storage for IO/filesystem metrics, and neither for a custom metric.
  - Each metric in the list is also associated with a type (internal to the operator) that is checked. This means if you define an `Application`
  - The operator will create a JobSet that runs one or more metrics per MetricSet type:
    - Application metrics create a JobSet with each metric as a sidecar container sharing the process namespace to monitor (they can be given volumes if needed)
@@ -62,16 +62,40 @@ it must be run on its own. As an example, for a networking tool that uses MPI to
 
 ![img/standalone-metric-set.png](img/standalone-metric-set.png)
 
-We don't technically need a shared process space, a storage setup, or an application. 
+We don't technically need a shared process space, a storage setup, or an application.
 And actually, that headless service that provides the network is available for storage
 or applications as well - we just don't use them in the previous example! The ability
 to scale (via a number of pods > 1) is also a feature of storage and services if your
 tool requires that.
 
+## Output Options
 
-## Database for Metric Storage
+### Logging Parser
 
-I want to try creating a consistent database that can be used to store metrics across runs. In the space of an operator, this means we can't clean it up when the specific metric is deleted, but rather it should be owned by the namespace. I'm not sure how to do that but will think about ideas. Worst case, we have the user deploy the database in the same namespace
+For the simplest start, I've decided to allow for metrics to have their own custom output (indeed it would be hard to standardize this between so many different tools) but have the operator
+provide structure to that, meaning separators to distinguish sections, and a consistent way to output metadata. As an example, here is what the top level metadata and sections (with some custom output data between)
+would look like:
+
+```console
+METADATA START {"pods":1,"completions":1,"storageVolumePath":"/workflow","storageVolumeHostPath":"/tmp/workflow","metricName":"io-sysstat","metricDescription":"statistics for Linux tasks (processes) : I/O, CPU, memory, etc.","metricType":"storage","metricOptions":{"completions":2,"human":"false","rate":10}}
+METADATA END
+METRICS OPERATOR COLLECTION START
+METRICS OPERATOR TIMEPOINT
+...custom data output here for timepoint 1...
+METRICS OPERATOR TIMEPOINT
+...custom data output here for timepoint 2...
+METRICS OPERATOR TIMEPOINT
+...custom data output here for timepoint N...
+METRICS OPERATOR COLLECTION END
+```
+
+In the above, we can parse the metadata for the run from the first line (a subset of flattened, important features dumped in json) and then clearly mark the start and end of collection,
+along with separation between timepoints. This is the most structure we can provide, as each metric output looks different. It's up to the Python module parser from the "metricsoperator"
+module to know how to parse (and possibly plot) any specific output type.
+
+### Database for Metric Storage
+
+I was considering (and still am, ) to try creating a consistent database that can be used to store metrics across runs. In the space of an operator, this means we can't clean it up when the specific metric is deleted, but rather it should be owned by the namespace. I'm not sure how to do that but will think about ideas. Worst case, we have the user deploy the database in the same namespace
 separately. Best case, we can manage it for them, or (better) not require it at all.
 I don't want anything complicated (I don't want to re-create prometheus or a monitoring service!)
 

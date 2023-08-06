@@ -22,7 +22,7 @@ $ kubectl apply -f ../../dist/metrics-operator-dev.yaml
 How to see metrics operator logs:
 
 ```bash
-$ kubectl logs -n metrics-system metrics-controller-manager-859c66464c-7rpbw 
+$ kubectl logs -n metrics-system metrics-controller-manager-859c66464c-7rpbw
 ```
 
 Make sure to load your private image into the node:

@@ -2,7 +2,7 @@ name: docs metrics-operator
 on:
   push:
     branches: [main]
- 
+
 jobs:
   generate-docs:
     runs-on: ubuntu-latest

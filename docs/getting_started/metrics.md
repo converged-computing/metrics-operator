@@ -1,6 +1,6 @@
 # Metrics
 
-The following metrics are under development (or being planned). 
+The following metrics are under development (or being planned).
 
  - [Examples](https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#examples)
  - [Storage Metrics](https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#storage)
@@ -25,8 +25,8 @@ These metrics are intended to assess application performance.
 #### perf-sysstat
 
  - [Application Metric Set](user-guide.md#application-metric-set)
-   
-This metric provides the "pidstat" executable of the sysstat library. 
+
+This metric provides the "pidstat" executable of the sysstat library.
 
 ### Storage
 
@@ -94,7 +94,7 @@ The following examples are provided alongside the operator. Each directory has a
  - https://www.vi-hps.org/tools/tools.html
  - https://open.xdmod.org/10.0/index.html
 
- 
+
 ## Containers
 
 The following tools are folded into the metrics above. Often, one tool can be built into one container and used across multiple metrics.
