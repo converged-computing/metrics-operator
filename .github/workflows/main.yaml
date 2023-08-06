@@ -18,6 +18,13 @@ jobs:
       with:
         files: ./README.md ./config/samples ./docs/*.md ./docs/*/*.md
 
+    - name: Lint and format Python code
+      run: |
+        export PATH="/usr/share/miniconda/bin:$PATH"
+        source activate black
+        pip install -r .github/dev-requirements.txt
+        pre-commit run --all-files
+
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest

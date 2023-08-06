@@ -17,5 +17,5 @@ spec:
 #         - osu_acc_latency
 #         - osu_fop_latency
 #         - osu_get_acc_latency
-#         - osu_get_latency 
+#         - osu_get_latency
 #         - osu_put_latency

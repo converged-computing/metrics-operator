@@ -6,9 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="The Metrics Operator Metrics">
-    <meta name="author" content="Vanessa Sochat">      
+    <meta name="author" content="Vanessa Sochat">
     <link rel="icon" href="../favicon.ico">
-    
+
     <title>Metrics Operator -- Metrics</title>
 
     <!-- Custom styles for this template -->
@@ -24,18 +24,18 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:400,900);
 @import url(https://fonts.googleapis.com/css?family=Lobster:400,900);
 
-* { 
+* {
     margin: 0;
     padding: 0px;
-} 
+}
 
-body { 
-    margin: 0; 
-    height: 100%; 
+body {
+    margin: 0;
+    height: 100%;
     color: #F7F7F7;
     font-family: 'Nunito Sans', sans-serif;
     /*font-family: 'Lato', sans-serif;*/
-    font-weight: 400; 
+    font-weight: 400;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -64,13 +64,13 @@ ol > li {
 }
 
 
-p { 
-    padding: 0; 
-    margin-bottom: 12px; 
+p {
+    padding: 0;
+    margin-bottom: 12px;
     font-weight: 400;
     line-height: 26px;
-    color: #333; 
-    margin-top: 10px; 
+    color: #333;
+    margin-top: 10px;
 }
 
 img {
@@ -88,11 +88,11 @@ ol {
     padding-left: 26px;
 }
 
-a { 
+a {
     color:#98256d;
     padding: 0;
     margin: 0;
-    text-decoration: none; 
+    text-decoration: none;
     -webkit-transition: background-color .4s linear, color .4s linear;
     -moz-transition: background-color .4s linear, color .4s linear;
     -o-transition: background-color .4s linear, color .4s linear;
@@ -309,7 +309,7 @@ a:focus {
     background-position: center center;
     min-height: 450px;
     width: 100%;
-    
+
     -webkit-background-size: 100%;
     -moz-background-size: 100%;
     -o-background-size: 100%;
@@ -406,7 +406,7 @@ table {
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-</head>    
+</head>
     <body>
 
 <div class="container-wide" style="padding:20px">
@@ -419,7 +419,7 @@ table {
             <th>Description</th>
             <th>Container</th>
         </tr>
-  </thead>      
+  </thead>
 </table>
 </div>
 
@@ -433,7 +433,7 @@ $.getJSON("metrics.json", function(data) {
     pageLength: 50,
     columns: [
       { data: "name",
-        render: function ( data, type, row ) { 
+        render: function ( data, type, row ) {
           if (row['url'] == "") {
             return row["name"]
           }
@@ -442,7 +442,7 @@ $.getJSON("metrics.json", function(data) {
       { data: "type"},
       { data: "description"},
       { data: "image",
-        render: function ( data, type, row ) { 
+        render: function ( data, type, row ) {
           if (data.startsWith("ghcr.io/converged-computing/metric-")) {
           var containerNameTagged = data.split("/")[2];
           var containerName = containerNameTagged.split(":")[0]

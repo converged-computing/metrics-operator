@@ -2,10 +2,7 @@
 Copyright 2023 Lawrence Livermore National Security, LLC
  (c.f. AUTHORS, NOTICE.LLNS, COPYING)
 
-This is part of the Flux resource manager framework.
-For details, see https://github.com/flux-framework.
-
-SPDX-License-Identifier: Apache-2.0
+SPDX-License-Identifier: MIT
 */
 
 package metrics
@@ -45,7 +42,7 @@ type MetricSet interface {
 func consolidateEntrypointScripts(metrics []*Metric, set *api.MetricSet) []EntrypointScript {
 	scripts := []EntrypointScript{}
 	for _, metric := range metrics {
-		for _, script := range (*metric).EntrypointScripts(set) {
+		for _, script := range (*metric).EntrypointScripts(set, metric) {
 			scripts = append(scripts, script)
 		}
 	}

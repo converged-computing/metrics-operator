@@ -2,10 +2,7 @@
 Copyright 2023 Lawrence Livermore National Security, LLC
  (c.f. AUTHORS, NOTICE.LLNS, COPYING)
 
-This is part of the Flux resource manager framework.
-For details, see https://github.com/flux-framework.
-
-SPDX-License-Identifier: Apache-2.0
+SPDX-License-Identifier: MIT
 */
 
 package network
@@ -16,6 +13,7 @@ import (
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
@@ -195,9 +193,26 @@ func (m *OSUBenchmark) SetOptions(metric *api.Metric) {
 	}
 }
 
+// Exported options and list options
+func (m OSUBenchmark) Options() map[string]intstr.IntOrString {
+	return map[string]intstr.IntOrString{
+		"rate":        intstr.FromInt(int(m.rate)),
+		"completions": intstr.FromInt(int(m.completions)),
+	}
+}
+func (m OSUBenchmark) ListOptions() map[string][]intstr.IntOrString {
+	commands := []intstr.IntOrString{}
+	for _, command := range m.commands {
+		commands = append(commands, intstr.FromString(command))
+	}
+	return map[string][]intstr.IntOrString{
+		"commands": commands,
+	}
+}
+
 // OSU Benchmarks MUST be run with two nodes
-func (n OSUBenchmark) Validate(spec *api.MetricSet) bool {
-	if len(n.commands) == 0 {
+func (m OSUBenchmark) Validate(spec *api.MetricSet) bool {
+	if len(m.commands) == 0 {
 		fmt.Printf("🟥️ OSUBenchmark not valid, requires 1+ commands.")
 		return false
 	}
@@ -205,7 +220,10 @@ func (n OSUBenchmark) Validate(spec *api.MetricSet) bool {
 }
 
 // Return lookup of entrypoint scripts
-func (m OSUBenchmark) EntrypointScripts(spec *api.MetricSet) []metrics.EntrypointScript {
+func (m OSUBenchmark) EntrypointScripts(
+	spec *api.MetricSet,
+	metric *metrics.Metric,
+) []metrics.EntrypointScript {
 
 	// Generate hostlists
 	// The launcher has a different hostname, n for netmark
@@ -221,7 +239,7 @@ func (m OSUBenchmark) EntrypointScripts(spec *api.MetricSet) []metrics.Entrypoin
 whoami
 # Show ourselves!
 cat ${0}
-	
+
 # Allow network to ready
 echo "Sleeping for 10 seconds waiting for network..."
 sleep 10

@@ -2,10 +2,7 @@
 Copyright 2023 Lawrence Livermore National Security, LLC
  (c.f. AUTHORS, NOTICE.LLNS, COPYING)
 
-This is part of the Flux resource manager framework.
-For details, see https://github.com/flux-framework.
-
-SPDX-License-Identifier: Apache-2.0
+SPDX-License-Identifier: MIT
 */
 
 package network
@@ -13,9 +10,11 @@ package network
 import (
 	"fmt"
 	"path"
+	"strconv"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
@@ -209,8 +208,28 @@ func (n Netmark) Validate(spec *api.MetricSet) bool {
 	return spec.Spec.Pods >= 2
 }
 
+// Exported options and list options
+func (n Netmark) Options() map[string]intstr.IntOrString {
+	return map[string]intstr.IntOrString{
+		"rate":              intstr.FromInt(int(n.rate)),
+		"completions":       intstr.FromInt(int(n.completions)),
+		"tasks":             intstr.FromInt(int(n.tasks)),
+		"warmups":           intstr.FromInt(int(n.warmups)),
+		"trials":            intstr.FromInt(int(n.trials)),
+		"sendReceiveCycles": intstr.FromInt(int(n.sendReceiveCycles)),
+		"messageSize":       intstr.FromInt(int(n.messageSize)),
+		"storeEachTrial":    intstr.FromString(strconv.FormatBool(n.storeEachTrial)),
+	}
+}
+func (n Netmark) ListOptions() map[string][]intstr.IntOrString {
+	return map[string][]intstr.IntOrString{}
+}
+
 // Return lookup of entrypoint scripts
-func (m Netmark) EntrypointScripts(spec *api.MetricSet) []metrics.EntrypointScript {
+func (m Netmark) EntrypointScripts(
+	spec *api.MetricSet,
+	metric *metrics.Metric,
+) []metrics.EntrypointScript {
 
 	// Generate hostlists
 	// The launcher has a different hostname, n for netmark
@@ -233,7 +252,7 @@ func (m Netmark) EntrypointScripts(spec *api.MetricSet) []metrics.EntrypointScri
 whoami
 # Show ourselves!
 cat ${0}
-	
+
 # If we have zero tasks, default to workers * nproc
 np=%d
 pods=%d
@@ -241,12 +260,12 @@ if [[ $np -eq 0 ]]; then
 	np=$(nproc)
 	np=$(( $pods*$np ))
 fi
-	
+
 # Write the hosts file
 cat <<EOF > ./hostlist.txt
 %s
 EOF
-	
+
 # Allow network to ready
 echo "Sleeping for 10 seconds waiting for network..."
 sleep 10

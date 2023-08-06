@@ -15,7 +15,7 @@ spec:
             shareProcessNamespace: true
             containers:
             - name: flux1
-              image: fluxrm/flux-sched:focal 
+              image: fluxrm/flux-sched:focal
               command:
                - flux
                - start

@@ -22,7 +22,7 @@ $ kubectl apply -f ../../dist/metrics-operator-dev.yaml
 How to see metrics operator logs:
 
 ```bash
-$ kubectl logs -n metrics-system metrics-controller-manager-859c66464c-7rpbw 
+$ kubectl logs -n metrics-system metrics-controller-manager-859c66464c-7rpbw
 ```
 
 We would typically apply a manifest for storage, but since we are using a host volume, we don't need to do that (the host is the kind container that we will bind to). We currently have a bug that previous config maps aren't cleaned up, so do that first (if you've run other examples):
@@ -40,7 +40,7 @@ kubectl apply -f metrics.yaml
 Note that the metrics.yaml is asking to run a sysstat io metric for 10 completions, with a delay of 10 seconds between each check (10). Wait until you see a pod created by the job and then running (there should be one since we've only asked for one metric):
 
 ```bash
-kubectl get pods 
+kubectl get pods
 ```
 ```diff
 NAME                         READY   STATUS              RESTARTS   AGE
@@ -51,7 +51,7 @@ metricset-sample-m-0-tjxsj   1/1     Running             0          70s
 If you peek at logs, you'll see the storage metric running once every 10 seconds, and for a total of 10 times.
 
 ```bash
-$ kubectl logs metricset-sample-m-0-9pq6w 
+$ kubectl logs metricset-sample-m-0-9pq6w
 ```
 
 By default, non human readable output is presented in blocks of json:
