@@ -18,8 +18,11 @@ To learn more:
 - Python function to save entire spec to yaml (for MetricSet and JobSet)?
 - Metrics parsers to do (need to add separators, formatting, python parser):
   - perf-sysstat
-  - netmark / osu-benchmark
-
+  - netmark
+- Plotting examples needed for
+  - perf-sysstat
+  - netmark
+  - io-sysstat
 
 ## License
 
