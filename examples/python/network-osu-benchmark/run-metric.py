@@ -40,19 +40,23 @@ def main():
     m = MetricsOperator(metrics_yaml)
     m.create()
 
-    # Directory for plotting results
-    img = os.path.join(here, "img")
-    if not os.path.exists(img):
-        os.makedirs(img)
-
     print('Sleeping a minute so container can pull...')
     time.sleep(60)
     for output in m.watch():
         print(json.dumps(output, indent=4))
         utils.write_json(output, args.out)
+        plot_results(output)
 
-    # Plot each metric to image. We only have one output above so
-    # this outside loop thing is OK to do :)
+
+def plot_results(output):
+    """
+    Plot result images to file
+    """
+    # Directory for plotting results
+    img = os.path.join(here, "img")
+    if not os.path.exists(img):
+        os.makedirs(img)
+
     # This could be adjusted to handle more than one run of the metric
     # in different environments, but we just have one for now!
     for result in output['data']:
