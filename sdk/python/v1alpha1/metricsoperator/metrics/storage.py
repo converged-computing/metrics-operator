@@ -13,14 +13,10 @@ class io_sysstat(MetricBase):
     def pod_prefix(self):
         return f"{self.name}-m-0"
 
-    def parse(self, pod, container):
+    def parse_log(self, lines):
         """
-        Parse io_sysstat log and return json
+        Given lines of output, parse and return json
         """
-        lines = self.stream_output(
-            name=pod.metadata.name, namespace=self.namespace, container=container.name
-        )
-
         # Get the log metadata
         metadata = self.get_log_metadata(lines)
 

@@ -10,8 +10,6 @@ from kubernetes import client, config
 import metricsoperator.metrics as mutils
 import metricsoperator.utils as utils
 
-config.load_kube_config()
-
 
 class MetricsOperator:
     def __init__(self, yaml_file):
@@ -22,6 +20,7 @@ class MetricsOperator:
         self._core_v1 = None
         self.yaml_file = os.path.abspath(yaml_file)
         self.spec = utils.read_yaml(self.yaml_file)
+        config.load_kube_config()
 
     def watch(self):
         """
