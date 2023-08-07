@@ -78,7 +78,7 @@ The following examples are provided alongside the operator. Each directory has a
  - [perf-lammps](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-lammps)
  - [io-host-volume](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/io-host-volume)
  - [network-netmark](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-netmark) (code still private)
- - [network-osu-benchmarks](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-osu-benchmarks)
+ - [network-osu-benchmark](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-osu-benchmark)
 
 ### Apps to be Measured
 

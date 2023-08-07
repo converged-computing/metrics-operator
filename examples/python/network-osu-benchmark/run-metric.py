@@ -50,9 +50,9 @@ def main():
     for output in m.watch():
         print(json.dumps(output, indent=4))
         utils.write_json(output, args.out)
-    output = utils.read_json(args.out)
 
-    # Plot each metric to image.
+    # Plot each metric to image. We only have one output above so
+    # this outside loop thing is OK to do :)
     # This could be adjusted to handle more than one run of the metric
     # in different environments, but we just have one for now!
     for result in output['data']:
