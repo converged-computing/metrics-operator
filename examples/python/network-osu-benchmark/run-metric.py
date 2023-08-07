@@ -10,7 +10,7 @@ import metricsoperator.utils as utils
 here = os.path.abspath(os.path.dirname(__file__))
 examples = os.path.dirname(os.path.dirname(here))
 tests = os.path.join(examples, "tests")
-metrics_yaml = os.path.join(tests, "io-host-volume", "metrics.yaml")
+metrics_yaml = os.path.join(tests, "network-osu-benchmark", "metrics.yaml")
 
 def get_parser():
     parser = argparse.ArgumentParser(
@@ -20,7 +20,7 @@ def get_parser():
     parser.add_argument(
         "--out",
         help="json file to save results",
-        default=os.path.join(here, "io-host-volume.json"),
+        default=os.path.join(here, "metrics.json"),
     )
     return parser
 
@@ -35,7 +35,7 @@ def main():
     m = MetricsOperator(metrics_yaml)
     m.create()
 
-    print('Sleeping one minute to allow container to pull...')
+    print('Sleeping a minute so container can pull...')
     time.sleep(60)
     for output in m.watch():
         print(json.dumps(output, indent=4))

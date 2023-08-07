@@ -8,7 +8,7 @@ Note that I haven't started the operator yet because I'm [testing ideas for the 
 To learn more:
 
 - ⭐️ [Documentation](https://converged-computing.github.io/metrics-operator/) ⭐️
-- 🐯️ [Python module](https://pypi.org/project/metricsoperator/0.0.0/) 🐯️
+- 🐯️ [Python Module](https://pypi.org/project/metricsoperator/) 🐯️
 
 ## Dinosaur TODO
 

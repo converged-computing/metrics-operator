@@ -262,6 +262,11 @@ test-deploy: manifests kustomize
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${DEVIMG}
 	$(KUSTOMIZE) build config/default > examples/dist/metrics-operator-dev.yaml
 
+.PHONY: test-deploy-recreate
+test-deploy-recreate: test-deploy
+	kubectl delete -f examples/dist/metrics-operator-dev.yaml || true
+	kubectl apply -f examples/dist/metrics-operator-dev.yaml
+
 # Build a catalog image by adding bundle images to an empty catalog using the operator package manager tool, 'opm'.
 # This recipe invokes 'opm' in 'semver' bundle add mode. For more information on add modes, see:
 # https://github.com/operator-framework/community-operators/blob/7f1438c/docs/packaging-operator.md#updating-your-existing-operator
