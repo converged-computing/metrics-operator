@@ -1,0 +1,20 @@
+apiVersion: flux-framework.org/v1alpha1
+kind: MetricSet
+metadata:
+  labels:
+    app.kubernetes.io/name: metricset
+    app.kubernetes.io/instance: metricset-sample
+  name: metricset-sample
+spec:
+  # Number of indexed jobs to run netmark on
+  pods: 10
+  metrics:
+   - name: network-netmark
+
+     # Custom options for netmark
+     # see pkg/metrics/network/netmark.go
+     options:
+       # 10 * 2
+       # This is probably off, but we just need data
+       # Likely we need to ensure pods don't share nodes
+       tasks: 20 

@@ -14,6 +14,7 @@ and **Merged pull requests**. Critical items to know are:
 The versions coincide with releases on pip. Only major versions will be released as tags on Github.
 
 ## [0.0.x](https://github.com/converged-computing/metrics-operator/tree/main) (0.0.x)
+ - Support for Netmark parser and plotting example (0.0.12)
  - Support for OSU Benchmarks parser (and plotting) (0.0.11)
  - First release with support for parsing io-sysstat output (0.0.1)
  - Skeleton release (0.0.0)

@@ -43,12 +43,10 @@ type OSUBenchmark struct {
 
 	// Scripts
 	// TODO make a function that derives this across metrics?
-	workerScript      string
-	launcherScript    string
-	workerScriptKey   string
-	launcherScriptKey string
-	commands          []string
-	lookup            map[string]bool
+	workerScript   string
+	launcherScript string
+	commands       []string
+	lookup         map[string]bool
 }
 
 // Name returns the metric name
@@ -87,12 +85,12 @@ func (n OSUBenchmark) getMetricsKeyToPath() []corev1.KeyToPath {
 	// Each metric has an entrypoint script
 	return []corev1.KeyToPath{
 		{
-			Key:  n.launcherScriptKey,
+			Key:  deriveScriptKey(n.launcherScript),
 			Path: path.Base(n.launcherScript),
 			Mode: &makeExecutable,
 		},
 		{
-			Key:  n.workerScriptKey,
+			Key:  deriveScriptKey(n.workerScript),
 			Path: path.Base(n.workerScript),
 			Mode: &makeExecutable,
 		},
@@ -138,7 +136,6 @@ func (m OSUBenchmark) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJo
 
 	// Derive the containers, one per metric
 	// This will also include mounts for volumes
-	// TODO allow ptrace and getting root filesystem?
 	launcherContainers, err := metrics.GetContainers(spec, launcherSpec, v, false)
 	if err != nil {
 		fmt.Printf("issue creating launcher containers %s", err)
@@ -281,12 +278,12 @@ echo "%s"
 	// Return the script templates for each of launcher and worker
 	return []metrics.EntrypointScript{
 		{
-			Name:   m.launcherScriptKey,
+			Name:   deriveScriptKey(m.launcherScript),
 			Path:   m.launcherScript,
 			Script: launcherTemplate,
 		},
 		{
-			Name:   m.workerScriptKey,
+			Name:   deriveScriptKey(m.workerScript),
 			Path:   m.workerScript,
 			Script: workerTemplate,
 		},
@@ -296,12 +293,10 @@ echo "%s"
 func init() {
 	metrics.Register(
 		&OSUBenchmark{
-			name:              "network-osu-benchmark",
-			description:       "point to point MPI benchmarks",
-			container:         "ghcr.io/converged-computing/metric-osu-benchmark:latest",
-			workerScript:      "/metrics_operator/osu-worker.sh",
-			launcherScript:    "/metrics_operator/osu-launcher.sh",
-			workerScriptKey:   "osu-worker",
-			launcherScriptKey: "osu-launcher",
+			name:           "network-osu-benchmark",
+			description:    "point to point MPI benchmarks",
+			container:      "ghcr.io/converged-computing/metric-osu-benchmark:latest",
+			workerScript:   "/metrics_operator/osu-worker.sh",
+			launcherScript: "/metrics_operator/osu-launcher.sh",
 		})
 }

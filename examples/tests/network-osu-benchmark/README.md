@@ -1,6 +1,7 @@
 # OSU Benchmarks Example
 
 This will demonstrate running [OSU Benchmarks](https://mvapich.cse.ohio-state.edu/benchmarks/) with the Metrics Operator.
+For running the example, parsing, and plotting output, see [the corresponding Python directory](../../python/network-osu-benchmark/).
 
 ## Usage
 
@@ -44,7 +45,9 @@ metricset-sample-w-0-0-4s5p9   1/1     Running   0          3s
 
 In the above, "w" is a worker pod, and "l" is the launcher that runs the mpirun commands.
 If you inspect the log for the launcher you'll see a short sleep (the network isn't up immediately)
-and then the benchmarks running. By default, we don't include a list in metrics.yaml so we run them all!
+and then the benchmarks running. The output is structured in a predictable format by the Metrics
+Operator so it can easily be parsed by the metricsoperator Python module.
+By default, we don't include a list in metrics.yaml so we run them all!
 
 ```bash
 kubectl logs metricset-sample-l-0-0-lt782 -f
@@ -56,153 +59,134 @@ kubectl logs metricset-sample-l-0-0-lt782 -f
 
 ```console
 root
-#!/bin/bash
-# Start ssh daemon
-/usr/sbin/sshd -D &
-whoami
-# Show ourselves!
-cat ${0}
-
-# Allow network to ready
-echo "Sleeping for 10 seconds waiting for network..."
-sleep 10
-
-# Write the hosts file
-launcher=$(getent hosts metricset-sample-l-0-0.ms.default.svc.cluster.local | awk '{ print $1 }')
-worker=$(getent hosts metricset-sample-w-0-0.ms.default.svc.cluster.local | awk '{ print $1 }')
-echo "${launcher}" >> ./hostfile.txt
-echo "${worker}" >> ./hostfile.txt
-
-sleep 5
-echo "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_acc_latency"
-mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_acc_latency
-echo "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_fop_latency"
-mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_fop_latency
-echo "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_get_acc_latency"
-mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_get_acc_latency
-echo "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_get_latency"
-mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_get_latency
-echo "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_put_latency"
-mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_put_latency
 Sleeping for 10 seconds waiting for network...
-mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_acc_latency
-# OSU MPI_Accumulate latency Test v5.8
-# Window creation: MPI_Win_allocate
-# Synchronization: MPI_Win_flush
-# Size          Latency (us)
-1                       0.58
-2                       0.41
-4                       0.37
-8                       0.30
-16                      0.28
-32                      0.25
-64                      0.26
-128                     0.32
-256                     0.39
-512                     0.54
-1024                    0.96
-2048                    1.61
-4096                    2.88
-8192                    5.57
-16384                  11.43
-32768                  21.93
-65536                  41.58
-131072                 81.81
-262144                157.80
-524288                278.97
-1048576               548.83
-2097152              1311.45
-4194304              2484.51
+METADATA START {"pods":2,"completions":2,"metricName":"network-osu-benchmark","metricDescription":"point to point MPI benchmarks","metricType":"standalone","metricOptions":{"completions":0,"rate":10},"metricListOptions":{"commands":["osu_fop_latency","osu_get_acc_latency","osu_get_latency","osu_put_latency","osu_acc_latency"]}}
+METADATA END
+METRICS OPERATOR COLLECTION START
+METRICS OPERATOR TIMEPOINT
 mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_fop_latency
 # OSU MPI_Fetch_and_op latency Test v5.8
 # Window creation: MPI_Win_allocate
 # Synchronization: MPI_Win_flush
 # Size          Latency (us)
-8                       0.40
+8                       0.45
+METRICS OPERATOR TIMEPOINT
 mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_get_acc_latency
 # OSU MPI_Get_accumulate latency Test v5.8
 # Window creation: MPI_Win_create
 # Synchronization: MPI_Win_lock/unlock
 # Size          Latency (us)
-1                       2.09
-2                       1.53
-4                       1.40
-8                       1.39
-16                      1.46
-32                      1.45
-64                      1.60
-128                     1.58
-256                     1.64
-512                     1.75
-1024                    2.03
-2048                    2.69
-4096                    4.17
-8192                    7.30
-16384                  14.18
-32768                  27.59
-65536                  54.19
-131072                113.30
-262144                248.55
-524288                457.77
-1048576              1000.72
-2097152              2149.51
-4194304              4332.33
+1                       3.16
+2                       2.12
+4                       1.48
+8                       1.43
+16                      1.42
+32                      1.46
+64                      1.48
+128                     1.51
+256                     1.57
+512                     1.73
+1024                    2.01
+2048                    2.65
+4096                    3.86
+8192                    7.86
+16384                  14.87
+32768                  27.92
+65536                  67.16
+131072                115.28
+262144                218.97
+524288                440.29
+1048576               899.82
+2097152              2056.84
+4194304              4217.38
+METRICS OPERATOR TIMEPOINT
 mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_get_latency
 # OSU MPI_Get latency Test v5.8
 # Window creation: MPI_Win_allocate
 # Synchronization: MPI_Win_flush
 # Size          Latency (us)
-1                       0.22
-2                       0.23
-4                       0.24
-8                       0.23
-16                      0.22
-32                      0.24
-64                      0.18
-128                     0.18
-256                     0.16
-512                     0.18
-1024                    0.16
-2048                    0.16
-4096                    0.17
-8192                    0.24
-16384                   0.45
-32768                   0.92
+1                       0.20
+2                       0.19
+4                       0.17
+8                       0.15
+16                      0.15
+32                      0.14
+64                      0.13
+128                     0.13
+256                     0.13
+512                     0.13
+1024                    0.17
+2048                    0.13
+4096                    0.15
+8192                    0.22
+16384                   0.52
+32768                   0.97
 65536                   1.91
-131072                  3.39
-262144                  7.82
-524288                 15.79
-1048576                32.33
-2097152                67.27
-4194304               331.57
+131072                  3.98
+262144                  8.56
+524288                 16.80
+1048576                32.75
+2097152                79.51
+4194304               578.12
+METRICS OPERATOR TIMEPOINT
 mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_put_latency
 # OSU MPI_Put Latency Test v5.8
 # Window creation: MPI_Win_allocate
 # Synchronization: MPI_Win_flush
 # Size          Latency (us)
-1                       0.27
-2                       0.29
+1                       0.30
+2                       0.33
 4                       0.31
-8                       0.27
-16                      0.24
-32                      0.21
-64                      0.20
-128                     0.16
-256                     0.16
-512                     0.19
-1024                    0.15
-2048                    0.17
-4096                    0.23
-8192                    0.29
-16384                   0.63
-32768                   1.19
-65536                   2.37
-131072                  4.30
-262144                  8.75
-524288                 16.65
-1048576                33.12
-2097152                70.90
-4194304               293.05
+8                       0.24
+16                      0.22
+32                      0.18
+64                      0.18
+128                     0.17
+256                     0.17
+512                     0.16
+1024                    0.14
+2048                    0.16
+4096                    0.20
+8192                    0.25
+16384                   0.54
+32768                   1.10
+65536                   1.95
+131072                  3.80
+262144                  7.97
+524288                 48.36
+1048576                38.53
+2097152                71.64
+4194304               307.45
+METRICS OPERATOR TIMEPOINT
+mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_acc_latency
+# OSU MPI_Accumulate latency Test v5.8
+# Window creation: MPI_Win_allocate
+# Synchronization: MPI_Win_flush
+# Size          Latency (us)
+1                       0.25
+2                       0.24
+4                       0.25
+8                       0.25
+16                      0.26
+32                      0.28
+64                      0.31
+128                     0.38
+256                     0.51
+512                     0.82
+1024                    1.29
+2048                    2.39
+4096                    4.21
+8192                    8.22
+16384                  15.93
+32768                  30.47
+65536                  61.28
+131072                122.85
+262144                252.14
+524288                509.32
+1048576              1035.88
+2097152              2249.48
+4194304              5677.54
+METRICS OPERATOR COLLECTION END
 ```
 
 </details>
@@ -211,26 +195,10 @@ The worker comes up and sleeps, and will only be alive long enough for the main 
 finish, and once it does, the worker goes away! Here is what you'll see in its brief life:
 
 ```console
-root
-#!/bin/bash
-# Start ssh daemon
-/usr/sbin/sshd -D &
-whoami
-# Show ourselves!
-cat ${0}
-
-# Allow network to ready
-echo "Sleeping for 10 seconds waiting for network..."
-sleep 10
-
-# Write the hosts file
-launcher=$(getent hosts metricset-sample-l-0-0.ms.default.svc.cluster.local | awk '{ print $1 }')
-worker=$(getent hosts metricset-sample-w-0-0.ms.default.svc.cluster.local | awk '{ print $1 }')
-echo "${launcher}" >> ./hostfile.txt
-echo "${worker}" >> ./hostfile.txt
-
-sleep infinity
+oot
 Sleeping for 10 seconds waiting for network...
+METADATA START {"pods":2,"completions":2,"metricName":"network-osu-benchmark","metricDescription":"point to point MPI benchmarks","metricType":"standalone","metricOptions":{"completions":0,"rate":10},"metricListOptions":{"commands":["osu_fop_latency","osu_get_acc_latency","osu_get_latency","osu_put_latency","osu_acc_latency"]}}
+METADATA END
 ```
 
 We can do this with JobSet logic that the entire set is done when the launcher is done.
