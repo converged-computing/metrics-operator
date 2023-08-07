@@ -23,14 +23,10 @@ class network_osu_benchmark(MetricBase):
         row = row.split(" ", 1)
         return [x.strip() for x in row]
 
-    def parse(self, pod, container):
+    def parse_log(self, lines):
         """
-        Parse osu benchmark output log and return json
+        Given lines of output, parse and return json
         """
-        lines = self.stream_output(
-            name=pod.metadata.name, namespace=self.namespace, container=container.name
-        )
-
         # Get the log metadata
         metadata = self.get_log_metadata(lines)
 
@@ -94,14 +90,10 @@ class network_netmark(MetricBase):
         row = row.split(" ", 1)
         return [x.strip() for x in row]
 
-    def parse(self, pod, container):
+    def parse_log(self, lines):
         """
-        Parse osu benchmark output log and return json
+        Given lines of output, parse and return json
         """
-        lines = self.stream_output(
-            name=pod.metadata.name, namespace=self.namespace, container=container.name
-        )
-
         # Get the log metadata
         metadata = self.get_log_metadata(lines)
 

@@ -6,8 +6,6 @@ from kubernetes.client.api import core_v1_api
 from kubernetes.client.exceptions import ApiException
 from kubernetes.client.models.v1_pod_list import V1PodList
 
-config.load_kube_config()
-
 
 class MetricBase:
     separator = "METRICS OPERATOR TIMEPOINT"
@@ -16,7 +14,7 @@ class MetricBase:
     metadata_start = "METADATA START"
     metadata_end = "METADATA END"
 
-    def __init__(self, spec, **kwargs):
+    def __init__(self, spec=None, **kwargs):
         """
         Create a persistent client to interact with a MiniCluster
 
@@ -25,12 +23,20 @@ class MetricBase:
         self.spec = spec
         self._core_v1 = kwargs.get("core_v1_api")
 
+        # Load kubeconfig on Metricbase init only
+        if self.spec is not None:
+            config.load_kube_config()
+
     @property
     def namespace(self):
+        if not self.spec:
+            return
         return self.spec["metadata"].get("namespace") or "default"
 
     @property
     def name(self):
+        if not self.spec:
+            return
         return self.spec["metadata"]["name"]
 
     @property
@@ -39,6 +45,15 @@ class MetricBase:
 
     def container(self):
         return self.classname.replace("-", "_")
+
+    def parse(self, pod, container):
+        """
+        Retrieve logs output and call parsing function
+        """
+        lines = self.stream_output(
+            name=pod.metadata.name, namespace=self.namespace, container=container.name
+        )
+        return self.parse_log(lines)
 
     @property
     def core_v1(self):
