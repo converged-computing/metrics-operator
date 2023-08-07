@@ -19,7 +19,7 @@ plt.style.use("bmh")
 
 def get_parser():
     parser = argparse.ArgumentParser(
-        description="Run Storage Metric and Get Output",
+        description="Run OSU Benchmarks Metric and Get Output",
         formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument(
