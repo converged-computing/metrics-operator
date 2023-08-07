@@ -20,6 +20,6 @@ spec:
       completions: 2
 
       # Add human readable output (in a table instead of json)
-      options:
-        human: "true"
+      # options:
+      #  human: "true"
 
