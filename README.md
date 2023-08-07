@@ -16,12 +16,11 @@ To learn more:
 - For larger metric collections, we should have a log streaming mode (and not wait for Completed/Successful)
 - For services we are measuring, we likely need to be able to kill after N seconds (to complete job) or to specify the success policy on the metrics containers instead of the application
 - Python function to save entire spec to yaml (for MetricSet and JobSet)?
+- Netmark / OSU need resources set to ensure 1 pod/node
 - Metrics parsers to do (need to add separators, formatting, python parser):
   - perf-sysstat
-  - netmark
 - Plotting examples needed for
   - perf-sysstat
-  - netmark
   - io-sysstat
 
 ## License

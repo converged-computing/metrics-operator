@@ -2,6 +2,7 @@
 
 The container for this example (and code) is private, so you won't be able to run it!
 I'm using it for development purposes.
+For running the example, parsing, and plotting output, see [the corresponding Python directory](../../python/network-netmark/).
 
 ## Usage
 
@@ -51,45 +52,22 @@ metricset-sample-w-0-0-4s5p9   1/1     Running   0          3s
 
 In the above, "w" is a worker pod, and "n" is the netmark launcher.
 If you inspect the log for the launcher you'll see a short sleep (the network isn't up immediately)
-and then netmark running.
+and then netmark running, and the matrix of RTT.csv times is printed at the end.
 
 ```bash
 kubectl logs metricset-sample-n-0-0-lt782 -f
 ```
 ```console
 root
-#!/bin/bash
-# Start ssh daemon
-/usr/sbin/sshd -D &
-whoami
-# Show ourselves!
-cat ${0}
-
-# If we have zero tasks, default to workers * nproc
-np=2
-pods=2
-if [[ $np -eq 0 ]]; then
-    np=$(nproc)
-    np=$(( $pods*$np ))
-fi
-
-# Write the hosts file
-cat <<EOF > ./hostlist.txt
-metricset-sample-m-0-0.ms.default.svc.cluster.local
-metricset-sample-m-0-1.ms.default.svc.cluster.local
-
-EOF
-
-# Allow network to ready
-echo "Sleeping for 10 seconds waiting for network..."
-sleep 10
-
-if [ $JOB_COMPLETION_INDEX = 0 ]; then
-   mpirun -f ./hostlist.txt -np $np /usr/local/bin/netmark.x -w 10 -t 20 -c 20 -b 0 -s
-else
-   sleep infinity
-fi
+METADATA START {"pods":2,"completions":2,"metricName":"network-netmark","metricDescription":"point to point networking tool","metricType":"standalone","metricOptions":{"completions":0,"messageSize":0,"rate":10,"sendReceiveCycles":20,"storeEachTrial":"true","tasks":2,"trials":20,"warmups":10}}
+METADATA END
 Sleeping for 10 seconds waiting for network...
+(env) (base) vanessa@vanessa-ThinkPad-T490s:~/Desktop/Code/metrics-operator$ kubectl logs metricset-sample-n-0-0-82jz4 -f
+root
+METADATA START {"pods":2,"completions":2,"metricName":"network-netmark","metricDescription":"point to point networking tool","metricType":"standalone","metricOptions":{"completions":0,"messageSize":0,"rate":10,"sendReceiveCycles":20,"storeEachTrial":"true","tasks":2,"trials":20,"warmups":10}}
+METADATA END
+Sleeping for 10 seconds waiting for network...
+METRICS OPERATOR COLLECTION START
 =========== SETUP ===========
 warmups                  10
 trials                   20
@@ -97,8 +75,8 @@ send_recv_cycles         20
 bytes                     0
 store_per_trial           1
 =============================
-size 2 rank 1 on host metricset-sample-m-0-1.ms.default.svc.cluster.local ip 10.244.0.43
-size 2 rank 0 on host metricset-sample-m-0-0.ms.default.svc.cluster.local ip 10.244.0.42
+size 2 rank 1 on host metricset-sample-w-0-0.ms.default.svc.cluster.local ip 10.244.0.68
+size 2 rank 0 on host metricset-sample-n-0-0.ms.default.svc.cluster.local ip 10.244.0.67
 Rank 0 sends to rank 1
 Rank 0 sends to rank 1
 Rank 0 sends to rank 1
@@ -110,45 +88,46 @@ Rank 0 sends to rank 1
 Rank 0 sends to rank 1
 Rank 0 sends to rank 1
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 25.250 micro-seconds
+RTT between rank 0 and rank 1 is 34.527 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 25.632 micro-seconds
+RTT between rank 0 and rank 1 is 29.943 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 25.849 micro-seconds
+RTT between rank 0 and rank 1 is 28.696 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 25.824 micro-seconds
+RTT between rank 0 and rank 1 is 27.141 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 25.651 micro-seconds
+RTT between rank 0 and rank 1 is 26.679 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 25.801 micro-seconds
+RTT between rank 0 and rank 1 is 25.841 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 25.572 micro-seconds
+RTT between rank 0 and rank 1 is 28.158 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 25.048 micro-seconds
+RTT between rank 0 and rank 1 is 29.306 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 24.780 micro-seconds
+RTT between rank 0 and rank 1 is 28.491 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 24.627 micro-seconds
+RTT between rank 0 and rank 1 is 27.729 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 24.506 micro-seconds
+RTT between rank 0 and rank 1 is 27.176 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 24.293 micro-seconds
+RTT between rank 0 and rank 1 is 26.680 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 24.758 micro-seconds
+RTT between rank 0 and rank 1 is 26.275 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 24.687 micro-seconds
+Rank 1 sends to rank 0
+RTT between rank 0 and rank 1 is 26.246 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 24.592 micro-seconds
+RTT between rank 0 and rank 1 is 26.975 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 24.488 micro-seconds
+RTT between rank 0 and rank 1 is 27.065 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 24.391 micro-seconds
+RTT between rank 0 and rank 1 is 26.780 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 24.093 micro-seconds
+RTT between rank 0 and rank 1 is 26.764 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 23.828 micro-seconds
+RTT between rank 0 and rank 1 is 26.815 micro-seconds
 Rank 0 sends to rank 1
-RTT between rank 0 and rank 1 is 23.643 micro-seconds
+RTT between rank 0 and rank 1 is 26.782 micro-seconds
 Rank 1 sends to rank 0
 Rank 1 sends to rank 0
 Rank 1 sends to rank 0
@@ -159,81 +138,71 @@ Rank 1 sends to rank 0
 Rank 1 sends to rank 0
 Rank 1 sends to rank 0
 Rank 1 sends to rank 0
+RTT between rank 1 and rank 0 is 25.498 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 17.500 micro-seconds
+RTT between rank 1 and rank 0 is 24.708 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 17.252 micro-seconds
+RTT between rank 1 and rank 0 is 24.268 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 17.728 micro-seconds
+RTT between rank 1 and rank 0 is 24.765 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 17.488 micro-seconds
+RTT between rank 1 and rank 0 is 26.183 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 17.410 micro-seconds
+RTT between rank 1 and rank 0 is 27.531 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 17.358 micro-seconds
+RTT between rank 1 and rank 0 is 28.310 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 17.264 micro-seconds
+RTT between rank 1 and rank 0 is 28.821 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 17.222 micro-seconds
+RTT between rank 1 and rank 0 is 29.143 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 17.438 micro-seconds
+RTT between rank 1 and rank 0 is 29.486 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 17.485 micro-seconds
+RTT between rank 1 and rank 0 is 29.838 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 17.474 micro-seconds
+RTT between rank 1 and rank 0 is 29.084 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 17.477 micro-seconds
+RTT between rank 1 and rank 0 is 28.213 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 17.422 micro-seconds
+RTT between rank 1 and rank 0 is 27.658 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 17.341 micro-seconds
+RTT between rank 1 and rank 0 is 27.058 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 17.321 micro-seconds
+RTT between rank 1 and rank 0 is 27.269 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 17.313 micro-seconds
+RTT between rank 1 and rank 0 is 28.099 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 17.262 micro-seconds
+RTT between rank 1 and rank 0 is 27.888 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 17.190 micro-seconds
+RTT between rank 1 and rank 0 is 27.467 micro-seconds
 Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 17.111 micro-seconds
-Rank 1 sends to rank 0
-RTT between rank 1 and rank 0 is 17.079 micro-seconds
+RTT between rank 1 and rank 0 is 27.071 micro-seconds
+BW-1.csv   BW-16.csv  BW-4.csv  RTT-1.csv   RTT-16.csv  RTT-4.csv  hostlist.txt
+BW-10.csv  BW-17.csv  BW-5.csv  RTT-10.csv  RTT-17.csv  RTT-5.csv  hosts.csv
+BW-11.csv  BW-18.csv  BW-6.csv  RTT-11.csv  RTT-18.csv  RTT-6.csv  ips.csv
+BW-12.csv  BW-19.csv  BW-7.csv  RTT-12.csv  RTT-19.csv  RTT-7.csv  scripts
+BW-13.csv  BW-2.csv   BW-8.csv  RTT-13.csv  RTT-2.csv   RTT-8.csv
+BW-14.csv  BW-20.csv  BW-9.csv  RTT-14.csv  RTT-20.csv  RTT-9.csv
+BW-15.csv  BW-3.csv   BW.csv    RTT-15.csv  RTT-3.csv   RTT.csv
+NETMARK RTT.CSV START
+0.000,26.782
+27.071,0.000
+NETMARK RTT.CSV END
+METRICS OPERATOR COLLECTION END
 ```
-The worker will only be alive long enough for the main job to
+The above also shows the structured output that is done in a way for our Python parsing script to easily
+find sections of data. Also note that the worker will only be alive long enough for the main job to
 finish, and once it does, the worker goes away! Here is what you'll see in its brief life:
 
 ```console
-#!/bin/bash
-# Start ssh daemon
-/usr/sbin/sshd -D &
-whoami
-# Show ourselves!
-cat ${0}
-
-# If we have zero tasks, default to workers * nproc
-np=2
-pods=2
-if [[ $np -eq 0 ]]; then
-        np=$(nproc)
-        np=$(( $pods*$np ))
-fi
-
-# Write the hosts file
-cat <<EOF > ./hostlist.txt
-metricset-sample-n-0-0.ms.default.svc.cluster.local
-metricset-sample-w-0-0.ms.default.svc.cluster.local
-
-EOF
-
-# Allow network to ready
-echo "Sleeping for 10 seconds waiting for network..."
-sleep 10
-
-sleep infinity
+root
+METADATA START {"pods":2,"completions":2,"metricName":"network-netmark","metricDescription":"point to point networking tool","metricType":"standalone","metricOptions":{"completions":0,"messageSize":0,"rate":10,"sendReceiveCycles":20,"storeEachTrial":"true","tasks":2,"trials":20,"warmups":10}}
+METADATA END
 Sleeping for 10 seconds waiting for network...
+METRICS OPERATOR COLLECTION START
 ```
 
+We never actually parse the output of the worker, so it isn't important.
 We can do this with JobSet logic that the entire set is done when the launcher is done.
 
 ```bash
@@ -281,5 +250,5 @@ metricset-sample-w-0-1-5j2kh   1/1     Terminating   0          23s
 metricset-sample-w-0-2-lxg7w   1/1     Terminating   0          23s
 ```
 
-Again, the worker jobs clean up nicely! We will next need to figure out a good strategy
-for saving the outside, aside from parsing the main pod logs.
+Again, the worker jobs clean up nicely, and the output is available for us
+to parse via the launcher pod.

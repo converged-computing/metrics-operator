@@ -1,12 +1,13 @@
 # Copyright 2023 Lawrence Livermore National Security, LLC
 # (c.f. AUTHORS, NOTICE.LLNS, COPYING)
 
-from .network import network_osu_benchmark
+from .network import network_netmark, network_osu_benchmark
 from .storage import io_sysstat
 
 metrics = {
     "io-sysstat": io_sysstat,
     "network-osu-benchmark": network_osu_benchmark,
+    "network-netmark": network_netmark,
 }
 
 

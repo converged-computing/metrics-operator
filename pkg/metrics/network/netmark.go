@@ -10,7 +10,9 @@ package network
 import (
 	"fmt"
 	"path"
+	"path/filepath"
 	"strconv"
+	"strings"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -30,10 +32,8 @@ type Netmark struct {
 	container   string
 
 	// Scripts
-	workerScript      string
-	launcherScript    string
-	workerScriptKey   string
-	launcherScriptKey string
+	workerScript   string
+	launcherScript string
 
 	// Options
 	tasks int32
@@ -90,12 +90,12 @@ func (n Netmark) getMetricsKeyToPath() []corev1.KeyToPath {
 	// Each metric has an entrypoint script
 	return []corev1.KeyToPath{
 		{
-			Key:  n.launcherScriptKey,
+			Key:  deriveScriptKey(n.launcherScript),
 			Path: path.Base(n.launcherScript),
 			Mode: &makeExecutable,
 		},
 		{
-			Key:  n.workerScriptKey,
+			Key:  deriveScriptKey(n.workerScript),
 			Path: path.Base(n.workerScript),
 			Mode: &makeExecutable,
 		},
@@ -225,11 +225,24 @@ func (n Netmark) ListOptions() map[string][]intstr.IntOrString {
 	return map[string][]intstr.IntOrString{}
 }
 
+// Given a full path, derive the key from the script name minus the extension
+func deriveScriptKey(path string) string {
+
+	// Basename
+	path = filepath.Base(path)
+
+	// Remove the extension, and this assumes we don't have double .
+	return strings.Split(path, ".")[0]
+}
+
 // Return lookup of entrypoint scripts
 func (m Netmark) EntrypointScripts(
 	spec *api.MetricSet,
 	metric *metrics.Metric,
 ) []metrics.EntrypointScript {
+
+	// Metadata to add to beginning of run
+	metadata := metrics.Metadata(spec, metric)
 
 	// Generate hostlists
 	// The launcher has a different hostname, n for netmark
@@ -250,8 +263,7 @@ func (m Netmark) EntrypointScripts(
 # Start ssh daemon
 /usr/sbin/sshd -D &
 whoami
-# Show ourselves!
-cat ${0}
+echo "%s"
 
 # If we have zero tasks, default to workers * nproc
 np=%d
@@ -269,17 +281,25 @@ EOF
 # Allow network to ready
 echo "Sleeping for 10 seconds waiting for network..."
 sleep 10
-	`
+echo "%s"
+`
 	prefix := fmt.Sprintf(
 		prefixTemplate,
+		metadata,
 		m.tasks,
 		spec.Spec.Pods,
 		hosts,
+		metrics.CollectionStart,
 	)
 
 	// Template for the launcher
 	template := `
 mpirun -f ./hostlist.txt -np $np /usr/local/bin/netmark.x -w %d -t %d -c %d -b %d %s
+ls
+echo "NETMARK RTT.CSV START"
+cat RTT.csv
+echo "NETMARK RTT.CSV END"
+echo "%s"
 `
 	launcherTemplate := prefix + fmt.Sprintf(
 		template,
@@ -288,6 +308,7 @@ mpirun -f ./hostlist.txt -np $np /usr/local/bin/netmark.x -w %d -t %d -c %d -b %
 		m.sendReceiveCycles,
 		m.messageSize,
 		storeTrial,
+		metrics.CollectionEnd,
 	)
 
 	// The worker just has sleep infinity added
@@ -296,12 +317,12 @@ mpirun -f ./hostlist.txt -np $np /usr/local/bin/netmark.x -w %d -t %d -c %d -b %
 	// Return the script templates for each of launcher and worker
 	return []metrics.EntrypointScript{
 		{
-			Name:   m.launcherScriptKey,
+			Name:   deriveScriptKey(m.launcherScript),
 			Path:   m.launcherScript,
 			Script: launcherTemplate,
 		},
 		{
-			Name:   m.workerScriptKey,
+			Name:   deriveScriptKey(m.workerScript),
 			Path:   m.workerScript,
 			Script: workerTemplate,
 		},
@@ -311,12 +332,10 @@ mpirun -f ./hostlist.txt -np $np /usr/local/bin/netmark.x -w %d -t %d -c %d -b %
 func init() {
 	metrics.Register(
 		&Netmark{
-			name:              "network-netmark",
-			description:       "point to point networking tool",
-			container:         "vanessa/netmark:latest",
-			workerScript:      "/metrics_operator/netmark-worker.sh",
-			launcherScript:    "/metrics_operator/netmark-launcher.sh",
-			workerScriptKey:   "netmark-worker",
-			launcherScriptKey: "netmark-launcher",
+			name:           "network-netmark",
+			description:    "point to point networking tool",
+			container:      "vanessa/netmark:latest",
+			workerScript:   "/metrics_operator/netmark-worker.sh",
+			launcherScript: "/metrics_operator/netmark-launcher.sh",
 		})
 }
