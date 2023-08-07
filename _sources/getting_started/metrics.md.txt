@@ -78,7 +78,7 @@ The following examples are provided alongside the operator. Each directory has a
  - [perf-lammps](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-lammps)
  - [io-host-volume](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/io-host-volume)
  - [network-netmark](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-netmark) (code still private)
- - [network-osu-benchmarks](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-osubenchmarks) (code still private)
+ - [network-osu-benchmark](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-osu-benchmark)
 
 ### Apps to be Measured
 
@@ -102,8 +102,6 @@ The following tools are folded into the metrics above. Often, one tool can be bu
 ### Sysstat
 
  - [ghcr.io/converged-computing/metric-sysstat](https://github.com/converged-computing/metrics-operator/pkgs/container/metric-sysstat)
-
-text.startsWith("Hello");
 
 Sysstat is stored as a general metrics analyzer, as it provides several different metric types; It generally provides utils to monitor system performance and usage, including:
 
