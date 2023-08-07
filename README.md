@@ -8,7 +8,7 @@ Note that I haven't started the operator yet because I'm [testing ideas for the 
 To learn more:
 
 - ⭐️ [Documentation](https://converged-computing.github.io/metrics-operator/) ⭐️
-- 🐯️ [Python module](https://pypi.org/project/metricsoperator/0.0.0/) 🐯️
+- 🐯️ [Python Module](https://pypi.org/project/metricsoperator/) 🐯️
 
 ## Dinosaur TODO
 
@@ -18,8 +18,11 @@ To learn more:
 - Python function to save entire spec to yaml (for MetricSet and JobSet)?
 - Metrics parsers to do (need to add separators, formatting, python parser):
   - perf-sysstat
-  - netmark / osu-benchmark
-
+  - netmark
+- Plotting examples needed for
+  - perf-sysstat
+  - netmark
+  - io-sysstat
 
 ## License
 

@@ -225,6 +225,9 @@ func (m OSUBenchmark) EntrypointScripts(
 	metric *metrics.Metric,
 ) []metrics.EntrypointScript {
 
+	// Metadata to add to beginning of run
+	metadata := metrics.Metadata(spec, metric)
+
 	// Generate hostlists
 	// The launcher has a different hostname, n for netmark
 	launcherHost := fmt.Sprintf("%s-l-0-0.%s.%s.svc.cluster.local",
@@ -234,11 +237,10 @@ func (m OSUBenchmark) EntrypointScripts(
 		spec.Name, spec.Spec.ServiceName, spec.Namespace,
 	)
 	prefixTemplate := `#!/bin/bash
+# Who are we?
+whoami
 # Start ssh daemon
 /usr/sbin/sshd -D &
-whoami
-# Show ourselves!
-cat ${0}
 
 # Allow network to ready
 echo "Sleeping for 10 seconds waiting for network..."
@@ -249,21 +251,28 @@ launcher=$(getent hosts %s | awk '{ print $1 }')
 worker=$(getent hosts %s | awk '{ print $1 }')
 echo "${launcher}" >> ./hostfile.txt
 echo "${worker}" >> ./hostfile.txt
+
+# Show metadata for run
+echo "%s"
 `
-	prefix := fmt.Sprintf(prefixTemplate, launcherHost, workerHost)
+	prefix := fmt.Sprintf(prefixTemplate, launcherHost, workerHost, metadata)
 
 	// Prepare list of commands, e.g.,
 	// mpirun -f ./hostlist.txt -np 2 ./osu_acc_latency (mpich)
 	// mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_fop_latency (openmpi)
 	// Sleep a little more to allow worker to write launcher hostname
-	commands := "sleep 5\n"
+	commands := fmt.Sprintf("\nsleep 5\necho %s\n", metrics.CollectionStart)
 	for _, command := range m.commands {
+
+		// This starts the line with a separator for the new section
 		line := fmt.Sprintf("mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./%s", command)
-		commands += fmt.Sprintf("echo \"%s\"\n%s\n", line, line)
+		commands += fmt.Sprintf("echo %s\necho \"%s\"\n%s\n", metrics.Separator, line, line)
 	}
 
+	// Close the commands block
+	commands += fmt.Sprintf("echo %s\n", metrics.CollectionEnd)
+
 	// Template for the launcher
-	//
 	launcherTemplate := fmt.Sprintf("%s\n%s", prefix, commands)
 
 	// The worker just has sleep infinity added, and getting the ip address of the launcher

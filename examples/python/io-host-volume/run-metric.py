@@ -3,6 +3,7 @@
 import argparse
 import os
 import json
+import time
 from metricsoperator import MetricsOperator
 import metricsoperator.utils as utils
 
@@ -33,9 +34,12 @@ def main():
     # Create a metrics operator with our metrics.yaml
     m = MetricsOperator(metrics_yaml)
     m.create()
+
+    print('Sleeping one minute to allow container to pull...')
+    time.sleep(60)
     for output in m.watch():
         print(json.dumps(output, indent=4))
-        utils.write_json(output, os.path.join(here, "metrics.json"))
+        utils.write_json(output, args.out)
 
 if __name__ == "__main__":
     main()
