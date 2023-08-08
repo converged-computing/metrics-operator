@@ -152,4 +152,4 @@ data:
     \ flux start -o --config /etc/flux/config ${brokerOptions}\n            retval=$?\n
     \           \n            if [[ \"${retval}\" -eq 0 ]]; then\n                \n
     \               break\n            fi\n            \n            sleep 15\n        done\n
-    \   fi\n\n    \nfi\n\nsleep infinity"
+    \   fi\n\n    \nfi\n\n"
