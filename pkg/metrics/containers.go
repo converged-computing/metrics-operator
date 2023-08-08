@@ -121,9 +121,13 @@ func GetContainers(
 			Name:            "app",
 			Image:           set.Spec.Application.Image,
 			ImagePullPolicy: pullPolicy,
+			VolumeMounts:    mounts,
 			Stdin:           true,
 			TTY:             true,
 			Command:         command,
+		}
+		if set.Spec.Application.WorkingDir != "" {
+			appContainer.WorkingDir = set.Spec.Application.WorkingDir
 		}
 		containers = append(containers, appContainer)
 	}

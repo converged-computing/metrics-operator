@@ -34,6 +34,10 @@ type MetricSetSpec struct {
 	// +optional
 	Metrics []Metric `json:"metrics"`
 
+	// Don't set JobSet FQDN
+	// +optional
+	DontSetFQDN bool `json:"dontSetFQDN"`
+
 	// Service name for the JobSet (MetricsSet) cluster network
 	// +kubebuilder:default="ms"
 	// +default="ms"
@@ -81,6 +85,10 @@ type Application struct {
 
 	// command to execute and monitor
 	Command string `json:"command"`
+
+	// Working Directory
+	//+optional
+	WorkingDir string `json:"workingDir"`
 
 	// Entrypoint of container, if different from command
 	//+optional

@@ -47,10 +47,10 @@ func GetApplicationReplicatedJobs(
 	// This defaults to one replicated job, named "m"
 	job := GetReplicatedJob(spec, shareProcessNamespace, spec.Spec.Pods, spec.Spec.Completions, "")
 
-	// Add volumes expecting an application.
-	// runnerScripts are custom for a netmark jobset
+	// Add volumes expecting an application. GetVolumes creates metric entrypoint volumes
+	// and adds existing volumes (application) to our set of mounts. We need both
+	// for the jobset.
 	runnerScripts := GetMetricsKeyToPath([]*Metric{metric})
-
 	job.Template.Spec.Template.Spec.Volumes = GetVolumes(spec, runnerScripts, volumes)
 
 	// Derive the containers for the metric
@@ -62,7 +62,9 @@ func GetApplicationReplicatedJobs(
 		Name:       m.Name(),
 	}
 
-	// This will also include mounts for volumes
+	// This is for the metric and application containers
+	// Metric containers have metric entrypoint volumes
+	// Application containers have existing volumes
 	containers, err := GetContainers(
 		spec,
 		[]ContainerSpec{containerSpec},

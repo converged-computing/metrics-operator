@@ -145,7 +145,8 @@ func GetReplicatedJob(
 		Replicas: 1,
 	}
 
-	setAsFDQN := true
+	// This should default to true
+	setAsFDQN := !set.Spec.DontSetFQDN
 
 	// Create the JobSpec for the job -> Template -> Spec
 	jobspec := batchv1.JobSpec{
