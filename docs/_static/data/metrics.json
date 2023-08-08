@@ -1,12 +1,5 @@
 [
  {
-  "name": "io-sysstat",
-  "description": "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
-  "type": "storage",
-  "image": "ghcr.io/converged-computing/metric-sysstat:latest",
-  "url": "https://github.com/sysstat/sysstat"
- },
- {
   "name": "network-netmark",
   "description": "point to point networking tool",
   "type": "standalone",
@@ -24,6 +17,13 @@
   "name": "perf-sysstat",
   "description": "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
   "type": "application",
+  "image": "ghcr.io/converged-computing/metric-sysstat:latest",
+  "url": "https://github.com/sysstat/sysstat"
+ },
+ {
+  "name": "io-sysstat",
+  "description": "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
+  "type": "storage",
   "image": "ghcr.io/converged-computing/metric-sysstat:latest",
   "url": "https://github.com/sysstat/sysstat"
  }
