@@ -22,6 +22,12 @@ def get_parser():
         help="json file to save results",
         default=os.path.join(here, "io-host-volume.json"),
     )
+    parser.add_argument(
+        "--sleep",
+        help="seconds to sleep allowing for pull and run",
+        type=int,
+        default=60,
+    )
     return parser
 
 def main():
@@ -35,8 +41,8 @@ def main():
     m = MetricsOperator(metrics_yaml)
     m.create()
 
-    print('Sleeping one minute to allow container to pull...')
-    time.sleep(60)
+    print(f'Sleeping {args.sleep} seconds to allow container to pull...')
+    time.sleep(args.sleep)
     for output in m.watch():
         print(json.dumps(output, indent=4))
         utils.write_json(output, args.out)

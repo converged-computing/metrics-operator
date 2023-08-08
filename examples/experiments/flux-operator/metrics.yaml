@@ -20,8 +20,9 @@ spec:
   # This is all the logic of the flux operator packaged as an application here
   application:
     image: ghcr.io/rse-ops/lammps:flux-sched-focal
+    #command: /usr/bin/python3.8 /usr/libexec/flux/cmd/flux-submit.py -n 2 --quiet --watch lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite
     command: /bin/bash /flux_operator/wait-0.sh lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite
-    workingDir: /home/flux/examples/reaxff/HNS
+    workingDir: /home/flux/examples/reaxff/HNS    
     volumes:
       curve:
         path: /mnt/curve/
@@ -43,3 +44,4 @@ spec:
           wait-0: wait-0.sh
   metrics:
     - name: perf-sysstat
+      rate: 2

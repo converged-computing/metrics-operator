@@ -6,12 +6,11 @@ metadata:
     app.kubernetes.io/instance: metricset-sample
   name: metricset-sample
 spec:
-  # We don't have support currently for bash commands with -c quotes - hence the simple commands
   application:
-    image: ubuntu
-    command: sleep 10
+    image: ghcr.io/rse-ops/vanilla-lammps:tag-latest
+    command: mpirun lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite
   metrics:
+
+    # Higher sampling for more data to plot :)
     - name: perf-sysstat
-      options:
-        color: "true"
-       
+      rate: 2
