@@ -20,7 +20,7 @@ class io_sysstat(MetricBase):
         # Get the log metadata
         metadata = self.get_log_metadata(lines)
 
-        # Split lines by IOSTAT TIMEPOINT
+        # Split and parse output lines
         results = []
         sections = self.get_log_sections(lines)
         for section in sections:

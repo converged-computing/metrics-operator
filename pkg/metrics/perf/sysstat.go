@@ -25,6 +25,10 @@ type PidStat struct {
 	completions int32
 	description string
 	container   string
+
+	// Options
+	useColor bool
+	showPIDS bool
 }
 
 // Name returns the metric name
@@ -57,6 +61,17 @@ func (m PidStat) Url() string {
 func (m *PidStat) SetOptions(metric *api.Metric) {
 	m.rate = metric.Rate
 	m.completions = metric.Completions
+
+	// UseColor set to anything means to use it
+	_, ok := metric.Options["color"]
+	if ok {
+		m.useColor = true
+	}
+	_, ok = metric.Options["pids"]
+	if ok {
+		m.showPIDS = true
+	}
+
 }
 
 func (m PidStat) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, error) {
@@ -84,6 +99,15 @@ func (m PidStat) EntrypointScripts(
 	// Metadata to add to beginning of run
 	metadata := metrics.Metadata(spec, metric)
 
+	useColor := ""
+	if !m.useColor {
+		useColor = "export NO_COLOR=true"
+	}
+
+	showPIDS := ""
+	if m.showPIDS {
+		showPIDS = "ps aux"
+	}
 	template := `#!/bin/bash
 
 echo "%s"
@@ -97,6 +121,9 @@ echo "PIDSTAT COMMAND END"
 echo "Waiting for application PID..."
 pid=$(goshare-wait -c "%s" -q)
 
+# Set color or not
+%s
+
 # See https://kellyjonbrazil.github.io/jc/docs/parsers/pidstat
 # for how we get lovely json
 i=0
@@ -105,6 +132,7 @@ echo "%s"
 while true
   do
     echo "%s"
+	%s
     echo "CPU STATISTICS"
     pidstat -p ${pid} -u -h | jc --pidstat
     echo "KERNEL STATISTICS"
@@ -142,9 +170,11 @@ done
 		metadata,
 		spec.Spec.Application.Command,
 		spec.Spec.Application.Command,
+		useColor,
 		m.completions,
 		metrics.CollectionStart,
 		metrics.Separator,
+		showPIDS,
 		metrics.CollectionEnd,
 		metrics.CollectionEnd,
 		m.rate,

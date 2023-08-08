@@ -26,7 +26,14 @@ These metrics are intended to assess application performance.
 
  - [Application Metric Set](user-guide.md#application-metric-set)
 
-This metric provides the "pidstat" executable of the sysstat library.
+This metric provides the "pidstat" executable of the sysstat library. There is only one option to set to turn on color:
+
+|Name | Description | Type | Default |
+|-----|-------------|------------|------|
+| color | Set to turn on color parsing | Anything set | unset |
+| pids | For debugging, show consistent output of ps aux | Anything set | Unset |
+
+By default color and pids are set to false anticipating log parsing.
 
 ### Storage
 

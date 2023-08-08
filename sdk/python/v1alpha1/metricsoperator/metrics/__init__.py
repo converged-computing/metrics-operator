@@ -2,12 +2,14 @@
 # (c.f. AUTHORS, NOTICE.LLNS, COPYING)
 
 from .network import network_netmark, network_osu_benchmark
+from .perf import perf_sysstat
 from .storage import io_sysstat
 
 metrics = {
     "io-sysstat": io_sysstat,
     "network-osu-benchmark": network_osu_benchmark,
     "network-netmark": network_netmark,
+    "perf-sysstat": perf_sysstat,
 }
 
 
