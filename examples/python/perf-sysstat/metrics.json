@@ -1,983 +1,1640 @@
 {
     "data": [
         {
-            "cpu_statistics": [
+            "cpu_statistics_task": [
                 {
-                    "time": 151915,
+                    "time": 233054,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 6,
+                    "cpu": 2,
+                    "command": "mpirun"
+                }
+            ],
+            "cpu_statistics_child": [
+                {
+                    "time": 233054,
+                    "uid": 0,
+                    "pid": 20,
+                    "usr-ms": "30",
+                    "system-ms": "10",
+                    "guest-ms": "0",
                     "command": "mpirun"
                 }
             ],
             "kernel_statistics": [
                 {
-                    "time": 151915,
+                    "time": 233054,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "kb_rd_s": 0.0,
                     "kb_wr_s": 0.0,
                     "kb_ccwr_s": 0.0,
                     "iodelay": "0",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233054,
+                    "uid": 0,
+                    "pid": 20,
+                    "kb_rd_s": null
                 }
             ],
             "policy": [
                 {
-                    "time": 151915,
+                    "time": 233054,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "prio": "0",
                     "policy": "NORMAL",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233054,
+                    "uid": 0,
+                    "pid": 20,
+                    "prio": "mpirun"
                 }
             ],
-            "pagefaults": [
+            "pagefaults_task": [
                 {
-                    "time": 151915,
+                    "time": 233054,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "minflt_s": 0.0,
                     "majflt_s": 0.0,
                     "vsz": 6548,
-                    "rss": 3176,
+                    "rss": 3164,
                     "percent_mem": 0.02,
+                    "command": "mpirun"
+                }
+            ],
+            "pagefaults_child": [
+                {
+                    "time": 233054,
+                    "uid": 0,
+                    "pid": 20,
+                    "minflt-nr": "2097",
+                    "majflt-nr": "26",
                     "command": "mpirun"
                 }
             ],
             "stack_utilization": [
                 {
-                    "time": 151915,
+                    "time": 233054,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "stksize": 132,
-                    "stkref": 48,
+                    "stkref": 52,
                     "command": "mpirun"
+                },
+                {
+                    "time": 233054,
+                    "uid": 0,
+                    "pid": 20,
+                    "stksize": null
                 }
             ],
-            "threads": [
+            "threads_task": [
                 {
-                    "time": 151915,
+                    "time": 233054,
                     "uid": 0,
-                    "tgid": "21",
+                    "tgid": "20",
                     "tid": "-",
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 6,
+                    "cpu": 2,
                     "command": "mpirun"
                 },
                 {
-                    "time": 151915,
+                    "time": 233054,
                     "uid": 0,
                     "tgid": "-",
-                    "tid": "21",
+                    "tid": "20",
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 6,
+                    "cpu": 2,
+                    "command": "|__mpirun"
+                }
+            ],
+            "threads_child": [
+                {
+                    "time": 233054,
+                    "uid": 0,
+                    "tgid": "20",
+                    "tid": "-",
+                    "usr-ms": "30",
+                    "system-ms": "10",
+                    "guest-ms": "0",
+                    "command": "mpirun"
+                },
+                {
+                    "time": 233054,
+                    "uid": 0,
+                    "tgid": "-",
+                    "tid": "20",
+                    "usr-ms": "30",
+                    "system-ms": "20",
+                    "guest-ms": "0",
                     "command": "|__mpirun"
                 }
             ],
             "kernel_tables": [
                 {
-                    "time": 151915,
+                    "time": 233054,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "threads": "1",
                     "fd-nr": "9",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233054,
+                    "uid": 0,
+                    "pid": 20,
+                    "threads": "mpirun"
                 }
             ],
             "task_switching": [
                 {
-                    "time": 151915,
+                    "time": 233054,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "cswch_s": 0.0,
                     "nvcswch_s": 0.0,
                     "command": "mpirun"
+                },
+                {
+                    "time": 233054,
+                    "uid": 0,
+                    "pid": 20,
+                    "cswch_s": null
                 }
             ]
         },
         {
-            "cpu_statistics": [
+            "cpu_statistics_task": [
                 {
-                    "time": 151917,
+                    "time": 233056,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 6,
+                    "cpu": 1,
+                    "command": "mpirun"
+                }
+            ],
+            "cpu_statistics_child": [
+                {
+                    "time": 233057,
+                    "uid": 0,
+                    "pid": 20,
+                    "usr-ms": "30",
+                    "system-ms": "10",
+                    "guest-ms": "0",
                     "command": "mpirun"
                 }
             ],
             "kernel_statistics": [
                 {
-                    "time": 151918,
+                    "time": 233057,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "kb_rd_s": 0.0,
                     "kb_wr_s": 0.0,
                     "kb_ccwr_s": 0.0,
                     "iodelay": "0",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233057,
+                    "uid": 0,
+                    "pid": 20,
+                    "kb_rd_s": null
                 }
             ],
             "policy": [
                 {
-                    "time": 151918,
+                    "time": 233057,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "prio": "0",
                     "policy": "NORMAL",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233057,
+                    "uid": 0,
+                    "pid": 20,
+                    "prio": "mpirun"
                 }
             ],
-            "pagefaults": [
+            "pagefaults_task": [
                 {
-                    "time": 151918,
+                    "time": 233057,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "minflt_s": 0.0,
                     "majflt_s": 0.0,
                     "vsz": 6548,
-                    "rss": 3176,
+                    "rss": 3164,
                     "percent_mem": 0.02,
+                    "command": "mpirun"
+                }
+            ],
+            "pagefaults_child": [
+                {
+                    "time": 233057,
+                    "uid": 0,
+                    "pid": 20,
+                    "minflt-nr": "2097",
+                    "majflt-nr": "26",
                     "command": "mpirun"
                 }
             ],
             "stack_utilization": [
                 {
-                    "time": 151918,
+                    "time": 233057,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "stksize": 132,
-                    "stkref": 48,
+                    "stkref": 52,
                     "command": "mpirun"
+                },
+                {
+                    "time": 233057,
+                    "uid": 0,
+                    "pid": 20,
+                    "stksize": null
                 }
             ],
-            "threads": [
+            "threads_task": [
                 {
-                    "time": 151918,
+                    "time": 233057,
                     "uid": 0,
-                    "tgid": "21",
+                    "tgid": "20",
                     "tid": "-",
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 6,
+                    "cpu": 2,
                     "command": "mpirun"
                 },
                 {
-                    "time": 151918,
+                    "time": 233057,
                     "uid": 0,
                     "tgid": "-",
-                    "tid": "21",
+                    "tid": "20",
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 6,
+                    "cpu": 2,
+                    "command": "|__mpirun"
+                }
+            ],
+            "threads_child": [
+                {
+                    "time": 233057,
+                    "uid": 0,
+                    "tgid": "20",
+                    "tid": "-",
+                    "usr-ms": "30",
+                    "system-ms": "10",
+                    "guest-ms": "0",
+                    "command": "mpirun"
+                },
+                {
+                    "time": 233057,
+                    "uid": 0,
+                    "tgid": "-",
+                    "tid": "20",
+                    "usr-ms": "30",
+                    "system-ms": "20",
+                    "guest-ms": "0",
                     "command": "|__mpirun"
                 }
             ],
             "kernel_tables": [
                 {
-                    "time": 151918,
+                    "time": 233057,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "threads": "1",
                     "fd-nr": "9",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233057,
+                    "uid": 0,
+                    "pid": 20,
+                    "threads": "mpirun"
                 }
             ],
             "task_switching": [
                 {
-                    "time": 151918,
+                    "time": 233057,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "cswch_s": 0.0,
                     "nvcswch_s": 0.0,
                     "command": "mpirun"
+                },
+                {
+                    "time": 233057,
+                    "uid": 0,
+                    "pid": 20,
+                    "cswch_s": null
                 }
             ]
         },
         {
-            "cpu_statistics": [
+            "cpu_statistics_task": [
                 {
-                    "time": 151920,
+                    "time": 233059,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 6,
+                    "cpu": 2,
+                    "command": "mpirun"
+                }
+            ],
+            "cpu_statistics_child": [
+                {
+                    "time": 233059,
+                    "uid": 0,
+                    "pid": 20,
+                    "usr-ms": "30",
+                    "system-ms": "10",
+                    "guest-ms": "0",
                     "command": "mpirun"
                 }
             ],
             "kernel_statistics": [
                 {
-                    "time": 151920,
+                    "time": 233059,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "kb_rd_s": 0.0,
                     "kb_wr_s": 0.0,
                     "kb_ccwr_s": 0.0,
                     "iodelay": "0",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233059,
+                    "uid": 0,
+                    "pid": 20,
+                    "kb_rd_s": null
                 }
             ],
             "policy": [
                 {
-                    "time": 151920,
+                    "time": 233059,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "prio": "0",
                     "policy": "NORMAL",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233059,
+                    "uid": 0,
+                    "pid": 20,
+                    "prio": "mpirun"
                 }
             ],
-            "pagefaults": [
+            "pagefaults_task": [
                 {
-                    "time": 151920,
+                    "time": 233059,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "minflt_s": 0.0,
                     "majflt_s": 0.0,
                     "vsz": 6548,
-                    "rss": 3176,
+                    "rss": 3164,
                     "percent_mem": 0.02,
+                    "command": "mpirun"
+                }
+            ],
+            "pagefaults_child": [
+                {
+                    "time": 233059,
+                    "uid": 0,
+                    "pid": 20,
+                    "minflt-nr": "2097",
+                    "majflt-nr": "26",
                     "command": "mpirun"
                 }
             ],
             "stack_utilization": [
                 {
-                    "time": 151920,
+                    "time": 233100,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "stksize": 132,
-                    "stkref": 48,
+                    "stkref": 52,
                     "command": "mpirun"
+                },
+                {
+                    "time": 233100,
+                    "uid": 0,
+                    "pid": 20,
+                    "stksize": null
                 }
             ],
-            "threads": [
+            "threads_task": [
                 {
-                    "time": 151920,
+                    "time": 233100,
                     "uid": 0,
-                    "tgid": "21",
+                    "tgid": "20",
                     "tid": "-",
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 4,
+                    "cpu": 2,
                     "command": "mpirun"
                 },
                 {
-                    "time": 151920,
+                    "time": 233100,
                     "uid": 0,
                     "tgid": "-",
-                    "tid": "21",
+                    "tid": "20",
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 4,
+                    "cpu": 2,
+                    "command": "|__mpirun"
+                }
+            ],
+            "threads_child": [
+                {
+                    "time": 233100,
+                    "uid": 0,
+                    "tgid": "20",
+                    "tid": "-",
+                    "usr-ms": "30",
+                    "system-ms": "10",
+                    "guest-ms": "0",
+                    "command": "mpirun"
+                },
+                {
+                    "time": 233100,
+                    "uid": 0,
+                    "tgid": "-",
+                    "tid": "20",
+                    "usr-ms": "30",
+                    "system-ms": "20",
+                    "guest-ms": "0",
                     "command": "|__mpirun"
                 }
             ],
             "kernel_tables": [
                 {
-                    "time": 151920,
+                    "time": 233100,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "threads": "1",
                     "fd-nr": "9",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233100,
+                    "uid": 0,
+                    "pid": 20,
+                    "threads": "mpirun"
                 }
             ],
             "task_switching": [
                 {
-                    "time": 151920,
+                    "time": 233100,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "cswch_s": 0.0,
                     "nvcswch_s": 0.0,
                     "command": "mpirun"
+                },
+                {
+                    "time": 233100,
+                    "uid": 0,
+                    "pid": 20,
+                    "cswch_s": null
                 }
             ]
         },
         {
-            "cpu_statistics": [
+            "cpu_statistics_task": [
                 {
-                    "time": 151922,
+                    "time": 233102,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 4,
+                    "cpu": 2,
+                    "command": "mpirun"
+                }
+            ],
+            "cpu_statistics_child": [
+                {
+                    "time": 233102,
+                    "uid": 0,
+                    "pid": 20,
+                    "usr-ms": "30",
+                    "system-ms": "10",
+                    "guest-ms": "0",
                     "command": "mpirun"
                 }
             ],
             "kernel_statistics": [
                 {
-                    "time": 151922,
+                    "time": 233102,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "kb_rd_s": 0.0,
                     "kb_wr_s": 0.0,
                     "kb_ccwr_s": 0.0,
                     "iodelay": "0",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233102,
+                    "uid": 0,
+                    "pid": 20,
+                    "kb_rd_s": null
                 }
             ],
             "policy": [
                 {
-                    "time": 151922,
+                    "time": 233102,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "prio": "0",
                     "policy": "NORMAL",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233102,
+                    "uid": 0,
+                    "pid": 20,
+                    "prio": "mpirun"
                 }
             ],
-            "pagefaults": [
+            "pagefaults_task": [
                 {
-                    "time": 151922,
+                    "time": 233102,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "minflt_s": 0.0,
                     "majflt_s": 0.0,
                     "vsz": 6548,
-                    "rss": 3176,
+                    "rss": 3164,
                     "percent_mem": 0.02,
+                    "command": "mpirun"
+                }
+            ],
+            "pagefaults_child": [
+                {
+                    "time": 233102,
+                    "uid": 0,
+                    "pid": 20,
+                    "minflt-nr": "2097",
+                    "majflt-nr": "26",
                     "command": "mpirun"
                 }
             ],
             "stack_utilization": [
                 {
-                    "time": 151922,
+                    "time": 233102,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "stksize": 132,
-                    "stkref": 48,
+                    "stkref": 52,
                     "command": "mpirun"
+                },
+                {
+                    "time": 233102,
+                    "uid": 0,
+                    "pid": 20,
+                    "stksize": null
                 }
             ],
-            "threads": [
+            "threads_task": [
                 {
-                    "time": 151923,
+                    "time": 233102,
                     "uid": 0,
-                    "tgid": "21",
+                    "tgid": "20",
                     "tid": "-",
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 4,
+                    "cpu": 2,
                     "command": "mpirun"
                 },
                 {
-                    "time": 151923,
+                    "time": 233102,
                     "uid": 0,
                     "tgid": "-",
-                    "tid": "21",
+                    "tid": "20",
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 4,
+                    "cpu": 2,
+                    "command": "|__mpirun"
+                }
+            ],
+            "threads_child": [
+                {
+                    "time": 233102,
+                    "uid": 0,
+                    "tgid": "20",
+                    "tid": "-",
+                    "usr-ms": "30",
+                    "system-ms": "10",
+                    "guest-ms": "0",
+                    "command": "mpirun"
+                },
+                {
+                    "time": 233102,
+                    "uid": 0,
+                    "tgid": "-",
+                    "tid": "20",
+                    "usr-ms": "30",
+                    "system-ms": "20",
+                    "guest-ms": "0",
                     "command": "|__mpirun"
                 }
             ],
             "kernel_tables": [
                 {
-                    "time": 151923,
+                    "time": 233102,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "threads": "1",
                     "fd-nr": "9",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233102,
+                    "uid": 0,
+                    "pid": 20,
+                    "threads": "mpirun"
                 }
             ],
             "task_switching": [
                 {
-                    "time": 151923,
+                    "time": 233103,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "cswch_s": 0.0,
                     "nvcswch_s": 0.0,
                     "command": "mpirun"
+                },
+                {
+                    "time": 233103,
+                    "uid": 0,
+                    "pid": 20,
+                    "cswch_s": null
                 }
             ]
         },
         {
-            "cpu_statistics": [
+            "cpu_statistics_task": [
                 {
-                    "time": 151925,
+                    "time": 233105,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 4,
+                    "cpu": 2,
+                    "command": "mpirun"
+                }
+            ],
+            "cpu_statistics_child": [
+                {
+                    "time": 233105,
+                    "uid": 0,
+                    "pid": 20,
+                    "usr-ms": "30",
+                    "system-ms": "10",
+                    "guest-ms": "0",
                     "command": "mpirun"
                 }
             ],
             "kernel_statistics": [
                 {
-                    "time": 151925,
+                    "time": 233105,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "kb_rd_s": 0.0,
                     "kb_wr_s": 0.0,
                     "kb_ccwr_s": 0.0,
                     "iodelay": "0",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233105,
+                    "uid": 0,
+                    "pid": 20,
+                    "kb_rd_s": null
                 }
             ],
             "policy": [
                 {
-                    "time": 151925,
+                    "time": 233105,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "prio": "0",
                     "policy": "NORMAL",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233105,
+                    "uid": 0,
+                    "pid": 20,
+                    "prio": "mpirun"
                 }
             ],
-            "pagefaults": [
+            "pagefaults_task": [
                 {
-                    "time": 151925,
+                    "time": 233105,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "minflt_s": 0.0,
                     "majflt_s": 0.0,
                     "vsz": 6548,
-                    "rss": 3176,
+                    "rss": 3164,
                     "percent_mem": 0.02,
+                    "command": "mpirun"
+                }
+            ],
+            "pagefaults_child": [
+                {
+                    "time": 233105,
+                    "uid": 0,
+                    "pid": 20,
+                    "minflt-nr": "2097",
+                    "majflt-nr": "26",
                     "command": "mpirun"
                 }
             ],
             "stack_utilization": [
                 {
-                    "time": 151925,
+                    "time": 233105,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "stksize": 132,
-                    "stkref": 48,
+                    "stkref": 52,
                     "command": "mpirun"
+                },
+                {
+                    "time": 233105,
+                    "uid": 0,
+                    "pid": 20,
+                    "stksize": null
                 }
             ],
-            "threads": [
+            "threads_task": [
                 {
-                    "time": 151925,
+                    "time": 233105,
                     "uid": 0,
-                    "tgid": "21",
+                    "tgid": "20",
                     "tid": "-",
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 4,
+                    "cpu": 2,
                     "command": "mpirun"
                 },
                 {
-                    "time": 151925,
+                    "time": 233105,
                     "uid": 0,
                     "tgid": "-",
-                    "tid": "21",
+                    "tid": "20",
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 4,
+                    "cpu": 2,
+                    "command": "|__mpirun"
+                }
+            ],
+            "threads_child": [
+                {
+                    "time": 233105,
+                    "uid": 0,
+                    "tgid": "20",
+                    "tid": "-",
+                    "usr-ms": "30",
+                    "system-ms": "10",
+                    "guest-ms": "0",
+                    "command": "mpirun"
+                },
+                {
+                    "time": 233105,
+                    "uid": 0,
+                    "tgid": "-",
+                    "tid": "20",
+                    "usr-ms": "30",
+                    "system-ms": "20",
+                    "guest-ms": "0",
                     "command": "|__mpirun"
                 }
             ],
             "kernel_tables": [
                 {
-                    "time": 151925,
+                    "time": 233105,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "threads": "1",
                     "fd-nr": "9",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233105,
+                    "uid": 0,
+                    "pid": 20,
+                    "threads": "mpirun"
                 }
             ],
             "task_switching": [
                 {
-                    "time": 151925,
+                    "time": 233105,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "cswch_s": 0.0,
                     "nvcswch_s": 0.0,
                     "command": "mpirun"
+                },
+                {
+                    "time": 233105,
+                    "uid": 0,
+                    "pid": 20,
+                    "cswch_s": null
                 }
             ]
         },
         {
-            "cpu_statistics": [
+            "cpu_statistics_task": [
                 {
-                    "time": 151927,
+                    "time": 233107,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 4,
+                    "cpu": 2,
+                    "command": "mpirun"
+                }
+            ],
+            "cpu_statistics_child": [
+                {
+                    "time": 233107,
+                    "uid": 0,
+                    "pid": 20,
+                    "usr-ms": "30",
+                    "system-ms": "10",
+                    "guest-ms": "0",
                     "command": "mpirun"
                 }
             ],
             "kernel_statistics": [
                 {
-                    "time": 151927,
+                    "time": 233107,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "kb_rd_s": 0.0,
                     "kb_wr_s": 0.0,
                     "kb_ccwr_s": 0.0,
                     "iodelay": "0",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233107,
+                    "uid": 0,
+                    "pid": 20,
+                    "kb_rd_s": null
                 }
             ],
             "policy": [
                 {
-                    "time": 151927,
+                    "time": 233108,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "prio": "0",
                     "policy": "NORMAL",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233108,
+                    "uid": 0,
+                    "pid": 20,
+                    "prio": "mpirun"
                 }
             ],
-            "pagefaults": [
+            "pagefaults_task": [
                 {
-                    "time": 151927,
+                    "time": 233108,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "minflt_s": 0.0,
                     "majflt_s": 0.0,
                     "vsz": 6548,
-                    "rss": 3176,
+                    "rss": 3164,
                     "percent_mem": 0.02,
+                    "command": "mpirun"
+                }
+            ],
+            "pagefaults_child": [
+                {
+                    "time": 233108,
+                    "uid": 0,
+                    "pid": 20,
+                    "minflt-nr": "2097",
+                    "majflt-nr": "26",
                     "command": "mpirun"
                 }
             ],
             "stack_utilization": [
                 {
-                    "time": 151927,
+                    "time": 233108,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "stksize": 132,
-                    "stkref": 48,
+                    "stkref": 52,
                     "command": "mpirun"
+                },
+                {
+                    "time": 233108,
+                    "uid": 0,
+                    "pid": 20,
+                    "stksize": null
                 }
             ],
-            "threads": [
+            "threads_task": [
                 {
-                    "time": 151927,
+                    "time": 233108,
                     "uid": 0,
-                    "tgid": "21",
+                    "tgid": "20",
                     "tid": "-",
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 4,
+                    "cpu": 2,
                     "command": "mpirun"
                 },
                 {
-                    "time": 151927,
+                    "time": 233108,
                     "uid": 0,
                     "tgid": "-",
-                    "tid": "21",
+                    "tid": "20",
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 4,
+                    "cpu": 2,
+                    "command": "|__mpirun"
+                }
+            ],
+            "threads_child": [
+                {
+                    "time": 233108,
+                    "uid": 0,
+                    "tgid": "20",
+                    "tid": "-",
+                    "usr-ms": "30",
+                    "system-ms": "10",
+                    "guest-ms": "0",
+                    "command": "mpirun"
+                },
+                {
+                    "time": 233108,
+                    "uid": 0,
+                    "tgid": "-",
+                    "tid": "20",
+                    "usr-ms": "30",
+                    "system-ms": "20",
+                    "guest-ms": "0",
                     "command": "|__mpirun"
                 }
             ],
             "kernel_tables": [
                 {
-                    "time": 151928,
+                    "time": 233108,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "threads": "1",
                     "fd-nr": "9",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233108,
+                    "uid": 0,
+                    "pid": 20,
+                    "threads": "mpirun"
                 }
             ],
             "task_switching": [
                 {
-                    "time": 151928,
+                    "time": 233108,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "cswch_s": 0.0,
                     "nvcswch_s": 0.0,
                     "command": "mpirun"
+                },
+                {
+                    "time": 233108,
+                    "uid": 0,
+                    "pid": 20,
+                    "cswch_s": null
                 }
             ]
         },
         {
-            "cpu_statistics": [
+            "cpu_statistics_task": [
                 {
-                    "time": 151930,
+                    "time": 233110,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 4,
+                    "cpu": 2,
+                    "command": "mpirun"
+                }
+            ],
+            "cpu_statistics_child": [
+                {
+                    "time": 233110,
+                    "uid": 0,
+                    "pid": 20,
+                    "usr-ms": "30",
+                    "system-ms": "10",
+                    "guest-ms": "0",
                     "command": "mpirun"
                 }
             ],
             "kernel_statistics": [
                 {
-                    "time": 151930,
+                    "time": 233110,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "kb_rd_s": 0.0,
                     "kb_wr_s": 0.0,
                     "kb_ccwr_s": 0.0,
                     "iodelay": "0",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233110,
+                    "uid": 0,
+                    "pid": 20,
+                    "kb_rd_s": null
                 }
             ],
             "policy": [
                 {
-                    "time": 151930,
+                    "time": 233110,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "prio": "0",
                     "policy": "NORMAL",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233110,
+                    "uid": 0,
+                    "pid": 20,
+                    "prio": "mpirun"
                 }
             ],
-            "pagefaults": [
+            "pagefaults_task": [
                 {
-                    "time": 151930,
+                    "time": 233110,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "minflt_s": 0.0,
                     "majflt_s": 0.0,
                     "vsz": 6548,
-                    "rss": 3176,
+                    "rss": 3164,
                     "percent_mem": 0.02,
+                    "command": "mpirun"
+                }
+            ],
+            "pagefaults_child": [
+                {
+                    "time": 233110,
+                    "uid": 0,
+                    "pid": 20,
+                    "minflt-nr": "2097",
+                    "majflt-nr": "26",
                     "command": "mpirun"
                 }
             ],
             "stack_utilization": [
                 {
-                    "time": 151930,
+                    "time": 233110,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "stksize": 132,
-                    "stkref": 48,
+                    "stkref": 52,
                     "command": "mpirun"
+                },
+                {
+                    "time": 233110,
+                    "uid": 0,
+                    "pid": 20,
+                    "stksize": null
                 }
             ],
-            "threads": [
+            "threads_task": [
                 {
-                    "time": 151930,
+                    "time": 233111,
                     "uid": 0,
-                    "tgid": "21",
+                    "tgid": "20",
                     "tid": "-",
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 4,
+                    "cpu": 2,
                     "command": "mpirun"
                 },
                 {
-                    "time": 151930,
+                    "time": 233111,
                     "uid": 0,
                     "tgid": "-",
-                    "tid": "21",
+                    "tid": "20",
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 4,
+                    "cpu": 2,
+                    "command": "|__mpirun"
+                }
+            ],
+            "threads_child": [
+                {
+                    "time": 233111,
+                    "uid": 0,
+                    "tgid": "20",
+                    "tid": "-",
+                    "usr-ms": "30",
+                    "system-ms": "10",
+                    "guest-ms": "0",
+                    "command": "mpirun"
+                },
+                {
+                    "time": 233111,
+                    "uid": 0,
+                    "tgid": "-",
+                    "tid": "20",
+                    "usr-ms": "30",
+                    "system-ms": "20",
+                    "guest-ms": "0",
                     "command": "|__mpirun"
                 }
             ],
             "kernel_tables": [
                 {
-                    "time": 151930,
+                    "time": 233111,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "threads": "1",
                     "fd-nr": "9",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233111,
+                    "uid": 0,
+                    "pid": 20,
+                    "threads": "mpirun"
                 }
             ],
             "task_switching": [
                 {
-                    "time": 151930,
+                    "time": 233111,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "cswch_s": 0.0,
                     "nvcswch_s": 0.0,
                     "command": "mpirun"
+                },
+                {
+                    "time": 233111,
+                    "uid": 0,
+                    "pid": 20,
+                    "cswch_s": null
                 }
             ]
         },
         {
-            "cpu_statistics": [
+            "cpu_statistics_task": [
                 {
-                    "time": 151932,
+                    "time": 233113,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 4,
+                    "cpu": 2,
+                    "command": "mpirun"
+                }
+            ],
+            "cpu_statistics_child": [
+                {
+                    "time": 233113,
+                    "uid": 0,
+                    "pid": 20,
+                    "usr-ms": "30",
+                    "system-ms": "10",
+                    "guest-ms": "0",
                     "command": "mpirun"
                 }
             ],
             "kernel_statistics": [
                 {
-                    "time": 151932,
+                    "time": 233113,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "kb_rd_s": 0.0,
                     "kb_wr_s": 0.0,
                     "kb_ccwr_s": 0.0,
                     "iodelay": "0",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233113,
+                    "uid": 0,
+                    "pid": 20,
+                    "kb_rd_s": null
                 }
             ],
             "policy": [
                 {
-                    "time": 151932,
+                    "time": 233113,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "prio": "0",
                     "policy": "NORMAL",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233113,
+                    "uid": 0,
+                    "pid": 20,
+                    "prio": "mpirun"
                 }
             ],
-            "pagefaults": [
+            "pagefaults_task": [
                 {
-                    "time": 151932,
+                    "time": 233113,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "minflt_s": 0.0,
                     "majflt_s": 0.0,
                     "vsz": 6548,
-                    "rss": 3176,
+                    "rss": 3164,
                     "percent_mem": 0.02,
+                    "command": "mpirun"
+                }
+            ],
+            "pagefaults_child": [
+                {
+                    "time": 233113,
+                    "uid": 0,
+                    "pid": 20,
+                    "minflt-nr": "2097",
+                    "majflt-nr": "26",
                     "command": "mpirun"
                 }
             ],
             "stack_utilization": [
                 {
-                    "time": 151932,
+                    "time": 233113,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "stksize": 132,
-                    "stkref": 48,
+                    "stkref": 52,
                     "command": "mpirun"
+                },
+                {
+                    "time": 233113,
+                    "uid": 0,
+                    "pid": 20,
+                    "stksize": null
                 }
             ],
-            "threads": [
+            "threads_task": [
                 {
-                    "time": 151932,
+                    "time": 233113,
                     "uid": 0,
-                    "tgid": "21",
+                    "tgid": "20",
                     "tid": "-",
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 4,
+                    "cpu": 2,
                     "command": "mpirun"
                 },
                 {
-                    "time": 151932,
+                    "time": 233113,
                     "uid": 0,
                     "tgid": "-",
-                    "tid": "21",
+                    "tid": "20",
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 4,
+                    "cpu": 2,
+                    "command": "|__mpirun"
+                }
+            ],
+            "threads_child": [
+                {
+                    "time": 233113,
+                    "uid": 0,
+                    "tgid": "20",
+                    "tid": "-",
+                    "usr-ms": "30",
+                    "system-ms": "10",
+                    "guest-ms": "0",
+                    "command": "mpirun"
+                },
+                {
+                    "time": 233113,
+                    "uid": 0,
+                    "tgid": "-",
+                    "tid": "20",
+                    "usr-ms": "30",
+                    "system-ms": "20",
+                    "guest-ms": "0",
                     "command": "|__mpirun"
                 }
             ],
             "kernel_tables": [
                 {
-                    "time": 151933,
+                    "time": 233113,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "threads": "1",
                     "fd-nr": "9",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233113,
+                    "uid": 0,
+                    "pid": 20,
+                    "threads": "mpirun"
                 }
             ],
             "task_switching": [
                 {
-                    "time": 151933,
+                    "time": 233113,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "cswch_s": 0.0,
                     "nvcswch_s": 0.0,
                     "command": "mpirun"
+                },
+                {
+                    "time": 233113,
+                    "uid": 0,
+                    "pid": 20,
+                    "cswch_s": null
                 }
             ]
         },
         {
-            "cpu_statistics": [
+            "cpu_statistics_task": [
                 {
-                    "time": 151935,
+                    "time": 233116,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 4,
+                    "cpu": 1,
+                    "command": "mpirun"
+                }
+            ],
+            "cpu_statistics_child": [
+                {
+                    "time": 233116,
+                    "uid": 0,
+                    "pid": 20,
+                    "usr-ms": "30",
+                    "system-ms": "10",
+                    "guest-ms": "0",
                     "command": "mpirun"
                 }
             ],
             "kernel_statistics": [
                 {
-                    "time": 151935,
+                    "time": 233116,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "kb_rd_s": 0.0,
                     "kb_wr_s": 0.0,
                     "kb_ccwr_s": 0.0,
                     "iodelay": "0",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233116,
+                    "uid": 0,
+                    "pid": 20,
+                    "kb_rd_s": null
                 }
             ],
             "policy": [
                 {
-                    "time": 151935,
+                    "time": 233116,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "prio": "0",
                     "policy": "NORMAL",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233116,
+                    "uid": 0,
+                    "pid": 20,
+                    "prio": "mpirun"
                 }
             ],
-            "pagefaults": [
+            "pagefaults_task": [
                 {
-                    "time": 151935,
+                    "time": 233116,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "minflt_s": 0.0,
                     "majflt_s": 0.0,
                     "vsz": 6548,
-                    "rss": 3176,
+                    "rss": 3164,
                     "percent_mem": 0.02,
+                    "command": "mpirun"
+                }
+            ],
+            "pagefaults_child": [
+                {
+                    "time": 233116,
+                    "uid": 0,
+                    "pid": 20,
+                    "minflt-nr": "2097",
+                    "majflt-nr": "26",
                     "command": "mpirun"
                 }
             ],
             "stack_utilization": [
                 {
-                    "time": 151935,
+                    "time": 233116,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "stksize": 132,
-                    "stkref": 48,
+                    "stkref": 12,
                     "command": "mpirun"
+                },
+                {
+                    "time": 233116,
+                    "uid": 0,
+                    "pid": 20,
+                    "stksize": null
                 }
             ],
-            "threads": [
+            "threads_task": [
                 {
-                    "time": 151935,
+                    "time": 233116,
                     "uid": 0,
-                    "tgid": "21",
+                    "tgid": "20",
                     "tid": "-",
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 4,
+                    "cpu": 1,
                     "command": "mpirun"
                 },
                 {
-                    "time": 151935,
+                    "time": 233116,
                     "uid": 0,
                     "tgid": "-",
-                    "tid": "21",
+                    "tid": "20",
                     "percent_usr": 0.0,
                     "percent_system": 0.0,
                     "percent_guest": 0.0,
                     "percent_wait": "0.00",
                     "percent_cpu": 0.0,
-                    "cpu": 4,
+                    "cpu": 1,
+                    "command": "|__mpirun"
+                }
+            ],
+            "threads_child": [
+                {
+                    "time": 233116,
+                    "uid": 0,
+                    "tgid": "20",
+                    "tid": "-",
+                    "usr-ms": "30",
+                    "system-ms": "10",
+                    "guest-ms": "0",
+                    "command": "mpirun"
+                },
+                {
+                    "time": 233116,
+                    "uid": 0,
+                    "tgid": "-",
+                    "tid": "20",
+                    "usr-ms": "30",
+                    "system-ms": "20",
+                    "guest-ms": "0",
                     "command": "|__mpirun"
                 }
             ],
             "kernel_tables": [
                 {
-                    "time": 151935,
+                    "time": 233116,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "threads": "1",
                     "fd-nr": "9",
                     "command": "mpirun"
+                },
+                {
+                    "time": 233116,
+                    "uid": 0,
+                    "pid": 20,
+                    "threads": "mpirun"
                 }
             ],
             "task_switching": [
                 {
-                    "time": 151935,
+                    "time": 233116,
                     "uid": 0,
-                    "pid": 21,
+                    "pid": 20,
                     "cswch_s": 0.0,
                     "nvcswch_s": 0.0,
                     "command": "mpirun"
+                },
+                {
+                    "time": 233116,
+                    "uid": 0,
+                    "pid": 20,
+                    "cswch_s": null
                 }
             ]
         }

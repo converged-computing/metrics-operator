@@ -20,8 +20,7 @@ To learn more:
 - For services we are measuring, we likely need to be able to kill after N seconds (to complete job) or to specify the success policy on the metrics containers instead of the application
 - Python function to save entire spec to yaml (for MetricSet and JobSet)?
 - Netmark / OSU need resources set to ensure 1 pod/node
-- Add Matrix of Python tests - can test structure of output
-  - Add assertions checking json output for each
+- Add assertions checking for python tests
 - Plotting examples needed for
   - io-sysstat
 

@@ -47,7 +47,7 @@ spec:
                 description: For metrics that require an application, we need a container and name (for now)
                 properties:
                   command:
-                    description: command to execute and monitor
+                    description: command to execute and monitor (if consistent across pods)
                     type: string
                   entrypoint:
                     description: Entrypoint of container, if different from command
@@ -129,6 +129,16 @@ spec:
                           x-kubernetes-int-or-string: true
                         type: array
                       description: Metric List Options Metric specific options
+                      type: object
+                    mapOptions:
+                      additionalProperties:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          x-kubernetes-int-or-string: true
+                        type: object
+                      description: Metric Map Options
                       type: object
                     name:
                       type: string
