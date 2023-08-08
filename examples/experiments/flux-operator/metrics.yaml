@@ -1,0 +1,45 @@
+apiVersion: flux-framework.org/v1alpha1
+kind: MetricSet
+metadata:
+  labels:
+    app.kubernetes.io/name: metricset
+    app.kubernetes.io/instance: metricset-sample
+  name: flux-sample
+spec:
+  # We don't have support currently for bash commands with -c quotes - hence the simple commands
+  serviceName: flux-service
+
+  # Create a minicluster of size 4
+  # Node that tasks, entrypoint, etc are hard coded into the config map
+  # so you need to use the same service name, etc.
+  pods: 4
+
+  # Don't set JobSet with FQDN (Flux Operator needs)
+  dontSetFQDN: true
+
+  # This is all the logic of the flux operator packaged as an application here
+  application:
+    image: ghcr.io/rse-ops/lammps:flux-sched-focal
+    command: /bin/bash /flux_operator/wait-0.sh lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite
+    workingDir: /home/flux/examples/reaxff/HNS
+    volumes:
+      curve:
+        path: /mnt/curve/
+        configMapName: flux-sample-curve-mount
+        readOnly: true
+        items:
+          curve.cert: curve.cert
+      flux-config:
+        path: /etc/flux/config
+        configMapName: flux-sample-flux-config
+        readOnly: true
+        items:
+          hostfile: broker.toml
+      entrypoint:
+        path: /flux_operator/
+        configMapName: flux-sample-entrypoint
+        readOnly: true
+        items:
+          wait-0: wait-0.sh
+  metrics:
+    - name: perf-sysstat

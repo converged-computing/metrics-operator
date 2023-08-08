@@ -85,6 +85,9 @@ spec:
                       type: object
                     description: Existing Volumes for the application
                     type: object
+                  workingDir:
+                    description: Working Directory
+                    type: string
                 required:
                 - command
                 - image
@@ -100,6 +103,9 @@ spec:
                   Approximately one year. This cannot be zero or job won't start
                 format: int64
                 type: integer
+              dontSetFQDN:
+                description: Don't set JobSet FQDN
+                type: boolean
               metrics:
                 description: The name of the metric (that will be associated with
                   a flavor like storage)

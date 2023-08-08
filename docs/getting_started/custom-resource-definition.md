@@ -48,6 +48,17 @@ The number of pods for an application or storage metric test will correspond wit
 
 When running as an indexed job, indicate the number of successful pods (completions) for the Job to be successful.  Note that if you set 1, your parallelism will default to 1 too, which isn't ideal. I've opened an issue [here](https://github.com/kubernetes-sigs/jobset).
 
+### dontSetFQDN
+
+For more of an "expert mode" if you know you want your JobSet use fully qualified domain names (FQDN) set to false,
+set this value to true.
+
+```yaml
+spec:
+  dontSetFQDN: true
+```
+
+By default it is false, meaning we use fully qualified domain names.
 
 ### application
 
@@ -63,6 +74,18 @@ spec:
 
 In the above example, we target a container with LAMMPS and mpi, and we are going to run MPIrun.
 The command will be used by the metrics sidecar containers to find the PID of interest to measure.
+
+#### workingDir
+
+To add a working directory for your application:
+
+```yaml
+spec:
+  application:
+    image: ghcr.io/rse-ops/vanilla-lammps:tag-latest
+    command: mpirun lmp -v x 1 -v y 1 -v z 1 -in in.reaxc.hns -nocite
+    workingDir: /opt/lammps/examples/reaxff/HNS
+```
 
 #### volumes
 

@@ -81,53 +81,80 @@ func (m PidStat) EntrypointScripts(
 	metric *metrics.Metric,
 ) []metrics.EntrypointScript {
 
+	// Metadata to add to beginning of run
+	metadata := metrics.Metadata(spec, metric)
+
 	template := `#!/bin/bash
 
+echo "%s"
 # Download the wait binary
 wget https://github.com/converged-computing/goshare/releases/download/2023-07-27/wait
 chmod +x ./wait
 mv ./wait /usr/bin/goshare-wait
+echo "PIDSTAT COMMAND START"
+echo "%s"
+echo "PIDSTAT COMMAND END"
 echo "Waiting for application PID..."
 pid=$(goshare-wait -c "%s" -q)
 
+# See https://kellyjonbrazil.github.io/jc/docs/parsers/pidstat
+# for how we get lovely json
 i=0
 completions=%d
+echo "%s"
 while true
   do
-    echo "CPU STATISTICS TIMEPOINT ${i}
-    pidstat -p ${pid} -u -h
-    echo "KERNEL STATISTICS TIMEPOINT ${i}
-    pidstat -p ${pid} -d -h
-    echo "POLICY TIMEPOINT ${i}
-    pidstat -p ${pid} -R -h
-    echo "PAGEFAULTS and MEMORY ${i}
-	pidstat -p ${pid} -r -h
-    echo "STACK UTILIZATION ${i}
-	pidstat -p ${pid} -s -h
-    echo "THREADS ${i}
-	pidstat -p ${pid} -t -h
-    echo "KERNEL TABLES ${i}
-	pidstat -p ${pid} -v -h
-    echo "TASK SWITCHING ${i}
-	pidstat -p ${pid} -w -h
+    echo "%s"
+    echo "CPU STATISTICS"
+    pidstat -p ${pid} -u -h | jc --pidstat
+    echo "KERNEL STATISTICS"
+    pidstat -p ${pid} -d -h | jc --pidstat
+    echo "POLICY"
+    pidstat -p ${pid} -R -h | jc --pidstat
+    echo "PAGEFAULTS"
+	pidstat -p ${pid} -r -h | jc --pidstat
+    echo "STACK UTILIZATION"
+	pidstat -p ${pid} -s -h | jc --pidstat
+    echo "THREADS"
+	pidstat -p ${pid} -t -h | jc --pidstat
+    echo "KERNEL TABLES"
+	pidstat -p ${pid} -v -h | jc --pidstat
+    echo "TASK SWITCHING"
+	pidstat -p ${pid} -w -h | jc --pidstat
 	# Check if still running
 	ps -p ${pid} > /dev/null
     retval=$?
 	if [[ $retval -ne 0 ]]; then
-	    exit 0
+        echo "%s"
+        exit 0
     fi
 	if [[ $completions -ne 0 ]] && [[ $i -eq $completions ]]; then
+	    echo "%s"
     	exit 0
     fi
 	sleep %d
 	let i=i+1
 done
 `
+
+	script := fmt.Sprintf(
+		template,
+		metadata,
+		spec.Spec.Application.Command,
+		spec.Spec.Application.Command,
+		m.completions,
+		metrics.CollectionStart,
+		metrics.Separator,
+		metrics.CollectionEnd,
+		metrics.CollectionEnd,
+		m.rate,
+	)
+
 	// NOTE: the entrypoint is the entrypoint for the container, while
 	// the command is expected to be what we are monitoring. Often
 	// they are the same thing.
 	return []metrics.EntrypointScript{
-		{Script: fmt.Sprintf(template, spec.Spec.Application.Command, m.completions, m.rate)},
+		{Script: script},
 	}
 }
 

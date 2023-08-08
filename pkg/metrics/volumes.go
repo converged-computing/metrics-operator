@@ -180,7 +180,7 @@ func getExistingVolumes(existing map[string]api.Volume) []corev1.Volume {
 
 			// This is a config map volume with items
 			newVolume = corev1.Volume{
-				Name: volumeMeta.ConfigMapName,
+				Name: volumeName,
 				VolumeSource: corev1.VolumeSource{
 					ConfigMap: &corev1.ConfigMapVolumeSource{
 						LocalObjectReference: corev1.LocalObjectReference{
