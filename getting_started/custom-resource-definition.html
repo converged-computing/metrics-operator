@@ -473,12 +473,26 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#dontsetfqdn" class="md-nav__link">
+    <span title="/getting_started/custom-resource-definition.md#dontsetfqdn (reference label)" class="md-ellipsis">dont<wbr>Set<wbr>FQDN</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#application" class="md-nav__link">
     <span title="/getting_started/custom-resource-definition.md#application (reference label)" class="md-ellipsis">application</span>
   </a>
   
     <nav class="md-nav" aria-label="application">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workingdir" class="md-nav__link">
+    <span title="/getting_started/custom-resource-definition.md#workingdir (reference label)" class="md-ellipsis">working<wbr>Dir</span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#volumes" class="md-nav__link">
@@ -725,6 +739,14 @@ number of pods (completions) to bind to the storage and measure.</p>
 <p>The number of pods for an application or storage metric test will correspond with the parallelism of the indexed job (which comes down to pods) for the storage or application JobSet. This defaults to 1, meaning we run in a non-indexed mode. The indexed mode is determined automatically by this variable, where “1” indicates non-indexed, and &gt;1 is indexed.</p>
 <h3 id="completions">completions<a class="headerlink" href="#completions" title="Permalink to this heading">¶</a></h3>
 <p>When running as an indexed job, indicate the number of successful pods (completions) for the Job to be successful.  Note that if you set 1, your parallelism will default to 1 too, which isn’t ideal. I’ve opened an issue <a class="reference external" href="https://github.com/kubernetes-sigs/jobset">here</a>.</p>
+<h3 id="dontsetfqdn">dontSetFQDN<a class="headerlink" href="#dontsetfqdn" title="Permalink to this heading">¶</a></h3>
+<p>For more of an “expert mode” if you know you want your JobSet use fully qualified domain names (FQDN) set to false,
+set this value to true.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">dontSetFQDN</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+</div>
+<p>By default it is false, meaning we use fully qualified domain names.</p>
 <h3 id="application">application<a class="headerlink" href="#application" title="Permalink to this heading">¶</a></h3>
 <p>When you want to measure application performance, you’ll need to add an “application” section to your MetricSet. This is the container that houses some application that you want to measure performance for. This means that minimally, you are required to define the application container image and command:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
@@ -735,6 +757,15 @@ number of pods (completions) to bind to the storage and measure.</p>
 </div>
 <p>In the above example, we target a container with LAMMPS and mpi, and we are going to run MPIrun.
 The command will be used by the metrics sidecar containers to find the PID of interest to measure.</p>
+<h4 id="workingdir">workingDir<a class="headerlink" href="#workingdir" title="Permalink to this heading">¶</a></h4>
+<p>To add a working directory for your application:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">application</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/rse-ops/vanilla-lammps:tag-latest</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun lmp -v x 1 -v y 1 -v z 1 -in in.reaxc.hns -nocite</span>
+<span class="w">    </span><span class="nt">workingDir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/lammps/examples/reaxff/HNS</span>
+</code></pre></div>
+</div>
 <h4 id="volumes">volumes<a class="headerlink" href="#volumes" title="Permalink to this heading">¶</a></h4>
 <p>An application is allowed to have one or more existing volumes. An existing volume can be any of the types described in <a class="reference internal" href="#existing-volumes"><span class="std std-ref">existing volumes</span></a></p>
 <h3 id="storage">storage<a class="headerlink" href="#storage" title="Permalink to this heading">¶</a></h3>
@@ -884,7 +915,7 @@ to the application container(s):</p>
   <small>
     
       Last update:
-      Aug 07, 2023
+      Aug 08, 2023
     
   </small>
 </div>
