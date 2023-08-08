@@ -761,7 +761,32 @@
 <ul class="simple">
 <li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Application Metric Set</span></a></p></li>
 </ul>
-<p>This metric provides the “pidstat” executable of the sysstat library.</p>
+<p>This metric provides the “pidstat” executable of the sysstat library. There is only one option to set to turn on color:</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>color</td>
+<td>Set to turn on color parsing</td>
+<td>Anything set</td>
+<td>unset</td>
+</tr>
+<tr>
+<td>pids</td>
+<td>For debugging, show consistent output of ps aux</td>
+<td>Anything set</td>
+<td>Unset</td>
+</tr>
+</tbody>
+</table>
+<p>By default color and pids are set to false anticipating log parsing.</p>
 <h3 id="storage">Storage<a class="headerlink" href="#storage" title="Permalink to this heading">¶</a></h3>
 <p>These metrics are intended to assess storage volumes.</p>
 <h4 id="io-sysstat">io-sysstat<a class="headerlink" href="#io-sysstat" title="Permalink to this heading">¶</a></h4>
