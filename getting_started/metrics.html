@@ -486,6 +486,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#fio" class="md-nav__link">
+    <span title="/getting_started/metrics.md#fio (reference label)" class="md-ellipsis">fio</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#io-sysstat" class="md-nav__link">
     <span title="/getting_started/metrics.md#io-sysstat (reference label)" class="md-ellipsis">io-<wbr>sysstat</span>
   </a>
@@ -815,6 +822,53 @@ more information on this command, and <a class="reference external" href="https:
 for how we use them.  If there is an option or command that is not exposed that you would like, please <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues">open an issue</a>.</p>
 <h3 id="storage">Storage<a class="headerlink" href="#storage" title="Permalink to this heading">¶</a></h3>
 <p>These metrics are intended to assess storage volumes.</p>
+<h4 id="fio">fio<a class="headerlink" href="#fio" title="Permalink to this heading">¶</a></h4>
+<p>This is a nice tool that you can simply point at a path, and it measures IO stats by way of writing a file there!
+Options you can set include:</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>testname</td>
+<td>Name for the test</td>
+<td>string</td>
+<td>test</td>
+</tr>
+<tr>
+<td>blocksize</td>
+<td>Size of block to write. It dfaults to 4k, but can be set from 256 to 8k.</td>
+<td>string</td>
+<td>4k</td>
+</tr>
+<tr>
+<td>iodepth</td>
+<td>Number of I/O units to keep in flight against the file.</td>
+<td>int</td>
+<td>64</td>
+</tr>
+<tr>
+<td>size</td>
+<td>Total size of file to write</td>
+<td>string</td>
+<td>4G</td>
+</tr>
+<tr>
+<td>directory</td>
+<td>Directory (usually mounted) to test.</td>
+<td>string</td>
+<td>/tmp</td>
+</tr>
+</tbody>
+</table>
+<p>For the last “directory” we use this location to write a temporary file, which will be cleaned up.
+This allows for testing storage mounted from multiple metric pods without worrying about a name conflict.</p>
 <h4 id="io-sysstat">io-sysstat<a class="headerlink" href="#io-sysstat" title="Permalink to this heading">¶</a></h4>
 <ul class="simple">
 <li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Storage Metric Set</span></a></p></li>
@@ -838,6 +892,7 @@ for how we use them.  If there is an option or command that is not exposed that 
 </tr>
 </tbody>
 </table>
+<p>This is good for mounted storage that can be seen by the operating system, but may not work for something like NFS.</p>
 <h3 id="standalone">Standalone<a class="headerlink" href="#standalone" title="Permalink to this heading">¶</a></h3>
 <h4 id="network-netmark">network-netmark<a class="headerlink" href="#network-netmark" title="Permalink to this heading">¶</a></h4>
 <ul class="simple">
