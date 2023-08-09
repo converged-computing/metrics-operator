@@ -91,6 +91,18 @@ spec:
 
 An application is allowed to have one or more existing volumes. An existing volume can be any of the types described in [existing volumes](#existing-volumes)
 
+#### resources
+
+Resource lists for an application container go under [Overhead](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-overhead/). Known keys include "memory" and "cpu" (should be provided in some
+string format that can be parsed) and all others are considered some kind of quantity request.
+
+```yaml
+pod:
+  resources:
+    memory: 500M
+    cpu: 4
+```
+
 ### storage
 
 When you want to measure some storage performance, you'll want to add a "storage" section to your MetricSet. This will typically just be a reference to some existing storage (see [existing volumes](#existing-volumes)) that we want to measure, and can
@@ -120,7 +132,7 @@ spec:
       rate: 20
 ```
 
-### completions
+#### completions
 
 Completions for a metric are relevant if you are assessing storage (which doesn't have an application runtime) or a service application that will continue to run forever. When this value is set to 0, it essentially indicates no set number of completions (meaning we run forever). Any non-zero value will ensure the metric
 runs for that many completions before exiting.
@@ -134,7 +146,7 @@ spec:
 
 This is usually suggested to provide for a storage metric.
 
-### options
+#### options
 
 Metrics can take custom options, which are key value pairs of a string key and either string or integer value. These come in three types:
 
@@ -163,6 +175,38 @@ spec:
 Presence of absence of an option type depends on the metric. Metrics are free to use these custom
 options as they see fit.
 
+
+## resources
+
+Resources for an entire spec are given to the Pod template of the Job. They can include limits and requests. Known keys include "memory" and "cpu" (should be provided in some
+string format that can be parsed) and all others are considered some kind of quantity request.
+
+```yaml
+resources:
+  limits:
+    memory: 500M
+    cpu: 4
+```
+
+If you wanted to, for example, request a GPU, that might look like:
+
+```yaml
+resources:
+  limits:
+    gpu-vendor.example/example-gpu: 1
+```
+
+Or for a particulat type of networking fabric:
+
+```yaml
+resources:
+  limits:
+    vpc.amazonaws.com/efa: 1
+```
+
+Both limits and resources are flexible to accept a string or an integer value, and you'll get an error if you
+provide something else. If you need something else, [let us know](https://github.com/converged-computing/metrics-operator/issues).
+If you are requesting GPU, [this documentation](https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/) is helpful.
 
 ## Existing Volumes
 

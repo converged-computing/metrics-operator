@@ -28,9 +28,10 @@ type PidStat struct {
 	container   string
 
 	// Options
-	useColor bool
-	showPIDS bool
-	commands map[string]intstr.IntOrString
+	useColor   bool
+	showPIDS   bool
+	useThreads bool
+	commands   map[string]intstr.IntOrString
 }
 
 // Name returns the metric name
@@ -76,6 +77,10 @@ func (m *PidStat) SetOptions(metric *api.Metric) {
 	if ok {
 		m.showPIDS = true
 	}
+	_, ok = metric.Options["threads"]
+	if ok {
+		m.useThreads = true
+	}
 
 	// Parse map options
 	commands, ok := metric.MapOptions["commands"]
@@ -91,9 +96,22 @@ func (m PidStat) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, er
 
 // Exported options and list options
 func (m PidStat) Options() map[string]intstr.IntOrString {
+
+	// Prepare bool options
+	showPIDS := "false"
+	if m.showPIDS {
+		showPIDS = "true"
+	}
+	useThreads := "false"
+	if m.useThreads {
+		useThreads = "true"
+	}
+
 	return map[string]intstr.IntOrString{
 		"rate":        intstr.FromInt(int(m.rate)),
 		"completions": intstr.FromInt(int(m.completions)),
+		"threads":     intstr.FromString(useThreads),
+		"pids":        intstr.FromString(showPIDS),
 	}
 }
 func (m PidStat) ListOptions() map[string][]intstr.IntOrString {
@@ -158,15 +176,22 @@ func (m PidStat) EntrypointScripts(
 		showPIDS = "ps aux\npstree ${pid}"
 	}
 
+	useThreads := ""
+	if m.useThreads {
+		useThreads = " -t "
+	}
 	// Prepare custom logic to determine command
 	command := m.prepareIndexedCommand(spec)
 	template := `#!/bin/bash
 
 echo "%s"
 # Download the wait binary
-wget https://github.com/converged-computing/goshare/releases/download/2023-07-27/wait
+wget https://github.com/converged-computing/goshare/releases/download/2023-07-27/wait > /dev/null
 chmod +x ./wait
 mv ./wait /usr/bin/goshare-wait
+
+# Do we want to use threads?
+threads="%s"
 
 # This is logic to determine the command, it will set $command
 # We do this because command to watch can vary between worker pods
@@ -190,46 +215,47 @@ while true
     echo "%s"
 	%s
     echo "CPU STATISTICS TASK"
-    pidstat -p ${pid} -u -h -T TASK | jc --pidstat
+    pidstat -p ${pid} -u -h $threads -T TASK | jc --pidstat
     echo "CPU STATISTICS CHILD"
-    pidstat -p ${pid} -u -h -T CHILD | jc --pidstat
+    pidstat -p ${pid} -u -h $threads -T CHILD | jc --pidstat
 	echo "KERNEL STATISTICS"
-    pidstat -p ${pid} -d -h -T ALL | jc --pidstat
+    pidstat -p ${pid} -d -h $threads -T ALL | jc --pidstat
 	echo "POLICY"
-    pidstat -p ${pid} -R -h -T ALL | jc --pidstat
+    pidstat -p ${pid} -R -h $threads -T ALL | jc --pidstat
 	echo "PAGEFAULTS TASK"
-	pidstat -p ${pid} -r -h -T TASK | jc --pidstat
+	pidstat -p ${pid} -r -h $threads -T TASK | jc --pidstat
 	echo "PAGEFAULTS CHILD"
-	pidstat -p ${pid} -r -h -T CHILD | jc --pidstat
+	pidstat -p ${pid} -r -h $threads -T CHILD | jc --pidstat
 	echo "STACK UTILIZATION"
-	pidstat -p ${pid} -s -h -T ALL | jc --pidstat
+	pidstat -p ${pid} -s -h $threads -T ALL | jc --pidstat
 	echo "THREADS TASK"
-	pidstat -p ${pid} -t -h -T TASK | jc --pidstat
+	pidstat -p ${pid} -t -h $threads -T TASK | jc --pidstat
 	echo "THREADS CHILD"
-	pidstat -p ${pid} -t -h -T CHILD | jc --pidstat
+	pidstat -p ${pid} -t -h $threads -T CHILD | jc --pidstat
 	echo "KERNEL TABLES"
-	pidstat -p ${pid} -v -h -T ALL | jc --pidstat
+	pidstat -p ${pid} -v -h $threads -T ALL | jc --pidstat
 	echo "TASK SWITCHING"
-	pidstat -p ${pid} -w -h -T ALL | jc --pidstat
+	pidstat -p ${pid} -w -h $threads -T ALL | jc --pidstat
 	# Check if still running
 	ps -p ${pid} > /dev/null
     retval=$?
-	if [[ $retval -ne 0 ]]; then
+    if [[ $retval -ne 0 ]]; then
         echo "%s"
         exit 0
     fi
-	if [[ $completions -ne 0 ]] && [[ $i -eq $completions ]]; then
-	    echo "%s"
+    if [[ $completions -ne 0 ]] && [[ $i -eq $completions ]]; then
+        echo "%s"
     	exit 0
     fi
-	sleep %d
-	let i=i+1
+    sleep %d
+    let i=i+1
 done
 `
 
 	script := fmt.Sprintf(
 		template,
 		metadata,
+		useThreads,
 		command,
 		useColor,
 		m.completions,

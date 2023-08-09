@@ -31,7 +31,8 @@ This metric provides the "pidstat" executable of the sysstat library. The follow
 |Name | Description | Type | Default |
 |-----|-------------|------------|------|
 | color | Set to turn on color parsing | Anything set | unset |
-| pids | For debugging, show consistent output of ps aux | Anything set | Unset |
+| pids | For debugging, show consistent output of ps aux | Anything set | unset |
+| threads | add `-t` to each pidstat command to indicate wanting thread-level output | unset |
 
 By default color and pids are set to false anticipating log parsing.
 And we also provide the option to see "commands" or specific commands based on a job index to the metric.
@@ -51,8 +52,11 @@ and the rest (workers).
        "all": /usr/libexec/flux/cmd/flux-broker --config /etc/flux/config -Scron.directory=/etc/flux/system/cron.d -Stbon.fanout
        "0": /usr/bin/python3.8 /usr/libexec/flux/cmd/flux-submit.py -n 2 --quiet --watch lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite
 ```
+
 In the map above, order matters, as the command for all indices is first set to be the flux-broker one, and then
-after the index at 0 gets a custom command.
+after the index at 0 gets a custom command. See [pidstat](https://man7.org/linux/man-pages/man1/pidstat.1.html) for
+more information on this command, and [this file](https://github.com/converged-computing/metrics-operator/blob/main/pkg/metrics/perf/sysstat.go) 
+for how we use them.  If there is an option or command that is not exposed that you would like, please [open an issue](https://github.com/converged-computing/metrics-operator/issues).
 
 ### Storage
 

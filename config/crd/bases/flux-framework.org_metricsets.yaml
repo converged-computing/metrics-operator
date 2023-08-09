@@ -51,6 +51,24 @@ spec:
                   pullSecret:
                     description: A pull secret for the application container
                     type: string
+                  resources:
+                    description: Resources include limits and requests for the application
+                    properties:
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          x-kubernetes-int-or-string: true
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          x-kubernetes-int-or-string: true
+                        type: object
+                    type: object
                   volumes:
                     additionalProperties:
                       description: 'A Volume should correspond with an existing volume,
@@ -172,6 +190,15 @@ spec:
                 description: Parallelism (e.g., pods)
                 format: int32
                 type: integer
+              resources:
+                additionalProperties:
+                  anyOf:
+                  - type: integer
+                  - type: string
+                  x-kubernetes-int-or-string: true
+                description: Resources include limits and requests for each pod (that
+                  include a JobSet)
+                type: object
               serviceName:
                 default: ms
                 description: Service name for the JobSet (MetricsSet) cluster network

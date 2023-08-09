@@ -14,6 +14,7 @@ and **Merged pull requests**. Critical items to know are:
 The versions coincide with releases on pip. Only major versions will be released as tags on Github.
 
 ## [0.0.x](https://github.com/converged-computing/metrics-operator/tree/main) (0.0.x)
+ - resources specification added and tweaks to perf-sysstat (0.0.14)
  - pidstat python parser and better support for metric in Go (0.0.13)
  - Separation of parsing logs into separate metric module functions (0.0.12.1)
  - Support for Netmark parser and plotting example (0.0.12)
