@@ -74,6 +74,27 @@ func (m *Fio) SetOptions(metric *api.Metric) {
 	m.iodepth = 64
 	m.size = "4G"
 	m.directory = "/tmp"
+
+	v, ok := metric.Options["testname"]
+	if ok {
+		m.testname = v.StrVal
+	}
+	v, ok = metric.Options["blocksize"]
+	if ok {
+		m.blocksize = v.StrVal
+	}
+	v, ok = metric.Options["size"]
+	if ok {
+		m.size = v.StrVal
+	}
+	v, ok = metric.Options["directory"]
+	if ok {
+		m.directory = v.StrVal
+	}
+	v, ok = metric.Options["iodepth"]
+	if ok {
+		m.iodepth = int(v.IntVal)
+	}
 }
 
 // Generate the entrypoint for measuring the storage
