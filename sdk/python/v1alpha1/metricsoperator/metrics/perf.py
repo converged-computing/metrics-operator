@@ -10,7 +10,7 @@ from .base import MetricBase
 headers = [
     "CPU STATISTICS TASK",
     "CPU STATISTICS CHILD",
-    "KERNEL STATISTICS",
+    "IO STATISTICS",
     "POLICY",
     "PAGEFAULTS TASK",
     "PAGEFAULTS CHILD",
