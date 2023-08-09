@@ -17,8 +17,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-// TODO add this to spec
-// also find logging library
 // getResourceGroup can return a ResourceList for either requests or limits
 func getResourceGroup(items api.ContainerResource) (corev1.ResourceList, error) {
 
