@@ -761,7 +761,7 @@
 <ul class="simple">
 <li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Application Metric Set</span></a></p></li>
 </ul>
-<p>This metric provides the “pidstat” executable of the sysstat library. There is only one option to set to turn on color:</p>
+<p>This metric provides the “pidstat” executable of the sysstat library. The following options are available:</p>
 <table border="1" class="docutils">
 <thead>
 <tr>
@@ -786,7 +786,25 @@
 </tr>
 </tbody>
 </table>
-<p>By default color and pids are set to false anticipating log parsing.</p>
+<p>By default color and pids are set to false anticipating log parsing.
+And we also provide the option to see “commands” or specific commands based on a job index to the metric.
+As an example, here is how we would ask to monitor two different commands for a launcher node (index 0)
+and the rest (workers).</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">perf-sysstat</span>
+<span class="w">  </span><span class="nt">rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">  </span><span class="nt">options</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">pids</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;true&quot;</span>
+
+<span class="w">  </span><span class="c1"># Look for pids based on commands matched to index</span>
+<span class="w">  </span><span class="nt">mapOptions</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">commands</span><span class="p">:</span>
+<span class="w">       </span><span class="c1"># First set all to use the worker command, but give the lead broker a special command</span>
+<span class="w">       </span><span class="s">&quot;all&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/usr/libexec/flux/cmd/flux-broker --config /etc/flux/config -Scron.directory=/etc/flux/system/cron.d -Stbon.fanout</span>
+<span class="w">       </span><span class="s">&quot;0&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/usr/bin/python3.8 /usr/libexec/flux/cmd/flux-submit.py -n 2 --quiet --watch lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite</span>
+</code></pre></div>
+</div>
+<p>In the map above, order matters, as the command for all indices is first set to be the flux-broker one, and then
+after the index at 0 gets a custom command.</p>
 <h3 id="storage">Storage<a class="headerlink" href="#storage" title="Permalink to this heading">¶</a></h3>
 <p>These metrics are intended to assess storage volumes.</p>
 <h4 id="io-sysstat">io-sysstat<a class="headerlink" href="#io-sysstat" title="Permalink to this heading">¶</a></h4>
@@ -949,7 +967,7 @@ Variables to customize include:</p>
   <small>
     
       Last update:
-      Aug 08, 2023
+      Aug 09, 2023
     
   </small>
 </div>

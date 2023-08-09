@@ -136,7 +136,33 @@ This is usually suggested to provide for a storage metric.
 
 ### options
 
-Metrics can take custom options, which are key value pairs of a string key and either string or integer value.
+Metrics can take custom options, which are key value pairs of a string key and either string or integer value. These come in three types:
+
+ - options (key value pairs, where the value is an integer/string type)
+ - listOptions (key value pairs, where the value is a list of integer/string types)
+ - mapOptions (key value pairs, where the value is a map (string key) of integer/string types)
+
+Here is an example with all three:
+
+```yaml
+spec:
+  metrics:
+    - name: perf-dummy
+      options:
+        pids: true
+      
+      listOptions:
+        pids: [1, 2, 3]
+
+      mapOptions:
+        commands:
+           "1": echo hello
+           "2": echo goodbye
+```
+
+Presence of absence of an option type depends on the metric. Metrics are free to use these custom
+options as they see fit.
+
 
 ## Existing Volumes
 

@@ -799,7 +799,30 @@ runs for that many completions before exiting.</p>
 </div>
 <p>This is usually suggested to provide for a storage metric.</p>
 <h3 id="options">options<a class="headerlink" href="#options" title="Permalink to this heading">¶</a></h3>
-<p>Metrics can take custom options, which are key value pairs of a string key and either string or integer value.</p>
+<p>Metrics can take custom options, which are key value pairs of a string key and either string or integer value. These come in three types:</p>
+<ul class="simple">
+<li><p>options (key value pairs, where the value is an integer/string type)</p></li>
+<li><p>listOptions (key value pairs, where the value is a list of integer/string types)</p></li>
+<li><p>mapOptions (key value pairs, where the value is a map (string key) of integer/string types)</p></li>
+</ul>
+<p>Here is an example with all three:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">metrics</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">perf-dummy</span>
+<span class="w">      </span><span class="nt">options</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">pids</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">      </span>
+<span class="w">      </span><span class="nt">listOptions</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">pids</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">3</span><span class="p p-Indicator">]</span>
+
+<span class="w">      </span><span class="nt">mapOptions</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">commands</span><span class="p">:</span>
+<span class="w">           </span><span class="s">&quot;1&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo hello</span>
+<span class="w">           </span><span class="s">&quot;2&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo goodbye</span>
+</code></pre></div>
+</div>
+<p>Presence of absence of an option type depends on the metric. Metrics are free to use these custom
+options as they see fit.</p>
 <h2 id="existing-volumes">Existing Volumes<a class="headerlink" href="#existing-volumes" title="Permalink to this heading">¶</a></h2>
 <p>An existing volume can be provided to support an application (multiple) or one can be provided for assessing its performance (single).</p>
 <ul class="simple">
@@ -915,7 +938,7 @@ to the application container(s):</p>
   <small>
     
       Last update:
-      Aug 08, 2023
+      Aug 09, 2023
     
   </small>
 </div>
