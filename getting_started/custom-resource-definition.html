@@ -518,6 +518,19 @@
     <span title="/getting_started/custom-resource-definition.md#storage (reference label)" class="md-ellipsis">storage</span>
   </a>
   
+    <nav class="md-nav" aria-label="storage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands" class="md-nav__link">
+    <span title="/getting_started/custom-resource-definition.md#commands (reference label)" class="md-ellipsis">commands</span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -792,8 +805,21 @@ string format that can be parsed) and all others are considered some kind of qua
 </code></pre></div>
 </div>
 <h3 id="storage">storage<a class="headerlink" href="#storage" title="Permalink to this heading">¶</a></h3>
-<p>When you want to measure some storage performance, you’ll want to add a “storage” section to your MetricSet. This will typically just be a reference to some existing storage (see <a class="reference internal" href="#existing-volumes"><span class="std std-ref">existing volumes</span></a>) that we want to measure, and can
-also be done for some number of completions and metrics for storage.</p>
+<p>When you want to measure some storage performance, you’ll want to add a “storage” section to your MetricSet. This will typically just be a reference to some existing storage (see <a class="reference internal" href="#existing-volumes"><span class="std std-ref">existing volumes</span></a>) that we want to measure, and can also be done for some number of completions and metrics for storage.</p>
+<h4 id="commands">commands<a class="headerlink" href="#commands" title="Permalink to this heading">¶</a></h4>
+<p>If you need to add some special logic to create or cleanup for a storage volume, you are free to define them for storage in each of pre and post sections, which will happen before and after the metric runs, respectively.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">storage</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">volume</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">claimName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data</span><span class="w"> </span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/data</span>
+<span class="w">  </span><span class="nt">commands</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">pre</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">      </span><span class="no">apt-get update &amp;&amp; apt-get install -y mymounter-tool</span>
+<span class="w">      </span><span class="no">mymounter-tool mount /data</span>
+<span class="w">    </span><span class="nt">post</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mymounter-tool unmount /data</span>
+</code></pre></div>
+</div>
+<p>Both of the above are strings. The pipe allows for multiple lines, if appropriate.</p>
 <h3 id="metrics">metrics<a class="headerlink" href="#metrics" title="Permalink to this heading">¶</a></h3>
 <p>The core of the MetricSet of course is the metrics! Since we can measure more than one thing at once, this is a list of named metrics known to the operator. As an example, here is how to run the <code class="docutils literal notranslate"><span class="pre">perf-sysstat</span></code> metric:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
