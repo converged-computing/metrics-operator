@@ -1,12 +1,5 @@
 [
  {
-  "name": "perf-sysstat",
-  "description": "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
-  "type": "application",
-  "image": "ghcr.io/converged-computing/metric-sysstat:latest",
-  "url": "https://github.com/sysstat/sysstat"
- },
- {
   "name": "io-fio",
   "description": "Flexible IO Tester (FIO)",
   "type": "storage",
@@ -33,5 +26,12 @@
   "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-osu-benchmark:latest",
   "url": "https://mvapich.cse.ohio-state.edu/benchmarks/"
+ },
+ {
+  "name": "perf-sysstat",
+  "description": "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
+  "type": "application",
+  "image": "ghcr.io/converged-computing/metric-sysstat:latest",
+  "url": "https://github.com/sysstat/sysstat"
  }
 ]
