@@ -125,6 +125,7 @@ func GetContainers(
 			return containers, err
 		}
 
+		// TODO have this executed in a script? Then with added additional entrypoint logic?
 		command := []string{"/bin/bash", "-c", set.Spec.Application.Entrypoint}
 		appContainer := corev1.Container{
 			Name:            "app",

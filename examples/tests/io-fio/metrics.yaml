@@ -1,0 +1,22 @@
+apiVersion: flux-framework.org/v1alpha1
+kind: MetricSet
+metadata:
+  labels:
+    app.kubernetes.io/name: metricset
+    app.kubernetes.io/instance: metricset-sample
+  name: metricset-sample
+spec:
+  storage:
+    volume:
+      # This is the path on the host (e.g., inside kind container)
+      hostPath: /tmp/workflow
+
+      # This is the path in the container
+      path: /workflow
+
+  metrics:
+     # Fio just runs once - no concept of completions / rate
+    - name: io-fio
+      options:
+        directory: /workflow
+

@@ -218,7 +218,7 @@ while true
     pidstat -p ${pid} -u -h $threads -T TASK | jc --pidstat
     echo "CPU STATISTICS CHILD"
     pidstat -p ${pid} -u -h $threads -T CHILD | jc --pidstat
-	echo "KERNEL STATISTICS"
+	echo "IO STATISTICS"
     pidstat -p ${pid} -d -h $threads -T ALL | jc --pidstat
 	echo "POLICY"
     pidstat -p ${pid} -R -h $threads -T ALL | jc --pidstat
@@ -229,9 +229,9 @@ while true
 	echo "STACK UTILIZATION"
 	pidstat -p ${pid} -s -h $threads -T ALL | jc --pidstat
 	echo "THREADS TASK"
-	pidstat -p ${pid} -t -h $threads -T TASK | jc --pidstat
+	pidstat -p ${pid} -h $threads -T TASK | jc --pidstat
 	echo "THREADS CHILD"
-	pidstat -p ${pid} -t -h $threads -T CHILD | jc --pidstat
+	pidstat -p ${pid} -h $threads -T CHILD | jc --pidstat
 	echo "KERNEL TABLES"
 	pidstat -p ${pid} -v -h $threads -T ALL | jc --pidstat
 	echo "TASK SWITCHING"

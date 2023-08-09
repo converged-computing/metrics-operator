@@ -10,17 +10,17 @@ import metricsoperator.utils as utils
 here = os.path.abspath(os.path.dirname(__file__))
 examples = os.path.dirname(os.path.dirname(here))
 tests = os.path.join(examples, "tests")
-metrics_yaml = os.path.join(tests, "io-host-volume", "metrics.yaml")
+metrics_yaml = os.path.join(tests, "io-fio", "metrics.yaml")
 
 def get_parser():
     parser = argparse.ArgumentParser(
-        description="Run Storage Metric and Get Output",
+        description="Run FIO Metric and Get Output",
         formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument(
         "--out",
         help="json file to save results",
-        default=os.path.join(here, "io-host-volume.json"),
+        default=os.path.join(here, "metrics.json"),
     )
     parser.add_argument(
         "--sleep",
@@ -52,6 +52,7 @@ def main():
     for output in m.watch():
         print(json.dumps(output, indent=4))
         utils.write_json(output, args.out)
+
 
 if __name__ == "__main__":
     main()

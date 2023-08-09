@@ -26,12 +26,7 @@ How to see metrics operator logs:
 $ kubectl logs -n metrics-system metrics-controller-manager-859c66464c-7rpbw
 ```
 
-We would typically apply a manifest for storage, but since we are using a host volume, we don't need to do that (the host is the kind container that we will bind to). We currently have a bug that previous config maps aren't cleaned up, so do that first (if you've run other examples):
-
-```bash
-$ kubectl delete cm metricset-sample
-```
-
+We would typically apply a manifest for storage, but since we are using a host volume, we don't need to do that (the host is the kind container that we will bind to). 
 Next, let's create the metrics set. This is going to run a simple sysstat io tool to collect metrics about our volumes.
 
 ```bash

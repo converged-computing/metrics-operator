@@ -62,6 +62,22 @@ for how we use them.  If there is an option or command that is not exposed that 
 
 These metrics are intended to assess storage volumes.
 
+#### fio
+
+This is a nice tool that you can simply point at a path, and it measures IO stats by way of writing a file there! 
+Options you can set include:
+
+|Name | Description | Type | Default |
+|-----|-------------|------------|------|
+|testname | Name for the test | string | test |
+| blocksize | Size of block to write. It dfaults to 4k, but can be set from 256 to 8k.  | string | 4k |
+| iodepth | Number of I/O units to keep in flight against the file. | int | 64 |
+| size | Total size of file to write | string | 4G |
+| directory | Directory (usually mounted) to test. | string | /tmp |
+
+For the last "directory" we use this location to write a temporary file, which will be cleaned up.
+This allows for testing storage mounted from multiple metric pods without worrying about a name conflict.
+
 #### io-sysstat
 
  - [Storage Metric Set](user-guide.md#application-metric-set)
@@ -71,6 +87,9 @@ This is the "iostat" executable of the sysstat library.
 |Name | Description | Type | Default |
 |-----|-------------|------------|------|
 | human | Show tabular, human-readable output inside of json | string "true" or "false" | "false" |
+
+This is good for mounted storage that can be seen by the operating system, but may not work for something like NFS.
+
 
 ### Standalone
 
