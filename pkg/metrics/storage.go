@@ -22,7 +22,10 @@ func (m *StorageMetricSet) ReplicatedJobs(spec *api.MetricSet) ([]jobset.Replica
 
 	// Storage metrics do not need to share the process namespace
 	// The jobname empty string will use the default
-	job := GetReplicatedJob(spec, false, spec.Spec.Pods, spec.Spec.Completions, "")
+	job, err := GetReplicatedJob(spec, false, spec.Spec.Pods, spec.Spec.Completions, "")
+	if err != nil {
+		return rjs, err
+	}
 
 	// Add volumes expecting an application.
 	// A storage app is required to have a volume

@@ -10,9 +10,11 @@ package metrics
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	"github.com/converged-computing/metrics-operator/pkg/utils"
+	"go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
@@ -21,6 +23,8 @@ var (
 	Separator       = "METRICS OPERATOR TIMEPOINT"
 	CollectionStart = "METRICS OPERATOR COLLECTION START"
 	CollectionEnd   = "METRICS OPERATOR COLLECTION END"
+	handle          *zap.Logger
+	logger          *zap.SugaredLogger
 )
 
 // Metric Export is a flattened structure with minimal required metadata for now
@@ -81,9 +85,18 @@ func Metadata(set *api.MetricSet, metric *Metric) string {
 	}
 	metadata, err := json.Marshal(export)
 	if err != nil {
-		fmt.Printf("Warning, error serializing spec metadata: %s", err.Error())
+		logger.Errorf("Warning, error serializing spec metadata: %s", err.Error())
 	}
 	// We need to escape the quotes for printing in bash
 	metadataEscaped := utils.EscapeCharacters(string(metadata))
 	return fmt.Sprintf("METADATA START %s\nMETADATA END", metadataEscaped)
+}
+
+func init() {
+	handle, err := zap.NewProduction()
+	if err != nil {
+		log.Fatalf("can't initialize zap logger: %v", err)
+	}
+	logger = handle.Sugar()
+	defer handle.Sync()
 }

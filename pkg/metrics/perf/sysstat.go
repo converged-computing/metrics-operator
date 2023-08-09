@@ -132,7 +132,7 @@ echo "%s"
 while true
   do
     echo "%s"
-	%s
+    %s
     echo "CPU STATISTICS"
     pidstat -p ${pid} -u -h | jc --pidstat
     echo "KERNEL STATISTICS"
@@ -140,28 +140,28 @@ while true
     echo "POLICY"
     pidstat -p ${pid} -R -h | jc --pidstat
     echo "PAGEFAULTS"
-	pidstat -p ${pid} -r -h | jc --pidstat
+    pidstat -p ${pid} -r -h | jc --pidstat
     echo "STACK UTILIZATION"
-	pidstat -p ${pid} -s -h | jc --pidstat
+    pidstat -p ${pid} -s -h | jc --pidstat
     echo "THREADS"
-	pidstat -p ${pid} -t -h | jc --pidstat
+    pidstat -p ${pid} -t -h | jc --pidstat
     echo "KERNEL TABLES"
-	pidstat -p ${pid} -v -h | jc --pidstat
+    pidstat -p ${pid} -v -h | jc --pidstat
     echo "TASK SWITCHING"
-	pidstat -p ${pid} -w -h | jc --pidstat
-	# Check if still running
-	ps -p ${pid} > /dev/null
+    pidstat -p ${pid} -w -h | jc --pidstat
+    # Check if still running
+    ps -p ${pid} > /dev/null
     retval=$?
-	if [[ $retval -ne 0 ]]; then
+    if [[ $retval -ne 0 ]]; then
         echo "%s"
         exit 0
     fi
-	if [[ $completions -ne 0 ]] && [[ $i -eq $completions ]]; then
-	    echo "%s"
+    if [[ $completions -ne 0 ]] && [[ $i -eq $completions ]]; then
+        echo "%s"
     	exit 0
     fi
-	sleep %d
-	let i=i+1
+    sleep %d
+    let i=i+1
 done
 `
 

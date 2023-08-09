@@ -66,6 +66,10 @@ type MetricSetSpec struct {
 	// +optional
 	Pods int32 `json:"pods"`
 
+	// Resources include limits and requests for each pod (that include a JobSet)
+	// +optional
+	Resources ContainerResource `json:"resources"`
+
 	// Single pod completion, meaning the jobspec completions is unset
 	// and we only require one main completion
 	// +optional
@@ -98,10 +102,26 @@ type Application struct {
 	//+optional
 	PullSecret string `json:"pullSecret"`
 
+	// Resources include limits and requests for the application
+	// +optional
+	Resources ContainerResources `json:"resources"`
+
 	// Existing Volumes for the application
 	// +optional
 	Volumes map[string]Volume `json:"volumes"`
 }
+
+// ContainerResources include limits and requests
+type ContainerResources struct {
+
+	// +optional
+	Limits ContainerResource `json:"limits"`
+
+	// +optional
+	Requests ContainerResource `json:"requests"`
+}
+
+type ContainerResource map[string]intstr.IntOrString
 
 // A Volume should correspond with an existing volume, either:
 // config map, secret, or claim name. This will be added soon.

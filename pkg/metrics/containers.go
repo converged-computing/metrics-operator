@@ -115,7 +115,16 @@ func GetContainers(
 	}
 
 	// If our metric set has an application, add it last
+	// We currently accept resources for an application (but not metrics yet)
 	if set.HasApplication() {
+
+		// Prepare container resources
+		resources, err := getContainerResources(&set.Spec.Application.Resources)
+		logger.Info("🌀 Application", "Container.Resources", resources)
+		if err != nil {
+			return containers, err
+		}
+
 		command := []string{"/bin/bash", "-c", set.Spec.Application.Entrypoint}
 		appContainer := corev1.Container{
 			Name:            "app",
@@ -131,6 +140,6 @@ func GetContainers(
 		}
 		containers = append(containers, appContainer)
 	}
-	fmt.Printf("🟪️ Adding %d containers\n", len(containers))
+	logger.Infof("🟪️ Adding %d containers\n", len(containers))
 	return containers, nil
 }
