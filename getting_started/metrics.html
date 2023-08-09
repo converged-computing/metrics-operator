@@ -782,7 +782,13 @@
 <td>pids</td>
 <td>For debugging, show consistent output of ps aux</td>
 <td>Anything set</td>
-<td>Unset</td>
+<td>unset</td>
+</tr>
+<tr>
+<td>threads</td>
+<td>add <code>-t</code> to each pidstat command to indicate wanting thread-level output</td>
+<td>unset</td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -804,7 +810,9 @@ and the rest (workers).</p>
 </code></pre></div>
 </div>
 <p>In the map above, order matters, as the command for all indices is first set to be the flux-broker one, and then
-after the index at 0 gets a custom command.</p>
+after the index at 0 gets a custom command. See <a class="reference external" href="https://man7.org/linux/man-pages/man1/pidstat.1.html">pidstat</a> for
+more information on this command, and <a class="reference external" href="https://github.com/converged-computing/metrics-operator/blob/main/pkg/metrics/perf/sysstat.go">this file</a>
+for how we use them.  If there is an option or command that is not exposed that you would like, please <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues">open an issue</a>.</p>
 <h3 id="storage">Storage<a class="headerlink" href="#storage" title="Permalink to this heading">¶</a></h3>
 <p>These metrics are intended to assess storage volumes.</p>
 <h4 id="io-sysstat">io-sysstat<a class="headerlink" href="#io-sysstat" title="Permalink to this heading">¶</a></h4>
