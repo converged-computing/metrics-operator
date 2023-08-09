@@ -100,9 +100,17 @@ func (n OSUBenchmark) getMetricsKeyToPath() []corev1.KeyToPath {
 // Replicated Jobs are custom for this standalone metric
 func (m OSUBenchmark) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, error) {
 
+	js := []jobset.ReplicatedJob{}
+
 	// Generate a replicated job for the launcher (netmark) and workers
-	launcher := metrics.GetReplicatedJob(spec, false, 1, 1, "l")
-	workers := metrics.GetReplicatedJob(spec, false, 1, 1, "w")
+	launcher, err := metrics.GetReplicatedJob(spec, false, 1, 1, "l")
+	if err != nil {
+		return js, err
+	}
+	workers, err := metrics.GetReplicatedJob(spec, false, 1, 1, "w")
+	if err != nil {
+		return js, err
+	}
 
 	// Add volumes defined under storage.
 	v := map[string]api.Volume{}
@@ -132,7 +140,6 @@ func (m OSUBenchmark) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJo
 			WorkingDir: m.WorkingDir(),
 		},
 	}
-	js := []jobset.ReplicatedJob{}
 
 	// Derive the containers, one per metric
 	// This will also include mounts for volumes

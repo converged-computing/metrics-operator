@@ -105,9 +105,18 @@ func (n Netmark) getMetricsKeyToPath() []corev1.KeyToPath {
 // Replicated Jobs are custom for this standalone metric
 func (m Netmark) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, error) {
 
+	js := []jobset.ReplicatedJob{}
+
 	// Generate a replicated job for the launcher (netmark) and workers
-	launcher := metrics.GetReplicatedJob(spec, false, 1, 1, "n")
-	workers := metrics.GetReplicatedJob(spec, false, spec.Spec.Pods-1, spec.Spec.Pods-1, "w")
+	launcher, err := metrics.GetReplicatedJob(spec, false, 1, 1, "n")
+	if err != nil {
+		return js, err
+	}
+
+	workers, err := metrics.GetReplicatedJob(spec, false, spec.Spec.Pods-1, spec.Spec.Pods-1, "w")
+	if err != nil {
+		return js, err
+	}
 
 	// Add volumes defined under storage.
 	v := map[string]api.Volume{}
@@ -137,7 +146,6 @@ func (m Netmark) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, er
 			Command: []string{"/bin/bash", m.workerScript},
 		},
 	}
-	js := []jobset.ReplicatedJob{}
 
 	// Derive the containers, one per metric
 	// This will also include mounts for volumes

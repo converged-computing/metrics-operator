@@ -8,8 +8,6 @@ SPDX-License-Identifier: MIT
 package metrics
 
 import (
-	"fmt"
-
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 )
@@ -45,7 +43,10 @@ func GetApplicationReplicatedJobs(
 	m := (*metric)
 
 	// This defaults to one replicated job, named "m"
-	job := GetReplicatedJob(spec, shareProcessNamespace, spec.Spec.Pods, spec.Spec.Completions, "")
+	job, err := GetReplicatedJob(spec, shareProcessNamespace, spec.Spec.Pods, spec.Spec.Completions, "")
+	if err != nil {
+		return rjs, err
+	}
 
 	// Add volumes expecting an application. GetVolumes creates metric entrypoint volumes
 	// and adds existing volumes (application) to our set of mounts. We need both
@@ -75,7 +76,7 @@ func GetApplicationReplicatedJobs(
 	)
 
 	if err != nil {
-		fmt.Printf("There was an error getting containers for %s: %s\n", m.Name(), err)
+		logger.Errorf("There was an error getting containers for %s: %s\n", m.Name(), err)
 		return rjs, err
 	}
 	job.Template.Spec.Template.Spec.Containers = containers

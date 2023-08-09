@@ -214,16 +214,16 @@ while true
 	# Check if still running
 	ps -p ${pid} > /dev/null
     retval=$?
-	if [[ $retval -ne 0 ]]; then
+    if [[ $retval -ne 0 ]]; then
         echo "%s"
         exit 0
     fi
-	if [[ $completions -ne 0 ]] && [[ $i -eq $completions ]]; then
-	    echo "%s"
+    if [[ $completions -ne 0 ]] && [[ $i -eq $completions ]]; then
+        echo "%s"
     	exit 0
     fi
-	sleep %d
-	let i=i+1
+    sleep %d
+    let i=i+1
 done
 `
 

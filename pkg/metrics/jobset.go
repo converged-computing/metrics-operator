@@ -117,7 +117,7 @@ func GetReplicatedJob(
 	pods int32,
 	completions int32,
 	jobname string,
-) *jobset.ReplicatedJob {
+) (*jobset.ReplicatedJob, error) {
 
 	// Default replicated job name, if not set
 	if jobname == "" {
@@ -182,8 +182,15 @@ func GetReplicatedJob(
 	}
 
 	// Should we add resources back?
-	// jobspec.Template.Spec.Overhead = resources
+	resources, err := getPodResources(set)
+	logger.Info("🌀 MiniCluster", "Pod.Resources", resources)
+	if err != nil {
+		logger.Info("🌀 MiniCluster", "Pod.Resources", resources)
+		return &job, err
+	}
+	jobspec.Template.Spec.Overhead = resources
+
 	// Tie the jobspec to the job
 	job.Template.Spec = jobspec
-	return &job
+	return &job, nil
 }
