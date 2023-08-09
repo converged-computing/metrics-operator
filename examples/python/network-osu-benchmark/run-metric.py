@@ -99,6 +99,7 @@ def plot_results(output):
         plt.tight_layout()
         plt.savefig(os.path.join(img, f"{slug}.png"))
         plt.clf()
+        plt.close()
 
 if __name__ == "__main__":
     main()

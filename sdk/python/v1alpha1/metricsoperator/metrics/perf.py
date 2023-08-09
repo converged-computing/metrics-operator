@@ -8,15 +8,19 @@ from .base import MetricBase
 
 # Known section headers
 headers = [
-    "CPU STATISTICS",
+    "CPU STATISTICS TASK",
+    "CPU STATISTICS CHILD",
     "KERNEL STATISTICS",
     "POLICY",
-    "PAGEFAULTS",
+    "PAGEFAULTS TASK",
+    "PAGEFAULTS CHILD",
     "STACK UTILIZATION",
-    "THREADS",
+    "THREADS TASK",
+    "THREADS CHILD",
     "KERNEL TABLES",
     "TASK SWITCHING",
 ]
+
 
 header_regex = "(%s)" % "|".join(headers)
 

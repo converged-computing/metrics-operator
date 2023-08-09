@@ -9,6 +9,7 @@ package perf
 
 import (
 	"fmt"
+	"strconv"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
@@ -29,6 +30,7 @@ type PidStat struct {
 	// Options
 	useColor bool
 	showPIDS bool
+	commands map[string]intstr.IntOrString
 }
 
 // Name returns the metric name
@@ -62,6 +64,9 @@ func (m *PidStat) SetOptions(metric *api.Metric) {
 	m.rate = metric.Rate
 	m.completions = metric.Completions
 
+	// Custom commands based on index of job
+	m.commands = map[string]intstr.IntOrString{}
+
 	// UseColor set to anything means to use it
 	_, ok := metric.Options["color"]
 	if ok {
@@ -70,6 +75,12 @@ func (m *PidStat) SetOptions(metric *api.Metric) {
 	_, ok = metric.Options["pids"]
 	if ok {
 		m.showPIDS = true
+	}
+
+	// Parse map options
+	commands, ok := metric.MapOptions["commands"]
+	if ok {
+		m.commands = commands
 	}
 
 }
@@ -89,6 +100,44 @@ func (m PidStat) ListOptions() map[string][]intstr.IntOrString {
 	return map[string][]intstr.IntOrString{}
 }
 
+func (m PidStat) prepareIndexedCommand(spec *api.MetricSet) string {
+
+	var command string
+	if len(m.commands) == 0 {
+
+		// This is a global command for the entire application
+		command = fmt.Sprintf("command=\"%s\"\n", spec.Spec.Application.Command)
+
+	} else {
+
+		// Keep a lookup of index -> command.
+		// Parse "all" or other TBA global identifiers first
+		commands := map[string]string{}
+		for key, value := range m.commands {
+
+			// We currently have support for all
+			if key == "all" {
+				for i := 0; i < int(spec.Spec.Pods); i++ {
+					commands[strconv.Itoa(i)] = value.StrVal
+				}
+			}
+		}
+		// Now add commands specific to indices
+		for key, value := range m.commands {
+			if key == "all" {
+				continue
+			}
+			commands[key] = value.StrVal
+		}
+
+		// Assemble final logic
+		for index, cmd := range commands {
+			command += fmt.Sprintf("if [[ \"JOB_COMPLETION_INDEX\" -eq %s ]]; then\n  command=\"%s\"\nfi\n", index, cmd)
+		}
+	}
+	return command
+}
+
 // Generate the replicated job for measuring the application
 // TODO if the app is too fast we might miss it?
 func (m PidStat) EntrypointScripts(
@@ -106,8 +155,11 @@ func (m PidStat) EntrypointScripts(
 
 	showPIDS := ""
 	if m.showPIDS {
-		showPIDS = "ps aux"
+		showPIDS = "ps aux\npstree ${pid}"
 	}
+
+	// Prepare custom logic to determine command
+	command := m.prepareIndexedCommand(spec)
 	template := `#!/bin/bash
 
 echo "%s"
@@ -115,11 +167,15 @@ echo "%s"
 wget https://github.com/converged-computing/goshare/releases/download/2023-07-27/wait
 chmod +x ./wait
 mv ./wait /usr/bin/goshare-wait
+
+# This is logic to determine the command, it will set $command
+# We do this because command to watch can vary between worker pods
+%s
 echo "PIDSTAT COMMAND START"
-echo "%s"
+echo "$command"
 echo "PIDSTAT COMMAND END"
 echo "Waiting for application PID..."
-pid=$(goshare-wait -c "%s" -q)
+pid=$(goshare-wait -c "$command" -q)
 
 # Set color or not
 %s
@@ -133,22 +189,28 @@ while true
   do
     echo "%s"
 	%s
-    echo "CPU STATISTICS"
-    pidstat -p ${pid} -u -h | jc --pidstat
-    echo "KERNEL STATISTICS"
-    pidstat -p ${pid} -d -h | jc --pidstat
-    echo "POLICY"
-    pidstat -p ${pid} -R -h | jc --pidstat
-    echo "PAGEFAULTS"
-	pidstat -p ${pid} -r -h | jc --pidstat
-    echo "STACK UTILIZATION"
-	pidstat -p ${pid} -s -h | jc --pidstat
-    echo "THREADS"
-	pidstat -p ${pid} -t -h | jc --pidstat
-    echo "KERNEL TABLES"
-	pidstat -p ${pid} -v -h | jc --pidstat
-    echo "TASK SWITCHING"
-	pidstat -p ${pid} -w -h | jc --pidstat
+    echo "CPU STATISTICS TASK"
+    pidstat -p ${pid} -u -h -T TASK | jc --pidstat
+    echo "CPU STATISTICS CHILD"
+    pidstat -p ${pid} -u -h -T CHILD | jc --pidstat
+	echo "KERNEL STATISTICS"
+    pidstat -p ${pid} -d -h -T ALL | jc --pidstat
+	echo "POLICY"
+    pidstat -p ${pid} -R -h -T ALL | jc --pidstat
+	echo "PAGEFAULTS TASK"
+	pidstat -p ${pid} -r -h -T TASK | jc --pidstat
+	echo "PAGEFAULTS CHILD"
+	pidstat -p ${pid} -r -h -T CHILD | jc --pidstat
+	echo "STACK UTILIZATION"
+	pidstat -p ${pid} -s -h -T ALL | jc --pidstat
+	echo "THREADS TASK"
+	pidstat -p ${pid} -t -h -T TASK | jc --pidstat
+	echo "THREADS CHILD"
+	pidstat -p ${pid} -t -h -T CHILD | jc --pidstat
+	echo "KERNEL TABLES"
+	pidstat -p ${pid} -v -h -T ALL | jc --pidstat
+	echo "TASK SWITCHING"
+	pidstat -p ${pid} -w -h -T ALL | jc --pidstat
 	# Check if still running
 	ps -p ${pid} > /dev/null
     retval=$?
@@ -168,8 +230,7 @@ done
 	script := fmt.Sprintf(
 		template,
 		metadata,
-		spec.Spec.Application.Command,
-		spec.Spec.Application.Command,
+		command,
 		useColor,
 		m.completions,
 		metrics.CollectionStart,

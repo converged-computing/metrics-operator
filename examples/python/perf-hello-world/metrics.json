@@ -1,0 +1,769 @@
+{
+    "data": [
+        {
+            "cpu_statistics_task": [
+                {
+                    "time": 234639,
+                    "uid": 0,
+                    "pid": 20,
+                    "percent_usr": 0.0,
+                    "percent_system": 0.0,
+                    "percent_guest": 0.0,
+                    "percent_wait": "0.00",
+                    "percent_cpu": 0.0,
+                    "cpu": 2,
+                    "command": "sleep"
+                }
+            ],
+            "cpu_statistics_child": [
+                {
+                    "time": 234639,
+                    "uid": 0,
+                    "pid": 20,
+                    "usr-ms": "40",
+                    "system-ms": "20",
+                    "guest-ms": "0",
+                    "command": "sleep"
+                }
+            ],
+            "kernel_statistics": [
+                {
+                    "time": 234639,
+                    "uid": 0,
+                    "pid": 20,
+                    "kb_rd_s": 0.0,
+                    "kb_wr_s": 0.0,
+                    "kb_ccwr_s": 0.0,
+                    "iodelay": "0",
+                    "command": "sleep"
+                },
+                {
+                    "time": 234639,
+                    "uid": 0,
+                    "pid": 20,
+                    "kb_rd_s": null
+                }
+            ],
+            "policy": [
+                {
+                    "time": 234639,
+                    "uid": 0,
+                    "pid": 20,
+                    "prio": "0",
+                    "policy": "NORMAL",
+                    "command": "sleep"
+                },
+                {
+                    "time": 234639,
+                    "uid": 0,
+                    "pid": 20,
+                    "prio": "sleep"
+                }
+            ],
+            "pagefaults_task": [
+                {
+                    "time": 234639,
+                    "uid": 0,
+                    "pid": 20,
+                    "minflt_s": 0.0,
+                    "majflt_s": 0.0,
+                    "vsz": 2788,
+                    "rss": 1028,
+                    "percent_mem": 0.01,
+                    "command": "sleep"
+                }
+            ],
+            "pagefaults_child": [
+                {
+                    "time": 234639,
+                    "uid": 0,
+                    "pid": 20,
+                    "minflt-nr": "2008",
+                    "majflt-nr": "1",
+                    "command": "sleep"
+                }
+            ],
+            "stack_utilization": [
+                {
+                    "time": 234640,
+                    "uid": 0,
+                    "pid": 20,
+                    "stksize": 132,
+                    "stkref": 12,
+                    "command": "sleep"
+                },
+                {
+                    "time": 234640,
+                    "uid": 0,
+                    "pid": 20,
+                    "stksize": null
+                }
+            ],
+            "threads_task": [
+                {
+                    "time": 234640,
+                    "uid": 0,
+                    "tgid": "20",
+                    "tid": "-",
+                    "percent_usr": 0.0,
+                    "percent_system": 0.0,
+                    "percent_guest": 0.0,
+                    "percent_wait": "0.00",
+                    "percent_cpu": 0.0,
+                    "cpu": 2,
+                    "command": "sleep"
+                },
+                {
+                    "time": 234640,
+                    "uid": 0,
+                    "tgid": "-",
+                    "tid": "20",
+                    "percent_usr": 0.0,
+                    "percent_system": 0.0,
+                    "percent_guest": 0.0,
+                    "percent_wait": "0.00",
+                    "percent_cpu": 0.0,
+                    "cpu": 2,
+                    "command": "|__sleep"
+                }
+            ],
+            "threads_child": [
+                {
+                    "time": 234640,
+                    "uid": 0,
+                    "tgid": "20",
+                    "tid": "-",
+                    "usr-ms": "40",
+                    "system-ms": "20",
+                    "guest-ms": "0",
+                    "command": "sleep"
+                },
+                {
+                    "time": 234640,
+                    "uid": 0,
+                    "tgid": "-",
+                    "tid": "20",
+                    "usr-ms": "40",
+                    "system-ms": "10",
+                    "guest-ms": "0",
+                    "command": "|__sleep"
+                }
+            ],
+            "kernel_tables": [
+                {
+                    "time": 234640,
+                    "uid": 0,
+                    "pid": 20,
+                    "threads": "1",
+                    "fd-nr": "3",
+                    "command": "sleep"
+                },
+                {
+                    "time": 234640,
+                    "uid": 0,
+                    "pid": 20,
+                    "threads": "sleep"
+                }
+            ],
+            "task_switching": [
+                {
+                    "time": 234640,
+                    "uid": 0,
+                    "pid": 20,
+                    "cswch_s": 0.0,
+                    "nvcswch_s": 0.0,
+                    "command": "sleep"
+                },
+                {
+                    "time": 234640,
+                    "uid": 0,
+                    "pid": 20,
+                    "cswch_s": null
+                }
+            ]
+        },
+        {
+            "cpu_statistics_task": [
+                {
+                    "time": 234642,
+                    "uid": 0,
+                    "pid": 20,
+                    "percent_usr": 0.0,
+                    "percent_system": 0.0,
+                    "percent_guest": 0.0,
+                    "percent_wait": "0.00",
+                    "percent_cpu": 0.0,
+                    "cpu": 2,
+                    "command": "sleep"
+                }
+            ],
+            "cpu_statistics_child": [
+                {
+                    "time": 234642,
+                    "uid": 0,
+                    "pid": 20,
+                    "usr-ms": "40",
+                    "system-ms": "20",
+                    "guest-ms": "0",
+                    "command": "sleep"
+                }
+            ],
+            "kernel_statistics": [
+                {
+                    "time": 234642,
+                    "uid": 0,
+                    "pid": 20,
+                    "kb_rd_s": 0.0,
+                    "kb_wr_s": 0.0,
+                    "kb_ccwr_s": 0.0,
+                    "iodelay": "0",
+                    "command": "sleep"
+                },
+                {
+                    "time": 234642,
+                    "uid": 0,
+                    "pid": 20,
+                    "kb_rd_s": null
+                }
+            ],
+            "policy": [
+                {
+                    "time": 234642,
+                    "uid": 0,
+                    "pid": 20,
+                    "prio": "0",
+                    "policy": "NORMAL",
+                    "command": "sleep"
+                },
+                {
+                    "time": 234642,
+                    "uid": 0,
+                    "pid": 20,
+                    "prio": "sleep"
+                }
+            ],
+            "pagefaults_task": [
+                {
+                    "time": 234642,
+                    "uid": 0,
+                    "pid": 20,
+                    "minflt_s": 0.0,
+                    "majflt_s": 0.0,
+                    "vsz": 2788,
+                    "rss": 1028,
+                    "percent_mem": 0.01,
+                    "command": "sleep"
+                }
+            ],
+            "pagefaults_child": [
+                {
+                    "time": 234642,
+                    "uid": 0,
+                    "pid": 20,
+                    "minflt-nr": "2008",
+                    "majflt-nr": "1",
+                    "command": "sleep"
+                }
+            ],
+            "stack_utilization": [
+                {
+                    "time": 234642,
+                    "uid": 0,
+                    "pid": 20,
+                    "stksize": 132,
+                    "stkref": 12,
+                    "command": "sleep"
+                },
+                {
+                    "time": 234642,
+                    "uid": 0,
+                    "pid": 20,
+                    "stksize": null
+                }
+            ],
+            "threads_task": [
+                {
+                    "time": 234643,
+                    "uid": 0,
+                    "tgid": "20",
+                    "tid": "-",
+                    "percent_usr": 0.0,
+                    "percent_system": 0.0,
+                    "percent_guest": 0.0,
+                    "percent_wait": "0.00",
+                    "percent_cpu": 0.0,
+                    "cpu": 2,
+                    "command": "sleep"
+                },
+                {
+                    "time": 234643,
+                    "uid": 0,
+                    "tgid": "-",
+                    "tid": "20",
+                    "percent_usr": 0.0,
+                    "percent_system": 0.0,
+                    "percent_guest": 0.0,
+                    "percent_wait": "0.00",
+                    "percent_cpu": 0.0,
+                    "cpu": 2,
+                    "command": "|__sleep"
+                }
+            ],
+            "threads_child": [
+                {
+                    "time": 234643,
+                    "uid": 0,
+                    "tgid": "20",
+                    "tid": "-",
+                    "usr-ms": "40",
+                    "system-ms": "20",
+                    "guest-ms": "0",
+                    "command": "sleep"
+                },
+                {
+                    "time": 234643,
+                    "uid": 0,
+                    "tgid": "-",
+                    "tid": "20",
+                    "usr-ms": "40",
+                    "system-ms": "10",
+                    "guest-ms": "0",
+                    "command": "|__sleep"
+                }
+            ],
+            "kernel_tables": [
+                {
+                    "time": 234643,
+                    "uid": 0,
+                    "pid": 20,
+                    "threads": "1",
+                    "fd-nr": "3",
+                    "command": "sleep"
+                },
+                {
+                    "time": 234643,
+                    "uid": 0,
+                    "pid": 20,
+                    "threads": "sleep"
+                }
+            ],
+            "task_switching": [
+                {
+                    "time": 234643,
+                    "uid": 0,
+                    "pid": 20,
+                    "cswch_s": 0.0,
+                    "nvcswch_s": 0.0,
+                    "command": "sleep"
+                },
+                {
+                    "time": 234643,
+                    "uid": 0,
+                    "pid": 20,
+                    "cswch_s": null
+                }
+            ]
+        },
+        {
+            "cpu_statistics_task": [
+                {
+                    "time": 234645,
+                    "uid": 0,
+                    "pid": 20,
+                    "percent_usr": 0.0,
+                    "percent_system": 0.0,
+                    "percent_guest": 0.0,
+                    "percent_wait": "0.00",
+                    "percent_cpu": 0.0,
+                    "cpu": 2,
+                    "command": "sleep"
+                }
+            ],
+            "cpu_statistics_child": [
+                {
+                    "time": 234645,
+                    "uid": 0,
+                    "pid": 20,
+                    "usr-ms": "40",
+                    "system-ms": "20",
+                    "guest-ms": "0",
+                    "command": "sleep"
+                }
+            ],
+            "kernel_statistics": [
+                {
+                    "time": 234645,
+                    "uid": 0,
+                    "pid": 20,
+                    "kb_rd_s": 0.0,
+                    "kb_wr_s": 0.0,
+                    "kb_ccwr_s": 0.0,
+                    "iodelay": "0",
+                    "command": "sleep"
+                },
+                {
+                    "time": 234645,
+                    "uid": 0,
+                    "pid": 20,
+                    "kb_rd_s": null
+                }
+            ],
+            "policy": [
+                {
+                    "time": 234645,
+                    "uid": 0,
+                    "pid": 20,
+                    "prio": "0",
+                    "policy": "NORMAL",
+                    "command": "sleep"
+                },
+                {
+                    "time": 234645,
+                    "uid": 0,
+                    "pid": 20,
+                    "prio": "sleep"
+                }
+            ],
+            "pagefaults_task": [
+                {
+                    "time": 234645,
+                    "uid": 0,
+                    "pid": 20,
+                    "minflt_s": 0.0,
+                    "majflt_s": 0.0,
+                    "vsz": 2788,
+                    "rss": 1028,
+                    "percent_mem": 0.01,
+                    "command": "sleep"
+                }
+            ],
+            "pagefaults_child": [
+                {
+                    "time": 234645,
+                    "uid": 0,
+                    "pid": 20,
+                    "minflt-nr": "2008",
+                    "majflt-nr": "1",
+                    "command": "sleep"
+                }
+            ],
+            "stack_utilization": [
+                {
+                    "time": 234645,
+                    "uid": 0,
+                    "pid": 20,
+                    "stksize": 132,
+                    "stkref": 12,
+                    "command": "sleep"
+                },
+                {
+                    "time": 234645,
+                    "uid": 0,
+                    "pid": 20,
+                    "stksize": null
+                }
+            ],
+            "threads_task": [
+                {
+                    "time": 234645,
+                    "uid": 0,
+                    "tgid": "20",
+                    "tid": "-",
+                    "percent_usr": 0.0,
+                    "percent_system": 0.0,
+                    "percent_guest": 0.0,
+                    "percent_wait": "0.00",
+                    "percent_cpu": 0.0,
+                    "cpu": 2,
+                    "command": "sleep"
+                },
+                {
+                    "time": 234645,
+                    "uid": 0,
+                    "tgid": "-",
+                    "tid": "20",
+                    "percent_usr": 0.0,
+                    "percent_system": 0.0,
+                    "percent_guest": 0.0,
+                    "percent_wait": "0.00",
+                    "percent_cpu": 0.0,
+                    "cpu": 2,
+                    "command": "|__sleep"
+                }
+            ],
+            "threads_child": [
+                {
+                    "time": 234645,
+                    "uid": 0,
+                    "tgid": "20",
+                    "tid": "-",
+                    "usr-ms": "40",
+                    "system-ms": "20",
+                    "guest-ms": "0",
+                    "command": "sleep"
+                },
+                {
+                    "time": 234645,
+                    "uid": 0,
+                    "tgid": "-",
+                    "tid": "20",
+                    "usr-ms": "40",
+                    "system-ms": "10",
+                    "guest-ms": "0",
+                    "command": "|__sleep"
+                }
+            ],
+            "kernel_tables": [
+                {
+                    "time": 234646,
+                    "uid": 0,
+                    "pid": 20,
+                    "threads": "1",
+                    "fd-nr": "3",
+                    "command": "sleep"
+                },
+                {
+                    "time": 234646,
+                    "uid": 0,
+                    "pid": 20,
+                    "threads": "sleep"
+                }
+            ],
+            "task_switching": [
+                {
+                    "time": 234646,
+                    "uid": 0,
+                    "pid": 20,
+                    "cswch_s": 0.0,
+                    "nvcswch_s": 0.0,
+                    "command": "sleep"
+                },
+                {
+                    "time": 234646,
+                    "uid": 0,
+                    "pid": 20,
+                    "cswch_s": null
+                }
+            ]
+        },
+        {
+            "cpu_statistics_task": [
+                {
+                    "time": 234648,
+                    "uid": 0,
+                    "pid": 20,
+                    "percent_usr": 0.0,
+                    "percent_system": 0.0,
+                    "percent_guest": 0.0,
+                    "percent_wait": "0.00",
+                    "percent_cpu": 0.0,
+                    "cpu": 2,
+                    "command": "sleep"
+                }
+            ],
+            "cpu_statistics_child": [
+                {
+                    "time": 234648,
+                    "uid": 0,
+                    "pid": 20,
+                    "usr-ms": "40",
+                    "system-ms": "20",
+                    "guest-ms": "0",
+                    "command": "sleep"
+                }
+            ],
+            "kernel_statistics": [
+                {
+                    "time": 234648,
+                    "uid": 0,
+                    "pid": 20,
+                    "kb_rd_s": 0.0,
+                    "kb_wr_s": 0.0,
+                    "kb_ccwr_s": 0.0,
+                    "iodelay": "0",
+                    "command": "sleep"
+                },
+                {
+                    "time": 234648,
+                    "uid": 0,
+                    "pid": 20,
+                    "kb_rd_s": null
+                }
+            ],
+            "policy": [
+                {
+                    "time": 234648,
+                    "uid": 0,
+                    "pid": 20,
+                    "prio": "0",
+                    "policy": "NORMAL",
+                    "command": "sleep"
+                },
+                {
+                    "time": 234648,
+                    "uid": 0,
+                    "pid": 20,
+                    "prio": "sleep"
+                }
+            ],
+            "pagefaults_task": [
+                {
+                    "time": 234648,
+                    "uid": 0,
+                    "pid": 20,
+                    "minflt_s": 0.0,
+                    "majflt_s": 0.0,
+                    "vsz": 2788,
+                    "rss": 1028,
+                    "percent_mem": 0.01,
+                    "command": "sleep"
+                }
+            ],
+            "pagefaults_child": [
+                {
+                    "time": 234648,
+                    "uid": 0,
+                    "pid": 20,
+                    "minflt-nr": "2008",
+                    "majflt-nr": "1",
+                    "command": "sleep"
+                }
+            ],
+            "stack_utilization": [
+                {
+                    "time": 234648,
+                    "uid": 0,
+                    "pid": 20,
+                    "stksize": 132,
+                    "stkref": 12,
+                    "command": "sleep"
+                },
+                {
+                    "time": 234648,
+                    "uid": 0,
+                    "pid": 20,
+                    "stksize": null
+                }
+            ],
+            "threads_task": [
+                {
+                    "time": 234648,
+                    "uid": 0,
+                    "tgid": "20",
+                    "tid": "-",
+                    "percent_usr": 0.0,
+                    "percent_system": 0.0,
+                    "percent_guest": 0.0,
+                    "percent_wait": "0.00",
+                    "percent_cpu": 0.0,
+                    "cpu": 2,
+                    "command": "sleep"
+                },
+                {
+                    "time": 234648,
+                    "uid": 0,
+                    "tgid": "-",
+                    "tid": "20",
+                    "percent_usr": 0.0,
+                    "percent_system": 0.0,
+                    "percent_guest": 0.0,
+                    "percent_wait": "0.00",
+                    "percent_cpu": 0.0,
+                    "cpu": 2,
+                    "command": "|__sleep"
+                }
+            ],
+            "threads_child": [
+                {
+                    "time": 234648,
+                    "uid": 0,
+                    "tgid": "20",
+                    "tid": "-",
+                    "usr-ms": "40",
+                    "system-ms": "20",
+                    "guest-ms": "0",
+                    "command": "sleep"
+                },
+                {
+                    "time": 234648,
+                    "uid": 0,
+                    "tgid": "-",
+                    "tid": "20",
+                    "usr-ms": "40",
+                    "system-ms": "10",
+                    "guest-ms": "0",
+                    "command": "|__sleep"
+                }
+            ],
+            "kernel_tables": [
+                {
+                    "time": 234648,
+                    "uid": 0,
+                    "pid": 20,
+                    "threads": "1",
+                    "fd-nr": "3",
+                    "command": "sleep"
+                },
+                {
+                    "time": 234648,
+                    "uid": 0,
+                    "pid": 20,
+                    "threads": "sleep"
+                }
+            ],
+            "task_switching": [
+                {
+                    "time": 234648,
+                    "uid": 0,
+                    "pid": 20,
+                    "cswch_s": 0.0,
+                    "nvcswch_s": 0.0,
+                    "command": "sleep"
+                },
+                {
+                    "time": 234648,
+                    "uid": 0,
+                    "pid": 20,
+                    "cswch_s": null
+                }
+            ]
+        }
+    ],
+    "metadata": {
+        "pods": 1,
+        "completions": 1,
+        "applicationImage": "ubuntu",
+        "applicationCommand": "sleep 10",
+        "metricName": "perf-sysstat",
+        "metricDescription": "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
+        "metricType": "application",
+        "metricOptions": {
+            "completions": 0,
+            "rate": 2
+        }
+    },
+    "command": "sleep 10",
+    "spec": {
+        "apiVersion": "flux-framework.org/v1alpha1",
+        "kind": "MetricSet",
+        "metadata": {
+            "labels": {
+                "app.kubernetes.io/name": "metricset",
+                "app.kubernetes.io/instance": "metricset-sample"
+            },
+            "name": "metricset-sample"
+        },
+        "spec": {
+            "application": {
+                "image": "ubuntu",
+                "command": "sleep 10"
+            },
+            "metrics": [
+                {
+                    "name": "perf-sysstat",
+                    "rate": 2
+                }
+            ]
+        }
+    }
+}

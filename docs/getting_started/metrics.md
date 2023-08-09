@@ -26,7 +26,7 @@ These metrics are intended to assess application performance.
 
  - [Application Metric Set](user-guide.md#application-metric-set)
 
-This metric provides the "pidstat" executable of the sysstat library. There is only one option to set to turn on color:
+This metric provides the "pidstat" executable of the sysstat library. The following options are available:
 
 |Name | Description | Type | Default |
 |-----|-------------|------------|------|
@@ -34,6 +34,25 @@ This metric provides the "pidstat" executable of the sysstat library. There is o
 | pids | For debugging, show consistent output of ps aux | Anything set | Unset |
 
 By default color and pids are set to false anticipating log parsing.
+And we also provide the option to see "commands" or specific commands based on a job index to the metric.
+As an example, here is how we would ask to monitor two different commands for a launcher node (index 0)
+and the rest (workers).
+
+```yaml
+- name: perf-sysstat
+  rate: 2
+  options:
+    pids: "true"
+
+  # Look for pids based on commands matched to index
+  mapOptions:
+    commands:
+       # First set all to use the worker command, but give the lead broker a special command
+       "all": /usr/libexec/flux/cmd/flux-broker --config /etc/flux/config -Scron.directory=/etc/flux/system/cron.d -Stbon.fanout
+       "0": /usr/bin/python3.8 /usr/libexec/flux/cmd/flux-submit.py -n 2 --quiet --watch lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite
+```
+In the map above, order matters, as the command for all indices is first set to be the flux-broker one, and then
+after the index at 0 gets a custom command.
 
 ### Storage
 

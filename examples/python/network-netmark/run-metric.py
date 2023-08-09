@@ -91,7 +91,7 @@ def plot_results(output):
             os.path.join(img, f"netmark-{tasks}-tasks-hist.png"), dpi=300, bbox_inches="tight"
         )
         plt.clf()
-
+        plt.close()
 
 if __name__ == "__main__":
     main()

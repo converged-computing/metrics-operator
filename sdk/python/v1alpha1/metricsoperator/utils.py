@@ -6,6 +6,15 @@ import json
 import yaml
 
 
+def read_file(filename):
+    """
+    Read file into text blob
+    """
+    with open(filename, "r") as fd:
+        text = fd.read()
+    return text
+
+
 def read_yaml(filename):
     """
     Read yaml into dict

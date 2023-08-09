@@ -83,7 +83,7 @@ type Storage struct {
 type Application struct {
 	Image string `json:"image"`
 
-	// command to execute and monitor
+	// command to execute and monitor (if consistent across pods)
 	Command string `json:"command"`
 
 	// Working Directory
@@ -161,6 +161,10 @@ type Metric struct {
 	// Metric specific options
 	// +optional
 	ListOptions map[string][]intstr.IntOrString `json:"listOptions"`
+
+	// Metric Map Options
+	// +optional
+	MapOptions map[string]map[string]intstr.IntOrString `json:"mapOptions"`
 
 	// Completions
 	// Number of completions to do, more relevant for service type applications
@@ -243,6 +247,7 @@ func (m *MetricSet) Validate() bool {
 			fmt.Printf("😥️ Application is missing a command.")
 			return false
 		}
+
 		if m.Spec.Application.Entrypoint == "" {
 			m.Spec.Application.Entrypoint = m.Spec.Application.Command
 		}
