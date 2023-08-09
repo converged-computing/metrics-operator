@@ -2,9 +2,9 @@
     "data": [
         {
             "fio version": "fio-3.28",
-            "timestamp": 1691555595,
-            "timestamp_ms": 1691555595622,
-            "time": "Wed Aug  9 04:33:15 2023",
+            "timestamp": 1691556360,
+            "timestamp_ms": 1691556360280,
+            "time": "Wed Aug  9 04:46:00 2023",
             "global options": {
                 "randrepeat": "1",
                 "ioengine": "libaio",
@@ -17,7 +17,7 @@
                     "groupid": 0,
                     "error": 0,
                     "eta": 0,
-                    "elapsed": 5,
+                    "elapsed": 6,
                     "job options": {
                         "name": "test",
                         "bs": "4k",
@@ -25,15 +25,15 @@
                         "rw": "randrw",
                         "rwmixread": "75",
                         "size": "4G",
-                        "filename": "/tmp/test-4cf3ad28caed0d15e872f940ab952e88"
+                        "filename": "/tmp/test-424813bc999f6384f554d7493f47bf04"
                     },
                     "read": {
                         "io_bytes": 3219128320,
                         "io_kbytes": 3143680,
-                        "bw_bytes": 762645894,
-                        "bw": 744771,
-                        "iops": 186192.845297,
-                        "runtime": 4221,
+                        "bw_bytes": 641260621,
+                        "bw": 626231,
+                        "iops": 156557.768924,
+                        "runtime": 5020,
                         "total_ios": 785920,
                         "short_ios": 0,
                         "drop_ios": 0,
@@ -58,25 +58,25 @@
                             "stddev": 0.0,
                             "N": 0
                         },
-                        "bw_min": 546992,
-                        "bw_max": 823256,
-                        "bw_agg": 99.362706,
-                        "bw_mean": 740025.0,
-                        "bw_dev": 84004.327555,
-                        "bw_samples": 8,
-                        "iops_min": 136748,
-                        "iops_max": 205814,
-                        "iops_mean": 185006.5,
-                        "iops_stddev": 21001.26605,
-                        "iops_samples": 8
+                        "bw_min": 544312,
+                        "bw_max": 719680,
+                        "bw_agg": 100.0,
+                        "bw_mean": 626406.4,
+                        "bw_dev": 52125.183445,
+                        "bw_samples": 10,
+                        "iops_min": 136078,
+                        "iops_max": 179920,
+                        "iops_mean": 156601.6,
+                        "iops_stddev": 13031.295861,
+                        "iops_samples": 10
                     },
                     "write": {
                         "io_bytes": 1075838976,
                         "io_kbytes": 1050624,
-                        "bw_bytes": 254877748,
-                        "bw": 248904,
-                        "iops": 62226.012793,
-                        "runtime": 4221,
+                        "bw_bytes": 214310552,
+                        "bw": 209287,
+                        "iops": 52321.912351,
+                        "runtime": 5020,
                         "total_ios": 262656,
                         "short_ios": 0,
                         "drop_ios": 0,
@@ -101,17 +101,17 @@
                             "stddev": 0.0,
                             "N": 0
                         },
-                        "bw_min": 181792,
-                        "bw_max": 277616,
-                        "bw_agg": 99.465235,
-                        "bw_mean": 247573.0,
-                        "bw_dev": 28618.907776,
-                        "bw_samples": 8,
-                        "iops_min": 45448,
-                        "iops_max": 69404,
-                        "iops_mean": 61893.25,
-                        "iops_stddev": 7154.726944,
-                        "iops_samples": 8
+                        "bw_min": 180896,
+                        "bw_max": 242640,
+                        "bw_agg": 100.0,
+                        "bw_mean": 209363.2,
+                        "bw_dev": 18255.453571,
+                        "bw_samples": 10,
+                        "iops_min": 45224,
+                        "iops_max": 60660,
+                        "iops_mean": 52340.8,
+                        "iops_stddev": 4563.863393,
+                        "iops_samples": 10
                     },
                     "trim": {
                         "io_bytes": 0,
@@ -166,12 +166,12 @@
                             "N": 0
                         }
                     },
-                    "job_runtime": 4220,
-                    "usr_cpu": 15.023697,
-                    "sys_cpu": 62.938389,
-                    "ctx": 231672,
+                    "job_runtime": 5019,
+                    "usr_cpu": 17.075115,
+                    "sys_cpu": 65.271967,
+                    "ctx": 237515,
                     "majf": 0,
-                    "minf": 5,
+                    "minf": 6,
                     "iodepth_level": {
                         "1": 0.1,
                         "2": 0.1,
@@ -290,5 +290,5 @@
             ]
         }
     },
-    "command": "fio --randrepeat=1 --ioengine=libaio --direct=1 --gtod_reduce=1 --name=test --bs=4k --iodepth=64 --readwrite=randrw --rwmixread=75 --size=4G --filename=/tmp/test-4cf3ad28caed0d15e872f940ab952e88 --output-format=json\nF"
+    "command": "fio --randrepeat=1 --ioengine=libaio --direct=1 --gtod_reduce=1 --name=test --bs=4k --iodepth=64 --readwrite=randrw --rwmixread=75 --size=4G --filename=/tmp/test-424813bc999f6384f554d7493f47bf04 --output-format=json\nF"
 }
