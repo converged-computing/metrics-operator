@@ -23,6 +23,7 @@ make run > ${out} 2> ${err} &
 pid=$!
 echo "PID for running cluster is ${pid}"
 
+/bin/bash examples/tests/${name}/pre-run.sh || true
 kubectl apply -f examples/tests/${name}/metrics.yaml
 echo "Sleeping for ${jobtime} seconds to allow job to complete 😴️."
 sleep ${jobtime}
@@ -34,8 +35,10 @@ status=$(kubectl get jobset -o json | jq -r .items[0].status.conditions[0].statu
 
 if [[ "${status}" != "True" ]] || [[ "${type}" != "Completed" ]]; then
     echo "Issue with running job ${name}"
+    /bin/bash examples/tests/${name}/post-run.sh || true
     exit 1
 fi
 
 kill ${pid} || true
 kill $(lsof -t -i:8080) || true
+/bin/bash examples/tests/${name}/post-run.sh || true
