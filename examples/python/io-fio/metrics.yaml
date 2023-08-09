@@ -12,13 +12,11 @@ spec:
       hostPath: /tmp/workflow
 
       # This is the path in the container
-      path: /tmp/workflow
+      path: /workflow
 
   metrics:
      # Fio just runs once - no concept of completions / rate
     - name: io-fio
       options:
-        size: 1M
-        blocksize: 1K
-        directory: /tmp/workflow
+        directory: /workflow
 

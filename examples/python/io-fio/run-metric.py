@@ -8,9 +8,7 @@ from metricsoperator import MetricsOperator
 import metricsoperator.utils as utils
 
 here = os.path.abspath(os.path.dirname(__file__))
-examples = os.path.dirname(os.path.dirname(here))
-tests = os.path.join(examples, "tests")
-metrics_yaml = os.path.join(tests, "io-fio", "metrics.yaml")
+metrics_yaml = os.path.join(here, "metrics.yaml")
 
 def get_parser():
     parser = argparse.ArgumentParser(
