@@ -104,7 +104,7 @@ while true
 	sleep %d
 	let i=i+1
 done
-% Custom post command after done, if we get here
+# Custom post command after done, if we get here
 %s
 `
 	script := fmt.Sprintf(
