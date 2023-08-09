@@ -85,6 +85,8 @@ func (m IOStat) EntrypointScripts(
 		command = "iostat -dxm"
 	}
 	template := `#!/bin/bash
+# Custom pre command
+%s
 i=0
 echo "%s"
 completions=%d
@@ -96,21 +98,27 @@ while true
 	# Note we can do iostat -o JSON
 	if [[ $completions -ne 0 ]] && [[ $i -eq $completions ]]; then
     	echo "%s"
-    	exit 0
+        %s
+		exit 0
     fi
 	sleep %d
 	let i=i+1
 done
+% Custom post command after done, if we get here
+%s
 `
 	script := fmt.Sprintf(
 		template,
+		spec.Spec.Storage.Commands.Pre,
 		metadata,
 		m.completions,
 		metrics.CollectionStart,
 		metrics.Separator,
 		command,
 		metrics.CollectionEnd,
+		spec.Spec.Storage.Commands.Post,
 		m.rate,
+		spec.Spec.Storage.Commands.Post,
 	)
 	// The entrypoint is the entrypoint for the container, while
 	// the command is expected to be what we are monitoring. Often

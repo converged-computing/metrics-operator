@@ -110,6 +110,8 @@ func (m Fio) EntrypointScripts(
 echo "%s"
 # Directory (and filename) for test assuming other storage mounts
 filename=%s/test-$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 32)
+# Run the pre-command here so it has access to the filename.
+%s
 command="fio --randrepeat=1 --ioengine=libaio --direct=1 --gtod_reduce=1 --name=%s --bs=%s --iodepth=%d --readwrite=randrw --rwmixread=75 --size=%s --filename=$filename --output-format=json"
 echo "FIO COMMAND START"
 echo $command
@@ -119,12 +121,15 @@ echo "%s"
 echo "%s"
 $command
 echo "%s"
+# Run command here so it's after collection finish, but before removing the filename
+%s 
 rm $filename
 `
 	script := fmt.Sprintf(
 		template,
 		metadata,
 		m.directory,
+		spec.Spec.Storage.Commands.Pre,
 		m.testname,
 		m.blocksize,
 		m.iodepth,
@@ -132,6 +137,7 @@ rm $filename
 		metrics.CollectionStart,
 		metrics.Separator,
 		metrics.CollectionEnd,
+		spec.Spec.Storage.Commands.Post,
 	)
 	// The entrypoint is the entrypoint for the container, while
 	// the command is expected to be what we are monitoring. Often
