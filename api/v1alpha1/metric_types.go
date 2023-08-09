@@ -81,6 +81,10 @@ type Storage struct {
 
 	// Volume type to test
 	Volume Volume `json:"volume"`
+
+	// Commands to run (pre is supported to make bind)
+	// +optional
+	Commands Commands `json:"commands"`
 }
 
 // Application that will be monitored
@@ -119,6 +123,17 @@ type ContainerResources struct {
 
 	// +optional
 	Requests ContainerResource `json:"requests"`
+}
+
+type Commands struct {
+
+	// pre command happens at start (before anything else)
+	// +optional
+	Pre string `json:"pre"`
+
+	// post happens at end (after collection end)
+	// +optional
+	Post string `json:"post"`
 }
 
 type ContainerResource map[string]intstr.IntOrString

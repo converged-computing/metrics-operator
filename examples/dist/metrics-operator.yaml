@@ -197,6 +197,16 @@ spec:
               storage:
                 description: A storage setup that we want to measure performance for. and binding to storage metrics
                 properties:
+                  commands:
+                    description: Commands to run (pre is supported to make bind)
+                    properties:
+                      post:
+                        description: post happens at end (after collection end)
+                        type: string
+                      pre:
+                        description: pre command happens at start (before anything else)
+                        type: string
+                    type: object
                   volume:
                     description: Volume type to test
                     properties:

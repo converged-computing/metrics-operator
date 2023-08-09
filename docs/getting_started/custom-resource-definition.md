@@ -105,8 +105,25 @@ pod:
 
 ### storage
 
-When you want to measure some storage performance, you'll want to add a "storage" section to your MetricSet. This will typically just be a reference to some existing storage (see [existing volumes](#existing-volumes)) that we want to measure, and can
-also be done for some number of completions and metrics for storage.
+When you want to measure some storage performance, you'll want to add a "storage" section to your MetricSet. This will typically just be a reference to some existing storage (see [existing volumes](#existing-volumes)) that we want to measure, and can also be done for some number of completions and metrics for storage.
+
+#### commands
+
+If you need to add some special logic to create or cleanup for a storage volume, you are free to define them for storage in each of pre and post sections, which will happen before and after the metric runs, respectively.
+
+```yaml
+storage:
+  volume:
+    claimName: data 
+    path: /data
+  commands:
+    pre: |
+      apt-get update && apt-get install -y mymounter-tool
+      mymounter-tool mount /data
+    post: mymounter-tool unmount /data
+```
+
+Both of the above are strings. The pipe allows for multiple lines, if appropriate.
 
 ### metrics
 
