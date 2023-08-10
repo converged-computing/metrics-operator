@@ -135,7 +135,7 @@ $command
 echo "%s"
 # Run command here so it's after collection finish, but before removing the filename
 %s 
-rm -rf $filename
+%s rm -rf $filename
 `
 	script := fmt.Sprintf(
 		template,
@@ -151,6 +151,7 @@ rm -rf $filename
 		metrics.Separator,
 		metrics.CollectionEnd,
 		spec.Spec.Storage.Commands.Post,
+		spec.Spec.Storage.Commands.Prefix,
 	)
 	// The entrypoint is the entrypoint for the container, while
 	// the command is expected to be what we are monitoring. Often

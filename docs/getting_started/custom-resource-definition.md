@@ -135,6 +135,8 @@ storage:
 ```
 
 All of the above are strings. The pipe allows for multiple lines, if appropriate.
+Note that while a "volume" is typical, you might have a storage setup that is done via a set of custom commands, in which case
+you don't need to define the volume too.
 
 ### metrics
 

@@ -1,0 +1,55 @@
+apiVersion: flux-framework.org/v1alpha1
+kind: MetricSet
+metadata:
+  labels:
+    app.kubernetes.io/name: metricset
+    app.kubernetes.io/instance: metricset-sample
+  name: metricset-sample
+spec:
+
+  # The service account gives access to storage
+  pod:
+    serviceAccountName: metrics-operator-sa
+    nodeSelector:
+      iam.gke.io/gke-metadata-server-enabled: "true"
+      # This is provided via the daemonset.yaml
+      smarter-device-manager : enabled
+
+  storage:
+    commands:
+
+        # A wrapper prefix to our storage interaction commands
+        prefix: /usr/bin/fusion
+
+        # See https://github.com/nextflow-io/nextflow/blob/master/modules/nextflow/src/main/groovy/nextflow/fusion/FusionConfig.groovy#L29
+        pre: |
+           # We need fusermount
+           apt-get update && apt-get install -y fuse
+           wget https://fusionfs.seqera.io/releases/pkg/2/1/6/fusion-amd64.tar.gz
+           tar -xzvf fusion-amd64.tar.gz 
+           # default -mount-point defaults to /fusion
+           mkdir -p /fusion
+
+  metrics:
+    - name: io-fio
+      options:
+        # Fusion has prefixes for google storage (gs) and s3
+        # note that this is where you put the bucket path
+        # e.g., /fusion/<storage>/<bucket>/<path>
+        directory: /fusion/gs/flux-experiments
+
+      # This is needed so fuse will work
+      # https://github.com/kubernetes/kubernetes/issues/7890#issuecomment-766088805
+      attributes:
+        securityContext:
+          privileged: true
+
+      # This adds resources for the pod for fusion to work
+      resources:
+        limits:
+          smarter-devices/fuse: 1
+          memory: 512Mi
+        requests:
+          smarter-devices/fuse: 1
+          cpu: 10m
+          memory: 50Mi
