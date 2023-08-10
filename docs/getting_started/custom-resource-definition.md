@@ -93,14 +93,23 @@ An application is allowed to have one or more existing volumes. An existing volu
 
 #### resources
 
-Resource lists for an application container go under [Overhead](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-overhead/). Known keys include "memory" and "cpu" (should be provided in some
-string format that can be parsed) and all others are considered some kind of quantity request.
+Resource lists for an application container go under [Overhead](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-overhead/). Known keys include "memory" and "cpu" (should be provided in some string format that can be parsed) and all others are considered some kind of quantity request.
 
 ```yaml
-pod:
+application:
   resources:
     memory: 500M
     cpu: 4
+```
+
+Metrics can also take resource requests.
+
+```yaml
+metrics:
+  - name: io-fio
+    resources:
+      memory: 500M
+      cpu: 4
 ```
 
 ### storage
@@ -121,9 +130,13 @@ storage:
       apt-get update && apt-get install -y mymounter-tool
       mymounter-tool mount /data
     post: mymounter-tool unmount /data
+    # Wrap the storage metric in this prefix
+    prefix: myprefix
 ```
 
-Both of the above are strings. The pipe allows for multiple lines, if appropriate.
+All of the above are strings. The pipe allows for multiple lines, if appropriate.
+Note that while a "volume" is typical, you might have a storage setup that is done via a set of custom commands, in which case
+you don't need to define the volume too.
 
 ### metrics
 

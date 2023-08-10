@@ -28,6 +28,8 @@ type IOStat struct {
 	description   string
 	container     string
 	humanReadable bool
+	resources     *api.ContainerResources
+	attributes    *api.ContainerSpec
 }
 
 // Name returns the metric name
@@ -53,6 +55,14 @@ func (m IOStat) WorkingDir() string {
 	return ""
 }
 
+// Return container resources for the metric container
+func (m IOStat) Resources() *api.ContainerResources {
+	return m.resources
+}
+func (m IOStat) Attributes() *api.ContainerSpec {
+	return m.attributes
+}
+
 // Validation
 func (m IOStat) Validate(set *api.MetricSet) bool {
 	return true
@@ -62,6 +72,8 @@ func (m IOStat) Validate(set *api.MetricSet) bool {
 func (m *IOStat) SetOptions(metric *api.Metric) {
 	m.rate = metric.Rate
 	m.completions = metric.Completions
+	m.resources = &metric.Resources
+	m.attributes = &metric.Attributes
 
 	// Does the person want human readable instead of table?
 	value, ok := metric.Options["human"]

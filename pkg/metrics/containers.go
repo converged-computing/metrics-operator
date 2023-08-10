@@ -21,6 +21,8 @@ type ContainerSpec struct {
 	Image      string
 	Name       string
 	WorkingDir string
+	Resources  *api.ContainerResources
+	Attributes *api.ContainerSpec
 }
 
 // Named entrypoint script for a container
@@ -43,14 +45,17 @@ func getContainers(
 	// Each needs to have the sys trace capability to see the application pids
 	for i, m := range metrics {
 
+		metric := (*m)
 		script := fmt.Sprintf("/metrics_operator/entrypoint-%d.sh", i)
 		command := []string{"/bin/bash", script}
 
 		newContainer := ContainerSpec{
 			Command:    command,
-			Image:      (*m).Image(),
-			WorkingDir: (*m).WorkingDir(),
-			Name:       (*m).Name(),
+			Image:      metric.Image(),
+			WorkingDir: metric.WorkingDir(),
+			Name:       metric.Name(),
+			Resources:  metric.Resources(),
+			Attributes: metric.Attributes(),
 		}
 		containers = append(containers, newContainer)
 	}
@@ -73,13 +78,17 @@ func GetContainers(
 	// Currently we share the same mounts across containers, makes life easier!
 	mounts := getVolumeMounts(set, volumes)
 
-	// Create one container per metric!
 	// Each needs to have the sys trace capability to see the application pids
 	for _, s := range specs {
 
-		// TODO specify container resources here?
+		// Get resources for container
+		resources, err := getContainerResources(s.Resources)
+		logger.Info("🌀 Metric", "Container.Resources", resources)
+		if err != nil {
+			return containers, err
+		}
 
-		// Assemble the container for the node
+		// Create one container per metric!
 		// Name the container by the metric for now
 		newContainer := corev1.Container{
 			Name:            s.Name,
@@ -89,6 +98,9 @@ func GetContainers(
 			Stdin:           true,
 			TTY:             true,
 			Command:         s.Command,
+			SecurityContext: &corev1.SecurityContext{
+				Privileged: &s.Attributes.SecurityContext.Privileged,
+			},
 		}
 
 		// Should we allow sharing the process namespace?

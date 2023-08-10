@@ -26,6 +26,8 @@ type PidStat struct {
 	completions int32
 	description string
 	container   string
+	resources   *api.ContainerResources
+	attributes  *api.ContainerSpec
 
 	// Options
 	useColor   bool
@@ -42,6 +44,14 @@ func (m PidStat) Name() string {
 // Description returns the metric description
 func (m PidStat) Description() string {
 	return m.description
+}
+
+// Return container resources for the metric container
+func (m PidStat) Resources() *api.ContainerResources {
+	return m.resources
+}
+func (m PidStat) Attributes() *api.ContainerSpec {
+	return m.attributes
 }
 
 // Validation
@@ -64,6 +74,8 @@ func (m PidStat) Url() string {
 func (m *PidStat) SetOptions(metric *api.Metric) {
 	m.rate = metric.Rate
 	m.completions = metric.Completions
+	m.resources = &metric.Resources
+	m.attributes = &metric.Attributes
 
 	// Custom commands based on index of job
 	m.commands = map[string]intstr.IntOrString{}

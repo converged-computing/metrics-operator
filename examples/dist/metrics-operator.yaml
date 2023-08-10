@@ -46,6 +46,18 @@ spec:
               application:
                 description: For metrics that require an application, we need a container and name (for now)
                 properties:
+                  attributes:
+                    description: Container Spec has attributes for the container
+                    properties:
+                      securityContext:
+                        description: Security context for the pod
+                        properties:
+                          privileged:
+                            type: boolean
+                        required:
+                        - privileged
+                        type: object
+                    type: object
                   command:
                     description: command to execute and monitor (if consistent across pods)
                     type: string
@@ -130,9 +142,16 @@ spec:
                   description: The difference between benchmark and metric is subtle. A metric is more a measurment, and the benchmark is the comparison value. I don't have strong opinions but I think we are doing more measurment not necessarily with benchmarks
                   properties:
                     attributes:
-                      additionalProperties:
-                        type: string
-                      description: Custom attributes specific to metrics
+                      description: Container Spec has attributes for the container
+                      properties:
+                        securityContext:
+                          description: Security context for the pod
+                          properties:
+                            privileged:
+                              type: boolean
+                          required:
+                          - privileged
+                          type: object
                       type: object
                     completions:
                       description: Completions Number of completions to do, more relevant for service type applications that run forever, or a storage metric. If not set (0) then don't set a limit
@@ -173,10 +192,40 @@ spec:
                       description: Global attributes shared by all metrics Sampling rate in seconds. Defaults to every 10 seconds
                       format: int32
                       type: integer
+                    resources:
+                      description: Resources include limits and requests for the metric container
+                      properties:
+                        limits:
+                          additionalProperties:
+                            anyOf:
+                            - type: integer
+                            - type: string
+                            x-kubernetes-int-or-string: true
+                          type: object
+                        requests:
+                          additionalProperties:
+                            anyOf:
+                            - type: integer
+                            - type: string
+                            x-kubernetes-int-or-string: true
+                          type: object
+                      type: object
                   required:
                   - name
                   type: object
                 type: array
+              pod:
+                description: Pod spec for the application, standalone, or storage metrics
+                properties:
+                  nodeSelector:
+                    additionalProperties:
+                      type: string
+                    description: NodeSelector labels
+                    type: object
+                  serviceAccountName:
+                    description: name of service account to associate with pod
+                    type: string
+                type: object
               pods:
                 default: 1
                 description: Parallelism (e.g., pods)
@@ -206,9 +255,12 @@ spec:
                       pre:
                         description: pre command happens at start (before anything else)
                         type: string
+                      prefix:
+                        description: Command prefix to put in front of a metric main command (not applicable for all)
+                        type: string
                     type: object
                   volume:
-                    description: Volume type to test
+                    description: Volume type to test (not all storage interfaces require one explicitly)
                     properties:
                       claimName:
                         description: Claim name if the existing volume is a PVC
@@ -234,8 +286,6 @@ spec:
                         description: An existing secret
                         type: string
                     type: object
-                required:
-                - volume
                 type: object
             type: object
           status:
