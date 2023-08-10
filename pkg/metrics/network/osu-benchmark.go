@@ -40,6 +40,8 @@ type OSUBenchmark struct {
 	completions int32
 	description string
 	container   string
+	resources   *api.ContainerResources
+	attributes  *api.ContainerSpec
 
 	// Scripts
 	// TODO make a function that derives this across metrics?
@@ -60,6 +62,14 @@ func (m OSUBenchmark) Description() string {
 }
 func (m OSUBenchmark) Url() string {
 	return "https://mvapich.cse.ohio-state.edu/benchmarks/"
+}
+func (m OSUBenchmark) Attributes() *api.ContainerSpec {
+	return m.attributes
+}
+
+// Return container resources for the metric container
+func (m OSUBenchmark) Resources() *api.ContainerResources {
+	return m.resources
 }
 
 // Jobs required for success condition (l is the osu benchmark launcher)
@@ -130,6 +140,8 @@ func (m OSUBenchmark) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJo
 			Name:       "launcher",
 			Command:    []string{"/bin/bash", m.launcherScript},
 			WorkingDir: m.WorkingDir(),
+			Resources:  m.resources,
+			Attributes: m.attributes,
 		},
 	}
 	workerSpec := []metrics.ContainerSpec{
@@ -138,6 +150,8 @@ func (m OSUBenchmark) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJo
 			Name:       "workers",
 			Command:    []string{"/bin/bash", m.workerScript},
 			WorkingDir: m.WorkingDir(),
+			Resources:  m.resources,
+			Attributes: m.attributes,
 		},
 	}
 
@@ -176,6 +190,8 @@ func (m *OSUBenchmark) SetOptions(metric *api.Metric) {
 	m.completions = metric.Completions
 	m.lookup = map[string]bool{}
 	m.commands = []string{}
+	m.resources = &metric.Resources
+	m.attributes = &metric.Attributes
 
 	// We are allowed to specify just one command
 	opts, ok := metric.ListOptions["commands"]

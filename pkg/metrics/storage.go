@@ -27,9 +27,14 @@ func (m *StorageMetricSet) ReplicatedJobs(spec *api.MetricSet) ([]jobset.Replica
 		return rjs, err
 	}
 
-	// Add volumes expecting an application.
-	// A storage app is required to have a volume
-	volumes := map[string]api.Volume{"storage": spec.Spec.Storage.Volume}
+	// Only add storage volume if we have it! Not all storage interfaces require
+	// A Kubernetes abstraction, some are created via a command.
+	volumes := map[string]api.Volume{}
+	if spec.HasStorageVolume() {
+		// Add volumes expecting an application.
+		// A storage app is required to have a volume
+		volumes = map[string]api.Volume{"storage": spec.Spec.Storage.Volume}
+	}
 
 	// Derive running scripts from the metric
 	runnerScripts := GetMetricsKeyToPath(m.Metrics())

@@ -30,6 +30,8 @@ type Netmark struct {
 	completions int32
 	description string
 	container   string
+	resources   *api.ContainerResources
+	attributes  *api.ContainerSpec
 
 	// Scripts
 	workerScript   string
@@ -83,6 +85,14 @@ func (n Netmark) WorkingDir() string {
 	return ""
 }
 
+// Return container resources for the metric container
+func (n Netmark) Resources() *api.ContainerResources {
+	return n.resources
+}
+func (n Netmark) Attributes() *api.ContainerSpec {
+	return n.attributes
+}
+
 func (n Netmark) getMetricsKeyToPath() []corev1.KeyToPath {
 	// Runner start scripts
 	makeExecutable := int32(0777)
@@ -134,16 +144,20 @@ func (m Netmark) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, er
 	// Prepare container specs, one for launcher and one for workers
 	launcherSpec := []metrics.ContainerSpec{
 		{
-			Image:   m.container,
-			Name:    "launcher",
-			Command: []string{"/bin/bash", m.launcherScript},
+			Image:      m.container,
+			Name:       "launcher",
+			Command:    []string{"/bin/bash", m.launcherScript},
+			Resources:  m.resources,
+			Attributes: m.attributes,
 		},
 	}
 	workerSpec := []metrics.ContainerSpec{
 		{
-			Image:   m.container,
-			Name:    "workers",
-			Command: []string{"/bin/bash", m.workerScript},
+			Image:      m.container,
+			Name:       "workers",
+			Command:    []string{"/bin/bash", m.workerScript},
+			Resources:  m.resources,
+			Attributes: m.attributes,
 		},
 	}
 
@@ -169,6 +183,8 @@ func (m Netmark) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, er
 func (m *Netmark) SetOptions(metric *api.Metric) {
 	m.rate = metric.Rate
 	m.completions = metric.Completions
+	m.resources = &metric.Resources
+	m.attributes = &metric.Attributes
 
 	// Set user defined values or fall back to defaults
 	// If we have tasks defined, use it! Otherwise fall back to 2 (likely demo)

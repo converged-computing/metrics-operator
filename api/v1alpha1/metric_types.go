@@ -56,6 +56,10 @@ type MetricSetSpec struct {
 	// +optional
 	Storage Storage `json:"storage"`
 
+	// Pod spec for the application, standalone, or storage metrics
+	//+optional
+	Pod Pod `json:"pod"`
+
 	// For metrics that require an application, we need a container and name (for now)
 	// +optional
 	Application Application `json:"application"`
@@ -76,10 +80,35 @@ type MetricSetSpec struct {
 	Completions int32 `json:"completions"`
 }
 
+// Pod attributes that can be given to an application or metric
+type Pod struct {
+
+	// name of service account to associate with pod
+	//+optional
+	ServiceAccountName string `json:"serviceAccountName"`
+
+	// NodeSelector labels
+	//+optional
+	NodeSelector map[string]string `json:"nodeSelector"`
+}
+
+// A container spec can belong to a metric or application
+type ContainerSpec struct {
+
+	// Security context for the pod
+	//+optional
+	SecurityContext SecurityContext `json:"securityContext"`
+}
+
+type SecurityContext struct {
+	Privileged bool `json:"privileged"`
+}
+
 // Storage that will be monitored, or storage alongside a standalone metric
 type Storage struct {
 
-	// Volume type to test
+	// Volume type to test (not all storage interfaces require one explicitly)
+	//+optional
 	Volume Volume `json:"volume"`
 
 	// Commands to run (pre is supported to make bind)
@@ -110,6 +139,10 @@ type Application struct {
 	// +optional
 	Resources ContainerResources `json:"resources"`
 
+	// Container Spec has attributes for the container
+	//+optional
+	Attributes ContainerSpec `json:"attributes"`
+
 	// Existing Volumes for the application
 	// +optional
 	Volumes map[string]Volume `json:"volumes"`
@@ -130,6 +163,10 @@ type Commands struct {
 	// pre command happens at start (before anything else)
 	// +optional
 	Pre string `json:"pre"`
+
+	// Command prefix to put in front of a metric main command (not applicable for all)
+	//+optional
+	Prefix string `json:"prefix"`
 
 	// post happens at end (after collection end)
 	// +optional
@@ -207,9 +244,13 @@ type Metric struct {
 	// +optional
 	Completions int32 `json:"completions"`
 
-	// Custom attributes specific to metrics
+	// Container Spec has attributes for the container
+	//+optional
+	Attributes ContainerSpec `json:"attributes"`
+
+	// Resources include limits and requests for the metric container
 	// +optional
-	Attributes map[string]string `json:"attributes"`
+	Resources ContainerResources `json:"resources"`
 }
 
 // Get pod labels for a metric set
@@ -244,6 +285,9 @@ func (m *MetricSet) HasApplication() bool {
 }
 func (m *MetricSet) HasStorage() bool {
 	return !reflect.DeepEqual(m.Spec.Storage, Storage{})
+}
+func (m *MetricSet) HasStorageVolume() bool {
+	return !reflect.DeepEqual(m.Spec.Storage.Volume, Volume{})
 }
 func (m *MetricSet) IsStandalone() bool {
 	return !m.HasStorage() && !m.HasApplication()

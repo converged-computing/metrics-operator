@@ -36,6 +36,8 @@ type Metric interface {
 	// One or more replicated jobs to populate a JobSet
 	ReplicatedJobs(*api.MetricSet) ([]jobset.ReplicatedJob, error)
 	SuccessJobs() []string
+	Resources() *api.ContainerResources
+	Attributes() *api.ContainerSpec
 
 	// Metric type to know how to add to MetricSet
 	Type() string

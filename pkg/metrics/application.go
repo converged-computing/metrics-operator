@@ -55,12 +55,13 @@ func GetApplicationReplicatedJobs(
 	job.Template.Spec.Template.Spec.Volumes = GetVolumes(spec, runnerScripts, volumes)
 
 	// Derive the containers for the metric
-	// TODO fnish this
 	containerSpec := ContainerSpec{
 		Image:      m.Image(),
 		Command:    []string{"/bin/bash", "/metrics_operator/entrypoint-0.sh"},
 		WorkingDir: m.WorkingDir(),
 		Name:       m.Name(),
+		Resources:  m.Resources(),
+		Attributes: m.Attributes(),
 	}
 
 	// This is for the metric and application containers

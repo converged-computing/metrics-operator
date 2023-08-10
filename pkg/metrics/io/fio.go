@@ -26,6 +26,8 @@ type Fio struct {
 	completions int32
 	description string
 	container   string
+	resources   *api.ContainerResources
+	attributes  *api.ContainerSpec
 
 	// Options
 	testname  string
@@ -53,6 +55,14 @@ func (m Fio) Image() string {
 	return m.container
 }
 
+// Return container resources for the metric container
+func (m Fio) Resources() *api.ContainerResources {
+	return m.resources
+}
+func (m Fio) Attributes() *api.ContainerSpec {
+	return m.attributes
+}
+
 // WorkingDir does not matter
 func (m Fio) WorkingDir() string {
 	return ""
@@ -67,6 +77,8 @@ func (m Fio) Validate(set *api.MetricSet) bool {
 func (m *Fio) SetOptions(metric *api.Metric) {
 	m.rate = metric.Rate
 	m.completions = metric.Completions
+	m.resources = &metric.Resources
+	m.attributes = &metric.Attributes
 
 	// Set defaults for options
 	m.testname = "test"
@@ -112,7 +124,7 @@ echo "%s"
 filename=%s/test-$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 32)
 # Run the pre-command here so it has access to the filename.
 %s
-command="fio --randrepeat=1 --ioengine=libaio --direct=1 --gtod_reduce=1 --name=%s --bs=%s --iodepth=%d --readwrite=randrw --rwmixread=75 --size=%s --filename=$filename --output-format=json"
+command="%s fio --randrepeat=1 --ioengine=libaio --direct=1 --gtod_reduce=1 --name=%s --bs=%s --iodepth=%d --readwrite=randrw --rwmixread=75 --size=%s --filename=$filename --output-format=json"
 echo "FIO COMMAND START"
 echo $command
 echo "FIO COMMAND END"
@@ -123,13 +135,14 @@ $command
 echo "%s"
 # Run command here so it's after collection finish, but before removing the filename
 %s 
-rm $filename
+rm -rf $filename
 `
 	script := fmt.Sprintf(
 		template,
 		metadata,
 		m.directory,
 		spec.Spec.Storage.Commands.Pre,
+		spec.Spec.Storage.Commands.Prefix,
 		m.testname,
 		m.blocksize,
 		m.iodepth,

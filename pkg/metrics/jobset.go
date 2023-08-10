@@ -170,6 +170,8 @@ func GetReplicatedJob(
 				// This is important to share the process namespace!
 				SetHostnameAsFQDN:     &setAsFDQN,
 				ShareProcessNamespace: &shareProcessNamespace,
+				ServiceAccountName:    set.Spec.Pod.ServiceAccountName,
+				NodeSelector:          set.Spec.Pod.NodeSelector,
 			},
 		},
 	}
