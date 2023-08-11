@@ -1,0 +1,75 @@
+kind: ConfigMap
+metadata:
+  name: metricset-sample
+  namespace: default
+apiVersion: v1
+data:
+  osu-launcher: |
+    #!/bin/bash
+    # Start ssh daemon
+    /usr/sbin/sshd -D &
+
+    # Allow network to ready
+    echo "Sleeping for 10 seconds waiting for network..."
+    sleep 10
+
+    # Write the hosts file
+    launcher=$(getent hosts metricset-sample-l-0-0.ms.default.svc.cluster.local | awk '{ print $1 }')
+    worker=$(getent hosts metricset-sample-w-0-0.ms.default.svc.cluster.local | awk '{ print $1 }')
+    echo "${launcher}" >> ./hostfile.txt
+    echo "${worker}" >> ./hostfile.txt
+
+    # Show metadata for run
+    echo "METADATA START {\"pods\":2,\"completions\":2,\"metricName\":\"network-osu-benchmark\",\"metricDescription\":\"point to point MPI benchmarks\",\"metricType\":\"standalone\",\"metricOptions\":{\"completions\":0,\"rate\":10},\"metricListOptions\":{\"commands\":[\"/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_acc_latency\",\"/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_acc_latency\",\"/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_fop_latency\",\"/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_latency\",\"/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_put_latency\",\"/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/collective/osu_allreduce\",\"/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency\",\"/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bibw\",\"/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bw\"]}}
+    METADATA END"
+
+    sleep 5
+    echo METRICS OPERATOR COLLECTION START
+    echo METRICS OPERATOR TIMEPOINT
+    echo "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_acc_latency"
+    mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_acc_latency
+    echo METRICS OPERATOR TIMEPOINT
+    echo "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_acc_latency"
+    mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_acc_latency
+    echo METRICS OPERATOR TIMEPOINT
+    echo "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_fop_latency"
+    mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_fop_latency
+    echo METRICS OPERATOR TIMEPOINT
+    echo "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_latency"
+    mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_latency
+    echo METRICS OPERATOR TIMEPOINT
+    echo "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_put_latency"
+    mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_put_latency
+    echo METRICS OPERATOR TIMEPOINT
+    echo "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/collective/osu_allreduce"
+    mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/collective/osu_allreduce
+    echo METRICS OPERATOR TIMEPOINT
+    echo "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency"
+    mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency
+    echo METRICS OPERATOR TIMEPOINT
+    echo "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bibw"
+    mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bibw
+    echo METRICS OPERATOR TIMEPOINT
+    echo "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bw"
+    mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bw
+    echo METRICS OPERATOR COLLECTION END
+  osu-worker: |-
+    #!/bin/bash
+    # Start ssh daemon
+    /usr/sbin/sshd -D &
+
+    # Allow network to ready
+    echo "Sleeping for 10 seconds waiting for network..."
+    sleep 10
+
+    # Write the hosts file
+    launcher=$(getent hosts metricset-sample-l-0-0.ms.default.svc.cluster.local | awk '{ print $1 }')
+    worker=$(getent hosts metricset-sample-w-0-0.ms.default.svc.cluster.local | awk '{ print $1 }')
+    echo "${launcher}" >> ./hostfile.txt
+    echo "${worker}" >> ./hostfile.txt
+
+    # Show metadata for run
+    echo "METADATA START {\"pods\":2,\"completions\":2,\"metricName\":\"network-osu-benchmark\",\"metricDescription\":\"point to point MPI benchmarks\",\"metricType\":\"standalone\",\"metricOptions\":{\"completions\":0,\"rate\":10},\"metricListOptions\":{\"commands\":[\"/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_acc_latency\",\"/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_acc_latency\",\"/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_fop_latency\",\"/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_latency\",\"/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_put_latency\",\"/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/collective/osu_allreduce\",\"/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency\",\"/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bibw\",\"/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bw\"]}}
+    METADATA END"
+
+    sleep infinity

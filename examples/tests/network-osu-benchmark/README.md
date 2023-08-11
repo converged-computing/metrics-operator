@@ -5,6 +5,8 @@ For running the example, parsing, and plotting output, see [the corresponding Py
 
 ## Usage
 
+### 1. Prepare Cluster
+
 Create a cluster and install JobSet to it.
 
 ```bash
@@ -24,6 +26,8 @@ How to see metrics operator logs:
 ```bash
 $ kubectl logs -n metrics-system metrics-controller-manager-859c66464c-7rpbw
 ```
+
+### 2. Create the Metric Set
 
 Then create the metrics set. This is going to run a simple sysstat tool to collect metrics
 as lammps runs.
@@ -58,134 +62,239 @@ kubectl logs metricset-sample-l-0-0-lt782 -f
 <summary>Output of OSU Benchmarks Launcher</summary>
 
 ```console
-root
 Sleeping for 10 seconds waiting for network...
-METADATA START {"pods":2,"completions":2,"metricName":"network-osu-benchmark","metricDescription":"point to point MPI benchmarks","metricType":"standalone","metricOptions":{"completions":0,"rate":10},"metricListOptions":{"commands":["osu_fop_latency","osu_get_acc_latency","osu_get_latency","osu_put_latency","osu_acc_latency"]}}
+METADATA START {"pods":2,"completions":2,"metricName":"network-osu-benchmark","metricDescription":"point to point MPI benchmarks","metricType":"standalone","metricOptions":{"completions":0,"rate":10},"metricListOptions":{"commands":["/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_acc_latency","/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_acc_latency","/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_fop_latency","/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_latency","/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_put_latency","/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/collective/osu_allreduce","/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency","/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bibw","/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bw"]}}
 METADATA END
 METRICS OPERATOR COLLECTION START
 METRICS OPERATOR TIMEPOINT
-mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_fop_latency
-# OSU MPI_Fetch_and_op latency Test v5.8
-# Window creation: MPI_Win_allocate
-# Synchronization: MPI_Win_flush
-# Size          Latency (us)
-8                       0.45
-METRICS OPERATOR TIMEPOINT
-mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_get_acc_latency
+mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_acc_latency
 # OSU MPI_Get_accumulate latency Test v5.8
 # Window creation: MPI_Win_create
 # Synchronization: MPI_Win_lock/unlock
 # Size          Latency (us)
-1                       3.16
-2                       2.12
-4                       1.48
-8                       1.43
-16                      1.42
-32                      1.46
-64                      1.48
-128                     1.51
-256                     1.57
-512                     1.73
-1024                    2.01
-2048                    2.65
-4096                    3.86
-8192                    7.86
-16384                  14.87
-32768                  27.92
-65536                  67.16
-131072                115.28
-262144                218.97
-524288                440.29
-1048576               899.82
-2097152              2056.84
-4194304              4217.38
+1                       2.78
+2                       1.65
+4                       1.56
+8                       1.55
+16                      1.53
+32                      1.61
+64                      1.55
+128                     1.61
+256                     1.98
+512                     1.87
+1024                    2.23
+2048                    2.97
+4096                    4.06
+8192                    7.58
+16384                  15.03
+32768                  29.06
+65536                  57.17
+131072                113.65
+262144                217.74
+524288                442.54
+1048576               873.24
+2097152              1838.53
+4194304              4118.13
 METRICS OPERATOR TIMEPOINT
-mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_get_latency
+mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_acc_latency
+# OSU MPI_Accumulate latency Test v5.8
+# Window creation: MPI_Win_allocate
+# Synchronization: MPI_Win_flush
+# Size          Latency (us)
+1                       0.48
+2                       0.45
+4                       0.50
+8                       0.49
+16                      0.46
+32                      0.36
+64                      0.31
+128                     0.34
+256                     0.43
+512                     0.52
+1024                    0.79
+2048                    1.34
+4096                    2.37
+8192                    4.84
+16384                   9.60
+32768                  18.92
+65536                  34.48
+131072                 69.30
+262144                135.87
+524288                264.04
+1048576               548.64
+2097152              1416.32
+4194304              2195.60
+METRICS OPERATOR TIMEPOINT
+mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_fop_latency
+# OSU MPI_Fetch_and_op latency Test v5.8
+# Window creation: MPI_Win_allocate
+# Synchronization: MPI_Win_flush
+# Size          Latency (us)
+8                       0.62
+METRICS OPERATOR TIMEPOINT
+mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_latency
 # OSU MPI_Get latency Test v5.8
 # Window creation: MPI_Win_allocate
 # Synchronization: MPI_Win_flush
 # Size          Latency (us)
 1                       0.20
-2                       0.19
-4                       0.17
-8                       0.15
-16                      0.15
-32                      0.14
+2                       0.16
+4                       0.16
+8                       0.14
+16                      0.14
+32                      0.16
 64                      0.13
 128                     0.13
-256                     0.13
+256                     0.12
 512                     0.13
-1024                    0.17
-2048                    0.13
-4096                    0.15
-8192                    0.22
-16384                   0.52
-32768                   0.97
-65536                   1.91
-131072                  3.98
-262144                  8.56
-524288                 16.80
-1048576                32.75
-2097152                79.51
-4194304               578.12
+1024                    0.11
+2048                    0.12
+4096                    0.21
+8192                    0.23
+16384                   0.41
+32768                   0.86
+65536                   1.82
+131072                  3.49
+262144                  9.07
+524288                 17.50
+1048576                35.53
+2097152                70.06
+4194304               269.72
 METRICS OPERATOR TIMEPOINT
-mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_put_latency
+mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_put_latency
 # OSU MPI_Put Latency Test v5.8
 # Window creation: MPI_Win_allocate
 # Synchronization: MPI_Win_flush
 # Size          Latency (us)
-1                       0.30
-2                       0.33
+1                       0.44
+2                       0.42
 4                       0.31
+8                       0.37
+16                      0.28
+32                      0.24
+64                      0.22
+128                     0.22
+256                     0.17
+512                     0.18
+1024                    0.15
+2048                    0.14
+4096                    0.17
+8192                    0.23
+16384                   0.59
+32768                   1.11
+65536                   2.78
+131072                  3.92
+262144                  8.96
+524288                 20.62
+1048576                36.66
+2097152                72.93
+4194304               275.19
+METRICS OPERATOR TIMEPOINT
+mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/collective/osu_allreduce
+
+# OSU MPI Allreduce Latency Test v5.8
+# Size       Avg Latency(us)
+4                       1.34
+8                       1.17
+16                      0.89
+32                      0.96
+64                      0.94
+128                     0.94
+256                     1.03
+512                     1.41
+1024                    1.59
+2048                    1.80
+4096                    4.42
+8192                    5.30
+16384                   6.44
+32768                  10.36
+65536                  16.93
+131072                 33.91
+262144                 59.87
+524288                110.83
+1048576               230.90
+METRICS OPERATOR TIMEPOINT
+mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency
+# OSU MPI Latency Test v5.8
+# Size          Latency (us)
+0                       0.80
+1                       0.46
+2                       0.32
+4                       0.29
 8                       0.24
 16                      0.22
-32                      0.18
-64                      0.18
-128                     0.17
-256                     0.17
-512                     0.16
-1024                    0.14
-2048                    0.16
-4096                    0.20
-8192                    0.25
-16384                   0.54
-32768                   1.10
-65536                   1.95
-131072                  3.80
-262144                  7.97
-524288                 48.36
-1048576                38.53
-2097152                71.64
-4194304               307.45
+32                      0.26
+64                      0.26
+128                     0.29
+256                     0.33
+512                     0.41
+1024                    0.51
+2048                    0.61
+4096                    1.31
+8192                    1.85
+16384                   2.59
+32768                   2.93
+65536                   5.62
+131072                  9.28
+262144                 16.55
+524288                 30.79
+1048576                58.15
+2097152               184.02
+4194304               584.22
 METRICS OPERATOR TIMEPOINT
-mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_acc_latency
-# OSU MPI_Accumulate latency Test v5.8
-# Window creation: MPI_Win_allocate
-# Synchronization: MPI_Win_flush
-# Size          Latency (us)
-1                       0.25
-2                       0.24
-4                       0.25
-8                       0.25
-16                      0.26
-32                      0.28
-64                      0.31
-128                     0.38
-256                     0.51
-512                     0.82
-1024                    1.29
-2048                    2.39
-4096                    4.21
-8192                    8.22
-16384                  15.93
-32768                  30.47
-65536                  61.28
-131072                122.85
-262144                252.14
-524288                509.32
-1048576              1035.88
-2097152              2249.48
-4194304              5677.54
+mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bibw
+# OSU MPI Bi-Directional Bandwidth Test v5.8
+# Size      Bandwidth (MB/s)
+1                       2.41
+2                       3.94
+4                      11.50
+8                      32.48
+16                     57.95
+32                    140.93
+64                    280.55
+128                   562.17
+256                   799.07
+512                  2059.54
+1024                 3287.79
+2048                 7635.69
+4096                 5608.39
+8192                 9489.32
+16384                9812.43
+32768               17272.36
+65536               26445.32
+131072              31649.61
+262144              32948.58
+524288              32199.06
+1048576             31963.81
+2097152             17770.85
+4194304              9360.80
+METRICS OPERATOR TIMEPOINT
+mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bw
+# OSU MPI Bandwidth Test v5.8
+# Size      Bandwidth (MB/s)
+1                       1.83
+2                       3.45
+4                       5.59
+8                      13.45
+16                     33.92
+32                     75.76
+64                    165.74
+128                   326.71
+256                   683.73
+512                  1303.41
+1024                 3053.38
+2048                 5100.77
+4096                 3959.97
+8192                 6322.19
+16384                8227.68
+32768               12834.55
+65536               16996.58
+131072              17358.56
+262144              17617.89
+524288              16931.85
+1048576             18476.89
+2097152             18718.87
+4194304             11256.10
 METRICS OPERATOR COLLECTION END
 ```
 
@@ -228,6 +337,31 @@ $ kubectl get jobs
 NAME                   COMPLETIONS   DURATION   AGE
 metricset-sample-l-0   1/1           18s        84s
 ```
+
+### 3. Save Configs
+
+If you want to run a single one-off Metrics set without the operator, you can save configs. We did this to provide a single YAML to run the entire thing.
+
+```bash
+kubectl get jobset metricset-sample -o yaml > ./manifests/jobset.yaml
+kubectl get cm metricset-sample -o yaml > ./manifests/configmap.yaml
+kubectl get svc ms -o yaml > ./manifests/service.yaml
+```
+
+**important** you will want to edit the resources (limits and requests) for your instance size!
+I also tweaked the initial files to remove the status / controller reference from those. And then you could create the entire directory as follows:
+
+```bash
+$ kubectl apply -f ./manifests
+```
+
+And delete when you are done:
+
+```bash
+$ kubectl delete -f ./manifests
+```
+
+### 4. Cleanup
 
 And then you can cleanup!
 

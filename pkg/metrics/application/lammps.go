@@ -101,12 +101,12 @@ func (m Lammps) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, err
 	js := []jobset.ReplicatedJob{}
 
 	// Generate a replicated job for the launcher (Lammps) and workers
-	launcher, err := metrics.GetReplicatedJob(spec, false, 1, 1, "l")
+	launcher, err := metrics.GetReplicatedJob(spec, false, 1, 1, "l", false)
 	if err != nil {
 		return js, err
 	}
 
-	workers, err := metrics.GetReplicatedJob(spec, false, spec.Spec.Pods-1, spec.Spec.Pods-1, "w")
+	workers, err := metrics.GetReplicatedJob(spec, false, spec.Spec.Pods-1, spec.Spec.Pods-1, "w", false)
 	if err != nil {
 		return js, err
 	}

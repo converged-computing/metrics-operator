@@ -1,0 +1,137 @@
+apiVersion: jobset.x-k8s.io/v1alpha2
+kind: JobSet
+metadata:
+  name: metricset-sample
+  namespace: default
+spec:
+  failurePolicy: {}
+  network:
+    enableDNSHostnames: false
+    subdomain: ms
+  replicatedJobs:
+  - name: l
+    replicas: 1
+    template:
+      metadata:
+        name: metricset-sample
+        namespace: default
+      spec:
+        activeDeadlineSeconds: 31500000
+        backoffLimit: 100
+        completionMode: Indexed
+        completions: 1
+        parallelism: 1
+        template:
+          metadata:
+            labels:
+              app.kubernetes.io/name: metricset-sample
+              cluster-name: metricset-sample
+              metricset-name: metricset-sample
+              namespace: default
+            name: metricset-sample
+            namespace: default
+          spec:
+            containers:
+            - command:
+              - /bin/bash
+              - /metrics_operator/osu-launcher.sh
+              image: ghcr.io/converged-computing/metric-osu-benchmark:latest
+              imagePullPolicy: IfNotPresent
+              name: launcher
+              # IMPORTANT: update these resources per your spec!
+              resources:
+                limits:
+                  cpu: "4"
+                  memory: 100M
+                requests:
+                  cpu: "4"
+                  memory: 100M
+              securityContext:
+                privileged: false
+              stdin: true
+              tty: true
+              volumeMounts:
+              - mountPath: /metrics_operator/
+                name: metricset-sample
+                readOnly: true
+              workingDir: /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided
+            restartPolicy: OnFailure
+            setHostnameAsFQDN: true
+            shareProcessNamespace: false
+            subdomain: ms
+            volumes:
+            - configMap:
+                items:
+                - key: osu-launcher
+                  mode: 511
+                  path: osu-launcher.sh
+                - key: osu-worker
+                  mode: 511
+                  path: osu-worker.sh
+                name: metricset-sample
+              name: metricset-sample
+  - name: w
+    replicas: 1
+    template:
+      metadata:
+        name: metricset-sample
+        namespace: default
+      spec:
+        activeDeadlineSeconds: 31500000
+        backoffLimit: 100
+        completionMode: Indexed
+        completions: 1
+        parallelism: 1
+        template:
+          metadata:
+            labels:
+              app.kubernetes.io/name: metricset-sample
+              cluster-name: metricset-sample
+              metricset-name: metricset-sample
+              namespace: default
+            name: metricset-sample
+            namespace: default
+          spec:
+            containers:
+            - command:
+              - /bin/bash
+              - /metrics_operator/osu-worker.sh
+              image: ghcr.io/converged-computing/metric-osu-benchmark:latest
+              imagePullPolicy: IfNotPresent
+              name: workers
+              resources:
+                limits:
+                  cpu: "2"
+                  memory: 20M
+                requests:
+                  cpu: "2"
+                  memory: 20M
+              securityContext:
+                privileged: false
+              stdin: true
+              tty: true
+              volumeMounts:
+              - mountPath: /metrics_operator/
+                name: metricset-sample
+                readOnly: true
+              workingDir: /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided
+            restartPolicy: OnFailure
+            setHostnameAsFQDN: true
+            shareProcessNamespace: false
+            subdomain: ms
+            volumes:
+            - configMap:
+                items:
+                - key: osu-launcher
+                  mode: 511
+                  path: osu-launcher.sh
+                - key: osu-worker
+                  mode: 511
+                  path: osu-worker.sh
+                name: metricset-sample
+              name: metricset-sample
+  successPolicy:
+    operator: All
+    targetReplicatedJobs:
+    - l
+  suspend: false

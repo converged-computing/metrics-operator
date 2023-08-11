@@ -53,5 +53,8 @@ def main():
         print(json.dumps(output, indent=4))
         utils.write_json(output, args.out)
 
+    # Ensure we cleanup!
+    m.delete()
+
 if __name__ == "__main__":
     main()

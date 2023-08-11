@@ -4,325 +4,95 @@
             "matrix": [
                 [
                     1.0,
-                    0.1
+                    2.69
                 ],
                 [
                     2.0,
-                    0.1
+                    2.02
                 ],
                 [
                     4.0,
-                    0.1
+                    1.8
                 ],
                 [
                     8.0,
-                    0.1
+                    1.53
                 ],
                 [
                     16.0,
-                    0.11
+                    1.42
                 ],
                 [
                     32.0,
-                    0.11
+                    1.77
                 ],
                 [
                     64.0,
-                    0.1
+                    1.56
                 ],
                 [
                     128.0,
-                    0.11
+                    1.6
                 ],
                 [
                     256.0,
-                    0.11
+                    1.6
                 ],
                 [
                     512.0,
-                    0.11
+                    1.72
                 ],
                 [
                     1024.0,
-                    0.13
+                    2.09
                 ],
                 [
                     2048.0,
-                    0.16
+                    2.66
                 ],
                 [
                     4096.0,
-                    0.23
+                    3.9
                 ],
                 [
                     8192.0,
-                    0.3
+                    7.18
                 ],
                 [
                     16384.0,
-                    0.6
+                    13.77
                 ],
                 [
                     32768.0,
-                    1.03
+                    28.17
                 ],
                 [
                     65536.0,
-                    2.49
+                    55.28
                 ],
                 [
                     131072.0,
-                    5.46
+                    109.25
                 ],
                 [
                     262144.0,
-                    10.59
+                    274.99
                 ],
                 [
                     524288.0,
-                    19.91
+                    434.96
                 ],
                 [
                     1048576.0,
-                    39.43
+                    932.86
                 ],
                 [
                     2097152.0,
-                    81.25
+                    1921.89
                 ],
                 [
                     4194304.0,
-                    282.09
-                ]
-            ],
-            "columns": [
-                "Size",
-                "Latency (us)"
-            ],
-            "header": [
-                "# OSU MPI_Put Latency Test v5.8",
-                "# Window creation: MPI_Win_allocate",
-                "# Synchronization: MPI_Win_flush"
-            ],
-            "command": "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_put_latency"
-        },
-        {
-            "matrix": [
-                [
-                    1.0,
-                    0.56
-                ],
-                [
-                    2.0,
-                    0.41
-                ],
-                [
-                    4.0,
-                    0.36
-                ],
-                [
-                    8.0,
-                    0.3
-                ],
-                [
-                    16.0,
-                    0.27
-                ],
-                [
-                    32.0,
-                    0.25
-                ],
-                [
-                    64.0,
-                    0.26
-                ],
-                [
-                    128.0,
-                    0.29
-                ],
-                [
-                    256.0,
-                    0.39
-                ],
-                [
-                    512.0,
-                    0.57
-                ],
-                [
-                    1024.0,
-                    0.78
-                ],
-                [
-                    2048.0,
-                    1.49
-                ],
-                [
-                    4096.0,
-                    2.36
-                ],
-                [
-                    8192.0,
-                    4.68
-                ],
-                [
-                    16384.0,
-                    9.47
-                ],
-                [
-                    32768.0,
-                    18.38
-                ],
-                [
-                    65536.0,
-                    35.33
-                ],
-                [
-                    131072.0,
-                    68.67
-                ],
-                [
-                    262144.0,
-                    138.39
-                ],
-                [
-                    524288.0,
-                    271.58
-                ],
-                [
-                    1048576.0,
-                    542.47
-                ],
-                [
-                    2097152.0,
-                    1085.58
-                ],
-                [
-                    4194304.0,
-                    2288.26
-                ]
-            ],
-            "columns": [
-                "Size",
-                "Latency (us)"
-            ],
-            "header": [
-                "# OSU MPI_Accumulate latency Test v5.8",
-                "# Window creation: MPI_Win_allocate",
-                "# Synchronization: MPI_Win_flush"
-            ],
-            "command": "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_acc_latency"
-        },
-        {
-            "matrix": [
-                [
-                    8.0,
-                    0.5
-                ]
-            ],
-            "columns": [
-                "Size",
-                "Latency (us)"
-            ],
-            "header": [
-                "# OSU MPI_Fetch_and_op latency Test v5.8",
-                "# Window creation: MPI_Win_allocate",
-                "# Synchronization: MPI_Win_flush"
-            ],
-            "command": "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_fop_latency"
-        },
-        {
-            "matrix": [
-                [
-                    1.0,
-                    2.96
-                ],
-                [
-                    2.0,
-                    1.89
-                ],
-                [
-                    4.0,
-                    1.83
-                ],
-                [
-                    8.0,
-                    1.75
-                ],
-                [
-                    16.0,
-                    1.71
-                ],
-                [
-                    32.0,
-                    1.68
-                ],
-                [
-                    64.0,
-                    1.75
-                ],
-                [
-                    128.0,
-                    1.9
-                ],
-                [
-                    256.0,
-                    2.21
-                ],
-                [
-                    512.0,
-                    2.65
-                ],
-                [
-                    1024.0,
-                    2.99
-                ],
-                [
-                    2048.0,
-                    3.66
-                ],
-                [
-                    4096.0,
-                    5.6
-                ],
-                [
-                    8192.0,
-                    10.8
-                ],
-                [
-                    16384.0,
-                    23.46
-                ],
-                [
-                    32768.0,
-                    46.46
-                ],
-                [
-                    65536.0,
-                    75.88
-                ],
-                [
-                    131072.0,
-                    166.75
-                ],
-                [
-                    262144.0,
-                    256.08
-                ],
-                [
-                    524288.0,
-                    456.7
-                ],
-                [
-                    1048576.0,
-                    1026.29
-                ],
-                [
-                    2097152.0,
-                    1970.85
-                ],
-                [
-                    4194304.0,
-                    4172.06
+                    4085.98
                 ]
             ],
             "columns": [
@@ -334,21 +104,21 @@
                 "# Window creation: MPI_Win_create",
                 "# Synchronization: MPI_Win_lock/unlock"
             ],
-            "command": "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_get_acc_latency"
+            "command": "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_acc_latency"
         },
         {
             "matrix": [
                 [
                     1.0,
-                    0.57
+                    0.5
                 ],
                 [
                     2.0,
-                    0.48
+                    0.38
                 ],
                 [
                     4.0,
-                    0.34
+                    0.33
                 ],
                 [
                     8.0,
@@ -356,11 +126,135 @@
                 ],
                 [
                     16.0,
-                    0.19
+                    0.27
                 ],
                 [
                     32.0,
-                    0.18
+                    0.44
+                ],
+                [
+                    64.0,
+                    0.31
+                ],
+                [
+                    128.0,
+                    0.27
+                ],
+                [
+                    256.0,
+                    0.33
+                ],
+                [
+                    512.0,
+                    0.43
+                ],
+                [
+                    1024.0,
+                    0.66
+                ],
+                [
+                    2048.0,
+                    1.17
+                ],
+                [
+                    4096.0,
+                    2.52
+                ],
+                [
+                    8192.0,
+                    4.45
+                ],
+                [
+                    16384.0,
+                    8.31
+                ],
+                [
+                    32768.0,
+                    17.97
+                ],
+                [
+                    65536.0,
+                    39.96
+                ],
+                [
+                    131072.0,
+                    67.01
+                ],
+                [
+                    262144.0,
+                    138.98
+                ],
+                [
+                    524288.0,
+                    259.99
+                ],
+                [
+                    1048576.0,
+                    524.74
+                ],
+                [
+                    2097152.0,
+                    1094.15
+                ],
+                [
+                    4194304.0,
+                    2229.0
+                ]
+            ],
+            "columns": [
+                "Size",
+                "Latency (us)"
+            ],
+            "header": [
+                "# OSU MPI_Accumulate latency Test v5.8",
+                "# Window creation: MPI_Win_allocate",
+                "# Synchronization: MPI_Win_flush"
+            ],
+            "command": "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_acc_latency"
+        },
+        {
+            "matrix": [
+                [
+                    8.0,
+                    0.29
+                ]
+            ],
+            "columns": [
+                "Size",
+                "Latency (us)"
+            ],
+            "header": [
+                "# OSU MPI_Fetch_and_op latency Test v5.8",
+                "# Window creation: MPI_Win_allocate",
+                "# Synchronization: MPI_Win_flush"
+            ],
+            "command": "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_fop_latency"
+        },
+        {
+            "matrix": [
+                [
+                    1.0,
+                    0.28
+                ],
+                [
+                    2.0,
+                    0.25
+                ],
+                [
+                    4.0,
+                    0.19
+                ],
+                [
+                    8.0,
+                    0.2
+                ],
+                [
+                    16.0,
+                    0.15
+                ],
+                [
+                    32.0,
+                    0.16
                 ],
                 [
                     64.0,
@@ -368,15 +262,15 @@
                 ],
                 [
                     128.0,
-                    0.15
+                    0.13
                 ],
                 [
                     256.0,
-                    0.15
+                    0.13
                 ],
                 [
                     512.0,
-                    0.13
+                    0.14
                 ],
                 [
                     1024.0,
@@ -384,7 +278,7 @@
                 ],
                 [
                     2048.0,
-                    0.16
+                    0.14
                 ],
                 [
                     4096.0,
@@ -392,11 +286,11 @@
                 ],
                 [
                     8192.0,
-                    0.23
+                    0.21
                 ],
                 [
                     16384.0,
-                    0.5
+                    0.42
                 ],
                 [
                     32768.0,
@@ -404,31 +298,31 @@
                 ],
                 [
                     65536.0,
-                    1.85
+                    1.74
                 ],
                 [
                     131072.0,
-                    3.75
+                    3.32
                 ],
                 [
                     262144.0,
-                    9.63
+                    7.37
                 ],
                 [
                     524288.0,
-                    20.8
+                    16.04
                 ],
                 [
                     1048576.0,
-                    45.42
+                    31.59
                 ],
                 [
                     2097152.0,
-                    76.36
+                    67.36
                 ],
                 [
                     4194304.0,
-                    303.25
+                    271.26
                 ]
             ],
             "columns": [
@@ -440,7 +334,517 @@
                 "# Window creation: MPI_Win_allocate",
                 "# Synchronization: MPI_Win_flush"
             ],
-            "command": "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_get_latency"
+            "command": "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_latency"
+        },
+        {
+            "matrix": [
+                [
+                    1.0,
+                    0.26
+                ],
+                [
+                    2.0,
+                    0.19
+                ],
+                [
+                    4.0,
+                    0.19
+                ],
+                [
+                    8.0,
+                    0.19
+                ],
+                [
+                    16.0,
+                    0.19
+                ],
+                [
+                    32.0,
+                    0.19
+                ],
+                [
+                    64.0,
+                    0.19
+                ],
+                [
+                    128.0,
+                    0.16
+                ],
+                [
+                    256.0,
+                    0.15
+                ],
+                [
+                    512.0,
+                    0.17
+                ],
+                [
+                    1024.0,
+                    0.15
+                ],
+                [
+                    2048.0,
+                    0.17
+                ],
+                [
+                    4096.0,
+                    0.2
+                ],
+                [
+                    8192.0,
+                    0.27
+                ],
+                [
+                    16384.0,
+                    0.6
+                ],
+                [
+                    32768.0,
+                    1.15
+                ],
+                [
+                    65536.0,
+                    1.96
+                ],
+                [
+                    131072.0,
+                    3.95
+                ],
+                [
+                    262144.0,
+                    8.53
+                ],
+                [
+                    524288.0,
+                    18.93
+                ],
+                [
+                    1048576.0,
+                    37.29
+                ],
+                [
+                    2097152.0,
+                    69.44
+                ],
+                [
+                    4194304.0,
+                    268.4
+                ]
+            ],
+            "columns": [
+                "Size",
+                "Latency (us)"
+            ],
+            "header": [
+                "# OSU MPI_Put Latency Test v5.8",
+                "# Window creation: MPI_Win_allocate",
+                "# Synchronization: MPI_Win_flush"
+            ],
+            "command": "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_put_latency"
+        },
+        {
+            "matrix": [
+                [
+                    4.0,
+                    0.7
+                ],
+                [
+                    8.0,
+                    0.68
+                ],
+                [
+                    16.0,
+                    0.69
+                ],
+                [
+                    32.0,
+                    0.69
+                ],
+                [
+                    64.0,
+                    0.73
+                ],
+                [
+                    128.0,
+                    0.69
+                ],
+                [
+                    256.0,
+                    0.72
+                ],
+                [
+                    512.0,
+                    1.17
+                ],
+                [
+                    1024.0,
+                    1.25
+                ],
+                [
+                    2048.0,
+                    1.48
+                ],
+                [
+                    4096.0,
+                    3.94
+                ],
+                [
+                    8192.0,
+                    4.58
+                ],
+                [
+                    16384.0,
+                    6.33
+                ],
+                [
+                    32768.0,
+                    10.02
+                ],
+                [
+                    65536.0,
+                    16.23
+                ],
+                [
+                    131072.0,
+                    30.2
+                ],
+                [
+                    262144.0,
+                    51.89
+                ],
+                [
+                    524288.0,
+                    95.58
+                ],
+                [
+                    1048576.0,
+                    192.54
+                ]
+            ],
+            "columns": [
+                "Size",
+                "Avg Latency(us)"
+            ],
+            "header": [
+                "# OSU MPI Allreduce Latency Test v5.8"
+            ],
+            "command": "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/collective/osu_allreduce"
+        },
+        {
+            "matrix": [
+                [
+                    0.0,
+                    0.45
+                ],
+                [
+                    1.0,
+                    0.41
+                ],
+                [
+                    2.0,
+                    0.31
+                ],
+                [
+                    4.0,
+                    0.27
+                ],
+                [
+                    8.0,
+                    0.23
+                ],
+                [
+                    16.0,
+                    0.23
+                ],
+                [
+                    32.0,
+                    0.22
+                ],
+                [
+                    64.0,
+                    0.23
+                ],
+                [
+                    128.0,
+                    0.28
+                ],
+                [
+                    256.0,
+                    0.28
+                ],
+                [
+                    512.0,
+                    0.38
+                ],
+                [
+                    1024.0,
+                    0.44
+                ],
+                [
+                    2048.0,
+                    0.62
+                ],
+                [
+                    4096.0,
+                    1.32
+                ],
+                [
+                    8192.0,
+                    1.49
+                ],
+                [
+                    16384.0,
+                    1.98
+                ],
+                [
+                    32768.0,
+                    2.67
+                ],
+                [
+                    65536.0,
+                    4.1
+                ],
+                [
+                    131072.0,
+                    7.04
+                ],
+                [
+                    262144.0,
+                    16.6
+                ],
+                [
+                    524288.0,
+                    28.72
+                ],
+                [
+                    1048576.0,
+                    60.14
+                ],
+                [
+                    2097152.0,
+                    191.67
+                ],
+                [
+                    4194304.0,
+                    656.73
+                ]
+            ],
+            "columns": [
+                "Size",
+                "Latency (us)"
+            ],
+            "header": [
+                "# OSU MPI Latency Test v5.8"
+            ],
+            "command": "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency"
+        },
+        {
+            "matrix": [
+                [
+                    1.0,
+                    2.52
+                ],
+                [
+                    2.0,
+                    6.75
+                ],
+                [
+                    4.0,
+                    16.03
+                ],
+                [
+                    8.0,
+                    35.92
+                ],
+                [
+                    16.0,
+                    95.98
+                ],
+                [
+                    32.0,
+                    215.15
+                ],
+                [
+                    64.0,
+                    300.67
+                ],
+                [
+                    128.0,
+                    526.46
+                ],
+                [
+                    256.0,
+                    1129.38
+                ],
+                [
+                    512.0,
+                    2299.61
+                ],
+                [
+                    1024.0,
+                    4375.96
+                ],
+                [
+                    2048.0,
+                    7687.79
+                ],
+                [
+                    4096.0,
+                    6381.66
+                ],
+                [
+                    8192.0,
+                    10914.41
+                ],
+                [
+                    16384.0,
+                    13150.18
+                ],
+                [
+                    32768.0,
+                    21241.68
+                ],
+                [
+                    65536.0,
+                    26159.63
+                ],
+                [
+                    131072.0,
+                    30981.19
+                ],
+                [
+                    262144.0,
+                    25362.5
+                ],
+                [
+                    524288.0,
+                    23341.25
+                ],
+                [
+                    1048576.0,
+                    18255.77
+                ],
+                [
+                    2097152.0,
+                    7265.99
+                ],
+                [
+                    4194304.0,
+                    5972.25
+                ]
+            ],
+            "columns": [
+                "Size",
+                "Bandwidth (MB/s)"
+            ],
+            "header": [
+                "# OSU MPI Bi-Directional Bandwidth Test v5.8"
+            ],
+            "command": "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bibw"
+        },
+        {
+            "matrix": [
+                [
+                    1.0,
+                    3.59
+                ],
+                [
+                    2.0,
+                    7.36
+                ],
+                [
+                    4.0,
+                    13.96
+                ],
+                [
+                    8.0,
+                    29.1
+                ],
+                [
+                    16.0,
+                    59.55
+                ],
+                [
+                    32.0,
+                    115.48
+                ],
+                [
+                    64.0,
+                    186.9
+                ],
+                [
+                    128.0,
+                    354.48
+                ],
+                [
+                    256.0,
+                    707.87
+                ],
+                [
+                    512.0,
+                    1550.94
+                ],
+                [
+                    1024.0,
+                    3069.66
+                ],
+                [
+                    2048.0,
+                    5302.94
+                ],
+                [
+                    4096.0,
+                    3824.76
+                ],
+                [
+                    8192.0,
+                    7266.95
+                ],
+                [
+                    16384.0,
+                    10702.79
+                ],
+                [
+                    32768.0,
+                    12976.45
+                ],
+                [
+                    65536.0,
+                    14435.93
+                ],
+                [
+                    131072.0,
+                    15825.85
+                ],
+                [
+                    262144.0,
+                    18433.81
+                ],
+                [
+                    524288.0,
+                    19042.76
+                ],
+                [
+                    1048576.0,
+                    16864.11
+                ],
+                [
+                    2097152.0,
+                    17910.99
+                ],
+                [
+                    4194304.0,
+                    5601.69
+                ]
+            ],
+            "columns": [
+                "Size",
+                "Bandwidth (MB/s)"
+            ],
+            "header": [
+                "# OSU MPI Bandwidth Test v5.8"
+            ],
+            "command": "mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bw"
         }
     ],
     "metadata": {
@@ -455,11 +859,15 @@
         },
         "metricListOptions": {
             "commands": [
-                "osu_put_latency",
-                "osu_acc_latency",
-                "osu_fop_latency",
-                "osu_get_acc_latency",
-                "osu_get_latency"
+                "/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_acc_latency",
+                "/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_acc_latency",
+                "/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_fop_latency",
+                "/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_latency",
+                "/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided/osu_put_latency",
+                "/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/collective/osu_allreduce",
+                "/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency",
+                "/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bibw",
+                "/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bw"
             ]
         }
     },

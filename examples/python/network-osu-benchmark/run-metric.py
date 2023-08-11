@@ -59,6 +59,9 @@ def main():
         utils.write_json(output, args.out)
         plot_results(output)
 
+    # Ensure we cleanup!
+    m.delete()
+
 
 def plot_results(output):
     """

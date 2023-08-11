@@ -24,6 +24,8 @@ var (
 	// This is the default Replicated Job Name optional for use
 	ReplicatedJobName = "m"
 	backoffLimit      = int32(100)
+	tenancyLabel      = "metrics-operator-tenancy"
+	soleTenancyValue  = "sole-tenancy"
 )
 
 // GetJobSet is called by the controller to return some JobSet based
@@ -117,6 +119,7 @@ func GetReplicatedJob(
 	pods int32,
 	completions int32,
 	jobname string,
+	soleTenancy bool,
 ) (*jobset.ReplicatedJob, error) {
 
 	// Default replicated job name, if not set
@@ -126,6 +129,12 @@ func GetReplicatedJob(
 
 	// Pod labels from the MetricSet
 	podLabels := set.GetPodLabels()
+
+	// If we are asking for single tenancy for this replicated job,
+	// This means just one pod / node
+	if soleTenancy {
+		podLabels[tenancyLabel] = soleTenancyValue
+	}
 
 	completionMode := batchv1.NonIndexedCompletion
 	if set.Spec.Pods > 1 {
@@ -167,6 +176,7 @@ func GetReplicatedJob(
 				// matches the service
 				Subdomain:     set.Spec.ServiceName,
 				RestartPolicy: corev1.RestartPolicyOnFailure,
+
 				// This is important to share the process namespace!
 				SetHostnameAsFQDN:     &setAsFDQN,
 				ShareProcessNamespace: &shareProcessNamespace,
@@ -176,23 +186,58 @@ func GetReplicatedJob(
 		},
 	}
 
+	// Add sole tenancy if desired (note this is not enabled for anything yet)
+	// as there is some bug with the selector, and I want to clarify how this works
+	if soleTenancy {
+		jobspec.Template.Spec.Affinity = getSoleTenancyAffinity()
+		jobspec.Selector = &metav1.LabelSelector{
+			MatchExpressions: []metav1.LabelSelectorRequirement{},
+		}
+		jobspec.Selector.MatchLabels = map[string]string{tenancyLabel: soleTenancyValue}
+		// jobspec.Template.Spec.TopologySpreadConstraints = getSoleTenancyConstraint()
+	}
+
 	// Do we have a pull secret for the application image?
 	if set.Spec.Application.PullSecret != "" {
 		jobspec.Template.Spec.ImagePullSecrets = []corev1.LocalObjectReference{
 			{Name: set.Spec.Application.PullSecret},
 		}
 	}
-
-	// Should we add resources back?
-	resources, err := getPodResources(set)
-	logger.Info("🌀 MiniCluster", "Pod.Resources", resources)
-	if err != nil {
-		logger.Info("🌀 MiniCluster", "Pod.Resources", resources)
-		return &job, err
-	}
-	jobspec.Template.Spec.Overhead = resources
-
 	// Tie the jobspec to the job
 	job.Template.Spec = jobspec
 	return &job, nil
+}
+
+// getSoleTenancyConstraint determines spread based on hostname (not currently used)
+func getSoleTenancyConstraint() []corev1.TopologySpreadConstraint {
+	return []corev1.TopologySpreadConstraint{
+		{
+			MaxSkew:           1,
+			TopologyKey:       "kubernetes.io/hostname",
+			WhenUnsatisfiable: corev1.DoNotSchedule,
+			LabelSelector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{tenancyLabel: soleTenancyValue},
+			},
+		},
+	}
+}
+
+// getSoleTenancyAffinity ensures one pod per node based on hostname
+func getSoleTenancyAffinity() *corev1.Affinity {
+	terms := []corev1.PodAffinityTerm{
+		{
+			TopologyKey: "kubernetes.io/hostname",
+			LabelSelector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{tenancyLabel: soleTenancyValue},
+			},
+		},
+	}
+	return &corev1.Affinity{
+		PodAntiAffinity: &corev1.PodAntiAffinity{
+			RequiredDuringSchedulingIgnoredDuringExecution: terms,
+		},
+		PodAffinity: &corev1.PodAffinity{
+			RequiredDuringSchedulingIgnoredDuringExecution: terms,
+		},
+	}
 }

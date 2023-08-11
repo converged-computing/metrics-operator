@@ -255,7 +255,9 @@ type Metric struct {
 
 // Get pod labels for a metric set
 func (m *MetricSet) GetPodLabels() map[string]string {
+
 	podLabels := map[string]string{}
+	// This is for autoscaling, although haven't used yet
 	podLabels["cluster-name"] = m.Name
 	// This is for the headless service
 	podLabels["metricset-name"] = m.Name
