@@ -13,13 +13,13 @@ spec:
 
      # Example of resource requests / limits
      # You should set these to ensure 1 pod : 1 node
-     resources:
-       limits:
-         memory: 100M
-         cpu: 4
-       requests:
-         memory: 100M
-         cpu: 4
+     # resources:
+     #   limits:
+     #     memory: 100M
+     #     cpu: 4
+     #   requests:
+     #     memory: 100M
+     #     cpu: 4
 
      # Custom list of commands to run
      # See https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#network-osu-benchmark
