@@ -1,16 +1,18 @@
 # Copyright 2023 Lawrence Livermore National Security, LLC
 # (c.f. AUTHORS, NOTICE.LLNS, COPYING)
 
-from .network import network_netmark, network_osu_benchmark
-from .perf import perf_sysstat
-from .storage import io_fio, io_sysstat
+import metricsoperator.metrics.application as apps
+import metricsoperator.metrics.network as network
+import metricsoperator.metrics.perf as perf
+import metricsoperator.metrics.storage as storage
 
 metrics = {
-    "io-sysstat": io_sysstat,
-    "network-osu-benchmark": network_osu_benchmark,
-    "network-netmark": network_netmark,
-    "perf-sysstat": perf_sysstat,
-    "io-fio": io_fio,
+    "io-sysstat": storage.io_sysstat,
+    "network-osu-benchmark": network.network_osu_benchmark,
+    "network-netmark": network.network_netmark,
+    "perf-sysstat": perf.perf_sysstat,
+    "io-fio": storage.io_fio,
+    "app-lammps": apps.app_lammps,
 }
 
 

@@ -12,9 +12,11 @@ jobs:
 
       # Tests in Python examples/python/run-metric.py
       matrix:
-        test: [["perf-sysstat", "ghcr.io/converged-computing/metric-sysstat:latest", 60],                   # performance test
-               ["io-host-volume", "ghcr.io/converged-computing/metric-sysstat:latest", 60],                 # storage test
-               ["network-osu-benchmark", "ghcr.io/converged-computing/metric-osu-benchmark:latest", 120]]   # standalone test
+        test: [["perf-sysstat", "ghcr.io/converged-computing/metric-sysstat:latest", 60, ""],                   # performance test
+               ["io-host-volume", "ghcr.io/converged-computing/metric-sysstat:latest", 60, ""],                 # storage test
+               ["network-osu-benchmark", "ghcr.io/converged-computing/metric-osu-benchmark:latest", 120, ""],   # standalone network test
+               ["app-lammps", "ghcr.io/converged-computing/metric-lammps:latest", 60, "--iter 1s"]]             # standalone app test
+
     steps:
     - uses: actions/checkout@v3
 
@@ -59,7 +61,8 @@ jobs:
       env:
         name: ${{ matrix.test[0] }}
         jobtime: ${{ matrix.test[2] }}
+        args: ${{ matrix.test[3] }}
       run: |
         export PATH="/usr/share/miniconda/bin:$PATH"
         source activate mo
-        python ./examples/python/${name}/run-metric.py --sleep ${jobtime} --test
+        python ./examples/python/${name}/run-metric.py --sleep ${jobtime} --test ${args}
