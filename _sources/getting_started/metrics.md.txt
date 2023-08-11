@@ -7,7 +7,7 @@ The following metrics are under development (or being planned).
  - [Application Metrics](https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#application)
  - [Standalone Metrics](https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#standalone)
 
-<iframe src="../_static/data/table.html" style="width:100%; height:500px;" frameBorder="0"></iframe>
+<iframe src="../_static/data/table.html" style="width:100%; height:600px;" frameBorder="0"></iframe>
 
 All metrics can be customized with the following variables
 
@@ -159,20 +159,7 @@ The following example uses io-fio to measure the Fusion filesystem:
 
  - [io-host-volume](https://github.com/converged-computing/metrics-operator/tree/main/examples/storage/google/io-fusion)
 
-### Apps to be Measured
-
- - Laghos
- - https://github.com/LLNL/Kripke
-
-### Metrics To Be Added
-
- - https://github.com/glennklockwood/bioinformatics-profile
- - HPCToolkit
- - https://dl.acm.org/doi/pdf/10.1145/3611007
- - https://hpc.fau.de/research/tools/likwid/
- - https://www.vi-hps.org/tools/tools.html
- - https://open.xdmod.org/10.0/index.html
-
+For apps / metrics to be added, please see [this issue](https://github.com/converged-computing/metrics-operator/issues/30).
 
 ## Containers
 
