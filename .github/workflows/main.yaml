@@ -53,6 +53,14 @@ jobs:
         make build-config
         diff examples/dist/metrics-operator.yaml /tmp/metrics-operator.yaml
 
+    - name: Check Updated metrics.json
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cp docs/_static/data/metrics.json /tmp/metrics.json
+        make docs-data
+        diff docs/_static/data/metrics.json /tmp/metrics.json
+
   test-metrics:
     runs-on: ubuntu-latest
     strategy:
