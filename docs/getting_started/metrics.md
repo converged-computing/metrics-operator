@@ -152,6 +152,8 @@ The following examples are provided alongside the operator. Each directory has a
  - [io-host-volume](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/io-host-volume)
  - [network-netmark](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-netmark) (code still private)
  - [network-osu-benchmark](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-osu-benchmark)
+ - [app-lammps](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-lammps)
+
 
 The following example uses io-fio to measure the Fusion filesystem:
 
