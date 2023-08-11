@@ -1,5 +1,19 @@
 [
  {
+  "name": "io-fio",
+  "description": "Flexible IO Tester (FIO)",
+  "type": "storage",
+  "image": "ghcr.io/converged-computing/metric-fio:latest",
+  "url": "https://fio.readthedocs.io/en/latest/fio_doc.html"
+ },
+ {
+  "name": "io-sysstat",
+  "description": "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
+  "type": "storage",
+  "image": "ghcr.io/converged-computing/metric-sysstat:latest",
+  "url": "https://github.com/sysstat/sysstat"
+ },
+ {
   "name": "network-netmark",
   "description": "point to point networking tool",
   "type": "standalone",
@@ -17,20 +31,6 @@
   "name": "perf-sysstat",
   "description": "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
   "type": "application",
-  "image": "ghcr.io/converged-computing/metric-sysstat:latest",
-  "url": "https://github.com/sysstat/sysstat"
- },
- {
-  "name": "io-fio",
-  "description": "Flexible IO Tester (FIO)",
-  "type": "storage",
-  "image": "ghcr.io/converged-computing/metric-fio:latest",
-  "url": "https://fio.readthedocs.io/en/latest/fio_doc.html"
- },
- {
-  "name": "io-sysstat",
-  "description": "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
-  "type": "storage",
   "image": "ghcr.io/converged-computing/metric-sysstat:latest",
   "url": "https://github.com/sysstat/sysstat"
  }

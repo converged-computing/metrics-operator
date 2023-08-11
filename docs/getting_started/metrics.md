@@ -129,14 +129,19 @@ to assess performance.
 
 |Name | Description | Option Key | Type | Default |
 |-----|-------------|------------|------|---------|
-| command | The full mpirun and lammps command | options->command |string | TODO |
-| workdir | The working directory for the command | options->workdir | int32 | 20 |
+| command | The full mpirun and lammps command | options->command |string | (see below) |
+| workdir | The working directory for the command | options->workdir | string | /opt/lammps/examples/reaxff/HNS# |
 
-For inspection, here is the tree of examples available to you in the metric container provided for LAMMPS:
+For inspection, you can see all the examples provided [in the LAMMPS GitHub repository](https://github.com/lammps/lammps/tree/develop/examples).
+The default command (if you don't change it) intended as an example is:
 
 ```bash
-
+mpirun --hostfile ./hostlist.txt -np 2 --map-by socket lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite(e
 ```
+
+In the working directory `/opt/lammps/examples/reaxff/HNS#`. You should be calling `mpirun` and expecting a ./hostlist.txt in the present working directory (the "workdir" you chose above).
+You should also provide the correct number of processes (np) and problem size for LAMMPS (lmp). We left this as open and flexible
+anticipating that you as a user would want total control.
 
 ## Examples
 
