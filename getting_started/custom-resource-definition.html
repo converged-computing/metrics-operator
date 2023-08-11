@@ -573,13 +573,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#id2" class="md-nav__link">
-    <span title="/getting_started/custom-resource-definition.md#id2 (reference label)" class="md-ellipsis">resources</span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#existing-volumes" class="md-nav__link">
     <span title="/getting_started/custom-resource-definition.md#existing-volumes (reference label)" class="md-ellipsis">Existing Volumes</span>
   </a>
@@ -796,7 +789,7 @@ The command will be used by the metrics sidecar containers to find the PID of in
 <h4 id="volumes">volumes<a class="headerlink" href="#volumes" title="Permalink to this heading">¶</a></h4>
 <p>An application is allowed to have one or more existing volumes. An existing volume can be any of the types described in <a class="reference internal" href="#existing-volumes"><span class="std std-ref">existing volumes</span></a></p>
 <h4 id="resources">resources<a class="headerlink" href="#resources" title="Permalink to this heading">¶</a></h4>
-<p>Resource lists for an application container go under <a class="reference external" href="https://kubernetes.io/docs/concepts/scheduling-eviction/pod-overhead/">Overhead</a>. Known keys include “memory” and “cpu” (should be provided in some string format that can be parsed) and all others are considered some kind of quantity request.</p>
+<p>You can define resources for an application or a metric container. Known keys include “memory” and “cpu” (should be provided in some string format that can be parsed) and all others are considered some kind of quantity request.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">application</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">resources</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">500M</span>
@@ -811,6 +804,21 @@ The command will be used by the metrics sidecar containers to find the PID of in
 <span class="w">      </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
 </code></pre></div>
 </div>
+<p>If you wanted to, for example, request a GPU, that might look like:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">resources</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">limits</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">gpu-vendor.example/example-gpu</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</code></pre></div>
+</div>
+<p>Or for a particular type of networking fabric:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">resources</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">limits</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">vpc.amazonaws.com/efa</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</code></pre></div>
+</div>
+<p>Both limits and resources are flexible to accept a string or an integer value, and you’ll get an error if you
+provide something else. If you need something else, <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues">let us know</a>.
+If you are requesting GPU, <a class="reference external" href="https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/">this documentation</a> is helpful.</p>
 <h3 id="storage">storage<a class="headerlink" href="#storage" title="Permalink to this heading">¶</a></h3>
 <p>When you want to measure some storage performance, you’ll want to add a “storage” section to your MetricSet. This will typically just be a reference to some existing storage (see <a class="reference internal" href="#existing-volumes"><span class="std std-ref">existing volumes</span></a>) that we want to measure, and can also be done for some number of completions and metrics for storage.</p>
 <h4 id="commands">commands<a class="headerlink" href="#commands" title="Permalink to this heading">¶</a></h4>
@@ -883,30 +891,6 @@ runs for that many completions before exiting.</p>
 </div>
 <p>Presence of absence of an option type depends on the metric. Metrics are free to use these custom
 options as they see fit.</p>
-<h2 id="id2">resources<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
-<p>Resources for an entire spec are given to the Pod template of the Job. They can include limits and requests. Known keys include “memory” and “cpu” (should be provided in some
-string format that can be parsed) and all others are considered some kind of quantity request.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">resources</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">limits</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">500M</span>
-<span class="w">    </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
-</code></pre></div>
-</div>
-<p>If you wanted to, for example, request a GPU, that might look like:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">resources</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">limits</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">gpu-vendor.example/example-gpu</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
-</code></pre></div>
-</div>
-<p>Or for a particulat type of networking fabric:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">resources</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">limits</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">vpc.amazonaws.com/efa</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
-</code></pre></div>
-</div>
-<p>Both limits and resources are flexible to accept a string or an integer value, and you’ll get an error if you
-provide something else. If you need something else, <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues">let us know</a>.
-If you are requesting GPU, <a class="reference external" href="https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/">this documentation</a> is helpful.</p>
 <h2 id="existing-volumes">Existing Volumes<a class="headerlink" href="#existing-volumes" title="Permalink to this heading">¶</a></h2>
 <p>An existing volume can be provided to support an application (multiple) or one can be provided for assessing its performance (single).</p>
 <ul class="simple">

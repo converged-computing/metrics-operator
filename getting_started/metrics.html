@@ -978,6 +978,75 @@ Variables to customize include:</p>
 </tr>
 </tbody>
 </table>
+<p>By default, we run a subset of commands:</p>
+<ul class="simple">
+<li><p>osu_get_acc_latency</p></li>
+<li><p>osu_acc_latency</p></li>
+<li><p>osu_fop_latency</p></li>
+<li><p>osu_get_latency</p></li>
+<li><p>osu_put_latency</p></li>
+<li><p>osu_allreduce</p></li>
+<li><p>osu_latency</p></li>
+<li><p>osu_bibw</p></li>
+<li><p>osu_bw</p></li>
+</ul>
+<p>However all of the following are available for MPI</p>
+<details>
+<summary>Commands available for OSU Benchmarks</summary>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="go">.</span>
+<span class="go">|-- collective</span>
+<span class="go">|   |-- osu_allgather</span>
+<span class="go">|   |-- osu_allgatherv</span>
+<span class="go">|   |-- osu_allreduce</span>
+<span class="go">|   |-- osu_alltoall</span>
+<span class="go">|   |-- osu_alltoallv</span>
+<span class="go">|   |-- osu_barrier</span>
+<span class="go">|   |-- osu_bcast</span>
+<span class="go">|   |-- osu_gather</span>
+<span class="go">|   |-- osu_gatherv</span>
+<span class="go">|   |-- osu_iallgather</span>
+<span class="go">|   |-- osu_iallgatherv</span>
+<span class="go">|   |-- osu_iallreduce</span>
+<span class="go">|   |-- osu_ialltoall</span>
+<span class="go">|   |-- osu_ialltoallv</span>
+<span class="go">|   |-- osu_ialltoallw</span>
+<span class="go">|   |-- osu_ibarrier</span>
+<span class="go">|   |-- osu_ibcast</span>
+<span class="go">|   |-- osu_igather</span>
+<span class="go">|   |-- osu_igatherv</span>
+<span class="go">|   |-- osu_ireduce</span>
+<span class="go">|   |-- osu_iscatter</span>
+<span class="go">|   |-- osu_iscatterv</span>
+<span class="go">|   |-- osu_reduce</span>
+<span class="go">|   |-- osu_reduce_scatter</span>
+<span class="go">|   |-- osu_scatter</span>
+<span class="go">|   `-- osu_scatterv</span>
+<span class="go">|-- one-sided</span>
+<span class="go">|   |-- osu_acc_latency</span>
+<span class="go">|   |-- osu_cas_latency</span>
+<span class="go">|   |-- osu_fop_latency</span>
+<span class="go">|   |-- osu_get_acc_latency</span>
+<span class="go">|   |-- osu_get_bw</span>
+<span class="go">|   |-- osu_get_latency</span>
+<span class="go">|   |-- osu_put_bibw</span>
+<span class="go">|   |-- osu_put_bw</span>
+<span class="go">|   `-- osu_put_latency</span>
+<span class="go">|-- pt2pt</span>
+<span class="go">|   |-- osu_bibw</span>
+<span class="go">|   |-- osu_bw</span>
+<span class="go">|   |-- osu_latency</span>
+<span class="go">|   |-- osu_latency_mp</span>
+<span class="go">|   |-- osu_latency_mt</span>
+<span class="go">|   |-- osu_mbw_mr</span>
+<span class="go">|   `-- osu_multi_lat</span>
+<span class="go">`-- startup</span>
+<span class="go">    |-- osu_hello</span>
+<span class="go">    `-- osu_init</span>
+</code></pre></div>
+</div>
+</details>
+<p>Note that not all of these have been tested on our setups, so
+if you have any questions please <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues">let us know</a>.</p>
 <h4 id="app-lammps">app-lammps<a class="headerlink" href="#app-lammps" title="Permalink to this heading">¶</a></h4>
 <ul class="simple">
 <li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
