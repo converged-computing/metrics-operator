@@ -234,6 +234,11 @@ but if appropriate you can scale up to more.
 > A custom, standalone metric that doesn't abide by any rules!
 
 The standalone metric is the most interesting of the set, as it doesn't have a strict requirement for a storage or application definition.
+We currently have a few flavors of standalone metrics that include:
+
+ - applications that are timed (e.g., LAMMPS)
+ - networking tools (e.g., OSU benchmarks and netmark)
+
 By definition, it is "standalone" because it's going to create a custom JobSet setup for a metric of interest. Because we cannot be
 certain of how to combine different jobs within this JobSet, we currently only allow one standalone metric to be defined at once.
 This means that in the diagram below, you see online one standalone metric in the metrics.yaml
@@ -271,7 +276,7 @@ than one pod, if appropriate.
 
 ![img/standalone-metric-set.png](img/standalone-metric-set.png)
 
-This metrics operator is early in design and subject to change! In the meantime, for more detail about this design, see the [developer docs](../development/index.md).
+For more detail about this design, see the [developer docs](../development/index.md).
 
 ## Containers Available
 

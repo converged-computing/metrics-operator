@@ -60,8 +60,9 @@ jobs:
       matrix:
         test: [["perf-hello-world", "ghcr.io/converged-computing/metric-sysstat:latest", 60],               # performance test
                ["io-host-volume", "ghcr.io/converged-computing/metric-sysstat:latest", 60],                 # storage test
-               ["network-osu-benchmark", "ghcr.io/converged-computing/metric-osu-benchmark:latest", 120],   # standalone test
-               ["io-fio", "ghcr.io/converged-computing/metric-fio:latest", 120]]                            # storage test
+               ["network-osu-benchmark", "ghcr.io/converged-computing/metric-osu-benchmark:latest", 120],   # standalone network test
+               ["io-fio", "ghcr.io/converged-computing/metric-fio:latest", 120],                            # storage test
+               ["app-lammps", "ghcr.io/converged-computing/metric-lammps:latest", 120]]                     # standalone app test
 
     steps:
     - name: Clone the code

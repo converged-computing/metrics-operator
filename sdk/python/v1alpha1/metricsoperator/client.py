@@ -37,13 +37,43 @@ class MetricsOperator:
         Create the associated YAML file.
         """
         api = client.CustomObjectsApi()
-        group, version = self.spec["apiVersion"].split("/", 2)
-        plural = self.spec["kind"].lower() + "s"
-        namespace = self.spec["metadata"].get("namespace") or "default"
         return api.create_namespaced_custom_object(
-            group=group,
-            version=version,
-            namespace=namespace,
-            plural=plural,
+            group=self.group,
+            version=self.version,
+            namespace=self.namespace,
+            plural=self.plural,
             body=self.spec,
+        )
+
+    @property
+    def group(self):
+        return self.spec["apiVersion"].split("/", 2)[0]
+
+    @property
+    def version(self):
+        return self.spec["apiVersion"].split("/", 2)[1]
+
+    @property
+    def plural(self):
+        return self.spec["kind"].lower() + "s"
+
+    @property
+    def namespace(self):
+        return self.spec["metadata"].get("namespace") or "default"
+
+    @property
+    def name(self):
+        return self.spec["metadata"]["name"]
+
+    def delete(self):
+        """
+        Delete the associated YAML file.
+        """
+        api = client.CustomObjectsApi()
+        return api.delete_namespaced_custom_object(
+            group=self.group,
+            version=self.version,
+            namespace=self.namespace,
+            plural=self.plural,
+            name=self.name,
         )

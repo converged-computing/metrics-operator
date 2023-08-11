@@ -2,6 +2,8 @@
 # (c.f. AUTHORS, NOTICE.LLNS, COPYING)
 
 import json
+import os
+import re
 
 import yaml
 
@@ -39,3 +41,38 @@ def read_json(filename):
     with open(filename, "r") as fd:
         content = json.loads(fd.read())
     return content
+
+
+def recursive_find(base, pattern="^(laamps[.]out|lammps.*[.]out|log[.]out)$"):
+    """
+    Recursively find lammps output files.
+    """
+    for root, _, filenames in os.walk(base):
+        for filename in filenames:
+            if re.search(pattern, filename):
+                yield os.path.join(root, filename)
+
+
+def read_lines(filename):
+    """
+    Read lines of a file into a list.
+    """
+    with open(filename, "r") as fd:
+        lines = fd.readlines()
+    return lines
+
+
+def timestr2seconds(timestr):
+    """
+    Given a timestring in two formats, return seconds (float).
+    """
+    # Minutes and seconds, MM:SS.mm
+    if timestr.count(":") == 1:
+        minutes, seconds = timestr.split(":")
+        return (int(minutes) * 60) + float(seconds)
+
+    # hours, minutes, seconds HH:MM:SS.mm
+    elif timestr.count(":") == 2:
+        hours, minutes, seconds = timestr.split(":")
+        return (int(hours) * 360) + (int(minutes) * 60) + float(seconds)
+    raise ValueError(f"Unrecognized time format {timestr}")

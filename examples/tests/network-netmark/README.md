@@ -32,8 +32,7 @@ Make sure to load your private image into the node:
 kind load docker-image vanessa/netmark:latest
 ```
 
-Then create the metrics set. This is going to run a simple sysstat tool to collect metrics
-as lammps runs.
+Then create the metrics set. This is going to run metrics to assess networking with netmark.
 
 ```bash
 kubectl apply -f metrics.yaml
@@ -44,7 +43,7 @@ Wait until you see pods created by the job and then running (there should be two
 ```bash
 kubectl get pods
 ```
-```diff
+```console
 NAME                           READY   STATUS    RESTARTS   AGE
 metricset-sample-n-0-0-lt782   1/1     Running   0          3s
 metricset-sample-w-0-0-4s5p9   1/1     Running   0          3s

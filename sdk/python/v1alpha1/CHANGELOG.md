@@ -14,6 +14,7 @@ and **Merged pull requests**. Critical items to know are:
 The versions coincide with releases on pip. Only major versions will be released as tags on Github.
 
 ## [0.0.x](https://github.com/converged-computing/metrics-operator/tree/main) (0.0.x)
+ - LAMMPS python parser (0.0.16)
  - add FIO storage (IO) metric (0.0.15)
  - resources specification added and tweaks to perf-sysstat (0.0.14)
  - pidstat python parser and better support for metric in Go (0.0.13)
