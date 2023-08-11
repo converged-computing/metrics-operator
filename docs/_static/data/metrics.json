@@ -1,5 +1,12 @@
 [
  {
+  "name": "app-lammps",
+  "description": "LAMMPS molecular dynamic simulation",
+  "type": "standalone",
+  "image": "ghcr.io/converged-computing/metric-lammps:latest",
+  "url": "https://www.lammps.org/"
+ },
+ {
   "name": "io-fio",
   "description": "Flexible IO Tester (FIO)",
   "type": "storage",
