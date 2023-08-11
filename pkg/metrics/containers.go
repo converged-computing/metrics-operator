@@ -123,6 +123,7 @@ func GetContainers(
 		envars := []corev1.EnvVar{}
 		newContainer.Ports = ports
 		newContainer.Env = envars
+		newContainer.Resources = resources
 		containers = append(containers, newContainer)
 	}
 

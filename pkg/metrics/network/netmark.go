@@ -118,12 +118,12 @@ func (m Netmark) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, er
 	js := []jobset.ReplicatedJob{}
 
 	// Generate a replicated job for the launcher (netmark) and workers
-	launcher, err := metrics.GetReplicatedJob(spec, false, 1, 1, "n")
+	launcher, err := metrics.GetReplicatedJob(spec, false, 1, 1, "n", false)
 	if err != nil {
 		return js, err
 	}
 
-	workers, err := metrics.GetReplicatedJob(spec, false, spec.Spec.Pods-1, spec.Spec.Pods-1, "w")
+	workers, err := metrics.GetReplicatedJob(spec, false, spec.Spec.Pods-1, spec.Spec.Pods-1, "w", false)
 	if err != nil {
 		return js, err
 	}

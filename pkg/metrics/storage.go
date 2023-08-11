@@ -21,8 +21,8 @@ func (m *StorageMetricSet) ReplicatedJobs(spec *api.MetricSet) ([]jobset.Replica
 	rjs := []jobset.ReplicatedJob{}
 
 	// Storage metrics do not need to share the process namespace
-	// The jobname empty string will use the default
-	job, err := GetReplicatedJob(spec, false, spec.Spec.Pods, spec.Spec.Completions, "")
+	// The jobname empty string will use the default, no custom replicated job name, and sole tenancy false
+	job, err := GetReplicatedJob(spec, false, spec.Spec.Pods, spec.Spec.Completions, "", false)
 	if err != nil {
 		return rjs, err
 	}

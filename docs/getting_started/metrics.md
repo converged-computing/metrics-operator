@@ -118,6 +118,80 @@ Variables to customize include:
 |-----|-------------|------------|------|---------|
 | commands | Custom list of osu-benchmark one-sided commands to run | listOptions->commands | array | unset uses default set |
 
+By default, we run a subset of commands:
+
+- osu_get_acc_latency
+- osu_acc_latency
+- osu_fop_latency
+-	osu_get_latency
+-	osu_put_latency
+-	osu_allreduce
+- osu_latency
+- osu_bibw
+-	osu_bw
+
+However all of the following are available for MPI
+
+<details>
+
+<summary>Commands available for OSU Benchmarks</summary>
+
+```console
+.
+|-- collective
+|   |-- osu_allgather
+|   |-- osu_allgatherv
+|   |-- osu_allreduce
+|   |-- osu_alltoall
+|   |-- osu_alltoallv
+|   |-- osu_barrier
+|   |-- osu_bcast
+|   |-- osu_gather
+|   |-- osu_gatherv
+|   |-- osu_iallgather
+|   |-- osu_iallgatherv
+|   |-- osu_iallreduce
+|   |-- osu_ialltoall
+|   |-- osu_ialltoallv
+|   |-- osu_ialltoallw
+|   |-- osu_ibarrier
+|   |-- osu_ibcast
+|   |-- osu_igather
+|   |-- osu_igatherv
+|   |-- osu_ireduce
+|   |-- osu_iscatter
+|   |-- osu_iscatterv
+|   |-- osu_reduce
+|   |-- osu_reduce_scatter
+|   |-- osu_scatter
+|   `-- osu_scatterv
+|-- one-sided
+|   |-- osu_acc_latency
+|   |-- osu_cas_latency
+|   |-- osu_fop_latency
+|   |-- osu_get_acc_latency
+|   |-- osu_get_bw
+|   |-- osu_get_latency
+|   |-- osu_put_bibw
+|   |-- osu_put_bw
+|   `-- osu_put_latency
+|-- pt2pt
+|   |-- osu_bibw
+|   |-- osu_bw
+|   |-- osu_latency
+|   |-- osu_latency_mp
+|   |-- osu_latency_mt
+|   |-- osu_mbw_mr
+|   `-- osu_multi_lat
+`-- startup
+    |-- osu_hello
+    `-- osu_init
+```
+
+</details>
+
+Note that not all of these have been tested on our setups, so
+if you have any questions please [let us know](https://github.com/converged-computing/metrics-operator/issues).
 
 #### app-lammps
 

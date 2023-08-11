@@ -23,14 +23,78 @@ import (
 // https://mvapich.cse.ohio-state.edu/benchmarks/
 
 var (
-	// I chose this set that can run on my small local machine
-	// likely others work on more powerful machines
-	osuBenchmarkCommands = map[string]bool{
-		"osu_acc_latency":     true,
-		"osu_fop_latency":     true,
-		"osu_get_acc_latency": true,
-		"osu_get_latency":     true,
-		"osu_put_latency":     true,
+	singleSidedDir  = "/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided"
+	pointToPointDir = "/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt"
+	collectiveDir   = "/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/collective"
+	startupDir      = "/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/startup"
+
+	// Lookup of all OSU benchmarks available
+	osuBenchmarkCommands = map[string]string{
+
+		// Single Sided
+		"osu_get_acc_latency": singleSidedDir,
+		"osu_acc_latency":     singleSidedDir, // Latency Test for Accumulate
+		"osu_fop_latency":     singleSidedDir,
+		"osu_get_latency":     singleSidedDir, // Latency Test for Get
+		"osu_put_latency":     singleSidedDir, // Latency Test for Put
+		"osu_cas_latency":     singleSidedDir,
+		"osu_get_bw":          singleSidedDir,
+		"osu_put_bibw":        singleSidedDir,
+		"osu_put_bw":          singleSidedDir,
+
+		// Collective
+		"osu_allreduce":      collectiveDir, // MPI_Allreduce Latency Test
+		"osu_allgather":      collectiveDir,
+		"osu_allgatherv":     collectiveDir,
+		"osu_alltoall":       collectiveDir,
+		"osu_alltoallv":      collectiveDir,
+		"osu_barrier":        collectiveDir,
+		"osu_bcast":          collectiveDir,
+		"osu_gather":         collectiveDir,
+		"osu_gatherv":        collectiveDir,
+		"osu_iallgather":     collectiveDir,
+		"osu_iallgatherv":    collectiveDir,
+		"osu_iallreduce":     collectiveDir,
+		"osu_ialltoall":      collectiveDir,
+		"osu_ialltoallv":     collectiveDir,
+		"osu_ialltoallw":     collectiveDir,
+		"osu_ibarrier":       collectiveDir,
+		"osu_ibcast":         collectiveDir,
+		"osu_igather":        collectiveDir,
+		"osu_igatherv":       collectiveDir,
+		"osu_ireduce":        collectiveDir,
+		"osu_iscatter":       collectiveDir,
+		"osu_iscatterv":      collectiveDir,
+		"osu_reduce":         collectiveDir,
+		"osu_reduce_scatter": collectiveDir,
+		"osu_scatter":        collectiveDir,
+		"osu_scatterv":       collectiveDir,
+
+		// Point to Point
+		"osu_latency":    pointToPointDir, // Latency Test
+		"osu_bibw":       pointToPointDir, // Bidirectional Bandwidth Test
+		"osu_bw":         pointToPointDir, // Bandwidth Test
+		"osu_latency_mp": pointToPointDir,
+		"osu_latency_mt": pointToPointDir,
+		"osu_mbw_mr":     pointToPointDir,
+		"osu_multi_lat":  pointToPointDir,
+
+		// Startup
+		"osu_hello": startupDir,
+		"osu_init":  startupDir,
+	}
+
+	// Defaults that we provide when none specified
+	osuBenchmarkDefaults = []string{
+		"osu_get_acc_latency",
+		"osu_acc_latency",
+		"osu_fop_latency",
+		"osu_get_latency",
+		"osu_put_latency",
+		"osu_allreduce",
+		"osu_latency",
+		"osu_bibw",
+		"osu_bw",
 	}
 )
 
@@ -112,12 +176,12 @@ func (m OSUBenchmark) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJo
 
 	js := []jobset.ReplicatedJob{}
 
-	// Generate a replicated job for the launcher (netmark) and workers
-	launcher, err := metrics.GetReplicatedJob(spec, false, 1, 1, "l")
+	// Generate a replicated job for the launcher (netmark) and workers, both need sole tenancy
+	launcher, err := metrics.GetReplicatedJob(spec, false, 1, 1, "l", false)
 	if err != nil {
 		return js, err
 	}
-	workers, err := metrics.GetReplicatedJob(spec, false, 1, 1, "w")
+	workers, err := metrics.GetReplicatedJob(spec, false, 1, 1, "w", false)
 	if err != nil {
 		return js, err
 	}
@@ -180,7 +244,9 @@ func (m *OSUBenchmark) hasCommand(command string) bool {
 }
 
 func (m *OSUBenchmark) addCommand(command string) {
-	m.commands = append(m.commands, command)
+	// Get the fullpath from our lookup
+	fullpath := path.Join(osuBenchmarkCommands[command], command)
+	m.commands = append(m.commands, fullpath)
 	m.lookup[command] = true
 }
 
@@ -204,8 +270,10 @@ func (m *OSUBenchmark) SetOptions(metric *api.Metric) {
 			}
 		}
 	}
+
+	// If not selected or found, fall back to default list
 	if len(m.commands) == 0 {
-		for command := range osuBenchmarkCommands {
+		for _, command := range osuBenchmarkDefaults {
 			if !m.hasCommand(command) {
 				m.addCommand(command)
 			}
@@ -257,8 +325,6 @@ func (m OSUBenchmark) EntrypointScripts(
 		spec.Name, spec.Spec.ServiceName, spec.Namespace,
 	)
 	prefixTemplate := `#!/bin/bash
-# Who are we?
-whoami
 # Start ssh daemon
 /usr/sbin/sshd -D &
 
@@ -285,7 +351,7 @@ echo "%s"
 	for _, command := range m.commands {
 
 		// This starts the line with a separator for the new section
-		line := fmt.Sprintf("mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./%s", command)
+		line := fmt.Sprintf("mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 %s", command)
 		commands += fmt.Sprintf("echo %s\necho \"%s\"\n%s\n", metrics.Separator, line, line)
 	}
 
