@@ -16,8 +16,7 @@ To learn more:
 - make flux operator command generator
 - For larger metric collections, we should have a log streaming mode (and not wait for Completed/Successful)
 - For services we are measuring, we likely need to be able to kill after N seconds (to complete job) or to specify the success policy on the metrics containers instead of the application
-- Python function to save entire spec to yaml (for MetricSet and JobSet)?
-- Netmark / OSU need resources set to ensure 1 pod/node
+- Look into pod affinity/anti-affintiy vs. topology constraint (which do we want)?
 - Add assertions checking for python tests
 - Plotting examples needed for
   - io-sysstat
