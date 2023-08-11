@@ -526,6 +526,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#app-lammps" class="md-nav__link">
+    <span title="/getting_started/metrics.md#app-lammps (reference label)" class="md-ellipsis">app-<wbr>lammps</span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -543,6 +550,13 @@
   
     <nav class="md-nav" aria-label="Examples">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="https://github.com/converged-computing/metrics-operator/tree/main/examples/storage/google/io-fusion" class="md-nav__link">
+    <span class="md-ellipsis">io-<wbr>host-<wbr>volume</span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#apps-to-be-measured" class="md-nav__link">
@@ -978,6 +992,48 @@ Variables to customize include:</p>
 </tr>
 </tbody>
 </table>
+<h4 id="app-lammps">app-lammps<a class="headerlink" href="#app-lammps" title="Permalink to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
+</ul>
+<p>Since we were using LAMMPS so often as a benchmark (and testing timing of a network) it made sense to add it here
+as a standalone metric! Although we are doing MPI with communication via SSH, this can still serve as a means
+to assess performance.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Option Key</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>command</td>
+<td>The full mpirun and lammps command</td>
+<td>options-&gt;command</td>
+<td>string</td>
+<td>(see below)</td>
+</tr>
+<tr>
+<td>workdir</td>
+<td>The working directory for the command</td>
+<td>options-&gt;workdir</td>
+<td>string</td>
+<td>/opt/lammps/examples/reaxff/HNS#</td>
+</tr>
+</tbody>
+</table>
+<p>For inspection, you can see all the examples provided <a class="reference external" href="https://github.com/lammps/lammps/tree/develop/examples">in the LAMMPS GitHub repository</a>.
+The default command (if you don’t change it) intended as an example is:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>mpirun<span class="w"> </span>--hostfile<span class="w"> </span>./hostlist.txt<span class="w"> </span>-np<span class="w"> </span><span class="m">2</span><span class="w"> </span>--map-by<span class="w"> </span>socket<span class="w"> </span>lmp<span class="w"> </span>-v<span class="w"> </span>x<span class="w"> </span><span class="m">2</span><span class="w"> </span>-v<span class="w"> </span>y<span class="w"> </span><span class="m">2</span><span class="w"> </span>-v<span class="w"> </span>z<span class="w"> </span><span class="m">2</span><span class="w"> </span>-in<span class="w"> </span><span class="k">in</span>.reaxc.hns<span class="w"> </span>-nocite<span class="o">(</span>e
+</code></pre></div>
+</div>
+<p>In the working directory <code class="docutils literal notranslate"><span class="pre">/opt/lammps/examples/reaxff/HNS#</span></code>. You should be calling <code class="docutils literal notranslate"><span class="pre">mpirun</span></code> and expecting a ./hostlist.txt in the present working directory (the “workdir” you chose above).
+You should also provide the correct number of processes (np) and problem size for LAMMPS (lmp). We left this as open and flexible
+anticipating that you as a user would want total control.</p>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permalink to this heading">¶</a></h2>
 <p>The following examples are provided alongside the operator. Each directory has a README with complete instructions for usage.</p>
 <ul class="simple">
@@ -986,7 +1042,14 @@ Variables to customize include:</p>
 <li><p><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/io-host-volume">io-host-volume</a></p></li>
 <li><p><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-netmark">network-netmark</a> (code still private)</p></li>
 <li><p><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-osu-benchmark">network-osu-benchmark</a></p></li>
+<li><p><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-lammps">app-lammps</a></p></li>
 </ul>
+<p>The following example uses io-fio to measure the Fusion filesystem:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/storage/google/io-fusion">io-host-volume</a></li>
+</ul>
+</div>
 <h3 id="apps-to-be-measured">Apps to be Measured<a class="headerlink" href="#apps-to-be-measured" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Laghos</p></li>
@@ -1030,7 +1093,7 @@ Variables to customize include:</p>
   <small>
     
       Last update:
-      Aug 10, 2023
+      Aug 11, 2023
     
   </small>
 </div>

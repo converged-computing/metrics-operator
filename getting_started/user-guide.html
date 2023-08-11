@@ -831,7 +831,12 @@ but if appropriate you can scale up to more.</p>
 <div><p>A custom, standalone metric that doesn’t abide by any rules!</p>
 </div></blockquote>
 <p>The standalone metric is the most interesting of the set, as it doesn’t have a strict requirement for a storage or application definition.
-By definition, it is “standalone” because it’s going to create a custom JobSet setup for a metric of interest. Because we cannot be
+We currently have a few flavors of standalone metrics that include:</p>
+<ul class="simple">
+<li><p>applications that are timed (e.g., LAMMPS)</p></li>
+<li><p>networking tools (e.g., OSU benchmarks and netmark)</p></li>
+</ul>
+<p>By definition, it is “standalone” because it’s going to create a custom JobSet setup for a metric of interest. Because we cannot be
 certain of how to combine different jobs within this JobSet, we currently only allow one standalone metric to be defined at once.
 This means that in the diagram below, you see online one standalone metric in the metrics.yaml</p>
 <p><img alt="img/standalone-metric-set-diagram.png" src="../_images/standalone-metric-set-diagram.png" /></p>
@@ -862,7 +867,7 @@ is consistent - it’s simply a matter of asking for the metric that is known to
 The image below also demonstrates that this standalone metric (along with storage or application) can be scaled to more
 than one pod, if appropriate.</p>
 <p><img alt="img/standalone-metric-set.png" src="../_images/standalone-metric-set1.png" /></p>
-<p>This metrics operator is early in design and subject to change! In the meantime, for more detail about this design, see the <a class="reference internal" href="../development/index.html"><span class="std std-doc">developer docs</span></a>.</p>
+<p>For more detail about this design, see the <a class="reference internal" href="../development/index.html"><span class="std std-doc">developer docs</span></a>.</p>
 <h2 id="containers-available">Containers Available<a class="headerlink" href="#containers-available" title="Permalink to this heading">¶</a></h2>
 <p>All containers are provided under <a class="reference external" href="https://github.com/converged-computing/metrics-operator/pkgs/container/metrics-operator">ghcr.io/converged-computing/metrics-operator</a>. The latest tag is the current main branch, a “bleeding edge” version, and we will provide releases when the operator is more stable.</p>
 
@@ -872,7 +877,7 @@ than one pod, if appropriate.</p>
   <small>
     
       Last update:
-      Aug 10, 2023
+      Aug 11, 2023
     
   </small>
 </div>

@@ -119,6 +119,30 @@ Variables to customize include:
 | commands | Custom list of osu-benchmark one-sided commands to run | listOptions->commands | array | unset uses default set |
 
 
+#### app-lammps
+
+ - [Standalone Metric Set](user-guide.md#application-metric-set)
+
+Since we were using LAMMPS so often as a benchmark (and testing timing of a network) it made sense to add it here
+as a standalone metric! Although we are doing MPI with communication via SSH, this can still serve as a means
+to assess performance.
+
+|Name | Description | Option Key | Type | Default |
+|-----|-------------|------------|------|---------|
+| command | The full mpirun and lammps command | options->command |string | (see below) |
+| workdir | The working directory for the command | options->workdir | string | /opt/lammps/examples/reaxff/HNS# |
+
+For inspection, you can see all the examples provided [in the LAMMPS GitHub repository](https://github.com/lammps/lammps/tree/develop/examples).
+The default command (if you don't change it) intended as an example is:
+
+```bash
+mpirun --hostfile ./hostlist.txt -np 2 --map-by socket lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite(e
+```
+
+In the working directory `/opt/lammps/examples/reaxff/HNS#`. You should be calling `mpirun` and expecting a ./hostlist.txt in the present working directory (the "workdir" you chose above).
+You should also provide the correct number of processes (np) and problem size for LAMMPS (lmp). We left this as open and flexible
+anticipating that you as a user would want total control.
+
 ## Examples
 
 The following examples are provided alongside the operator. Each directory has a README with complete instructions for usage.
@@ -128,6 +152,12 @@ The following examples are provided alongside the operator. Each directory has a
  - [io-host-volume](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/io-host-volume)
  - [network-netmark](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-netmark) (code still private)
  - [network-osu-benchmark](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-osu-benchmark)
+ - [app-lammps](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-lammps)
+
+
+The following example uses io-fio to measure the Fusion filesystem:
+
+ - [io-host-volume](https://github.com/converged-computing/metrics-operator/tree/main/examples/storage/google/io-fusion)
 
 ### Apps to be Measured
 
