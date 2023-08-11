@@ -15,7 +15,7 @@ jobs:
         test: [["perf-sysstat", "ghcr.io/converged-computing/metric-sysstat:latest", 60, ""],                   # performance test
                ["io-host-volume", "ghcr.io/converged-computing/metric-sysstat:latest", 60, ""],                 # storage test
                ["network-osu-benchmark", "ghcr.io/converged-computing/metric-osu-benchmark:latest", 120, ""],   # standalone network test
-               ["app-lammps", "ghcr.io/converged-computing/metric-lammps:latest", 60, "--iter 1s"]]             # standalone app test
+               ["app-lammps", "ghcr.io/converged-computing/metric-lammps:latest", 60, "--iter 1"]]             # standalone app test
 
     steps:
     - uses: actions/checkout@v3
