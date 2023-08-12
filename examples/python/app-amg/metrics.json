@@ -1,0 +1,832 @@
+[
+    {
+        "data": [
+            {
+                "driver_params": {
+                    "solver_id": "1",
+                    "laplacian_27pt": {
+                        "(nx,_ny,_nz)": "(10, 20, 10)",
+                        "(px,_py,_pz)": "(1, 2, 1)"
+                    }
+                },
+                "generate_matrix": {
+                    "spatial_operator": {
+                        "wall_clock_time": "0.154680 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "0.626910 seconds",
+                        "cpu_mflops": "0.000000"
+                    }
+                },
+                "vector_setup": {
+                    "rhs_and_initial_guess": {
+                        "wall_clock_time": "0.069727 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "0.204182 seconds",
+                        "cpu_mflops": "0.000000"
+                    }
+                },
+                "problem_setup": {
+                    "pcg_setup": {
+                        "wall_clock_time": "8.967483 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "25.461097 seconds",
+                        "cpu_mflops": "0.000000"
+                    },
+                    "fom_setup": "nnz_AP / Setup Phase Time: 5.468536e+03"
+                },
+                "solve_time": {
+                    "pcg_solve": {
+                        "wall_clock_time": "22.670724 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "79.430604 seconds",
+                        "cpu_mflops": "0.000000"
+                    },
+                    "iterations": "14",
+                    "final_relative_residual_norm": "4.643894e-09",
+                    "fom_solve": "nnz_AP * Iterations / Solve Phase Time: 3.028337e+04",
+                    "figure_of_merit_(fom_1)": "2.407966e+04"
+                }
+            }
+        ],
+        "metadata": {
+            "pods": 2,
+            "completions": 2,
+            "metricName": "app-amg",
+            "metricDescription": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
+            "metricType": "standalone",
+            "metricOptions": {
+                "command": "amg",
+                "completions": 0,
+                "mpirun": "mpirun --hostfile ./hostlist.txt",
+                "rate": 10,
+                "workdir": "/opt/AMG"
+            }
+        },
+        "spec": {
+            "apiVersion": "flux-framework.org/v1alpha1",
+            "kind": "MetricSet",
+            "metadata": {
+                "labels": {
+                    "app.kubernetes.io/name": "metricset",
+                    "app.kubernetes.io/instance": "metricset-sample"
+                },
+                "name": "metricset-sample"
+            },
+            "spec": {
+                "pods": 2,
+                "metrics": [
+                    {
+                        "name": "app-amg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "data": [
+            {
+                "driver_params": {
+                    "solver_id": "1",
+                    "laplacian_27pt": {
+                        "(nx,_ny,_nz)": "(10, 20, 10)",
+                        "(px,_py,_pz)": "(1, 2, 1)"
+                    }
+                },
+                "generate_matrix": {
+                    "spatial_operator": {
+                        "wall_clock_time": "0.233553 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "0.866093 seconds",
+                        "cpu_mflops": "0.000000"
+                    }
+                },
+                "vector_setup": {
+                    "rhs_and_initial_guess": {
+                        "wall_clock_time": "0.042373 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "0.126982 seconds",
+                        "cpu_mflops": "0.000000"
+                    }
+                },
+                "problem_setup": {
+                    "pcg_setup": {
+                        "wall_clock_time": "4.685015 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "18.331535 seconds",
+                        "cpu_mflops": "0.000000"
+                    },
+                    "fom_setup": "nnz_AP / Setup Phase Time: 1.046720e+04"
+                },
+                "solve_time": {
+                    "pcg_solve": {
+                        "wall_clock_time": "19.920358 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "75.432426 seconds",
+                        "cpu_mflops": "0.000000"
+                    },
+                    "iterations": "14",
+                    "final_relative_residual_norm": "4.643894e-09",
+                    "fom_solve": "nnz_AP * Iterations / Solve Phase Time: 3.446454e+04",
+                    "figure_of_merit_(fom_1)": "2.846521e+04"
+                }
+            }
+        ],
+        "metadata": {
+            "pods": 2,
+            "completions": 2,
+            "metricName": "app-amg",
+            "metricDescription": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
+            "metricType": "standalone",
+            "metricOptions": {
+                "command": "amg",
+                "completions": 0,
+                "mpirun": "mpirun --hostfile ./hostlist.txt",
+                "rate": 10,
+                "workdir": "/opt/AMG"
+            }
+        },
+        "spec": {
+            "apiVersion": "flux-framework.org/v1alpha1",
+            "kind": "MetricSet",
+            "metadata": {
+                "labels": {
+                    "app.kubernetes.io/name": "metricset",
+                    "app.kubernetes.io/instance": "metricset-sample"
+                },
+                "name": "metricset-sample"
+            },
+            "spec": {
+                "pods": 2,
+                "metrics": [
+                    {
+                        "name": "app-amg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "data": [
+            {
+                "driver_params": {
+                    "solver_id": "1",
+                    "laplacian_27pt": {
+                        "(nx,_ny,_nz)": "(10, 20, 10)",
+                        "(px,_py,_pz)": "(1, 2, 1)"
+                    }
+                },
+                "generate_matrix": {
+                    "spatial_operator": {
+                        "wall_clock_time": "0.240115 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "0.922137 seconds",
+                        "cpu_mflops": "0.000000"
+                    }
+                },
+                "vector_setup": {
+                    "rhs_and_initial_guess": {
+                        "wall_clock_time": "0.059379 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "0.263196 seconds",
+                        "cpu_mflops": "0.000000"
+                    }
+                },
+                "problem_setup": {
+                    "pcg_setup": {
+                        "wall_clock_time": "5.564823 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "19.814483 seconds",
+                        "cpu_mflops": "0.000000"
+                    },
+                    "fom_setup": "nnz_AP / Setup Phase Time: 8.812320e+03"
+                },
+                "solve_time": {
+                    "pcg_solve": {
+                        "wall_clock_time": "23.945171 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "81.345526 seconds",
+                        "cpu_mflops": "0.000000"
+                    },
+                    "iterations": "14",
+                    "final_relative_residual_norm": "4.643894e-09",
+                    "fom_solve": "nnz_AP * Iterations / Solve Phase Time: 2.867159e+04",
+                    "figure_of_merit_(fom_1)": "2.370677e+04"
+                }
+            }
+        ],
+        "metadata": {
+            "pods": 2,
+            "completions": 2,
+            "metricName": "app-amg",
+            "metricDescription": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
+            "metricType": "standalone",
+            "metricOptions": {
+                "command": "amg",
+                "completions": 0,
+                "mpirun": "mpirun --hostfile ./hostlist.txt",
+                "rate": 10,
+                "workdir": "/opt/AMG"
+            }
+        },
+        "spec": {
+            "apiVersion": "flux-framework.org/v1alpha1",
+            "kind": "MetricSet",
+            "metadata": {
+                "labels": {
+                    "app.kubernetes.io/name": "metricset",
+                    "app.kubernetes.io/instance": "metricset-sample"
+                },
+                "name": "metricset-sample"
+            },
+            "spec": {
+                "pods": 2,
+                "metrics": [
+                    {
+                        "name": "app-amg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "data": [
+            {
+                "driver_params": {
+                    "solver_id": "1",
+                    "laplacian_27pt": {
+                        "(nx,_ny,_nz)": "(10, 20, 10)",
+                        "(px,_py,_pz)": "(1, 2, 1)"
+                    }
+                },
+                "generate_matrix": {
+                    "spatial_operator": {
+                        "wall_clock_time": "0.222429 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "0.874576 seconds",
+                        "cpu_mflops": "0.000000"
+                    }
+                },
+                "vector_setup": {
+                    "rhs_and_initial_guess": {
+                        "wall_clock_time": "0.043813 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "0.104386 seconds",
+                        "cpu_mflops": "0.000000"
+                    }
+                },
+                "problem_setup": {
+                    "pcg_setup": {
+                        "wall_clock_time": "6.022492 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "22.145176 seconds",
+                        "cpu_mflops": "0.000000"
+                    },
+                    "fom_setup": "nnz_AP / Setup Phase Time: 8.142642e+03"
+                },
+                "solve_time": {
+                    "pcg_solve": {
+                        "wall_clock_time": "22.838187 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "80.316067 seconds",
+                        "cpu_mflops": "0.000000"
+                    },
+                    "iterations": "14",
+                    "final_relative_residual_norm": "4.643894e-09",
+                    "fom_solve": "nnz_AP * Iterations / Solve Phase Time: 3.006132e+04",
+                    "figure_of_merit_(fom_1)": "2.458165e+04"
+                }
+            }
+        ],
+        "metadata": {
+            "pods": 2,
+            "completions": 2,
+            "metricName": "app-amg",
+            "metricDescription": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
+            "metricType": "standalone",
+            "metricOptions": {
+                "command": "amg",
+                "completions": 0,
+                "mpirun": "mpirun --hostfile ./hostlist.txt",
+                "rate": 10,
+                "workdir": "/opt/AMG"
+            }
+        },
+        "spec": {
+            "apiVersion": "flux-framework.org/v1alpha1",
+            "kind": "MetricSet",
+            "metadata": {
+                "labels": {
+                    "app.kubernetes.io/name": "metricset",
+                    "app.kubernetes.io/instance": "metricset-sample"
+                },
+                "name": "metricset-sample"
+            },
+            "spec": {
+                "pods": 2,
+                "metrics": [
+                    {
+                        "name": "app-amg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "data": [
+            {
+                "driver_params": {
+                    "solver_id": "1",
+                    "laplacian_27pt": {
+                        "(nx,_ny,_nz)": "(10, 20, 10)",
+                        "(px,_py,_pz)": "(1, 2, 1)"
+                    }
+                },
+                "generate_matrix": {
+                    "spatial_operator": {
+                        "wall_clock_time": "0.247462 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "0.864699 seconds",
+                        "cpu_mflops": "0.000000"
+                    }
+                },
+                "vector_setup": {
+                    "rhs_and_initial_guess": {
+                        "wall_clock_time": "0.057285 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "0.184888 seconds",
+                        "cpu_mflops": "0.000000"
+                    }
+                },
+                "problem_setup": {
+                    "pcg_setup": {
+                        "wall_clock_time": "5.777684 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "20.600999 seconds",
+                        "cpu_mflops": "0.000000"
+                    },
+                    "fom_setup": "nnz_AP / Setup Phase Time: 8.487657e+03"
+                },
+                "solve_time": {
+                    "pcg_solve": {
+                        "wall_clock_time": "23.086673 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "80.998381 seconds",
+                        "cpu_mflops": "0.000000"
+                    },
+                    "iterations": "14",
+                    "final_relative_residual_norm": "4.643894e-09",
+                    "fom_solve": "nnz_AP * Iterations / Solve Phase Time: 2.973776e+04",
+                    "figure_of_merit_(fom_1)": "2.442524e+04"
+                }
+            }
+        ],
+        "metadata": {
+            "pods": 2,
+            "completions": 2,
+            "metricName": "app-amg",
+            "metricDescription": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
+            "metricType": "standalone",
+            "metricOptions": {
+                "command": "amg",
+                "completions": 0,
+                "mpirun": "mpirun --hostfile ./hostlist.txt",
+                "rate": 10,
+                "workdir": "/opt/AMG"
+            }
+        },
+        "spec": {
+            "apiVersion": "flux-framework.org/v1alpha1",
+            "kind": "MetricSet",
+            "metadata": {
+                "labels": {
+                    "app.kubernetes.io/name": "metricset",
+                    "app.kubernetes.io/instance": "metricset-sample"
+                },
+                "name": "metricset-sample"
+            },
+            "spec": {
+                "pods": 2,
+                "metrics": [
+                    {
+                        "name": "app-amg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "data": [
+            {
+                "driver_params": {
+                    "solver_id": "1",
+                    "laplacian_27pt": {
+                        "(nx,_ny,_nz)": "(10, 20, 10)",
+                        "(px,_py,_pz)": "(1, 2, 1)"
+                    }
+                },
+                "generate_matrix": {
+                    "spatial_operator": {
+                        "wall_clock_time": "0.238863 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "0.863483 seconds",
+                        "cpu_mflops": "0.000000"
+                    }
+                },
+                "vector_setup": {
+                    "rhs_and_initial_guess": {
+                        "wall_clock_time": "0.060950 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "0.157549 seconds",
+                        "cpu_mflops": "0.000000"
+                    }
+                },
+                "problem_setup": {
+                    "pcg_setup": {
+                        "wall_clock_time": "4.881566 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "18.379813 seconds",
+                        "cpu_mflops": "0.000000"
+                    },
+                    "fom_setup": "nnz_AP / Setup Phase Time: 1.004575e+04"
+                },
+                "solve_time": {
+                    "pcg_solve": {
+                        "wall_clock_time": "23.461902 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "80.350049 seconds",
+                        "cpu_mflops": "0.000000"
+                    },
+                    "iterations": "14",
+                    "final_relative_residual_norm": "4.643894e-09",
+                    "fom_solve": "nnz_AP * Iterations / Solve Phase Time: 2.926216e+04",
+                    "figure_of_merit_(fom_1)": "2.445806e+04"
+                }
+            }
+        ],
+        "metadata": {
+            "pods": 2,
+            "completions": 2,
+            "metricName": "app-amg",
+            "metricDescription": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
+            "metricType": "standalone",
+            "metricOptions": {
+                "command": "amg",
+                "completions": 0,
+                "mpirun": "mpirun --hostfile ./hostlist.txt",
+                "rate": 10,
+                "workdir": "/opt/AMG"
+            }
+        },
+        "spec": {
+            "apiVersion": "flux-framework.org/v1alpha1",
+            "kind": "MetricSet",
+            "metadata": {
+                "labels": {
+                    "app.kubernetes.io/name": "metricset",
+                    "app.kubernetes.io/instance": "metricset-sample"
+                },
+                "name": "metricset-sample"
+            },
+            "spec": {
+                "pods": 2,
+                "metrics": [
+                    {
+                        "name": "app-amg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "data": [
+            {
+                "driver_params": {
+                    "solver_id": "1",
+                    "laplacian_27pt": {
+                        "(nx,_ny,_nz)": "(10, 20, 10)",
+                        "(px,_py,_pz)": "(1, 2, 1)"
+                    }
+                },
+                "generate_matrix": {
+                    "spatial_operator": {
+                        "wall_clock_time": "0.148020 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "0.622478 seconds",
+                        "cpu_mflops": "0.000000"
+                    }
+                },
+                "vector_setup": {
+                    "rhs_and_initial_guess": {
+                        "wall_clock_time": "0.043564 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "0.154993 seconds",
+                        "cpu_mflops": "0.000000"
+                    }
+                },
+                "problem_setup": {
+                    "pcg_setup": {
+                        "wall_clock_time": "6.770451 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "23.645068 seconds",
+                        "cpu_mflops": "0.000000"
+                    },
+                    "fom_setup": "nnz_AP / Setup Phase Time: 7.243092e+03"
+                },
+                "solve_time": {
+                    "pcg_solve": {
+                        "wall_clock_time": "35.372723 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "97.783956 seconds",
+                        "cpu_mflops": "0.000000"
+                    },
+                    "iterations": "14",
+                    "final_relative_residual_norm": "4.643894e-09",
+                    "fom_solve": "nnz_AP * Iterations / Solve Phase Time: 1.940891e+04",
+                    "figure_of_merit_(fom_1)": "1.636746e+04"
+                }
+            }
+        ],
+        "metadata": {
+            "pods": 2,
+            "completions": 2,
+            "metricName": "app-amg",
+            "metricDescription": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
+            "metricType": "standalone",
+            "metricOptions": {
+                "command": "amg",
+                "completions": 0,
+                "mpirun": "mpirun --hostfile ./hostlist.txt",
+                "rate": 10,
+                "workdir": "/opt/AMG"
+            }
+        },
+        "spec": {
+            "apiVersion": "flux-framework.org/v1alpha1",
+            "kind": "MetricSet",
+            "metadata": {
+                "labels": {
+                    "app.kubernetes.io/name": "metricset",
+                    "app.kubernetes.io/instance": "metricset-sample"
+                },
+                "name": "metricset-sample"
+            },
+            "spec": {
+                "pods": 2,
+                "metrics": [
+                    {
+                        "name": "app-amg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "data": [
+            {
+                "driver_params": {
+                    "solver_id": "1",
+                    "laplacian_27pt": {
+                        "(nx,_ny,_nz)": "(10, 20, 10)",
+                        "(px,_py,_pz)": "(1, 2, 1)"
+                    }
+                },
+                "generate_matrix": {
+                    "spatial_operator": {
+                        "wall_clock_time": "0.227810 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "0.809670 seconds",
+                        "cpu_mflops": "0.000000"
+                    }
+                },
+                "vector_setup": {
+                    "rhs_and_initial_guess": {
+                        "wall_clock_time": "0.069407 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "0.254313 seconds",
+                        "cpu_mflops": "0.000000"
+                    }
+                },
+                "problem_setup": {
+                    "pcg_setup": {
+                        "wall_clock_time": "5.671133 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "20.602727 seconds",
+                        "cpu_mflops": "0.000000"
+                    },
+                    "fom_setup": "nnz_AP / Setup Phase Time: 8.647126e+03"
+                },
+                "solve_time": {
+                    "pcg_solve": {
+                        "wall_clock_time": "22.816052 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "80.114706 seconds",
+                        "cpu_mflops": "0.000000"
+                    },
+                    "iterations": "14",
+                    "final_relative_residual_norm": "4.643894e-09",
+                    "fom_solve": "nnz_AP * Iterations / Solve Phase Time: 3.009048e+04",
+                    "figure_of_merit_(fom_1)": "2.472964e+04"
+                }
+            }
+        ],
+        "metadata": {
+            "pods": 2,
+            "completions": 2,
+            "metricName": "app-amg",
+            "metricDescription": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
+            "metricType": "standalone",
+            "metricOptions": {
+                "command": "amg",
+                "completions": 0,
+                "mpirun": "mpirun --hostfile ./hostlist.txt",
+                "rate": 10,
+                "workdir": "/opt/AMG"
+            }
+        },
+        "spec": {
+            "apiVersion": "flux-framework.org/v1alpha1",
+            "kind": "MetricSet",
+            "metadata": {
+                "labels": {
+                    "app.kubernetes.io/name": "metricset",
+                    "app.kubernetes.io/instance": "metricset-sample"
+                },
+                "name": "metricset-sample"
+            },
+            "spec": {
+                "pods": 2,
+                "metrics": [
+                    {
+                        "name": "app-amg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "data": [
+            {
+                "driver_params": {
+                    "solver_id": "1",
+                    "laplacian_27pt": {
+                        "(nx,_ny,_nz)": "(10, 20, 10)",
+                        "(px,_py,_pz)": "(1, 2, 1)"
+                    }
+                },
+                "generate_matrix": {
+                    "spatial_operator": {
+                        "wall_clock_time": "0.185441 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "0.661079 seconds",
+                        "cpu_mflops": "0.000000"
+                    }
+                },
+                "vector_setup": {
+                    "rhs_and_initial_guess": {
+                        "wall_clock_time": "0.058139 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "0.159175 seconds",
+                        "cpu_mflops": "0.000000"
+                    }
+                },
+                "problem_setup": {
+                    "pcg_setup": {
+                        "wall_clock_time": "5.218203 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "19.601490 seconds",
+                        "cpu_mflops": "0.000000"
+                    },
+                    "fom_setup": "nnz_AP / Setup Phase Time: 9.397679e+03"
+                },
+                "solve_time": {
+                    "pcg_solve": {
+                        "wall_clock_time": "19.777390 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "72.259056 seconds",
+                        "cpu_mflops": "0.000000"
+                    },
+                    "iterations": "14",
+                    "final_relative_residual_norm": "4.643894e-09",
+                    "fom_solve": "nnz_AP * Iterations / Solve Phase Time: 3.471368e+04",
+                    "figure_of_merit_(fom_1)": "2.838468e+04"
+                }
+            }
+        ],
+        "metadata": {
+            "pods": 2,
+            "completions": 2,
+            "metricName": "app-amg",
+            "metricDescription": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
+            "metricType": "standalone",
+            "metricOptions": {
+                "command": "amg",
+                "completions": 0,
+                "mpirun": "mpirun --hostfile ./hostlist.txt",
+                "rate": 10,
+                "workdir": "/opt/AMG"
+            }
+        },
+        "spec": {
+            "apiVersion": "flux-framework.org/v1alpha1",
+            "kind": "MetricSet",
+            "metadata": {
+                "labels": {
+                    "app.kubernetes.io/name": "metricset",
+                    "app.kubernetes.io/instance": "metricset-sample"
+                },
+                "name": "metricset-sample"
+            },
+            "spec": {
+                "pods": 2,
+                "metrics": [
+                    {
+                        "name": "app-amg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "data": [
+            {
+                "driver_params": {
+                    "solver_id": "1",
+                    "laplacian_27pt": {
+                        "(nx,_ny,_nz)": "(10, 20, 10)",
+                        "(px,_py,_pz)": "(1, 2, 1)"
+                    }
+                },
+                "generate_matrix": {
+                    "spatial_operator": {
+                        "wall_clock_time": "0.188481 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "0.613128 seconds",
+                        "cpu_mflops": "0.000000"
+                    }
+                },
+                "vector_setup": {
+                    "rhs_and_initial_guess": {
+                        "wall_clock_time": "0.053878 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "0.190935 seconds",
+                        "cpu_mflops": "0.000000"
+                    }
+                },
+                "problem_setup": {
+                    "pcg_setup": {
+                        "wall_clock_time": "6.171202 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "21.461641 seconds",
+                        "cpu_mflops": "0.000000"
+                    },
+                    "fom_setup": "nnz_AP / Setup Phase Time: 7.946426e+03"
+                },
+                "solve_time": {
+                    "pcg_solve": {
+                        "wall_clock_time": "21.616691 seconds",
+                        "wall_mflops": "0.000000",
+                        "cpu_clock_time": "77.353095 seconds",
+                        "cpu_mflops": "0.000000"
+                    },
+                    "iterations": "14",
+                    "final_relative_residual_norm": "4.643894e-09",
+                    "fom_solve": "nnz_AP * Iterations / Solve Phase Time: 3.175999e+04",
+                    "figure_of_merit_(fom_1)": "2.580660e+04"
+                }
+            }
+        ],
+        "metadata": {
+            "pods": 2,
+            "completions": 2,
+            "metricName": "app-amg",
+            "metricDescription": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
+            "metricType": "standalone",
+            "metricOptions": {
+                "command": "amg",
+                "completions": 0,
+                "mpirun": "mpirun --hostfile ./hostlist.txt",
+                "rate": 10,
+                "workdir": "/opt/AMG"
+            }
+        },
+        "spec": {
+            "apiVersion": "flux-framework.org/v1alpha1",
+            "kind": "MetricSet",
+            "metadata": {
+                "labels": {
+                    "app.kubernetes.io/name": "metricset",
+                    "app.kubernetes.io/instance": "metricset-sample"
+                },
+                "name": "metricset-sample"
+            },
+            "spec": {
+                "pods": 2,
+                "metrics": [
+                    {
+                        "name": "app-amg"
+                    }
+                ]
+            }
+        }
+    }
+]

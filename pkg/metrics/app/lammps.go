@@ -260,12 +260,14 @@ echo "%s"
 echo "%s"
 %s
 echo "%s"
+%s
 `
 	launcherTemplate := prefix + fmt.Sprintf(
 		template,
 		metrics.Separator,
 		m.command,
 		metrics.CollectionEnd,
+		metrics.Interactive(spec.Spec.Logging.Interactive),
 	)
 
 	// The worker just has sleep infinity added

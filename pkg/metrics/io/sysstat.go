@@ -118,6 +118,7 @@ while true
 done
 # Custom post command after done, if we get here
 %s
+%s
 `
 	script := fmt.Sprintf(
 		template,
@@ -131,6 +132,7 @@ done
 		spec.Spec.Storage.Commands.Post,
 		m.rate,
 		spec.Spec.Storage.Commands.Post,
+		metrics.Interactive(spec.Spec.Logging.Interactive),
 	)
 	// The entrypoint is the entrypoint for the container, while
 	// the command is expected to be what we are monitoring. Often

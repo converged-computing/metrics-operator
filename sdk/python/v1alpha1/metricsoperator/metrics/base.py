@@ -92,7 +92,11 @@ class MetricBase:
 
     def wait(self, namespace=None, states=None, retry_seconds=5):
         """
-        Wait for one or more pods of interest to be done
+        Wait for one or more pods of interest to be done.
+
+        This assumes creation or a consistent size of pod getting to a
+        particular state. If looking for Termination -> gone, use
+        wait_for_delete.
         """
         namespace = namespace or self.namespace
         print(f"Looking for prefix {self.pod_prefix} in namespace {namespace}")
@@ -121,6 +125,19 @@ class MetricBase:
         states = '" or "'.join(states)
         print(f'All pods are in states "{states}"')
         return pod_list
+
+    def wait_for_delete(self, namespace=None, retry_seconds=5):
+        """
+        Wait for one or more pods of interest to be gone
+        """
+        namespace = namespace or self.namespace
+        print(f"Looking for prefix {self.pod_prefix} in namespace {namespace}")
+        pod_list = self.get_pods(namespace, name=self.pod_prefix)
+        while len(pod_list.items) != 0:
+            print(f"{len(pod_list.items)} pods exist, waiting for termination.")
+            pod_list = self.get_pods(name=self.pod_prefix, namespace=namespace)
+            time.sleep(retry_seconds)
+        print("All pods are terminated.")
 
     def _filter_pods(self, pods, name):
         """

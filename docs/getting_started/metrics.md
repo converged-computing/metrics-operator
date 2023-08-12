@@ -205,7 +205,7 @@ Since we were using LAMMPS so often as a benchmark (and testing timing of a netw
 as a standalone metric! Although we are doing MPI with communication via SSH, this can still serve as a means
 to assess performance.
 
-|Name | Description | Option Key | Type | Default |
+| Name | Description | Option Key | Type | Default |
 |-----|-------------|------------|------|---------|
 | command | The full mpirun and lammps command | options->command |string | (see below) |
 | workdir | The working directory for the command | options->workdir | string | /opt/lammps/examples/reaxff/HNS# |
@@ -220,6 +220,58 @@ mpirun --hostfile ./hostlist.txt -np 2 --map-by socket lmp -v x 2 -v y 2 -v z 2 
 In the working directory `/opt/lammps/examples/reaxff/HNS#`. You should be calling `mpirun` and expecting a ./hostlist.txt in the present working directory (the "workdir" you chose above).
 You should also provide the correct number of processes (np) and problem size for LAMMPS (lmp). We left this as open and flexible
 anticipating that you as a user would want total control.
+
+#### app-amg
+
+AMG means "algebraic multi-grid" and it's easy to confuse with the company [AMD](https://www.amd.com/en/solutions/supercomputing-and-hpc) "Advanced Micro Devices" ! From [the guide](https://asc.llnl.gov/sites/asc/files/2020-09/AMG_Summary_v1_7.pdf):
+
+> AMG is a parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids. The driver provided for this benchmark builds linear systems for a 3D problem with a 27-point stencil and generates two different problems that are described in section D of the AMG.readme file in the docs directory.
+
+Here are examples of small and medium problem sizes provided in that same guide. Each of these would be given to MPI (mpirun), but srun is provided as an example instead.
+
+```console
+# Small size problems
+srun –N 32 –n 512 amg –problem 1 –n 96 96 96 –P 8 8 8
+srun –N 32 –n 512 amg –problem 2 –n 40 40 40 –P 8 8 8
+srun –N 64 –n 1024 amg –problem 1 –n 96 96 96 –P 16 8 8
+srun –N 64 –n 1024 amg –problem 2 –n 40 40 40 –P 16 8 8
+
+# Medium size problems
+srun –N 512 –n 8192 amg –problem 1 –n 96 96 96 –P 32 16 16
+srun –N 512 –n 8192 amg –problem 2 –n 40 40 40 –P 32 16 16
+srun –N 1024 –n 16384 amg –problem 1 –n 96 96 96 –P 32 32 16
+srun –N 1024 –n 16384 amg –problem 2 –n 40 40 40 –P 32 32 16
+```
+
+By default, akin to LAMMPS we expose the entire mpirun command along with the working directory for you to adjust.
+
+| Name | Description | Option Key | Type | Default |
+|-----|-------------|------------|------|---------|
+| command | The amg command (without mpirun) | options->command |string | (see below) |
+| mpirun | The mpirun command (and arguments) | options->mpirun | string | (see below) | 
+| workdir | The working directory for the command | options->workdir | string | /opt/AMG |
+
+By default, when not set, you will just run the amg binary to get a test case run: 
+
+```bash
+# mpirun
+mpirun --hostfile ./hostlist.txt
+
+# command
+amg
+
+# Assembled into
+mpirun --hostfile ./hostlist.txt ./problem.sh
+```
+
+More likely you want an actual problem size on a specific number of node and tasks, and you'll want to test this. The two problem sizes include:
+
+ - *problem 1* (default) will use conjugate gradient preconditioned with AMG to solve a linear system with a 3D 27-point stencil of size nx*ny*nz*Px*Py*Pz.
+ - *problem 2* simulates a time-dependent problem of size nx*ny*nz*Px*Py*Pz with AMG-GMRES. The linear system is also a 3D 27-point stencil. The system is sized to be 5-10% of the large problem.
+
+**NOTE** that the Python parser was written for the test case, and likely we need to extend it to problem 2 or larger sized problems. If you
+run a larger problem and the parser does not work as expected, please [send us the output](https://github.com/converged-computing/metrics-operator/issues) and we will provide an updated parser.
+See [this guide](https://asc.llnl.gov/sites/asc/files/2020-09/AMG_Summary_v1_7.pdf) for more detail.
 
 ## Examples
 

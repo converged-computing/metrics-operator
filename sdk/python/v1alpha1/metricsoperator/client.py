@@ -70,10 +70,21 @@ class MetricsOperator:
         Delete the associated YAML file.
         """
         api = client.CustomObjectsApi()
-        return api.delete_namespaced_custom_object(
+        result = api.delete_namespaced_custom_object(
             group=self.group,
             version=self.version,
             namespace=self.namespace,
             plural=self.plural,
             name=self.name,
         )
+        self.wait_for_delete()
+        return result
+
+    def wait_for_delete(self):
+        """
+        Wait for pods to be gone (deleted)
+        """
+        for metric in self.spec["spec"]["metrics"]:
+            parser = mutils.get_metric(metric["name"])(self.spec)
+            print("Watching %s for deletion" % metric["name"])
+            parser.wait_for_delete()

@@ -14,6 +14,7 @@ jobs:
       matrix:
         test: [["perf-sysstat", "ghcr.io/converged-computing/metric-sysstat:latest", 60, ""],      # performance test
                ["io-host-volume", "ghcr.io/converged-computing/metric-sysstat:latest", 60, ""],    # storage test
+               ["app-amg", "ghcr.io/converged-computing/metric-amg:latest", 60, "--iter 1"], # standalone app test
                ["app-lammps", "ghcr.io/converged-computing/metric-lammps:latest", 60, "--iter 1"]] # standalone app test
 
     steps:

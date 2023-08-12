@@ -1,0 +1,20 @@
+apiVersion: flux-framework.org/v1alpha1
+kind: MetricSet
+metadata:
+  labels:
+    app.kubernetes.io/name: metricset
+    app.kubernetes.io/instance: metricset-sample
+  name: metricset-sample
+spec:
+  # Number of indexed jobs to run netmark on
+  pods: 2
+  metrics:
+   # This uses the default commands
+   - name: app-amg
+
+     # This should the default - you are responsible for asking for the right number of processes,
+     # amg arguments (-problem 1 or -problem 2), and calling mpirun to point at an expected hostfile in the workdir.
+     # Note that the content for "command" is put in a file for mpirun to execute
+     # options:
+     #  mpirun: mpirun --hostfile ./hostlist.txt -N 2 -np 8
+     #  command: amg -problem 1 -n 96 96 96 -P 8 8 8 

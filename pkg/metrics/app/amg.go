@@ -5,14 +5,11 @@ Copyright 2023 Lawrence Livermore National Security, LLC
 SPDX-License-Identifier: MIT
 */
 
-package network
+package application
 
 import (
 	"fmt"
 	"path"
-	"path/filepath"
-	"strconv"
-	"strings"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -22,9 +19,7 @@ import (
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 
-// This library is currently private
-
-type Netmark struct {
+type AMG struct {
 	name        string
 	rate        int32
 	completions int32
@@ -38,87 +33,74 @@ type Netmark struct {
 	launcherScript string
 
 	// Options
-	tasks int32
-
-	// number of warmups
-	warmups int32
-
-	// number of trials
-	trials int32
-
-	// number of send-recv cycles
-	sendReceiveCycles int32
-
-	// message size in bytes
-	messageSize int32
-
-	// storage each trial flag
-	storeEachTrial bool
+	workdir string
+	command string
+	mpirun  string
 }
 
 // Name returns the metric name
-func (m Netmark) Name() string {
+func (m AMG) Name() string {
 	return m.name
 }
-func (m Netmark) Url() string {
-	return ""
+func (m AMG) Url() string {
+	return "https://github.com/LLNL/AMG"
 }
 
 // Description returns the metric description
-func (m Netmark) Description() string {
+func (m AMG) Description() string {
 	return m.description
 }
 
-// Jobs required for success condition (n is the netmark run)
-func (m Netmark) SuccessJobs() []string {
-	return []string{"n"}
+// Jobs required for success condition (n is the AMG run)
+func (m AMG) SuccessJobs() []string {
+	return []string{"l"}
 }
 
 // Container variables
-func (n Netmark) Type() string {
+func (m AMG) Type() string {
 	return metrics.StandaloneMetric
 }
-func (n Netmark) Image() string {
-	return n.container
+func (m AMG) Image() string {
+	return m.container
 }
-func (n Netmark) WorkingDir() string {
+func (m AMG) WorkingDir() string {
 	return ""
 }
 
 // Return container resources for the metric container
-func (n Netmark) Resources() *api.ContainerResources {
-	return n.resources
+func (m AMG) Resources() *api.ContainerResources {
+	return m.resources
 }
-func (n Netmark) Attributes() *api.ContainerSpec {
-	return n.attributes
+func (m AMG) Attributes() *api.ContainerSpec {
+	return m.attributes
 }
 
-func (n Netmark) getMetricsKeyToPath() []corev1.KeyToPath {
+func (m AMG) getMetricsKeyToPath() []corev1.KeyToPath {
 	// Runner start scripts
 	makeExecutable := int32(0777)
 
 	// Each metric has an entrypoint script
 	return []corev1.KeyToPath{
 		{
-			Key:  deriveScriptKey(n.launcherScript),
-			Path: path.Base(n.launcherScript),
+			Key:  deriveScriptKey(m.launcherScript),
+			Path: path.Base(m.launcherScript),
 			Mode: &makeExecutable,
 		},
 		{
-			Key:  deriveScriptKey(n.workerScript),
-			Path: path.Base(n.workerScript),
+			Key:  deriveScriptKey(m.workerScript),
+			Path: path.Base(m.workerScript),
 			Mode: &makeExecutable,
 		},
 	}
 }
 
 // Replicated Jobs are custom for this standalone metric
-func (m Netmark) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, error) {
+func (m AMG) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, error) {
 
 	js := []jobset.ReplicatedJob{}
 
-	// Generate a replicated job for the launcher (netmark) and workers
-	launcher, err := metrics.GetReplicatedJob(spec, false, 1, 1, "n", false)
+	// Generate a replicated job for the launcher (AMG) and workers
+	launcher, err := metrics.GetReplicatedJob(spec, false, 1, 1, "l", false)
 	if err != nil {
 		return js, err
 	}
@@ -134,7 +116,7 @@ func (m Netmark) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, er
 		v["storage"] = spec.Spec.Storage.Volume
 	}
 
-	// runnerScripts are custom for a netmark jobset
+	// runnerScripts are custom for a AMG jobset
 	runnerScripts := m.getMetricsKeyToPath()
 
 	volumes := metrics.GetVolumes(spec, runnerScripts, v)
@@ -160,9 +142,6 @@ func (m Netmark) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, er
 			Attributes: m.attributes,
 		},
 	}
-
-	// Derive the containers, one per metric
-	// This will also include mounts for volumes
 	launcherContainers, err := metrics.GetContainers(spec, launcherSpec, v, false)
 	if err != nil {
 		fmt.Printf("issue creating launcher containers %s", err)
@@ -180,87 +159,53 @@ func (m Netmark) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, er
 }
 
 // Set custom options / attributes for the metric
-func (m *Netmark) SetOptions(metric *api.Metric) {
+func (m *AMG) SetOptions(metric *api.Metric) {
 	m.rate = metric.Rate
 	m.completions = metric.Completions
 	m.resources = &metric.Resources
 	m.attributes = &metric.Attributes
 
 	// Set user defined values or fall back to defaults
-	// If we have tasks defined, use it! Otherwise fall back to 2 (likely demo)
-	m.tasks = 0
-	m.warmups = 10
-	m.trials = 20
-	m.sendReceiveCycles = 20
-	m.messageSize = 0
-	m.storeEachTrial = true
+	m.mpirun = "mpirun --hostfile ./hostlist.txt"
+	m.command = "amg"
+	m.workdir = "/opt/AMG"
 
 	// This could be improved :)
-	tasks, ok := metric.Options["tasks"]
+	command, ok := metric.Options["command"]
 	if ok {
-		m.tasks = tasks.IntVal
+		m.command = command.StrVal
 	}
-	warmups, ok := metric.Options["warmups"]
+	workdir, ok := metric.Options["workdir"]
 	if ok {
-		m.warmups = warmups.IntVal
+		m.workdir = workdir.StrVal
 	}
-	trials, ok := metric.Options["trials"]
+	mpirun, ok := metric.Options["mpirun"]
 	if ok {
-		m.trials = trials.IntVal
-	}
-	messageSize, ok := metric.Options["messageSize"]
-	if ok {
-		m.messageSize = messageSize.IntVal
-	}
-	sendReceiveCycle, ok := metric.Options["sendReceiveCycles"]
-	if ok {
-		m.sendReceiveCycles = sendReceiveCycle.IntVal
-	}
-	storeEachTrial, ok := metric.Options["storeEachTrial"]
-	if ok {
-		if storeEachTrial.StrVal == "true" || storeEachTrial.StrVal == "yes" {
-			m.storeEachTrial = true
-		}
-		if storeEachTrial.StrVal == "false" || storeEachTrial.StrVal == "no" {
-			m.storeEachTrial = false
-		}
+		m.mpirun = mpirun.StrVal
 	}
 }
 
-// Validate that we can run Netmark
-func (n Netmark) Validate(spec *api.MetricSet) bool {
+// Validate that we can run AMG
+func (n AMG) Validate(spec *api.MetricSet) bool {
 	return spec.Spec.Pods >= 2
 }
 
 // Exported options and list options
-func (n Netmark) Options() map[string]intstr.IntOrString {
+func (m AMG) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"rate":              intstr.FromInt(int(n.rate)),
-		"completions":       intstr.FromInt(int(n.completions)),
-		"tasks":             intstr.FromInt(int(n.tasks)),
-		"warmups":           intstr.FromInt(int(n.warmups)),
-		"trials":            intstr.FromInt(int(n.trials)),
-		"sendReceiveCycles": intstr.FromInt(int(n.sendReceiveCycles)),
-		"messageSize":       intstr.FromInt(int(n.messageSize)),
-		"storeEachTrial":    intstr.FromString(strconv.FormatBool(n.storeEachTrial)),
+		"rate":        intstr.FromInt(int(m.rate)),
+		"completions": intstr.FromInt(int(m.completions)),
+		"command":     intstr.FromString(m.command),
+		"mpirun":      intstr.FromString(m.mpirun),
+		"workdir":     intstr.FromString(m.workdir),
 	}
 }
-func (n Netmark) ListOptions() map[string][]intstr.IntOrString {
+func (n AMG) ListOptions() map[string][]intstr.IntOrString {
 	return map[string][]intstr.IntOrString{}
 }
 
-// Given a full path, derive the key from the script name minus the extension
-func deriveScriptKey(path string) string {
-
-	// Basename
-	path = filepath.Base(path)
-
-	// Remove the extension, and this assumes we don't have double .
-	return strings.Split(path, ".")[0]
-}
-
 // Return lookup of entrypoint scripts
-func (m Netmark) EntrypointScripts(
+func (m AMG) EntrypointScripts(
 	spec *api.MetricSet,
 	metric *metrics.Metric,
 ) []metrics.EntrypointScript {
@@ -269,8 +214,8 @@ func (m Netmark) EntrypointScripts(
 	metadata := metrics.Metadata(spec, metric)
 
 	// Generate hostlists
-	// The launcher has a different hostname, n for netmark
-	hosts := fmt.Sprintf("%s-n-0-0.%s.%s.svc.cluster.local\n",
+	// The launcher has a different hostname, n for AMG
+	hosts := fmt.Sprintf("%s-l-0-0.%s.%s.svc.cluster.local\n",
 		spec.Name, spec.Spec.ServiceName, spec.Namespace,
 	)
 	// Add number of workers
@@ -278,28 +223,24 @@ func (m Netmark) EntrypointScripts(
 		hosts += fmt.Sprintf("%s-w-0-%d.%s.%s.svc.cluster.local\n",
 			spec.Name, i, spec.Spec.ServiceName, spec.Namespace)
 	}
-	storeTrial := ""
-	if m.storeEachTrial {
-		storeTrial = "-s"
-	}
 
 	prefixTemplate := `#!/bin/bash
 # Start ssh daemon
 /usr/sbin/sshd -D &
 echo "%s"
-
-# If we have zero tasks, default to workers * nproc
-np=%d
-pods=%d
-if [[ $np -eq 0 ]]; then
-	np=$(nproc)
-	np=$(( $pods*$np ))
-fi
-
+# Change directory to where we will run (and write hostfile)
+cd %s
 # Write the hosts file
 cat <<EOF > ./hostlist.txt
 %s
 EOF
+
+# Write the command file for mpirun
+cat <<EOF > ./problem.sh
+#!/bin/bash
+%s
+EOF
+chmod +x ./problem.sh
 
 # Allow network to ready
 echo "Sleeping for 10 seconds waiting for network..."
@@ -309,29 +250,23 @@ echo "%s"
 	prefix := fmt.Sprintf(
 		prefixTemplate,
 		metadata,
-		m.tasks,
-		spec.Spec.Pods,
+		m.workdir,
 		hosts,
+		m.command,
 		metrics.CollectionStart,
 	)
 
 	// Template for the launcher
 	template := `
-mpirun -f ./hostlist.txt -np $np /usr/local/bin/netmark.x -w %d -t %d -c %d -b %d %s
-ls
-echo "NETMARK RTT.CSV START"
-cat RTT.csv
-echo "NETMARK RTT.CSV END"
+echo "%s"
+%s ./problem.sh
 echo "%s"
 %s
 `
 	launcherTemplate := prefix + fmt.Sprintf(
 		template,
-		m.warmups,
-		m.trials,
-		m.sendReceiveCycles,
-		m.messageSize,
-		storeTrial,
+		metrics.Separator,
+		m.mpirun,
 		metrics.CollectionEnd,
 		metrics.Interactive(spec.Spec.Logging.Interactive),
 	)
@@ -356,11 +291,11 @@ echo "%s"
 
 func init() {
 	metrics.Register(
-		&Netmark{
-			name:           "network-netmark",
-			description:    "point to point networking tool",
-			container:      "vanessa/netmark:latest",
-			workerScript:   "/metrics_operator/netmark-worker.sh",
-			launcherScript: "/metrics_operator/netmark-launcher.sh",
+		&AMG{
+			name:           "app-amg",
+			description:    "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
+			container:      "ghcr.io/converged-computing/metric-amg:latest",
+			workerScript:   "/metrics_operator/amg-worker.sh",
+			launcherScript: "/metrics_operator/amg-launcher.sh",
 		})
 }

@@ -74,10 +74,23 @@ type MetricSetSpec struct {
 	// +optional
 	Resources ContainerResource `json:"resources"`
 
+	// Logging spec, preparing for other kinds of logging
+	// Right now we just include an interactive option
+	//+optional
+	Logging Logging `json:"logging"`
+
 	// Single pod completion, meaning the jobspec completions is unset
 	// and we only require one main completion
 	// +optional
 	Completions int32 `json:"completions"`
+}
+
+type Logging struct {
+
+	// Don't allow the application, metric, or storage test to finish
+	// This adds sleep infinity at the end to allow for interactive mode.
+	// +optional
+	Interactive bool `json:"interactive"`
 }
 
 // Pod attributes that can be given to an application or metric

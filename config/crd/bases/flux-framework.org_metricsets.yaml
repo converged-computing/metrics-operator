@@ -137,6 +137,16 @@ spec:
               dontSetFQDN:
                 description: Don't set JobSet FQDN
                 type: boolean
+              logging:
+                description: Logging spec, preparing for other kinds of logging Right
+                  now we just include an interactive option
+                properties:
+                  interactive:
+                    description: Don't allow the application, metric, or storage test
+                      to finish This adds sleep infinity at the end to allow for interactive
+                      mode.
+                    type: boolean
+                type: object
               metrics:
                 description: The name of the metric (that will be associated with
                   a flavor like storage)
