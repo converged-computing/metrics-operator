@@ -23,10 +23,9 @@ spec:
 
      # Custom list of commands to run
      # See https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#network-osu-benchmark
-#     listOptions:
-#       commands:
-#         - osu_acc_latency
-#         - osu_fop_latency
-#         - osu_get_acc_latency
-#         - osu_get_latency
-#         - osu_put_latency
+     listOptions:
+       commands:
+         - osu_acc_latency
+         - osu_get_acc_latency
+         - osu_get_latency
+         - osu_put_latency
