@@ -192,6 +192,10 @@ However all of the following are available for MPI
 
 Note that not all of these have been tested on our setups, so
 if you have any questions please [let us know](https://github.com/converged-computing/metrics-operator/issues).
+Here are some useful resources for the benchmarks:
+
+ - [HPC Council](https://hpcadvisorycouncil.atlassian.net/wiki/spaces/HPCWORKS/pages/1284538459/OSU+Benchmark+Tuning+for+2nd+Gen+AMD+EPYC+using+HDR+InfiniBand+over+HPC-X+MPI)
+ - [AWS Tutorials](https://www.hpcworkshops.com/08-efa/04-complie-run-osu.html)
 
 #### app-lammps
 
