@@ -262,6 +262,7 @@ while true
     sleep %d
     let i=i+1
 done
+%s
 `
 
 	script := fmt.Sprintf(
@@ -277,6 +278,7 @@ done
 		metrics.CollectionEnd,
 		metrics.CollectionEnd,
 		m.rate,
+		metrics.Interactive(spec.Spec.Logging.Interactive),
 	)
 
 	// NOTE: the entrypoint is the entrypoint for the container, while

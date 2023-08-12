@@ -54,6 +54,15 @@ type MetricExport struct {
 	MetricListOptions map[string][]intstr.IntOrString `json:"metricListOptions,omitempty"`
 }
 
+
+// Interactive returns a sleep infinity if interactive is true
+func Interactive(interactive bool) string {
+	if interactive {
+		return "sleep infinity"
+	}
+	return ""
+}
+
 // Default metadata (in JSON) to also put at the top of logs for parsing
 // I'd like to improve upon this manual approach, it's a bit messy.
 func Metadata(set *api.MetricSet, metric *Metric) string {

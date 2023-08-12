@@ -5,8 +5,7 @@
 import re
 
 import metricsoperator.utils as utils
-
-from .base import MetricBase
+from metricsoperator.metrics.base import MetricBase
 
 
 def get_first_int(match):

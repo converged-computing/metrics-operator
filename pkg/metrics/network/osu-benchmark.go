@@ -398,8 +398,8 @@ echo "%s"
 	// Close the commands block
 	commands += fmt.Sprintf("echo %s\n", metrics.CollectionEnd)
 
-	// Template for the launcher
-	launcherTemplate := fmt.Sprintf("%s\n%s", prefix, commands)
+	// Template for the launcher with interactive mode, if desired
+	launcherTemplate := fmt.Sprintf("%s\n%s\n%s", prefix, commands, metrics.Interactive(spec.Spec.Logging.Interactive))
 
 	// The worker just has sleep infinity added, and getting the ip address of the launcher
 	workerTemplate := prefix + "\nsleep infinity"

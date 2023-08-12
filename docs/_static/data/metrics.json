@@ -1,5 +1,12 @@
 [
  {
+  "name": "app-amg",
+  "description": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
+  "type": "standalone",
+  "image": "ghcr.io/converged-computing/metric-amg:latest",
+  "url": "https://github.com/LLNL/AMG"
+ },
+ {
   "name": "app-lammps",
   "description": "LAMMPS molecular dynamic simulation",
   "type": "standalone",

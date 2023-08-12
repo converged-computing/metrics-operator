@@ -48,6 +48,19 @@ The number of pods for an application or storage metric test will correspond wit
 
 When running as an indexed job, indicate the number of successful pods (completions) for the Job to be successful.  Note that if you set 1, your parallelism will default to 1 too, which isn't ideal. I've opened an issue [here](https://github.com/kubernetes-sigs/jobset).
 
+### logging
+
+We are anticipating adding more logging options, but for not logging exposes one "interactive" option that will add a "sleep infinity" to the end of a storage, performance, or standalone metric.
+This is intended for debugging purposes.
+
+```yaml
+logging:
+  interactive: false
+```
+
+It is typically added to a launcher or main container, if relevant, since workers tend to sleep anyway and the JobSet completion depends on the launcher.
+By default, of course, it is set to false so the metric container and JobSet will finish.
+
 ### dontSetFQDN
 
 For more of an "expert mode" if you know you want your JobSet use fully qualified domain names (FQDN) set to false,

@@ -1,7 +1,7 @@
 # Copyright 2023 Lawrence Livermore National Security, LLC
 # (c.f. AUTHORS, NOTICE.LLNS, COPYING)
 
-import metricsoperator.metrics.application as apps
+import metricsoperator.metrics.app as apps
 import metricsoperator.metrics.network as network
 import metricsoperator.metrics.perf as perf
 import metricsoperator.metrics.storage as storage
@@ -13,6 +13,7 @@ metrics = {
     "perf-sysstat": perf.perf_sysstat,
     "io-fio": storage.io_fio,
     "app-lammps": apps.app_lammps,
+    "app-amg": apps.app_amg,
 }
 
 

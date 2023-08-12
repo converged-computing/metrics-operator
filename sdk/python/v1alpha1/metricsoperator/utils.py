@@ -26,6 +26,13 @@ def read_yaml(filename):
     return configuration
 
 
+def slugify(section):
+    """
+    Slugify into lowercase and underscores
+    """
+    return section.lower().replace(" ", "_").replace("-", "_")
+
+
 def write_file(content, filename):
     """
     Write dict to json
