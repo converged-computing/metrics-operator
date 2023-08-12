@@ -38,7 +38,7 @@ if [[ "${status}" != "True" ]] || [[ "${type}" != "Completed" ]]; then
     /bin/bash examples/tests/${name}/post-run.sh || true
     echo "LOGS for Metrics Operator pod"
     metrics_pod=$(kubectl get -n metrics-system pods -o json | jq -r .items[0].metadata.name)
-    kubectl logs -n metrics-system ${metrics_pods}
+    kubectl logs -n metrics-system ${metrics_pod}
     echo "LOGS for JobSet Operator pod"
     jobset_pod=$(kubectl get -n jobset-system pods -o json | jq -r .items[0].metadata.name)
     kubectl logs -n jobset-system ${jobset_pod}

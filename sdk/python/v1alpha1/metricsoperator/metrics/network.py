@@ -39,37 +39,47 @@ class network_osu_benchmark(MetricBase):
             section = section.split("\n")
             section = [x.strip() for x in section if x.strip()]
 
-            # Command is the first entry
-            command = section.pop(0)
-
-            # Each section has some number of header lines (with #)
-            header = []
-            while section[0].startswith("#"):
-                header.append(section.pop(0))
-
-            # Last row of the header are the column names
-            columns = header.pop()
-            columns = columns.replace("# ", "").strip()
-            columns = self.parse_row(columns)
-
-            # The remainder is data, again always two points
-            data = []
-            for line in section:
-                if not line:
-                    continue
-                row = self.parse_row(line)
-                row = [float(x) for x in row]
-                data.append(row)
-
-            datum = {
-                "matrix": data,
-                "columns": columns,
-                "header": header,
-                "command": command,
-            }
+            try:
+                datum = self.parse_benchmark_section(section)
+            except Exception:
+                print(f"Issue parsing section {section}")
+                continue
             results.append(datum)
 
         return {"data": results, "metadata": metadata, "spec": self.spec}
+
+    def parse_benchmark_section(self, section):
+        """
+        A wrapper for parsing in case there is an error we can catch!
+        """
+        # Command is the first entry
+        command = section.pop(0)
+
+        # Each section has some number of header lines (with #)
+        header = []
+        while section and section[0].startswith("#"):
+            header.append(section.pop(0))
+
+        # Last row of the header are the column names
+        columns = header.pop()
+        columns = columns.replace("# ", "").strip()
+        columns = self.parse_row(columns)
+
+        # The remainder is data, again always two points
+        data = []
+        for line in section:
+            if not line:
+                continue
+            row = self.parse_row(line)
+            row = [float(x) for x in row]
+            data.append(row)
+
+        return {
+            "matrix": data,
+            "columns": columns,
+            "header": header,
+            "command": command,
+        }
 
 
 class network_netmark(MetricBase):
