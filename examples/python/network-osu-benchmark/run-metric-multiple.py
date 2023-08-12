@@ -84,10 +84,6 @@ def plot_results(results, img):
     """
     Plot result images to file
     """
-    import IPython
-
-    IPython.embed()
-
     # Create a data frame for each result type
     dfs = {}
     idxs = {}
