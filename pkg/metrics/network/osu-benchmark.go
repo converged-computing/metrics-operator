@@ -22,67 +22,16 @@ import (
 // ghcr.io/converged-computing/metric-osu-benchmark:latest
 // https://mvapich.cse.ohio-state.edu/benchmarks/
 
+type BenchmarkConfig struct {
+	Workdir string
+	Flags   string
+}
+
 var (
 	singleSidedDir  = "/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided"
 	pointToPointDir = "/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/pt2pt"
 	collectiveDir   = "/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/collective"
 	startupDir      = "/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/startup"
-
-	// Lookup of all OSU benchmarks available
-	osuBenchmarkCommands = map[string]string{
-
-		// Single Sided
-		"osu_get_acc_latency": singleSidedDir,
-		"osu_acc_latency":     singleSidedDir, // Latency Test for Accumulate
-		"osu_fop_latency":     singleSidedDir,
-		"osu_get_latency":     singleSidedDir, // Latency Test for Get
-		"osu_put_latency":     singleSidedDir, // Latency Test for Put
-		"osu_cas_latency":     singleSidedDir,
-		"osu_get_bw":          singleSidedDir,
-		"osu_put_bibw":        singleSidedDir,
-		"osu_put_bw":          singleSidedDir,
-
-		// Collective
-		"osu_allreduce":      collectiveDir, // MPI_Allreduce Latency Test
-		"osu_allgather":      collectiveDir,
-		"osu_allgatherv":     collectiveDir,
-		"osu_alltoall":       collectiveDir,
-		"osu_alltoallv":      collectiveDir,
-		"osu_barrier":        collectiveDir,
-		"osu_bcast":          collectiveDir,
-		"osu_gather":         collectiveDir,
-		"osu_gatherv":        collectiveDir,
-		"osu_iallgather":     collectiveDir,
-		"osu_iallgatherv":    collectiveDir,
-		"osu_iallreduce":     collectiveDir,
-		"osu_ialltoall":      collectiveDir,
-		"osu_ialltoallv":     collectiveDir,
-		"osu_ialltoallw":     collectiveDir,
-		"osu_ibarrier":       collectiveDir,
-		"osu_ibcast":         collectiveDir,
-		"osu_igather":        collectiveDir,
-		"osu_igatherv":       collectiveDir,
-		"osu_ireduce":        collectiveDir,
-		"osu_iscatter":       collectiveDir,
-		"osu_iscatterv":      collectiveDir,
-		"osu_reduce":         collectiveDir,
-		"osu_reduce_scatter": collectiveDir,
-		"osu_scatter":        collectiveDir,
-		"osu_scatterv":       collectiveDir,
-
-		// Point to Point
-		"osu_latency":    pointToPointDir, // Latency Test
-		"osu_bibw":       pointToPointDir, // Bidirectional Bandwidth Test
-		"osu_bw":         pointToPointDir, // Bandwidth Test
-		"osu_latency_mp": pointToPointDir,
-		"osu_latency_mt": pointToPointDir,
-		"osu_mbw_mr":     pointToPointDir,
-		"osu_multi_lat":  pointToPointDir,
-
-		// Startup
-		"osu_hello": startupDir,
-		"osu_init":  startupDir,
-	}
 
 	// Defaults that we provide when none specified
 	osuBenchmarkDefaults = []string{
@@ -96,6 +45,63 @@ var (
 		"osu_bibw",
 		"osu_bw",
 	}
+
+	// Lookup of all OSU benchmarks available
+	osuBenchmarkCommands = map[string]BenchmarkConfig{
+
+		// Single Sided
+		"osu_get_acc_latency": {Workdir: singleSidedDir, Flags: ""},
+		"osu_acc_latency":     {Workdir: singleSidedDir, Flags: ""}, // Latency Test for Accumulate
+		"osu_fop_latency":     {Workdir: singleSidedDir, Flags: ""},
+		"osu_get_latency":     {Workdir: singleSidedDir, Flags: ""}, // Latency Test for Get
+		"osu_put_latency":     {Workdir: singleSidedDir, Flags: ""}, // Latency Test for Put
+		"osu_cas_latency":     {Workdir: singleSidedDir, Flags: ""},
+		"osu_get_bw":          {Workdir: singleSidedDir, Flags: ""},
+		"osu_put_bibw":        {Workdir: singleSidedDir, Flags: ""},
+		"osu_put_bw":          {Workdir: singleSidedDir, Flags: ""},
+
+		// Collective
+		// For allreduce this should work, need to test -np $np -map-by ppr:1:node -rank-by core
+		"osu_allreduce":      {Workdir: collectiveDir, Flags: "-np 2 -map-by ppr:1:node -rank-by core"}, // MPI_Allreduce Latency Test
+		"osu_allgather":      {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:1:node -rank-by core"},
+		"osu_allgatherv":     {Workdir: collectiveDir, Flags: ""},
+		"osu_alltoall":       {Workdir: collectiveDir, Flags: ""},
+		"osu_alltoallv":      {Workdir: collectiveDir, Flags: ""},
+		"osu_barrier":        {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:1:node -rank-by core"},
+		"osu_bcast":          {Workdir: collectiveDir, Flags: ""},
+		"osu_gather":         {Workdir: collectiveDir, Flags: ""},
+		"osu_gatherv":        {Workdir: collectiveDir, Flags: ""},
+		"osu_iallgather":     {Workdir: collectiveDir, Flags: ""},
+		"osu_iallgatherv":    {Workdir: collectiveDir, Flags: ""},
+		"osu_iallreduce":     {Workdir: collectiveDir, Flags: ""},
+		"osu_ialltoall":      {Workdir: collectiveDir, Flags: ""},
+		"osu_ialltoallv":     {Workdir: collectiveDir, Flags: ""},
+		"osu_ialltoallw":     {Workdir: collectiveDir, Flags: ""},
+		"osu_ibarrier":       {Workdir: collectiveDir, Flags: ""},
+		"osu_ibcast":         {Workdir: collectiveDir, Flags: ""},
+		"osu_igather":        {Workdir: collectiveDir, Flags: ""},
+		"osu_igatherv":       {Workdir: collectiveDir, Flags: ""},
+		"osu_ireduce":        {Workdir: collectiveDir, Flags: ""},
+		"osu_iscatter":       {Workdir: collectiveDir, Flags: ""},
+		"osu_iscatterv":      {Workdir: collectiveDir, Flags: ""},
+		"osu_reduce":         {Workdir: collectiveDir, Flags: ""},
+		"osu_reduce_scatter": {Workdir: collectiveDir, Flags: ""},
+		"osu_scatter":        {Workdir: collectiveDir, Flags: ""},
+		"osu_scatterv":       {Workdir: collectiveDir, Flags: ""},
+
+		// Point to Point
+		"osu_latency":    {Workdir: pointToPointDir, Flags: "-np 2 -map-by ppr:1:node"}, // Latency Test
+		"osu_bibw":       {Workdir: pointToPointDir, Flags: "-np 2 -map-by ppr:1:node"}, // Bidirectional Bandwidth Test
+		"osu_bw":         {Workdir: pointToPointDir, Flags: "-np 2 -map-by ppr:1:node"}, // Bandwidth Test
+		"osu_latency_mp": {Workdir: pointToPointDir, Flags: ""},
+		"osu_latency_mt": {Workdir: pointToPointDir, Flags: ""},
+		"osu_mbw_mr":     {Workdir: pointToPointDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core"},
+		"osu_multi_lat":  {Workdir: pointToPointDir, Flags: ""},
+
+		// Startup
+		"osu_hello": {Workdir: startupDir, Flags: ""},
+		"osu_init":  {Workdir: startupDir, Flags: ""},
+	}
 )
 
 type OSUBenchmark struct {
@@ -108,10 +114,10 @@ type OSUBenchmark struct {
 	attributes  *api.ContainerSpec
 
 	// Scripts
-	// TODO make a function that derives this across metrics?
 	workerScript   string
 	launcherScript string
 	commands       []string
+	tasks          int32
 	lookup         map[string]bool
 }
 
@@ -245,8 +251,7 @@ func (m *OSUBenchmark) hasCommand(command string) bool {
 
 func (m *OSUBenchmark) addCommand(command string) {
 	// Get the fullpath from our lookup
-	fullpath := path.Join(osuBenchmarkCommands[command], command)
-	m.commands = append(m.commands, fullpath)
+	m.commands = append(m.commands, command)
 	m.lookup[command] = true
 }
 
@@ -271,6 +276,12 @@ func (m *OSUBenchmark) SetOptions(metric *api.Metric) {
 		}
 	}
 
+	// Don't use default tasks
+	tasks, ok := metric.Options["tasks"]
+	if ok {
+		m.tasks = tasks.IntVal
+	}
+
 	// If not selected or found, fall back to default list
 	if len(m.commands) == 0 {
 		for _, command := range osuBenchmarkDefaults {
@@ -286,6 +297,7 @@ func (m OSUBenchmark) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
 		"rate":        intstr.FromInt(int(m.rate)),
 		"completions": intstr.FromInt(int(m.completions)),
+		"tasks":       intstr.FromInt(int(m.tasks)),
 	}
 }
 func (m OSUBenchmark) ListOptions() map[string][]intstr.IntOrString {
@@ -328,6 +340,19 @@ func (m OSUBenchmark) EntrypointScripts(
 # Start ssh daemon
 /usr/sbin/sshd -D &
 
+# If we have zero tasks, default to workers * nproc for total tasks
+# This is only for non point to point benchmarks
+np=%d
+pods=%d
+# Tasks per node, not total
+tasks=$(nproc)
+if [[ $np -eq 0 ]]; then
+	np=$(( $pods*$tasks ))
+fi
+
+echo "Number of tasks (nproc on one node) is $tasks"
+echo "Number of tasks total (across $pods nodes) is $np"
+
 # Allow network to ready
 echo "Sleeping for 10 seconds waiting for network..."
 sleep 10
@@ -341,17 +366,32 @@ echo "${worker}" >> ./hostfile.txt
 # Show metadata for run
 echo "%s"
 `
-	prefix := fmt.Sprintf(prefixTemplate, launcherHost, workerHost, metadata)
+	prefix := fmt.Sprintf(
+		prefixTemplate,
+		m.tasks,
+		spec.Spec.Pods,
+		launcherHost,
+		workerHost,
+		metadata,
+	)
 
 	// Prepare list of commands, e.g.,
 	// mpirun -f ./hostlist.txt -np 2 ./osu_acc_latency (mpich)
-	// mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 ./osu_fop_latency (openmpi)
+	// mpirun --hostfile ./hostfile.txt --allow-run-as-root -N 2 -np 2 ./osu_fop_latency (openmpi)
 	// Sleep a little more to allow worker to write launcher hostname
 	commands := fmt.Sprintf("\nsleep 5\necho %s\n", metrics.CollectionStart)
-	for _, command := range m.commands {
+	for _, executable := range m.commands {
 
-		// This starts the line with a separator for the new section
-		line := fmt.Sprintf("mpirun --hostfile ./hostfile.txt --allow-run-as-root -np 2 %s", command)
+		command := path.Join(osuBenchmarkCommands[executable].Workdir, executable)
+
+		// Flags can vary by command
+		flags := osuBenchmarkCommands[executable].Flags
+		if flags == "" {
+			flags = "-np 2 -map-by ppr:1:node"
+		}
+
+		// Assume always 2 nodes for now
+		line := fmt.Sprintf("mpirun --hostfile ./hostfile.txt --allow-run-as-root -N 2 %s %s", flags, command)
 		commands += fmt.Sprintf("echo %s\necho \"%s\"\n%s\n", metrics.Separator, line, line)
 	}
 

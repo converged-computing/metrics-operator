@@ -17,6 +17,7 @@ metrics_yaml = os.path.join(tests, "network-osu-benchmark", "metrics.yaml")
 
 plt.style.use("bmh")
 
+
 def get_parser():
     parser = argparse.ArgumentParser(
         description="Run OSU Benchmarks Metric and Get Output",
@@ -41,6 +42,7 @@ def get_parser():
     )
     return parser
 
+
 def main():
     """
     Run a job.
@@ -52,7 +54,7 @@ def main():
     m = MetricsOperator(metrics_yaml)
     m.create()
 
-    print(f'Sleeping {args.sleep} seconds so container can pull...')
+    print(f"Sleeping {args.sleep} seconds so container can pull...")
     time.sleep(args.sleep)
     for output in m.watch():
         print(json.dumps(output, indent=4))
@@ -74,20 +76,20 @@ def plot_results(output):
 
     # This could be adjusted to handle more than one run of the metric
     # in different environments, but we just have one for now!
-    for result in output['data']:
-        df = pandas.DataFrame(columns=result['columns'])
+    for result in output["data"]:
+        df = pandas.DataFrame(columns=result["columns"])
         idx = 0
-        for datum in result['matrix']:
+        for datum in result["matrix"]:
             df.loc[idx, :] = datum
-            idx +=1
-        
+            idx += 1
+
         # Separate x and y - latency (y) is a function of size (x)
-        x = result['columns'][0]
-        y = result['columns'][1]
+        x = result["columns"][0]
+        y = result["columns"][1]
 
         # Save to data file
-        title = result['header'][0].replace('#', '').strip()
-        slug = title.replace(' ', '-')
+        title = result["header"][0].replace("#", "").strip()
+        slug = title.replace(" ", "-")
         df.to_csv(os.path.join(img, f"{slug}.csv"))
 
         # for sty in plt.style.available:
@@ -97,12 +99,13 @@ def plot_results(output):
         ax.set_ylabel(y + " logscale", fontsize=16)
         ax.set_xticklabels(ax.get_xmajorticklabels(), fontsize=14)
         ax.set_yticklabels(ax.get_yticks(), fontsize=14)
-        plt.xscale('log')
-        plt.yscale('log')
+        plt.xscale("log")
+        plt.yscale("log")
         plt.tight_layout()
         plt.savefig(os.path.join(img, f"{slug}.png"))
         plt.clf()
         plt.close()
+
 
 if __name__ == "__main__":
     main()

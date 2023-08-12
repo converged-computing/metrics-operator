@@ -286,7 +286,6 @@ func (m Netmark) EntrypointScripts(
 	prefixTemplate := `#!/bin/bash
 # Start ssh daemon
 /usr/sbin/sshd -D &
-whoami
 echo "%s"
 
 # If we have zero tasks, default to workers * nproc

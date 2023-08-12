@@ -26,6 +26,14 @@ def read_yaml(filename):
     return configuration
 
 
+def write_file(content, filename):
+    """
+    Write dict to json
+    """
+    with open(filename, "w") as fd:
+        fd.write(content)
+
+
 def write_json(obj, filename):
     """
     Write dict to json
