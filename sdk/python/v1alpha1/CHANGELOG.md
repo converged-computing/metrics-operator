@@ -15,6 +15,8 @@ The versions coincide with releases on pip. Only major versions will be released
 
 ## [0.0.x](https://github.com/converged-computing/metrics-operator/tree/main) (0.0.x)
  - LAMMPS python parser (0.0.16)
+   - custom flags and multi example for osu-benchmarks (0.0.16.2)
+   - fixes to metric osu-benchmarks (0.0.16.1)
  - add FIO storage (IO) metric (0.0.15)
  - resources specification added and tweaks to perf-sysstat (0.0.14)
  - pidstat python parser and better support for metric in Go (0.0.13)
