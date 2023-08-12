@@ -553,6 +553,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#app-amg" class="md-nav__link">
+    <span title="/getting_started/metrics.md#app-amg (reference label)" class="md-ellipsis">app-<wbr>amg</span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1116,6 +1123,79 @@ The default command (if you don’t change it) intended as an example is:</p>
 <p>In the working directory <code class="docutils literal notranslate"><span class="pre">/opt/lammps/examples/reaxff/HNS#</span></code>. You should be calling <code class="docutils literal notranslate"><span class="pre">mpirun</span></code> and expecting a ./hostlist.txt in the present working directory (the “workdir” you chose above).
 You should also provide the correct number of processes (np) and problem size for LAMMPS (lmp). We left this as open and flexible
 anticipating that you as a user would want total control.</p>
+<h4 id="app-amg">app-amg<a class="headerlink" href="#app-amg" title="Permalink to this heading">¶</a></h4>
+<p>AMG means “algebraic multi-grid” and it’s easy to confuse with the company <a class="reference external" href="https://www.amd.com/en/solutions/supercomputing-and-hpc">AMD</a> “Advanced Micro Devices” ! From <a class="reference external" href="https://asc.llnl.gov/sites/asc/files/2020-09/AMG_Summary_v1_7.pdf">the guide</a>:</p>
+<blockquote>
+<div><p>AMG is a parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids. The driver provided for this benchmark builds linear systems for a 3D problem with a 27-point stencil and generates two different problems that are described in section D of the AMG.readme file in the docs directory.</p>
+</div></blockquote>
+<p>Here are examples of small and medium problem sizes provided in that same guide. Each of these would be given to MPI (mpirun), but srun is provided as an example instead.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="gp"># </span>Small<span class="w"> </span>size<span class="w"> </span>problems
+<span class="go">srun –N 32 –n 512 amg –problem 1 –n 96 96 96 –P 8 8 8</span>
+<span class="go">srun –N 32 –n 512 amg –problem 2 –n 40 40 40 –P 8 8 8</span>
+<span class="go">srun –N 64 –n 1024 amg –problem 1 –n 96 96 96 –P 16 8 8</span>
+<span class="go">srun –N 64 –n 1024 amg –problem 2 –n 40 40 40 –P 16 8 8</span>
+
+<span class="gp"># </span>Medium<span class="w"> </span>size<span class="w"> </span>problems
+<span class="go">srun –N 512 –n 8192 amg –problem 1 –n 96 96 96 –P 32 16 16</span>
+<span class="go">srun –N 512 –n 8192 amg –problem 2 –n 40 40 40 –P 32 16 16</span>
+<span class="go">srun –N 1024 –n 16384 amg –problem 1 –n 96 96 96 –P 32 32 16</span>
+<span class="go">srun –N 1024 –n 16384 amg –problem 2 –n 40 40 40 –P 32 32 16</span>
+</code></pre></div>
+</div>
+<p>By default, akin to LAMMPS we expose the entire mpirun command along with the working directory for you to adjust.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Option Key</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>command</td>
+<td>The amg command (without mpirun)</td>
+<td>options-&gt;command</td>
+<td>string</td>
+<td>(see below)</td>
+</tr>
+<tr>
+<td>mpirun</td>
+<td>The mpirun command (and arguments)</td>
+<td>options-&gt;mpirun</td>
+<td>string</td>
+<td>(see below)</td>
+</tr>
+<tr>
+<td>workdir</td>
+<td>The working directory for the command</td>
+<td>options-&gt;workdir</td>
+<td>string</td>
+<td>/opt/AMG</td>
+</tr>
+</tbody>
+</table>
+<p>By default, when not set, you will just run the amg binary to get a test case run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span class="c1"># mpirun</span>
+mpirun<span class="w"> </span>--hostfile<span class="w"> </span>./hostlist.txt
+
+<span class="c1"># command</span>
+amg
+
+<span class="c1"># Assembled into</span>
+mpirun<span class="w"> </span>--hostfile<span class="w"> </span>./hostlist.txt<span class="w"> </span>./problem.sh
+</code></pre></div>
+</div>
+<p>More likely you want an actual problem size on a specific number of node and tasks, and you’ll want to test this. The two problem sizes include:</p>
+<ul class="simple">
+<li><p><em>problem 1</em> (default) will use conjugate gradient preconditioned with AMG to solve a linear system with a 3D 27-point stencil of size nx<em>ny</em>nz<em>Px</em>Py*Pz.</p></li>
+<li><p><em>problem 2</em> simulates a time-dependent problem of size nx<em>ny</em>nz<em>Px</em>Py*Pz with AMG-GMRES. The linear system is also a 3D 27-point stencil. The system is sized to be 5-10% of the large problem.</p></li>
+</ul>
+<p><strong>NOTE</strong> that the Python parser was written for the test case, and likely we need to extend it to problem 2 or larger sized problems. If you
+run a larger problem and the parser does not work as expected, please <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues">send us the output</a> and we will provide an updated parser.
+See <a class="reference external" href="https://asc.llnl.gov/sites/asc/files/2020-09/AMG_Summary_v1_7.pdf">this guide</a> for more detail.</p>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permalink to this heading">¶</a></h2>
 <p>The following examples are provided alongside the operator. Each directory has a README with complete instructions for usage.</p>
 <ul class="simple">

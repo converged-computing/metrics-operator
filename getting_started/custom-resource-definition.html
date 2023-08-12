@@ -473,6 +473,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#logging" class="md-nav__link">
+    <span title="/getting_started/custom-resource-definition.md#logging (reference label)" class="md-ellipsis">logging</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#dontsetfqdn" class="md-nav__link">
     <span title="/getting_started/custom-resource-definition.md#dontsetfqdn (reference label)" class="md-ellipsis">dont<wbr>Set<wbr>FQDN</span>
   </a>
@@ -759,6 +766,15 @@ number of pods (completions) to bind to the storage and measure.</p>
 <p>The number of pods for an application or storage metric test will correspond with the parallelism of the indexed job (which comes down to pods) for the storage or application JobSet. This defaults to 1, meaning we run in a non-indexed mode. The indexed mode is determined automatically by this variable, where “1” indicates non-indexed, and &gt;1 is indexed.</p>
 <h3 id="completions">completions<a class="headerlink" href="#completions" title="Permalink to this heading">¶</a></h3>
 <p>When running as an indexed job, indicate the number of successful pods (completions) for the Job to be successful.  Note that if you set 1, your parallelism will default to 1 too, which isn’t ideal. I’ve opened an issue <a class="reference external" href="https://github.com/kubernetes-sigs/jobset">here</a>.</p>
+<h3 id="logging">logging<a class="headerlink" href="#logging" title="Permalink to this heading">¶</a></h3>
+<p>We are anticipating adding more logging options, but for not logging exposes one “interactive” option that will add a “sleep infinity” to the end of a storage, performance, or standalone metric.
+This is intended for debugging purposes.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">logging</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">interactive</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</code></pre></div>
+</div>
+<p>It is typically added to a launcher or main container, if relevant, since workers tend to sleep anyway and the JobSet completion depends on the launcher.
+By default, of course, it is set to false so the metric container and JobSet will finish.</p>
 <h3 id="dontsetfqdn">dontSetFQDN<a class="headerlink" href="#dontsetfqdn" title="Permalink to this heading">¶</a></h3>
 <p>For more of an “expert mode” if you know you want your JobSet use fully qualified domain names (FQDN) set to false,
 set this value to true.</p>
