@@ -9,28 +9,15 @@ package application
 
 import (
 	"fmt"
-	"path"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 
 type Kripke struct {
-	name        string
-	rate        int32
-	completions int32
-	description string
-	container   string
-	resources   *api.ContainerResources
-	attributes  *api.ContainerSpec
-
-	// Scripts
-	workerScript   string
-	launcherScript string
+	LauncherWorkerApp
 
 	// Options
 	workdir string
@@ -38,124 +25,8 @@ type Kripke struct {
 	mpirun  string
 }
 
-// Name returns the metric name
-func (m Kripke) Name() string {
-	return m.name
-}
 func (m Kripke) Url() string {
 	return "https://github.com/LLNL/Kripke"
-}
-
-// Description returns the metric description
-func (m Kripke) Description() string {
-	return m.description
-}
-
-// Jobs required for success condition (n is the Kripke run)
-func (m Kripke) SuccessJobs() []string {
-	return []string{"l"}
-}
-
-// Container variables
-func (m Kripke) Type() string {
-	return metrics.StandaloneMetric
-}
-func (m Kripke) Image() string {
-	return m.container
-}
-func (m Kripke) WorkingDir() string {
-	return ""
-}
-
-// Return container resources for the metric container
-func (m Kripke) Resources() *api.ContainerResources {
-	return m.resources
-}
-func (m Kripke) Attributes() *api.ContainerSpec {
-	return m.attributes
-}
-
-func (m Kripke) getMetricsKeyToPath() []corev1.KeyToPath {
-	// Runner start scripts
-	makeExecutable := int32(0777)
-
-	// Each metric has an entrypoint script
-	return []corev1.KeyToPath{
-		{
-			Key:  deriveScriptKey(m.launcherScript),
-			Path: path.Base(m.launcherScript),
-			Mode: &makeExecutable,
-		},
-		{
-			Key:  deriveScriptKey(m.workerScript),
-			Path: path.Base(m.workerScript),
-			Mode: &makeExecutable,
-		},
-	}
-}
-
-// Replicated Jobs are custom for this standalone metric
-func (m Kripke) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, error) {
-
-	js := []jobset.ReplicatedJob{}
-
-	// Generate a replicated job for the launcher (Kripke) and workers
-	launcher, err := metrics.GetReplicatedJob(spec, false, 1, 1, "l", false)
-	if err != nil {
-		return js, err
-	}
-
-	workers, err := metrics.GetReplicatedJob(spec, false, spec.Spec.Pods-1, spec.Spec.Pods-1, "w", false)
-	if err != nil {
-		return js, err
-	}
-
-	// Add volumes defined under storage.
-	v := map[string]api.Volume{}
-	if spec.HasStorage() {
-		v["storage"] = spec.Spec.Storage.Volume
-	}
-
-	// runnerScripts are custom for a Kripke jobset
-	runnerScripts := m.getMetricsKeyToPath()
-
-	volumes := metrics.GetVolumes(spec, runnerScripts, v)
-	launcher.Template.Spec.Template.Spec.Volumes = volumes
-	workers.Template.Spec.Template.Spec.Volumes = volumes
-
-	// Prepare container specs, one for launcher and one for workers
-	launcherSpec := []metrics.ContainerSpec{
-		{
-			Image:      m.container,
-			Name:       "launcher",
-			Command:    []string{"/bin/bash", m.launcherScript},
-			Resources:  m.resources,
-			Attributes: m.attributes,
-		},
-	}
-	workerSpec := []metrics.ContainerSpec{
-		{
-			Image:      m.container,
-			Name:       "workers",
-			Command:    []string{"/bin/bash", m.workerScript},
-			Resources:  m.resources,
-			Attributes: m.attributes,
-		},
-	}
-	launcherContainers, err := metrics.GetContainers(spec, launcherSpec, v, false)
-	if err != nil {
-		fmt.Printf("issue creating launcher containers %s", err)
-		return js, err
-	}
-	workerContainers, err := metrics.GetContainers(spec, workerSpec, v, false)
-	if err != nil {
-		fmt.Printf("issue creating worker containers %s", err)
-		return js, err
-	}
-	launcher.Template.Spec.Template.Spec.Containers = launcherContainers
-	workers.Template.Spec.Template.Spec.Containers = workerContainers
-	js = []jobset.ReplicatedJob{*launcher, *workers}
-	return js, nil
 }
 
 // Set custom options / attributes for the metric
@@ -212,17 +83,7 @@ func (m Kripke) EntrypointScripts(
 
 	// Metadata to add to beginning of run
 	metadata := metrics.Metadata(spec, metric)
-
-	// Generate hostlists
-	// The launcher has a different hostname, n for Kripke
-	hosts := fmt.Sprintf("%s-l-0-0.%s.%s.svc.cluster.local\n",
-		spec.Name, spec.Spec.ServiceName, spec.Namespace,
-	)
-	// Add number of workers
-	for i := 0; i < int(spec.Spec.Pods-1); i++ {
-		hosts += fmt.Sprintf("%s-w-0-%d.%s.%s.svc.cluster.local\n",
-			spec.Name, i, spec.Spec.ServiceName, spec.Namespace)
-	}
+	hosts := m.getHostlist(spec)
 
 	prefixTemplate := `#!/bin/bash
 # Start ssh daemon
@@ -273,29 +134,17 @@ echo "%s"
 
 	// The worker just has sleep infinity added
 	workerTemplate := prefix + "\nsleep infinity"
-
-	// Return the script templates for each of launcher and worker
-	return []metrics.EntrypointScript{
-		{
-			Name:   deriveScriptKey(m.launcherScript),
-			Path:   m.launcherScript,
-			Script: launcherTemplate,
-		},
-		{
-			Name:   deriveScriptKey(m.workerScript),
-			Path:   m.workerScript,
-			Script: workerTemplate,
-		},
-	}
+	return m.finalizeEntrypoints(launcherTemplate, workerTemplate)
 }
 
 func init() {
-	metrics.Register(
-		&Kripke{
-			name:           "app-kripke",
-			description:    "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
-			container:      "ghcr.io/converged-computing/metric-kripke:latest",
-			workerScript:   "/metrics_operator/kripke-worker.sh",
-			launcherScript: "/metrics_operator/kripke-launcher.sh",
-		})
+	launcher := LauncherWorkerApp{
+		name:           "app-kripke",
+		description:    "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
+		container:      "ghcr.io/converged-computing/metric-kripke:latest",
+		workerScript:   "/metrics_operator/kripke-worker.sh",
+		launcherScript: "/metrics_operator/kripke-launcher.sh",
+	}
+	kripke := Kripke{LauncherWorkerApp: launcher}
+	metrics.Register(&kripke)
 }

@@ -12,9 +12,7 @@ import (
 	"path"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
@@ -105,142 +103,16 @@ var (
 )
 
 type OSUBenchmark struct {
-	name        string
-	rate        int32
-	completions int32
-	description string
-	container   string
-	resources   *api.ContainerResources
-	attributes  *api.ContainerSpec
+	LauncherWorkerNetwork
 
-	// Scripts
-	workerScript   string
-	launcherScript string
-	commands       []string
-	tasks          int32
-	lookup         map[string]bool
+	// Custom options
+	commands []string
+	tasks    int32
+	lookup   map[string]bool
 }
 
-// Name returns the metric name
-func (m OSUBenchmark) Name() string {
-	return m.name
-}
-
-// Description returns the metric description
-func (m OSUBenchmark) Description() string {
-	return m.description
-}
 func (m OSUBenchmark) Url() string {
 	return "https://mvapich.cse.ohio-state.edu/benchmarks/"
-}
-func (m OSUBenchmark) Attributes() *api.ContainerSpec {
-	return m.attributes
-}
-
-// Return container resources for the metric container
-func (m OSUBenchmark) Resources() *api.ContainerResources {
-	return m.resources
-}
-
-// Jobs required for success condition (l is the osu benchmark launcher)
-func (m OSUBenchmark) SuccessJobs() []string {
-	return []string{"l"}
-}
-
-// Container variables
-func (n OSUBenchmark) Type() string {
-	return metrics.StandaloneMetric
-}
-func (n OSUBenchmark) Image() string {
-	return n.container
-}
-func (n OSUBenchmark) WorkingDir() string {
-	return "/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided"
-}
-
-func (n OSUBenchmark) getMetricsKeyToPath() []corev1.KeyToPath {
-	// Runner start scripts
-	makeExecutable := int32(0777)
-
-	// Each metric has an entrypoint script
-	return []corev1.KeyToPath{
-		{
-			Key:  deriveScriptKey(n.launcherScript),
-			Path: path.Base(n.launcherScript),
-			Mode: &makeExecutable,
-		},
-		{
-			Key:  deriveScriptKey(n.workerScript),
-			Path: path.Base(n.workerScript),
-			Mode: &makeExecutable,
-		},
-	}
-}
-
-// Replicated Jobs are custom for this standalone metric
-func (m OSUBenchmark) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, error) {
-
-	js := []jobset.ReplicatedJob{}
-
-	// Generate a replicated job for the launcher (netmark) and workers, both need sole tenancy
-	launcher, err := metrics.GetReplicatedJob(spec, false, 1, 1, "l", false)
-	if err != nil {
-		return js, err
-	}
-	workers, err := metrics.GetReplicatedJob(spec, false, 1, 1, "w", false)
-	if err != nil {
-		return js, err
-	}
-
-	// Add volumes defined under storage.
-	v := map[string]api.Volume{}
-	if spec.HasStorage() {
-		v["storage"] = spec.Spec.Storage.Volume
-	}
-
-	runnerScripts := m.getMetricsKeyToPath()
-	volumes := metrics.GetVolumes(spec, runnerScripts, v)
-	launcher.Template.Spec.Template.Spec.Volumes = volumes
-	workers.Template.Spec.Template.Spec.Volumes = volumes
-
-	// Prepare container specs, one for launcher and one for workers
-	launcherSpec := []metrics.ContainerSpec{
-		{
-			Image:      m.container,
-			Name:       "launcher",
-			Command:    []string{"/bin/bash", m.launcherScript},
-			WorkingDir: m.WorkingDir(),
-			Resources:  m.resources,
-			Attributes: m.attributes,
-		},
-	}
-	workerSpec := []metrics.ContainerSpec{
-		{
-			Image:      m.container,
-			Name:       "workers",
-			Command:    []string{"/bin/bash", m.workerScript},
-			WorkingDir: m.WorkingDir(),
-			Resources:  m.resources,
-			Attributes: m.attributes,
-		},
-	}
-
-	// Derive the containers, one per metric
-	// This will also include mounts for volumes
-	launcherContainers, err := metrics.GetContainers(spec, launcherSpec, v, false)
-	if err != nil {
-		fmt.Printf("issue creating launcher containers %s", err)
-		return js, err
-	}
-	workerContainers, err := metrics.GetContainers(spec, workerSpec, v, false)
-	if err != nil {
-		fmt.Printf("issue creating worker containers %s", err)
-		return js, err
-	}
-	launcher.Template.Spec.Template.Spec.Containers = launcherContainers
-	workers.Template.Spec.Template.Spec.Containers = workerContainers
-	js = []jobset.ReplicatedJob{*launcher, *workers}
-	return js, nil
 }
 
 // Determine if the command is poised to run
@@ -262,6 +134,7 @@ func (m *OSUBenchmark) SetOptions(metric *api.Metric) {
 	m.lookup = map[string]bool{}
 	m.commands = []string{}
 	m.resources = &metric.Resources
+	m.launcherLetter = "l"
 	m.attributes = &metric.Attributes
 
 	// We are allowed to specify just one command
@@ -328,7 +201,6 @@ func (m OSUBenchmark) EntrypointScripts(
 	// Metadata to add to beginning of run
 	metadata := metrics.Metadata(spec, metric)
 
-	// Generate hostlists
 	// The launcher has a different hostname, n for netmark
 	launcherHost := fmt.Sprintf("%s-l-0-0.%s.%s.svc.cluster.local",
 		spec.Name, spec.Spec.ServiceName, spec.Namespace,
@@ -403,29 +275,17 @@ echo "%s"
 
 	// The worker just has sleep infinity added, and getting the ip address of the launcher
 	workerTemplate := prefix + "\nsleep infinity"
-
-	// Return the script templates for each of launcher and worker
-	return []metrics.EntrypointScript{
-		{
-			Name:   deriveScriptKey(m.launcherScript),
-			Path:   m.launcherScript,
-			Script: launcherTemplate,
-		},
-		{
-			Name:   deriveScriptKey(m.workerScript),
-			Path:   m.workerScript,
-			Script: workerTemplate,
-		},
-	}
+	return m.finalizeEntrypoints(launcherTemplate, workerTemplate)
 }
 
 func init() {
-	metrics.Register(
-		&OSUBenchmark{
-			name:           "network-osu-benchmark",
-			description:    "point to point MPI benchmarks",
-			container:      "ghcr.io/converged-computing/metric-osu-benchmark:latest",
-			workerScript:   "/metrics_operator/osu-worker.sh",
-			launcherScript: "/metrics_operator/osu-launcher.sh",
-		})
+	launcher := LauncherWorkerNetwork{
+		name:           "network-osu-benchmark",
+		description:    "point to point MPI benchmarks",
+		container:      "ghcr.io/converged-computing/metric-osu-benchmark:latest",
+		workerScript:   "/metrics_operator/osu-worker.sh",
+		launcherScript: "/metrics_operator/osu-launcher.sh",
+	}
+	osu := OSUBenchmark{LauncherWorkerNetwork: launcher}
+	metrics.Register(&osu)
 }
