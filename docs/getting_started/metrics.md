@@ -297,7 +297,9 @@ See [this guide](https://asc.llnl.gov/sites/asc/files/2020-09/AMG_Summary_v1_7.p
 
 [Kripke](https://github.com/LLNL/Kripke) is (from the README):
 
-> Kripke is a simple, scalable, 3D Sn deterministic particle transport code. Its primary purpose is to research how data layout, programming paradigms and architectures effect the implementation and performance of Sn transport. A main goal of Kripke is investigating how different data-layouts affect instruction, thread and task level parallelism, and what the implications are on overall solver performance. Akin to AMG, we allow you to modify each of the mpirun and kripke commands via:
+> Kripke is a simple, scalable, 3D Sn deterministic particle transport code. Its primary purpose is to research how data layout, programming paradigms and architectures effect the implementation and performance of Sn transport. A main goal of Kripke is investigating how different data-layouts affect instruction, thread and task level parallelism, and what the implications are on overall solver performance. 
+
+Akin to AMG, we allow you to modify each of the mpirun and kripke commands via:
 
 | Name | Description | Option Key | Type | Default |
 |-----|-------------|------------|------|---------|
