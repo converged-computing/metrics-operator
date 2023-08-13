@@ -273,6 +273,48 @@ More likely you want an actual problem size on a specific number of node and tas
 run a larger problem and the parser does not work as expected, please [send us the output](https://github.com/converged-computing/metrics-operator/issues) and we will provide an updated parser.
 See [this guide](https://asc.llnl.gov/sites/asc/files/2020-09/AMG_Summary_v1_7.pdf) for more detail.
 
+trol.
+
+#### app-kripke
+
+[Kripke](https://github.com/LLNL/Kripke) is (from the README):
+
+> Kripke is a simple, scalable, 3D Sn deterministic particle transport code. Its primary purpose is to research how data layout, programming paradigms and architectures effect the implementation and performance of Sn transport. A main goal of Kripke is investigating how different data-layouts affect instruction, thread and task level parallelism, and what the implications are on overall solver performance. Akin to AMG, we allow you to modify each of the mpirun and kripke commands via:
+
+| Name | Description | Option Key | Type | Default |
+|-----|-------------|------------|------|---------|
+| command | The amg command (without mpirun) | options->command |string | (see below) |
+| mpirun | The mpirun command (and arguments) | options->mpirun | string | (see below) | 
+| workdir | The working directory for the command | options->workdir | string | /opt/AMG |
+
+By default, when not set, you will just run the kripke binary to get a test case run, so mpirun is set to be blank.
+
+```bash
+# mpirun is blank
+""
+# But could be an actual mpirun command
+mpirun --hostfile ./hostlist.txt
+
+# command written to problem.sh
+kripke
+
+# Assembled into
+mpirun --hostfile ./hostlist.txt ./problem.sh
+```
+
+There is a nice [guide here](https://asc.llnl.gov/sites/asc/files/2020-09/Kripke_Summary_v1.2.2-CORAL2_0.pdf) that can help you to decide
+on your specific command or problem size. Also note that we expose the following executables built with it:
+
+```console
+ex1_vector-addition            ex4_atomic-histogram                ex7_nested-loop-reorder
+ex1_vector-addition_solution   ex4_atomic-histogram_solution       ex7_nested-loop-reorder_solution
+ex2_approx-pi                  ex5_line-of-sight                   ex8_tiled-matrix-transpose
+ex2_approx-pi_solution         ex5_line-of-sight_solution          ex8_tiled-matrix-transpose_solution
+ex3_colored-indexset           ex6_stencil-offset-layout           ex9_matrix-transpose-local-array
+ex3_colored-indexset_solution  ex6_stencil-offset-layout_solution  ex9_matrix-transpose-local-array_solution
+```
+(meaning on the PATH in `/opt/Kripke/build/bin` in the container).
+
 ## Examples
 
 The following examples are provided alongside the operator. Each directory has a README with complete instructions for usage.
@@ -283,6 +325,7 @@ The following examples are provided alongside the operator. Each directory has a
  - [network-netmark](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-netmark) (code still private)
  - [network-osu-benchmark](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-osu-benchmark)
  - [app-lammps](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-lammps)
+ - [app-kripke](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-kripke)
 
 
 The following example uses io-fio to measure the Fusion filesystem:

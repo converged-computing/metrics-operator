@@ -20,6 +20,7 @@ To learn more:
 - Add assertions checking for python tests
 - Plotting examples needed for
   - io-sysstat
+  - app-kripke
 
 ## License
 
