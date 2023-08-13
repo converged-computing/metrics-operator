@@ -7,7 +7,7 @@ The following metrics are under development (or being planned).
  - [Application Metrics](https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#application)
  - [Standalone Metrics](https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#standalone)
 
-<iframe src="../_static/data/table.html" style="width:100%; height:600px;" frameBorder="0"></iframe>
+<iframe src="../_static/data/table.html" style="width:100%; height:650px;" frameBorder="0"></iframe>
 
 All metrics can be customized with the following variables
 
@@ -325,6 +325,7 @@ The following examples are provided alongside the operator. Each directory has a
  - [network-netmark](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-netmark) (code still private)
  - [network-osu-benchmark](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-osu-benchmark)
  - [app-lammps](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-lammps)
+ - [app-amg](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-amg)
  - [app-kripke](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-kripke)
 
 
