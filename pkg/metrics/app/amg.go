@@ -13,12 +13,13 @@ import (
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
+	"github.com/converged-computing/metrics-operator/pkg/jobs"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 
 // AMG is a launcher + workers metric application
 type AMG struct {
-	LauncherWorkerApp
+	jobs.LauncherWorker
 
 	// Custom Options
 	workdir string
@@ -32,10 +33,10 @@ func (m AMG) Url() string {
 
 // Set custom options / attributes for the metric
 func (m *AMG) SetOptions(metric *api.Metric) {
-	m.rate = metric.Rate
-	m.completions = metric.Completions
-	m.resources = &metric.Resources
-	m.attributes = &metric.Attributes
+	m.Rate = metric.Rate
+	m.Completions = metric.Completions
+	m.ResourceSpec = &metric.Resources
+	m.AttributeSpec = &metric.Attributes
 
 	// Set user defined values or fall back to defaults
 	m.mpirun = "mpirun --hostfile ./hostlist.txt"
@@ -65,15 +66,12 @@ func (n AMG) Validate(spec *api.MetricSet) bool {
 // Exported options and list options
 func (m AMG) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"rate":        intstr.FromInt(int(m.rate)),
-		"completions": intstr.FromInt(int(m.completions)),
+		"rate":        intstr.FromInt(int(m.Rate)),
+		"completions": intstr.FromInt(int(m.Completions)),
 		"command":     intstr.FromString(m.command),
 		"mpirun":      intstr.FromString(m.mpirun),
 		"workdir":     intstr.FromString(m.workdir),
 	}
-}
-func (n AMG) ListOptions() map[string][]intstr.IntOrString {
-	return map[string][]intstr.IntOrString{}
 }
 
 // Return lookup of entrypoint scripts
@@ -86,7 +84,7 @@ func (m AMG) EntrypointScripts(
 	metadata := metrics.Metadata(spec, metric)
 
 	// Generate hostlists
-	hosts := m.getHostlist(spec)
+	hosts := m.GetHostlist(spec)
 
 	prefixTemplate := `#!/bin/bash
 # Start ssh daemon
@@ -139,17 +137,17 @@ echo "%s"
 	workerTemplate := prefix + "\nsleep infinity"
 
 	// Return the script templates for each of launcher and worker
-	return m.finalizeEntrypoints(launcherTemplate, workerTemplate)
+	return m.FinalizeEntrypoints(launcherTemplate, workerTemplate)
 }
 
 func init() {
-	launcher := LauncherWorkerApp{
-		name:           "app-amg",
-		description:    "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
-		container:      "ghcr.io/converged-computing/metric-amg:latest",
-		workerScript:   "/metrics_operator/amg-worker.sh",
-		launcherScript: "/metrics_operator/amg-launcher.sh",
+	launcher := jobs.LauncherWorker{
+		Identifier:     "app-amg",
+		Summary:        "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
+		Container:      "ghcr.io/converged-computing/metric-amg:latest",
+		WorkerScript:   "/metrics_operator/amg-worker.sh",
+		LauncherScript: "/metrics_operator/amg-launcher.sh",
 	}
-	amg := AMG{LauncherWorkerApp: launcher}
+	amg := AMG{LauncherWorker: launcher}
 	metrics.Register(&amg)
 }

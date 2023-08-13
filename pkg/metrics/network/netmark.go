@@ -14,13 +14,14 @@ import (
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
+	jobs "github.com/converged-computing/metrics-operator/pkg/jobs"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 
 // This library is currently private
 
 type Netmark struct {
-	LauncherWorkerNetwork
+	jobs.LauncherWorker
 
 	// Options
 	tasks int32
@@ -47,11 +48,11 @@ func (m Netmark) Url() string {
 
 // Set custom options / attributes for the metric
 func (m *Netmark) SetOptions(metric *api.Metric) {
-	m.rate = metric.Rate
-	m.completions = metric.Completions
-	m.resources = &metric.Resources
-	m.attributes = &metric.Attributes
-	m.launcherLetter = "n"
+	m.Rate = metric.Rate
+	m.Completions = metric.Completions
+	m.ResourceSpec = &metric.Resources
+	m.AttributeSpec = &metric.Attributes
+	m.LauncherLetter = "n"
 
 	// Set user defined values or fall back to defaults
 	// If we have tasks defined, use it! Otherwise fall back to 2 (likely demo)
@@ -97,8 +98,8 @@ func (m *Netmark) SetOptions(metric *api.Metric) {
 // Exported options and list options
 func (n Netmark) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"rate":              intstr.FromInt(int(n.rate)),
-		"completions":       intstr.FromInt(int(n.completions)),
+		"rate":              intstr.FromInt(int(n.Rate)),
+		"completions":       intstr.FromInt(int(n.Completions)),
 		"tasks":             intstr.FromInt(int(n.tasks)),
 		"warmups":           intstr.FromInt(int(n.warmups)),
 		"trials":            intstr.FromInt(int(n.trials)),
@@ -116,7 +117,7 @@ func (m Netmark) EntrypointScripts(
 
 	// Metadata to add to beginning of run
 	metadata := metrics.Metadata(spec, metric)
-	hosts := m.getHostlist(spec)
+	hosts := m.GetHostlist(spec)
 
 	// Add boolean flag to store the trial?
 	storeTrial := ""
@@ -179,17 +180,17 @@ echo "%s"
 
 	// The worker just has sleep infinity added
 	workerTemplate := prefix + "\nsleep infinity"
-	return m.finalizeEntrypoints(launcherTemplate, workerTemplate)
+	return m.FinalizeEntrypoints(launcherTemplate, workerTemplate)
 }
 
 func init() {
-	launcher := LauncherWorkerNetwork{
-		name:           "network-netmark",
-		description:    "point to point networking tool",
-		container:      "vanessa/netmark:latest",
-		workerScript:   "/metrics_operator/netmark-worker.sh",
-		launcherScript: "/metrics_operator/netmark-launcher.sh",
+	launcher := jobs.LauncherWorker{
+		Identifier:     "network-netmark",
+		Summary:        "point to point networking tool",
+		Container:      "vanessa/netmark:latest",
+		WorkerScript:   "/metrics_operator/netmark-worker.sh",
+		LauncherScript: "/metrics_operator/netmark-launcher.sh",
 	}
-	netmark := Netmark{LauncherWorkerNetwork: launcher}
+	netmark := Netmark{LauncherWorker: launcher}
 	metrics.Register(&netmark)
 }

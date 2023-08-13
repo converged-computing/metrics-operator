@@ -14,6 +14,7 @@ import (
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
+	jobs "github.com/converged-computing/metrics-operator/pkg/jobs"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 
@@ -103,7 +104,7 @@ var (
 )
 
 type OSUBenchmark struct {
-	LauncherWorkerNetwork
+	jobs.LauncherWorker
 
 	// Custom options
 	commands []string
@@ -129,13 +130,12 @@ func (m *OSUBenchmark) addCommand(command string) {
 
 // Set custom options / attributes for the metric
 func (m *OSUBenchmark) SetOptions(metric *api.Metric) {
-	m.rate = metric.Rate
-	m.completions = metric.Completions
+	m.Rate = metric.Rate
+	m.Completions = metric.Completions
 	m.lookup = map[string]bool{}
 	m.commands = []string{}
-	m.resources = &metric.Resources
-	m.launcherLetter = "l"
-	m.attributes = &metric.Attributes
+	m.ResourceSpec = &metric.Resources
+	m.AttributeSpec = &metric.Attributes
 
 	// We are allowed to specify just one command
 	opts, ok := metric.ListOptions["commands"]
@@ -168,8 +168,8 @@ func (m *OSUBenchmark) SetOptions(metric *api.Metric) {
 // Exported options and list options
 func (m OSUBenchmark) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"rate":        intstr.FromInt(int(m.rate)),
-		"completions": intstr.FromInt(int(m.completions)),
+		"rate":        intstr.FromInt(int(m.Rate)),
+		"completions": intstr.FromInt(int(m.Completions)),
 		"tasks":       intstr.FromInt(int(m.tasks)),
 	}
 }
@@ -275,17 +275,17 @@ echo "%s"
 
 	// The worker just has sleep infinity added, and getting the ip address of the launcher
 	workerTemplate := prefix + "\nsleep infinity"
-	return m.finalizeEntrypoints(launcherTemplate, workerTemplate)
+	return m.FinalizeEntrypoints(launcherTemplate, workerTemplate)
 }
 
 func init() {
-	launcher := LauncherWorkerNetwork{
-		name:           "network-osu-benchmark",
-		description:    "point to point MPI benchmarks",
-		container:      "ghcr.io/converged-computing/metric-osu-benchmark:latest",
-		workerScript:   "/metrics_operator/osu-worker.sh",
-		launcherScript: "/metrics_operator/osu-launcher.sh",
+	launcher := jobs.LauncherWorker{
+		Identifier:     "network-osu-benchmark",
+		Summary:        "point to point MPI benchmarks",
+		Container:      "ghcr.io/converged-computing/metric-osu-benchmark:latest",
+		WorkerScript:   "/metrics_operator/osu-worker.sh",
+		LauncherScript: "/metrics_operator/osu-launcher.sh",
 	}
-	osu := OSUBenchmark{LauncherWorkerNetwork: launcher}
+	osu := OSUBenchmark{LauncherWorker: launcher}
 	metrics.Register(&osu)
 }

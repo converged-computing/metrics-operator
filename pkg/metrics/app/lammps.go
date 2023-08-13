@@ -13,11 +13,12 @@ import (
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
+	"github.com/converged-computing/metrics-operator/pkg/jobs"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 
 type Lammps struct {
-	LauncherWorkerApp
+	jobs.LauncherWorker
 
 	// Options
 	workdir string
@@ -30,10 +31,10 @@ func (m Lammps) Url() string {
 
 // Set custom options / attributes for the metric
 func (m *Lammps) SetOptions(metric *api.Metric) {
-	m.rate = metric.Rate
-	m.completions = metric.Completions
-	m.resources = &metric.Resources
-	m.attributes = &metric.Attributes
+	m.Rate = metric.Rate
+	m.Completions = metric.Completions
+	m.ResourceSpec = &metric.Resources
+	m.AttributeSpec = &metric.Attributes
 
 	// Set user defined values or fall back to defaults
 	// This is a more manual approach that puts the user in charge of determining the entire command
@@ -60,8 +61,8 @@ func (n Lammps) Validate(spec *api.MetricSet) bool {
 // Exported options and list options
 func (m Lammps) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"rate":        intstr.FromInt(int(m.rate)),
-		"completions": intstr.FromInt(int(m.completions)),
+		"rate":        intstr.FromInt(int(m.Rate)),
+		"completions": intstr.FromInt(int(m.Completions)),
 		"command":     intstr.FromString(m.command),
 		"workdir":     intstr.FromString(m.workdir),
 	}
@@ -78,7 +79,7 @@ func (m Lammps) EntrypointScripts(
 
 	// Metadata to add to beginning of run
 	metadata := metrics.Metadata(spec, metric)
-	hosts := m.getHostlist(spec)
+	hosts := m.GetHostlist(spec)
 
 	prefixTemplate := `#!/bin/bash
 # Start ssh daemon
@@ -123,17 +124,17 @@ echo "%s"
 	workerTemplate := prefix + "\nsleep infinity"
 
 	// Return the script templates for each of launcher and worker
-	return m.finalizeEntrypoints(launcherTemplate, workerTemplate)
+	return m.FinalizeEntrypoints(launcherTemplate, workerTemplate)
 }
 
 func init() {
-	launcher := LauncherWorkerApp{
-		name:           "app-lammps",
-		description:    "LAMMPS molecular dynamic simulation",
-		container:      "ghcr.io/converged-computing/metric-lammps:latest",
-		workerScript:   "/metrics_operator/lammps-worker.sh",
-		launcherScript: "/metrics_operator/lammps-launcher.sh",
+	launcher := jobs.LauncherWorker{
+		Identifier:     "app-lammps",
+		Summary:        "LAMMPS molecular dynamic simulation",
+		Container:      "ghcr.io/converged-computing/metric-lammps:latest",
+		WorkerScript:   "/metrics_operator/lammps-worker.sh",
+		LauncherScript: "/metrics_operator/lammps-launcher.sh",
 	}
-	lammps := Lammps{LauncherWorkerApp: launcher}
+	lammps := Lammps{LauncherWorker: launcher}
 	metrics.Register(&lammps)
 }
