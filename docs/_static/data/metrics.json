@@ -21,6 +21,13 @@
   "url": "https://www.lammps.org/"
  },
  {
+  "name": "app-quicksilver",
+  "description": "A proxy app for the Monte Carlo Transport Code",
+  "type": "standalone",
+  "image": "ghcr.io/converged-computing/metric-quicksilver:latest",
+  "url": "https://github.com/LLNL/Quicksilver"
+ },
+ {
   "name": "io-fio",
   "description": "Flexible IO Tester (FIO)",
   "type": "storage",

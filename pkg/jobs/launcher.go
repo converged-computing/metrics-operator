@@ -102,11 +102,8 @@ func (m LauncherWorker) getMetricsKeyToPath() []corev1.KeyToPath {
 	}
 }
 
-// Replicated Jobs are custom for this standalone metric
-func (m *LauncherWorker) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, error) {
-
-	js := []jobset.ReplicatedJob{}
-
+// Ensure the worker and launcher default names are set
+func (m *LauncherWorker) ensureDefaultNames() {
 	// Ensure we set the default launcher letter, if not set
 	if m.LauncherLetter == "" {
 		m.LauncherLetter = defaultLauncherLetter
@@ -114,6 +111,13 @@ func (m *LauncherWorker) ReplicatedJobs(spec *api.MetricSet) ([]jobset.Replicate
 	if m.WorkerLetter == "" {
 		m.WorkerLetter = defaultWorkerLetter
 	}
+}
+
+// Replicated Jobs are custom for this standalone metric
+func (m *LauncherWorker) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, error) {
+
+	js := []jobset.ReplicatedJob{}
+	m.ensureDefaultNames()
 
 	// Generate a replicated job for the launcher (LauncherWorker) and workers
 	launcher, err := metrics.GetReplicatedJob(spec, false, 1, 1, m.LauncherLetter, false)
@@ -213,6 +217,7 @@ func (m LauncherWorker) FinalizeEntrypoints(launcherTemplate string, workerTempl
 
 // Get common hostlist for launcher/worker app
 func (m *LauncherWorker) GetHostlist(spec *api.MetricSet) string {
+	m.ensureDefaultNames()
 
 	// The launcher has a different hostname, n for netmark
 	hosts := fmt.Sprintf("%s-%s-0-0.%s.%s.svc.cluster.local\n",
