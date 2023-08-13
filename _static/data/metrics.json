@@ -7,6 +7,13 @@
   "url": "https://github.com/LLNL/AMG"
  },
  {
+  "name": "app-kripke",
+  "description": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
+  "type": "standalone",
+  "image": "ghcr.io/converged-computing/metric-kripke:latest",
+  "url": "https://github.com/LLNL/Kripke"
+ },
+ {
   "name": "app-lammps",
   "description": "LAMMPS molecular dynamic simulation",
   "type": "standalone",

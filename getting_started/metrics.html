@@ -486,8 +486,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#fio" class="md-nav__link">
-    <span title="/getting_started/metrics.md#fio (reference label)" class="md-ellipsis">fio</span>
+  <a href="#io-sfio" class="md-nav__link">
+    <span title="/getting_started/metrics.md#io-sfio (reference label)" class="md-ellipsis">io-<wbr>sfio</span>
   </a>
   
 </li>
@@ -560,28 +560,15 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#examples" class="md-nav__link">
-    <span title="/getting_started/metrics.md#examples (reference label)" class="md-ellipsis">Examples</span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Examples">
-      <ul class="md-nav__list">
-        
           <li class="md-nav__item">
-  <a href="https://github.com/converged-computing/metrics-operator/tree/main/examples/storage/google/io-fusion" class="md-nav__link">
-    <span class="md-ellipsis">io-<wbr>host-<wbr>volume</span>
+  <a href="#app-kripke" class="md-nav__link">
+    <span title="/getting_started/metrics.md#app-kripke (reference label)" class="md-ellipsis">app-<wbr>kripke</span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -762,7 +749,7 @@
 <li class="toctree-l1"><a class="reference external" href="https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#standalone">Standalone Metrics</a></li>
 </ul>
 </div>
-<iframe src="../_static/data/table.html" style="width:100%; height:600px;" frameBorder="0"></iframe>
+<iframe src="../_static/data/table.html" style="width:100%; height:650px;" frameBorder="0"></iframe>
 <p>All metrics can be customized with the following variables</p>
 <table border="1" class="docutils">
 <thead>
@@ -789,11 +776,14 @@
 </tbody>
 </table>
 <h2 id="implemented-metrics">Implemented Metrics<a class="headerlink" href="#implemented-metrics" title="Permalink to this heading">¶</a></h2>
+<p>Each metric has a link to the type, along with (optionally) examples.</p>
 <h3 id="performance">Performance<a class="headerlink" href="#performance" title="Permalink to this heading">¶</a></h3>
 <p>These metrics are intended to assess application performance.</p>
 <h4 id="perf-sysstat">perf-sysstat<a class="headerlink" href="#perf-sysstat" title="Permalink to this heading">¶</a></h4>
 <ul class="simple">
 <li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Application Metric Set</span></a></p></li>
+<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-hello-world">perf-hello-world</a></em></p></li>
+<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-lammps">perf-lammps</a></em></p></li>
 </ul>
 <p>This metric provides the “pidstat” executable of the sysstat library. The following options are available:</p>
 <table border="1" class="docutils">
@@ -849,7 +839,11 @@ more information on this command, and <a class="reference external" href="https:
 for how we use them.  If there is an option or command that is not exposed that you would like, please <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues">open an issue</a>.</p>
 <h3 id="storage">Storage<a class="headerlink" href="#storage" title="Permalink to this heading">¶</a></h3>
 <p>These metrics are intended to assess storage volumes.</p>
-<h4 id="fio">fio<a class="headerlink" href="#fio" title="Permalink to this heading">¶</a></h4>
+<h4 id="io-sfio">io-sfio<a class="headerlink" href="#io-sfio" title="Permalink to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Storage Metric Set</span></a></p></li>
+<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/storage/google/io-fusion">io-host-volume</a></em></p></li>
+</ul>
 <p>This is a nice tool that you can simply point at a path, and it measures IO stats by way of writing a file there!
 Options you can set include:</p>
 <table border="1" class="docutils">
@@ -899,6 +893,7 @@ This allows for testing storage mounted from multiple metric pods without worryi
 <h4 id="io-sysstat">io-sysstat<a class="headerlink" href="#io-sysstat" title="Permalink to this heading">¶</a></h4>
 <ul class="simple">
 <li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Storage Metric Set</span></a></p></li>
+<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/io-host-volume">io-host-volume</a></em></p></li>
 </ul>
 <p>This is the “iostat” executable of the sysstat library.</p>
 <table border="1" class="docutils">
@@ -924,6 +919,7 @@ This allows for testing storage mounted from multiple metric pods without worryi
 <h4 id="network-netmark">network-netmark<a class="headerlink" href="#network-netmark" title="Permalink to this heading">¶</a></h4>
 <ul class="simple">
 <li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
+<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-netmark">network-netmark</a></em> (code still private)</p></li>
 </ul>
 <p>This is currently a private container/software, but we have support for it when it’s ready to be made public (networking)
 Variables to customize include:</p>
@@ -983,6 +979,10 @@ Variables to customize include:</p>
 </tbody>
 </table>
 <h4 id="network-osu-benchmark">network-osu-benchmark<a class="headerlink" href="#network-osu-benchmark" title="Permalink to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
+<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-osu-benchmark">network-osu-benchmark</a></em></p></li>
+</ul>
 <p>Point to point benchmarks for MPI (networking). If listOptions-&gt;commands not set, will use all one-point commands.
 Variables to customize include:</p>
 <table border="1" class="docutils">
@@ -1084,6 +1084,7 @@ Here are some useful resources for the benchmarks:</p>
 <h4 id="app-lammps">app-lammps<a class="headerlink" href="#app-lammps" title="Permalink to this heading">¶</a></h4>
 <ul class="simple">
 <li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
+<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-lammps">app-lammps</a></em></p></li>
 </ul>
 <p>Since we were using LAMMPS so often as a benchmark (and testing timing of a network) it made sense to add it here
 as a standalone metric! Although we are doing MPI with communication via SSH, this can still serve as a means
@@ -1124,6 +1125,10 @@ The default command (if you don’t change it) intended as an example is:</p>
 You should also provide the correct number of processes (np) and problem size for LAMMPS (lmp). We left this as open and flexible
 anticipating that you as a user would want total control.</p>
 <h4 id="app-amg">app-amg<a class="headerlink" href="#app-amg" title="Permalink to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
+<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-amg">app-amg</a></em></p></li>
+</ul>
 <p>AMG means “algebraic multi-grid” and it’s easy to confuse with the company <a class="reference external" href="https://www.amd.com/en/solutions/supercomputing-and-hpc">AMD</a> “Advanced Micro Devices” ! From <a class="reference external" href="https://asc.llnl.gov/sites/asc/files/2020-09/AMG_Summary_v1_7.pdf">the guide</a>:</p>
 <blockquote>
 <div><p>AMG is a parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids. The driver provided for this benchmark builds linear systems for a 3D problem with a 27-point stencil and generates two different problems that are described in section D of the AMG.readme file in the docs directory.</p>
@@ -1196,23 +1201,74 @@ mpirun<span class="w"> </span>--hostfile<span class="w"> </span>./hostlist.txt<s
 <p><strong>NOTE</strong> that the Python parser was written for the test case, and likely we need to extend it to problem 2 or larger sized problems. If you
 run a larger problem and the parser does not work as expected, please <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues">send us the output</a> and we will provide an updated parser.
 See <a class="reference external" href="https://asc.llnl.gov/sites/asc/files/2020-09/AMG_Summary_v1_7.pdf">this guide</a> for more detail.</p>
-<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permalink to this heading">¶</a></h2>
-<p>The following examples are provided alongside the operator. Each directory has a README with complete instructions for usage.</p>
+<h4 id="app-kripke">app-kripke<a class="headerlink" href="#app-kripke" title="Permalink to this heading">¶</a></h4>
 <ul class="simple">
-<li><p><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-hello-world">perf-hello-world</a></p></li>
-<li><p><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-lammps">perf-lammps</a></p></li>
-<li><p><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/io-host-volume">io-host-volume</a></p></li>
-<li><p><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-netmark">network-netmark</a> (code still private)</p></li>
-<li><p><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-osu-benchmark">network-osu-benchmark</a></p></li>
-<li><p><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-lammps">app-lammps</a></p></li>
+<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
+<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-kripke">app-kripke</a></em></p></li>
 </ul>
-<p>The following example uses io-fio to measure the Fusion filesystem:</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/storage/google/io-fusion">io-host-volume</a></li>
-</ul>
+<p><a class="reference external" href="https://github.com/LLNL/Kripke">Kripke</a> is (from the README):</p>
+<blockquote>
+<div><p>Kripke is a simple, scalable, 3D Sn deterministic particle transport code. Its primary purpose is to research how data layout, programming paradigms and architectures effect the implementation and performance of Sn transport. A main goal of Kripke is investigating how different data-layouts affect instruction, thread and task level parallelism, and what the implications are on overall solver performance. Akin to AMG, we allow you to modify each of the mpirun and kripke commands via:</p>
+</div></blockquote>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Option Key</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>command</td>
+<td>The amg command (without mpirun)</td>
+<td>options-&gt;command</td>
+<td>string</td>
+<td>(see below)</td>
+</tr>
+<tr>
+<td>mpirun</td>
+<td>The mpirun command (and arguments)</td>
+<td>options-&gt;mpirun</td>
+<td>string</td>
+<td>(see below)</td>
+</tr>
+<tr>
+<td>workdir</td>
+<td>The working directory for the command</td>
+<td>options-&gt;workdir</td>
+<td>string</td>
+<td>/opt/AMG</td>
+</tr>
+</tbody>
+</table>
+<p>By default, when not set, you will just run the kripke binary to get a test case run, so mpirun is set to be blank.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span class="c1"># mpirun is blank</span>
+<span class="s2">&quot;&quot;</span>
+<span class="c1"># But could be an actual mpirun command</span>
+mpirun<span class="w"> </span>--hostfile<span class="w"> </span>./hostlist.txt
+
+<span class="c1"># command written to problem.sh</span>
+kripke
+
+<span class="c1"># Assembled into</span>
+mpirun<span class="w"> </span>--hostfile<span class="w"> </span>./hostlist.txt<span class="w"> </span>./problem.sh
+</code></pre></div>
 </div>
-<p>For apps / metrics to be added, please see <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues/30">this issue</a>.</p>
+<p>There is a nice <a class="reference external" href="https://asc.llnl.gov/sites/asc/files/2020-09/Kripke_Summary_v1.2.2-CORAL2_0.pdf">guide here</a> that can help you to decide
+on your specific command or problem size. Also note that we expose the following executables built with it:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="go">ex1_vector-addition            ex4_atomic-histogram                ex7_nested-loop-reorder</span>
+<span class="go">ex1_vector-addition_solution   ex4_atomic-histogram_solution       ex7_nested-loop-reorder_solution</span>
+<span class="go">ex2_approx-pi                  ex5_line-of-sight                   ex8_tiled-matrix-transpose</span>
+<span class="go">ex2_approx-pi_solution         ex5_line-of-sight_solution          ex8_tiled-matrix-transpose_solution</span>
+<span class="go">ex3_colored-indexset           ex6_stencil-offset-layout           ex9_matrix-transpose-local-array</span>
+<span class="go">ex3_colored-indexset_solution  ex6_stencil-offset-layout_solution  ex9_matrix-transpose-local-array_solution</span>
+</code></pre></div>
+</div>
+<p>(meaning on the PATH in <code class="docutils literal notranslate"><span class="pre">/opt/Kripke/build/bin</span></code> in the container).
+For apps / metrics to be added, please see <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues/30">this issue</a>.</p>
 <h2 id="containers">Containers<a class="headerlink" href="#containers" title="Permalink to this heading">¶</a></h2>
 <p>The following tools are folded into the metrics above. Often, one tool can be built into one container and used across multiple metrics.</p>
 <h3 id="sysstat">Sysstat<a class="headerlink" href="#sysstat" title="Permalink to this heading">¶</a></h3>
@@ -1242,7 +1298,7 @@ See <a class="reference external" href="https://asc.llnl.gov/sites/asc/files/202
   <small>
     
       Last update:
-      Aug 12, 2023
+      Aug 13, 2023
     
   </small>
 </div>
