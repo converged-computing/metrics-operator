@@ -7,7 +7,7 @@ The following metrics are under development (or being planned).
  - [Application Metrics](https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#application)
  - [Standalone Metrics](https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#standalone)
 
-<iframe src="../_static/data/table.html" style="width:100%; height:650px;" frameBorder="0"></iframe>
+<iframe src="../_static/data/table.html" style="width:100%; height:700px;" frameBorder="0"></iframe>
 
 All metrics can be customized with the following variables
 
@@ -356,6 +356,31 @@ You can also look more closely in the [GitHub repository](https://github.com/LLN
  - [Standalone Metric Set](user-guide.md#application-metric-set)
  - *[app-pennant](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-pennant)*
 
+Pennant is an unstructured mesh hydrodynamics for advanced architectures. The documentation is sparse, but you
+can find the [source code on GitHub](https://github.com/llnl/pennant). 
+By default, akin to other apps we expose the entire mpirun prefix and command along with the working directory for you to adjust.
+
+| Name | Description | Option Key | Type | Default |
+|-----|-------------|------------|------|---------|
+| command | The pennant command (without mpirun) | options->command |string | (see below) |
+| mpirun | The mpirun command (and arguments) | options->mpirun | string | (see below) | 
+| workdir | The working directory for the command | options->workdir | string | /opt/AMG |
+
+By default, when not set, you will just run pennant on a test problem, represented by an input text file: 
+
+```bash
+# mpirun
+mpirun --hostfile ./hostlist.txt
+
+# command
+pennant /opt/pennant/test/sedovsmall/sedovsmall.pnt
+
+# Assembled into problem.sh as follows:
+mpirun --hostfile ./hostlist.txt ./problem.sh
+```
+
+There are many input files that come in the container, and here are the fullpaths in `/opt/pennant/test`:
+
 <details>
 
 <summary>Input files available to pennant</summary>
@@ -426,6 +451,7 @@ You can also look more closely in the [GitHub repository](https://github.com/LLN
 
 </details>
 
+And likely you will need to adjust the mpirun parameters, etc.
 
 #### app-kripke
 
