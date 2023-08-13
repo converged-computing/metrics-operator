@@ -61,6 +61,7 @@ func (m LauncherWorker) Description() string {
 
 // Jobs required for success condition (n is the LauncherWorker run)
 func (m *LauncherWorker) SuccessJobs() []string {
+	m.ensureDefaultNames()
 	return []string{m.LauncherLetter}
 }
 
