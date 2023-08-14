@@ -32,6 +32,7 @@ type Metric interface {
 	// Attributes to expose for containers
 	WorkingDir() string
 	Image() string
+	Family() string
 
 	// One or more replicated jobs to populate a JobSet
 	ReplicatedJobs(*api.MetricSet) ([]jobset.ReplicatedJob, error)

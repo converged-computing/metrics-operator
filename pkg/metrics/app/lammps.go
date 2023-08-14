@@ -28,6 +28,11 @@ func (m Lammps) Url() string {
 	return "https://www.lammps.org/"
 }
 
+// I think this is a simulation?
+func (m Lammps) Family() string {
+	return metrics.SimulationFamily
+}
+
 // Set custom options / attributes for the metric
 func (m *Lammps) SetOptions(metric *api.Metric) {
 	m.Rate = metric.Rate

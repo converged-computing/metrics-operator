@@ -25,6 +25,11 @@ type Quicksilver struct {
 	mpirun  string
 }
 
+// I think this is a simulation?
+func (m Quicksilver) Family() string {
+	return metrics.SimulationFamily
+}
+
 func (m Quicksilver) Url() string {
 	return "https://github.com/LLNL/Quicksilver"
 }

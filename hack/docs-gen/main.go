@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"os"
 	"sort"
@@ -23,6 +22,7 @@ var (
 type MetricOutput struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
+	Family      string `json:"family"`
 	Type        string `json:"type"`
 	Image       string `json:"image"`
 	Url         string `json:"url"`
@@ -38,6 +38,7 @@ func main() {
 		newRecord := MetricOutput{
 			Name:        metric.Name(),
 			Description: metric.Description(),
+			Family:      metric.Family(),
 			Type:        metric.Type(),
 			Image:       metric.Image(),
 			Url:         metric.Url(),
@@ -54,7 +55,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Could not marshall records %s\n", err.Error())
 	}
-	err = ioutil.WriteFile(filename, file, 0644)
+	err = os.WriteFile(filename, file, 0644)
 	if err != nil {
 		log.Fatalf("Could not write to file %s: %s\n", filename, err.Error())
 	}

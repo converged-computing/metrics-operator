@@ -7,7 +7,11 @@ The following metrics are under development (or being planned).
  - [Application Metrics](https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#application)
  - [Standalone Metrics](https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#standalone)
 
-<iframe src="../_static/data/table.html" style="width:100%; height:700px;" frameBorder="0"></iframe>
+Each of the above is a metric design, which is primarily represented in the Metrics Operator code. However, within each design
+there are different families of metrics (e.g., storage, network, performance, simulation) shown in the table below as the "Family" column. 
+We likely will tweak and improve upon these categories.
+
+<iframe src="../_static/data/table.html" style="width:100%; height:800px;" frameBorder="0"></iframe>
 
 All metrics can be customized with the following variables
 
@@ -18,7 +22,8 @@ All metrics can be customized with the following variables
 
 ## Implemented Metrics
 
-Each metric has a link to the type, along with (optionally) examples.
+Each metric has a link to the type, along with (optionally) examples. These sections will better be organized by
+family once we decide on a more final set.
 
 ### Performance
 

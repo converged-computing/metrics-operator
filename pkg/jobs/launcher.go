@@ -59,6 +59,11 @@ func (m LauncherWorker) Description() string {
 	return m.Summary
 }
 
+// Family returns a generic performance family
+func (m LauncherWorker) Family() string {
+	return metrics.PerformanceFamily
+}
+
 // Jobs required for success condition (n is the LauncherWorker run)
 func (m *LauncherWorker) SuccessJobs() []string {
 	m.ensureDefaultNames()

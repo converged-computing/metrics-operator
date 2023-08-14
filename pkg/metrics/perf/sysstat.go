@@ -12,70 +12,34 @@ import (
 	"strconv"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	"github.com/converged-computing/metrics-operator/pkg/jobs"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 )
 
 // sysstat provides a tool "pidstat" that can monitor a PID (along with others)
 // https://github.com/sysstat/sysstat
 
 type PidStat struct {
-	name        string
-	rate        int32
-	completions int32
-	description string
-	container   string
-	resources   *api.ContainerResources
-	attributes  *api.ContainerSpec
+	jobs.SingleApplication
 
-	// Options
+	// Custom Options
 	useColor   bool
 	showPIDS   bool
 	useThreads bool
 	commands   map[string]intstr.IntOrString
 }
 
-// Name returns the metric name
-func (m PidStat) Name() string {
-	return m.name
-}
-
-// Description returns the metric description
-func (m PidStat) Description() string {
-	return m.description
-}
-
-// Return container resources for the metric container
-func (m PidStat) Resources() *api.ContainerResources {
-	return m.resources
-}
-func (m PidStat) Attributes() *api.ContainerSpec {
-	return m.attributes
-}
-
-// Validation
-func (m PidStat) Validate(spec *api.MetricSet) bool {
-	return true
-}
-
-// Container variables
-func (m PidStat) Image() string {
-	return m.container
-}
-func (m PidStat) WorkingDir() string {
-	return ""
-}
 func (m PidStat) Url() string {
 	return "https://github.com/sysstat/sysstat"
 }
 
 // Set custom options / attributes for the metric
 func (m *PidStat) SetOptions(metric *api.Metric) {
-	m.rate = metric.Rate
-	m.completions = metric.Completions
-	m.resources = &metric.Resources
-	m.attributes = &metric.Attributes
+	m.Rate = metric.Rate
+	m.Completions = metric.Completions
+	m.ResourceSpec = &metric.Resources
+	m.AttributeSpec = &metric.Attributes
 
 	// Custom commands based on index of job
 	m.commands = map[string]intstr.IntOrString{}
@@ -102,10 +66,6 @@ func (m *PidStat) SetOptions(metric *api.Metric) {
 
 }
 
-func (m PidStat) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, error) {
-	return []jobset.ReplicatedJob{}, nil
-}
-
 // Exported options and list options
 func (m PidStat) Options() map[string]intstr.IntOrString {
 
@@ -120,14 +80,11 @@ func (m PidStat) Options() map[string]intstr.IntOrString {
 	}
 
 	return map[string]intstr.IntOrString{
-		"rate":        intstr.FromInt(int(m.rate)),
-		"completions": intstr.FromInt(int(m.completions)),
+		"rate":        intstr.FromInt(int(m.Rate)),
+		"completions": intstr.FromInt(int(m.Completions)),
 		"threads":     intstr.FromString(useThreads),
 		"pids":        intstr.FromString(showPIDS),
 	}
-}
-func (m PidStat) ListOptions() map[string][]intstr.IntOrString {
-	return map[string][]intstr.IntOrString{}
 }
 
 func (m PidStat) prepareIndexedCommand(spec *api.MetricSet) string {
@@ -271,13 +228,13 @@ done
 		useThreads,
 		command,
 		useColor,
-		m.completions,
+		m.Completions,
 		metrics.CollectionStart,
 		metrics.Separator,
 		showPIDS,
 		metrics.CollectionEnd,
 		metrics.CollectionEnd,
-		m.rate,
+		m.Rate,
 		metrics.Interactive(spec.Spec.Logging.Interactive),
 	)
 
@@ -289,19 +246,12 @@ done
 	}
 }
 
-func (m PidStat) SuccessJobs() []string {
-	return []string{}
-}
-
-func (m PidStat) Type() string {
-	return metrics.ApplicationMetric
-}
-
 func init() {
-	metrics.Register(
-		&PidStat{
-			name:        "perf-sysstat",
-			description: "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
-			container:   "ghcr.io/converged-computing/metric-sysstat:latest",
-		})
+	app := jobs.SingleApplication{
+		Identifier: "perf-sysstat",
+		Summary:    "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
+		Container:  "ghcr.io/converged-computing/metric-sysstat:latest",
+	}
+	pidstat := PidStat{SingleApplication: app}
+	metrics.Register(&pidstat)
 }
