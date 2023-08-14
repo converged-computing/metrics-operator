@@ -21,7 +21,6 @@ type Lammps struct {
 	jobs.LauncherWorker
 
 	// Options
-	workdir string
 	command string
 }
 
@@ -40,7 +39,7 @@ func (m *Lammps) SetOptions(metric *api.Metric) {
 	// This is a more manual approach that puts the user in charge of determining the entire command
 	// This more closely matches what we might do on HPC :)
 	m.command = "mpirun --hostfile ./hostlist.txt -np 2 --map-by socket lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite"
-	m.workdir = "/opt/lammps/examples/reaxff/HNS"
+	m.Workdir = "/opt/lammps/examples/reaxff/HNS"
 
 	// This could be improved :)
 	command, ok := metric.Options["command"]
@@ -49,7 +48,7 @@ func (m *Lammps) SetOptions(metric *api.Metric) {
 	}
 	workdir, ok := metric.Options["workdir"]
 	if ok {
-		m.workdir = workdir.StrVal
+		m.Workdir = workdir.StrVal
 	}
 }
 
@@ -64,7 +63,7 @@ func (m Lammps) Options() map[string]intstr.IntOrString {
 		"rate":        intstr.FromInt(int(m.Rate)),
 		"completions": intstr.FromInt(int(m.Completions)),
 		"command":     intstr.FromString(m.command),
-		"workdir":     intstr.FromString(m.workdir),
+		"workdir":     intstr.FromString(m.Workdir),
 	}
 }
 func (n Lammps) ListOptions() map[string][]intstr.IntOrString {

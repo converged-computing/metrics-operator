@@ -13,8 +13,8 @@ import (
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
+	"github.com/converged-computing/metrics-operator/pkg/jobs"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 
@@ -22,58 +22,20 @@ import (
 // https://github.com/sysstat/sysstat
 
 type IOStat struct {
-	name          string
-	rate          int32
-	completions   int32
-	description   string
-	container     string
+	jobs.StorageGeneric
 	humanReadable bool
-	resources     *api.ContainerResources
-	attributes    *api.ContainerSpec
 }
 
-// Name returns the metric name
-func (m IOStat) Name() string {
-	return m.name
-}
 func (m IOStat) Url() string {
 	return "https://github.com/sysstat/sysstat"
 }
 
-// Description returns the metric description
-func (m IOStat) Description() string {
-	return m.description
-}
-
-// Container
-func (m IOStat) Image() string {
-	return m.container
-}
-
-// WorkingDir does not matter
-func (m IOStat) WorkingDir() string {
-	return ""
-}
-
-// Return container resources for the metric container
-func (m IOStat) Resources() *api.ContainerResources {
-	return m.resources
-}
-func (m IOStat) Attributes() *api.ContainerSpec {
-	return m.attributes
-}
-
-// Validation
-func (m IOStat) Validate(set *api.MetricSet) bool {
-	return true
-}
-
 // Set custom options / attributes for the metric
 func (m *IOStat) SetOptions(metric *api.Metric) {
-	m.rate = metric.Rate
-	m.completions = metric.Completions
-	m.resources = &metric.Resources
-	m.attributes = &metric.Attributes
+	m.Rate = metric.Rate
+	m.Completions = metric.Completions
+	m.ResourceSpec = &metric.Resources
+	m.AttributeSpec = &metric.Attributes
 
 	// Does the person want human readable instead of table?
 	value, ok := metric.Options["human"]
@@ -124,13 +86,13 @@ done
 		template,
 		spec.Spec.Storage.Commands.Pre,
 		metadata,
-		m.completions,
+		m.Completions,
 		metrics.CollectionStart,
 		metrics.Separator,
 		command,
 		metrics.CollectionEnd,
 		spec.Spec.Storage.Commands.Post,
-		m.rate,
+		m.Rate,
 		spec.Spec.Storage.Commands.Post,
 		metrics.Interactive(spec.Spec.Logging.Interactive),
 	)
@@ -147,32 +109,18 @@ done
 // Exported options and list options
 func (m IOStat) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"rate":        intstr.FromInt(int(m.rate)),
-		"completions": intstr.FromInt(int(m.completions)),
+		"rate":        intstr.FromInt(int(m.Rate)),
+		"completions": intstr.FromInt(int(m.Completions)),
 		"human":       intstr.FromString(strconv.FormatBool(m.humanReadable)),
 	}
 }
-func (m IOStat) ListOptions() map[string][]intstr.IntOrString {
-	return map[string][]intstr.IntOrString{}
-}
-
-// Jobs required for success condition (n is the netmark run)
-func (m IOStat) SuccessJobs() []string {
-	return []string{}
-}
-
-func (m IOStat) Type() string {
-	return metrics.StorageMetric
-}
-func (m IOStat) ReplicatedJobs(set *api.MetricSet) ([]jobset.ReplicatedJob, error) {
-	return []jobset.ReplicatedJob{}, nil
-}
 
 func init() {
-	metrics.Register(
-		&IOStat{
-			name:        "io-sysstat",
-			description: "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
-			container:   "ghcr.io/converged-computing/metric-sysstat:latest",
-		})
+	storage := jobs.StorageGeneric{
+		Identifier: "io-sysstat",
+		Summary:    "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
+		Container:  "ghcr.io/converged-computing/metric-sysstat:latest",
+	}
+	iostat := IOStat{StorageGeneric: storage}
+	metrics.Register(&iostat)
 }

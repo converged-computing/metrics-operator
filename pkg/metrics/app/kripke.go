@@ -21,7 +21,6 @@ type Kripke struct {
 	jobs.LauncherWorker
 
 	// Options
-	workdir string
 	command string
 	prefix  string
 }
@@ -40,7 +39,7 @@ func (m *Kripke) SetOptions(metric *api.Metric) {
 	// Set user defined values or fall back to defaults
 	m.prefix = "mpirun --hostfile ./hostlist.txt"
 	m.command = "kripke"
-	m.workdir = "/opt/kripke"
+	m.Workdir = "/opt/kripke"
 
 	// This could be improved :)
 	command, ok := metric.Options["command"]
@@ -49,7 +48,7 @@ func (m *Kripke) SetOptions(metric *api.Metric) {
 	}
 	workdir, ok := metric.Options["workdir"]
 	if ok {
-		m.workdir = workdir.StrVal
+		m.Workdir = workdir.StrVal
 	}
 	mpirun, ok := metric.Options["mpirun"]
 	if ok {
@@ -69,7 +68,7 @@ func (m Kripke) Options() map[string]intstr.IntOrString {
 		"completions": intstr.FromInt(int(m.Completions)),
 		"command":     intstr.FromString(m.command),
 		"mpirun":      intstr.FromString(m.prefix),
-		"workdir":     intstr.FromString(m.workdir),
+		"workdir":     intstr.FromString(m.Workdir),
 	}
 }
 func (n Kripke) ListOptions() map[string][]intstr.IntOrString {

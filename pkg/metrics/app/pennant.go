@@ -21,7 +21,6 @@ type Pennant struct {
 	jobs.LauncherWorker
 
 	// Custom Options
-	workdir string
 	command string
 	prefix  string
 }
@@ -40,7 +39,7 @@ func (m *Pennant) SetOptions(metric *api.Metric) {
 	// Set user defined values or fall back to defaults
 	m.prefix = "mpirun --hostfile ./hostlist.txt"
 	m.command = "pennant /opt/pennant/test/sedovsmall/sedovsmall.pnt"
-	m.workdir = "/opt/pennant/test"
+	m.Workdir = "/opt/pennant/test"
 
 	// This could be improved :)
 	command, ok := metric.Options["command"]
@@ -49,7 +48,7 @@ func (m *Pennant) SetOptions(metric *api.Metric) {
 	}
 	workdir, ok := metric.Options["workdir"]
 	if ok {
-		m.workdir = workdir.StrVal
+		m.Workdir = workdir.StrVal
 	}
 	mpirun, ok := metric.Options["mpirun"]
 	if ok {
@@ -64,7 +63,7 @@ func (m Pennant) Options() map[string]intstr.IntOrString {
 		"completions": intstr.FromInt(int(m.Completions)),
 		"command":     intstr.FromString(m.command),
 		"mpirun":      intstr.FromString(m.prefix),
-		"workdir":     intstr.FromString(m.workdir),
+		"workdir":     intstr.FromString(m.Workdir),
 	}
 }
 func (n Pennant) ListOptions() map[string][]intstr.IntOrString {

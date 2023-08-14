@@ -21,7 +21,6 @@ type Quicksilver struct {
 	jobs.LauncherWorker
 
 	// Custom Options
-	workdir string
 	command string
 	mpirun  string
 }
@@ -40,7 +39,7 @@ func (m *Quicksilver) SetOptions(metric *api.Metric) {
 	// Set user defined values or fall back to defaults
 	m.mpirun = "mpirun --hostfile ./hostlist.txt"
 	m.command = "qs /opt/quicksilver/Examples/CORAL2_Benchmark/Problem1/Coral2_P1.inp"
-	m.workdir = "/opt/quicksilver/Examples"
+	m.Workdir = "/opt/quicksilver/Examples"
 
 	// This could be improved :)
 	command, ok := metric.Options["command"]
@@ -49,7 +48,7 @@ func (m *Quicksilver) SetOptions(metric *api.Metric) {
 	}
 	workdir, ok := metric.Options["workdir"]
 	if ok {
-		m.workdir = workdir.StrVal
+		m.Workdir = workdir.StrVal
 	}
 	mpirun, ok := metric.Options["mpirun"]
 	if ok {
@@ -64,7 +63,7 @@ func (m Quicksilver) Options() map[string]intstr.IntOrString {
 		"completions": intstr.FromInt(int(m.Completions)),
 		"command":     intstr.FromString(m.command),
 		"mpirun":      intstr.FromString(m.mpirun),
-		"workdir":     intstr.FromString(m.workdir),
+		"workdir":     intstr.FromString(m.Workdir),
 	}
 }
 func (n Quicksilver) ListOptions() map[string][]intstr.IntOrString {
