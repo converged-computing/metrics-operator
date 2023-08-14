@@ -12,8 +12,8 @@ import (
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
+	"github.com/converged-computing/metrics-operator/pkg/jobs"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 
@@ -21,13 +21,7 @@ import (
 // https://docs.gitlab.com/ee/administration/operations/filesystem_benchmarking.html
 
 type Fio struct {
-	name        string
-	rate        int32
-	completions int32
-	description string
-	container   string
-	resources   *api.ContainerResources
-	attributes  *api.ContainerSpec
+	jobs.StorageGeneric
 
 	// Options
 	testname  string
@@ -37,48 +31,16 @@ type Fio struct {
 	directory string
 }
 
-// Name returns the metric name
-func (m Fio) Name() string {
-	return m.name
-}
 func (m Fio) Url() string {
 	return "https://fio.readthedocs.io/en/latest/fio_doc.html"
 }
 
-// Description returns the metric description
-func (m Fio) Description() string {
-	return m.description
-}
-
-// Container
-func (m Fio) Image() string {
-	return m.container
-}
-
-// Return container resources for the metric container
-func (m Fio) Resources() *api.ContainerResources {
-	return m.resources
-}
-func (m Fio) Attributes() *api.ContainerSpec {
-	return m.attributes
-}
-
-// WorkingDir does not matter
-func (m Fio) WorkingDir() string {
-	return ""
-}
-
-// Validation
-func (m Fio) Validate(set *api.MetricSet) bool {
-	return true
-}
-
 // Set custom options / attributes for the metric
 func (m *Fio) SetOptions(metric *api.Metric) {
-	m.rate = metric.Rate
-	m.completions = metric.Completions
-	m.resources = &metric.Resources
-	m.attributes = &metric.Attributes
+	m.Rate = metric.Rate
+	m.Completions = metric.Completions
+	m.ResourceSpec = &metric.Resources
+	m.AttributeSpec = &metric.Attributes
 
 	// Set defaults for options
 	m.testname = "test"
@@ -168,8 +130,8 @@ echo "%s"
 // Exported options and list options
 func (m Fio) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"rate":        intstr.FromInt(int(m.rate)),
-		"completions": intstr.FromInt(int(m.completions)),
+		"rate":        intstr.FromInt(int(m.Rate)),
+		"completions": intstr.FromInt(int(m.Completions)),
 		"testname":    intstr.FromString(m.testname),
 		"blocksize":   intstr.FromString(m.blocksize),
 		"iodepth":     intstr.FromInt(m.iodepth),
@@ -177,27 +139,13 @@ func (m Fio) Options() map[string]intstr.IntOrString {
 		"directory":   intstr.FromString(m.directory),
 	}
 }
-func (m Fio) ListOptions() map[string][]intstr.IntOrString {
-	return map[string][]intstr.IntOrString{}
-}
-
-// Jobs required for success condition (n is the netmark run)
-func (m Fio) SuccessJobs() []string {
-	return []string{}
-}
-
-func (m Fio) Type() string {
-	return metrics.StorageMetric
-}
-func (m Fio) ReplicatedJobs(set *api.MetricSet) ([]jobset.ReplicatedJob, error) {
-	return []jobset.ReplicatedJob{}, nil
-}
 
 func init() {
-	metrics.Register(
-		&Fio{
-			name:        "io-fio",
-			description: "Flexible IO Tester (FIO)",
-			container:   "ghcr.io/converged-computing/metric-fio:latest",
-		})
+	storage := jobs.StorageGeneric{
+		Identifier: "io-fio",
+		Summary:    "Flexible IO Tester (FIO)",
+		Container:  "ghcr.io/converged-computing/metric-fio:latest",
+	}
+	fio := Fio{StorageGeneric: storage}
+	metrics.Register(&fio)
 }

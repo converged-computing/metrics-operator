@@ -18,9 +18,11 @@ To learn more:
 - For services we are measuring, we likely need to be able to kill after N seconds (to complete job) or to specify the success policy on the metrics containers instead of the application
 - Look into pod affinity/anti-affintiy vs. topology constraint (which do we want)?
 - Add assertions checking for python tests
-- Plotting examples needed for
+- Plotting examples (python parsers) needed for
   - io-sysstat
   - app-kripke
+  - app-quicksilver
+  - app-pennant
 
 ## License
 

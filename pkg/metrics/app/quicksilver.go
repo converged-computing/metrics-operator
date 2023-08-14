@@ -17,29 +17,29 @@ import (
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 
-type Lammps struct {
+type Quicksilver struct {
 	jobs.LauncherWorker
 
-	// Options
+	// Custom Options
 	command string
+	mpirun  string
 }
 
-func (m Lammps) Url() string {
-	return "https://www.lammps.org/"
+func (m Quicksilver) Url() string {
+	return "https://github.com/LLNL/Quicksilver"
 }
 
 // Set custom options / attributes for the metric
-func (m *Lammps) SetOptions(metric *api.Metric) {
+func (m *Quicksilver) SetOptions(metric *api.Metric) {
 	m.Rate = metric.Rate
 	m.Completions = metric.Completions
 	m.ResourceSpec = &metric.Resources
 	m.AttributeSpec = &metric.Attributes
 
 	// Set user defined values or fall back to defaults
-	// This is a more manual approach that puts the user in charge of determining the entire command
-	// This more closely matches what we might do on HPC :)
-	m.command = "mpirun --hostfile ./hostlist.txt -np 2 --map-by socket lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite"
-	m.Workdir = "/opt/lammps/examples/reaxff/HNS"
+	m.mpirun = "mpirun --hostfile ./hostlist.txt"
+	m.command = "qs /opt/quicksilver/Examples/CORAL2_Benchmark/Problem1/Coral2_P1.inp"
+	m.Workdir = "/opt/quicksilver/Examples"
 
 	// This could be improved :)
 	command, ok := metric.Options["command"]
@@ -50,28 +50,28 @@ func (m *Lammps) SetOptions(metric *api.Metric) {
 	if ok {
 		m.Workdir = workdir.StrVal
 	}
-}
-
-// Validate that we can run Lammps
-func (n Lammps) Validate(spec *api.MetricSet) bool {
-	return spec.Spec.Pods >= 2
+	mpirun, ok := metric.Options["mpirun"]
+	if ok {
+		m.mpirun = mpirun.StrVal
+	}
 }
 
 // Exported options and list options
-func (m Lammps) Options() map[string]intstr.IntOrString {
+func (m Quicksilver) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
 		"rate":        intstr.FromInt(int(m.Rate)),
 		"completions": intstr.FromInt(int(m.Completions)),
 		"command":     intstr.FromString(m.command),
+		"mpirun":      intstr.FromString(m.mpirun),
 		"workdir":     intstr.FromString(m.Workdir),
 	}
 }
-func (n Lammps) ListOptions() map[string][]intstr.IntOrString {
+func (n Quicksilver) ListOptions() map[string][]intstr.IntOrString {
 	return map[string][]intstr.IntOrString{}
 }
 
 // Return lookup of entrypoint scripts
-func (m Lammps) EntrypointScripts(
+func (m Quicksilver) EntrypointScripts(
 	spec *api.MetricSet,
 	metric *metrics.Metric,
 ) []metrics.EntrypointScript {
@@ -84,33 +84,31 @@ func (m Lammps) EntrypointScripts(
 	// Template for the launcher
 	template := `
 echo "%s"
-%s
+%s ./problem.sh
 echo "%s"
 %s
 `
 	launcherTemplate := prefix + fmt.Sprintf(
 		template,
 		metrics.Separator,
-		m.command,
+		m.mpirun,
 		metrics.CollectionEnd,
 		metrics.Interactive(spec.Spec.Logging.Interactive),
 	)
 
 	// The worker just has sleep infinity added
 	workerTemplate := prefix + "\nsleep infinity"
-
-	// Return the script templates for each of launcher and worker
 	return m.FinalizeEntrypoints(launcherTemplate, workerTemplate)
 }
 
 func init() {
 	launcher := jobs.LauncherWorker{
-		Identifier:     "app-lammps",
-		Summary:        "LAMMPS molecular dynamic simulation",
-		Container:      "ghcr.io/converged-computing/metric-lammps:latest",
-		WorkerScript:   "/metrics_operator/lammps-worker.sh",
-		LauncherScript: "/metrics_operator/lammps-launcher.sh",
+		Identifier:     "app-quicksilver",
+		Summary:        "A proxy app for the Monte Carlo Transport Code",
+		Container:      "ghcr.io/converged-computing/metric-quicksilver:latest",
+		WorkerScript:   "/metrics_operator/quicksilver-worker.sh",
+		LauncherScript: "/metrics_operator/quicksilver-launcher.sh",
 	}
-	lammps := Lammps{LauncherWorker: launcher}
-	metrics.Register(&lammps)
+	Quicksilver := Quicksilver{LauncherWorker: launcher}
+	metrics.Register(&Quicksilver)
 }

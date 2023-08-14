@@ -9,33 +9,19 @@ package network
 
 import (
 	"fmt"
-	"path"
-	"path/filepath"
 	"strconv"
-	"strings"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
+	jobs "github.com/converged-computing/metrics-operator/pkg/jobs"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 
 // This library is currently private
 
 type Netmark struct {
-	name        string
-	rate        int32
-	completions int32
-	description string
-	container   string
-	resources   *api.ContainerResources
-	attributes  *api.ContainerSpec
-
-	// Scripts
-	workerScript   string
-	launcherScript string
+	jobs.LauncherWorker
 
 	// Options
 	tasks int32
@@ -56,135 +42,17 @@ type Netmark struct {
 	storeEachTrial bool
 }
 
-// Name returns the metric name
-func (m Netmark) Name() string {
-	return m.name
-}
 func (m Netmark) Url() string {
 	return ""
 }
 
-// Description returns the metric description
-func (m Netmark) Description() string {
-	return m.description
-}
-
-// Jobs required for success condition (n is the netmark run)
-func (m Netmark) SuccessJobs() []string {
-	return []string{"n"}
-}
-
-// Container variables
-func (n Netmark) Type() string {
-	return metrics.StandaloneMetric
-}
-func (n Netmark) Image() string {
-	return n.container
-}
-func (n Netmark) WorkingDir() string {
-	return ""
-}
-
-// Return container resources for the metric container
-func (n Netmark) Resources() *api.ContainerResources {
-	return n.resources
-}
-func (n Netmark) Attributes() *api.ContainerSpec {
-	return n.attributes
-}
-
-func (n Netmark) getMetricsKeyToPath() []corev1.KeyToPath {
-	// Runner start scripts
-	makeExecutable := int32(0777)
-
-	// Each metric has an entrypoint script
-	return []corev1.KeyToPath{
-		{
-			Key:  deriveScriptKey(n.launcherScript),
-			Path: path.Base(n.launcherScript),
-			Mode: &makeExecutable,
-		},
-		{
-			Key:  deriveScriptKey(n.workerScript),
-			Path: path.Base(n.workerScript),
-			Mode: &makeExecutable,
-		},
-	}
-}
-
-// Replicated Jobs are custom for this standalone metric
-func (m Netmark) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, error) {
-
-	js := []jobset.ReplicatedJob{}
-
-	// Generate a replicated job for the launcher (netmark) and workers
-	launcher, err := metrics.GetReplicatedJob(spec, false, 1, 1, "n", false)
-	if err != nil {
-		return js, err
-	}
-
-	workers, err := metrics.GetReplicatedJob(spec, false, spec.Spec.Pods-1, spec.Spec.Pods-1, "w", false)
-	if err != nil {
-		return js, err
-	}
-
-	// Add volumes defined under storage.
-	v := map[string]api.Volume{}
-	if spec.HasStorage() {
-		v["storage"] = spec.Spec.Storage.Volume
-	}
-
-	// runnerScripts are custom for a netmark jobset
-	runnerScripts := m.getMetricsKeyToPath()
-
-	volumes := metrics.GetVolumes(spec, runnerScripts, v)
-	launcher.Template.Spec.Template.Spec.Volumes = volumes
-	workers.Template.Spec.Template.Spec.Volumes = volumes
-
-	// Prepare container specs, one for launcher and one for workers
-	launcherSpec := []metrics.ContainerSpec{
-		{
-			Image:      m.container,
-			Name:       "launcher",
-			Command:    []string{"/bin/bash", m.launcherScript},
-			Resources:  m.resources,
-			Attributes: m.attributes,
-		},
-	}
-	workerSpec := []metrics.ContainerSpec{
-		{
-			Image:      m.container,
-			Name:       "workers",
-			Command:    []string{"/bin/bash", m.workerScript},
-			Resources:  m.resources,
-			Attributes: m.attributes,
-		},
-	}
-
-	// Derive the containers, one per metric
-	// This will also include mounts for volumes
-	launcherContainers, err := metrics.GetContainers(spec, launcherSpec, v, false)
-	if err != nil {
-		fmt.Printf("issue creating launcher containers %s", err)
-		return js, err
-	}
-	workerContainers, err := metrics.GetContainers(spec, workerSpec, v, false)
-	if err != nil {
-		fmt.Printf("issue creating worker containers %s", err)
-		return js, err
-	}
-	launcher.Template.Spec.Template.Spec.Containers = launcherContainers
-	workers.Template.Spec.Template.Spec.Containers = workerContainers
-	js = []jobset.ReplicatedJob{*launcher, *workers}
-	return js, nil
-}
-
 // Set custom options / attributes for the metric
 func (m *Netmark) SetOptions(metric *api.Metric) {
-	m.rate = metric.Rate
-	m.completions = metric.Completions
-	m.resources = &metric.Resources
-	m.attributes = &metric.Attributes
+	m.Rate = metric.Rate
+	m.Completions = metric.Completions
+	m.ResourceSpec = &metric.Resources
+	m.AttributeSpec = &metric.Attributes
+	m.LauncherLetter = "n"
 
 	// Set user defined values or fall back to defaults
 	// If we have tasks defined, use it! Otherwise fall back to 2 (likely demo)
@@ -227,16 +95,11 @@ func (m *Netmark) SetOptions(metric *api.Metric) {
 	}
 }
 
-// Validate that we can run Netmark
-func (n Netmark) Validate(spec *api.MetricSet) bool {
-	return spec.Spec.Pods >= 2
-}
-
 // Exported options and list options
 func (n Netmark) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"rate":              intstr.FromInt(int(n.rate)),
-		"completions":       intstr.FromInt(int(n.completions)),
+		"rate":              intstr.FromInt(int(n.Rate)),
+		"completions":       intstr.FromInt(int(n.Completions)),
 		"tasks":             intstr.FromInt(int(n.tasks)),
 		"warmups":           intstr.FromInt(int(n.warmups)),
 		"trials":            intstr.FromInt(int(n.trials)),
@@ -244,19 +107,6 @@ func (n Netmark) Options() map[string]intstr.IntOrString {
 		"messageSize":       intstr.FromInt(int(n.messageSize)),
 		"storeEachTrial":    intstr.FromString(strconv.FormatBool(n.storeEachTrial)),
 	}
-}
-func (n Netmark) ListOptions() map[string][]intstr.IntOrString {
-	return map[string][]intstr.IntOrString{}
-}
-
-// Given a full path, derive the key from the script name minus the extension
-func deriveScriptKey(path string) string {
-
-	// Basename
-	path = filepath.Base(path)
-
-	// Remove the extension, and this assumes we don't have double .
-	return strings.Split(path, ".")[0]
 }
 
 // Return lookup of entrypoint scripts
@@ -267,17 +117,9 @@ func (m Netmark) EntrypointScripts(
 
 	// Metadata to add to beginning of run
 	metadata := metrics.Metadata(spec, metric)
+	hosts := m.GetHostlist(spec)
 
-	// Generate hostlists
-	// The launcher has a different hostname, n for netmark
-	hosts := fmt.Sprintf("%s-n-0-0.%s.%s.svc.cluster.local\n",
-		spec.Name, spec.Spec.ServiceName, spec.Namespace,
-	)
-	// Add number of workers
-	for i := 0; i < int(spec.Spec.Pods-1); i++ {
-		hosts += fmt.Sprintf("%s-w-0-%d.%s.%s.svc.cluster.local\n",
-			spec.Name, i, spec.Spec.ServiceName, spec.Namespace)
-	}
+	// Add boolean flag to store the trial?
 	storeTrial := ""
 	if m.storeEachTrial {
 		storeTrial = "-s"
@@ -338,29 +180,17 @@ echo "%s"
 
 	// The worker just has sleep infinity added
 	workerTemplate := prefix + "\nsleep infinity"
-
-	// Return the script templates for each of launcher and worker
-	return []metrics.EntrypointScript{
-		{
-			Name:   deriveScriptKey(m.launcherScript),
-			Path:   m.launcherScript,
-			Script: launcherTemplate,
-		},
-		{
-			Name:   deriveScriptKey(m.workerScript),
-			Path:   m.workerScript,
-			Script: workerTemplate,
-		},
-	}
+	return m.FinalizeEntrypoints(launcherTemplate, workerTemplate)
 }
 
 func init() {
-	metrics.Register(
-		&Netmark{
-			name:           "network-netmark",
-			description:    "point to point networking tool",
-			container:      "vanessa/netmark:latest",
-			workerScript:   "/metrics_operator/netmark-worker.sh",
-			launcherScript: "/metrics_operator/netmark-launcher.sh",
-		})
+	launcher := jobs.LauncherWorker{
+		Identifier:     "network-netmark",
+		Summary:        "point to point networking tool",
+		Container:      "vanessa/netmark:latest",
+		WorkerScript:   "/metrics_operator/netmark-worker.sh",
+		LauncherScript: "/metrics_operator/netmark-launcher.sh",
+	}
+	netmark := Netmark{LauncherWorker: launcher}
+	metrics.Register(&netmark)
 }
