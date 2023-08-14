@@ -7,7 +7,7 @@ The following metrics are under development (or being planned).
  - [Application Metrics](https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#application)
  - [Standalone Metrics](https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#standalone)
 
-<iframe src="../_static/data/table.html" style="width:100%; height:650px;" frameBorder="0"></iframe>
+<iframe src="../_static/data/table.html" style="width:100%; height:700px;" frameBorder="0"></iframe>
 
 All metrics can be customized with the following variables
 
@@ -289,6 +289,169 @@ More likely you want an actual problem size on a specific number of node and tas
 **NOTE** that the Python parser was written for the test case, and likely we need to extend it to problem 2 or larger sized problems. If you
 run a larger problem and the parser does not work as expected, please [send us the output](https://github.com/converged-computing/metrics-operator/issues) and we will provide an updated parser.
 See [this guide](https://asc.llnl.gov/sites/asc/files/2020-09/AMG_Summary_v1_7.pdf) for more detail.
+
+
+#### app-quicksilver
+
+ - [Standalone Metric Set](user-guide.md#application-metric-set)
+ - *[app-quicksilver](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-quicksilver)*
+
+Quicksilver is a proxy app for Monte Carlo simulation code. You can learn more about it on the [GitHub repository](https://github.com/LLNL/Quicksilver/).
+By default, akin to other apps we expose the entire mpirun command along with the working directory for you to adjust.
+
+| Name | Description | Option Key | Type | Default |
+|-----|-------------|------------|------|---------|
+| command | The qs command (without mpirun) | options->command |string | (see below) |
+| mpirun | The mpirun command (and arguments) | options->mpirun | string | (see below) | 
+| workdir | The working directory for the command | options->workdir | string | /opt/AMG |
+
+By default, when not set, you will just run the qs (quicksilver) binary on a sample problem, represented by an input text file: 
+
+```bash
+# mpirun
+mpirun --hostfile ./hostlist.txt
+
+# command
+qs /opt/quicksilver/Examples/CORAL2_Benchmark/Problem1/Coral2_P1.inp
+
+# Assembled into problem.sh as follows:
+mpirun --hostfile ./hostlist.txt ./problem.sh
+```
+
+There are many problems that come in the container, and here are the fullpaths:
+
+```console
+# Example command
+qs /opt/quicksilver/Examples/CORAL2_Benchmark/Problem1/Coral2_P1.inp
+
+# All examples:
+/opt/quicksilver/Examples/AllScattering/scatteringOnly.inp
+/opt/quicksilver/Examples/NoCollisions/no.collisions.inp
+/opt/quicksilver/Examples/NonFlatXC/NonFlatXC.inp
+/opt/quicksilver/Examples/CORAL2_Benchmark/Problem2/Coral2_P2_4096.inp
+/opt/quicksilver/Examples/CORAL2_Benchmark/Problem2/Coral2_P2.inp
+/opt/quicksilver/Examples/CORAL2_Benchmark/Problem2/Coral2_P2_1.inp
+/opt/quicksilver/Examples/CORAL2_Benchmark/Problem1/Coral2_P1.inp
+/opt/quicksilver/Examples/CORAL2_Benchmark/Problem1/Coral2_P1_1.inp
+/opt/quicksilver/Examples/CORAL2_Benchmark/Problem1/Coral2_P1_4096.inp
+/opt/quicksilver/Examples/CTS2_Benchmark/CTS2.inp
+/opt/quicksilver/Examples/CTS2_Benchmark/CTS2_36.inp
+/opt/quicksilver/Examples/CTS2_Benchmark/CTS2_1.inp
+/opt/quicksilver/Examples/AllAbsorb/allAbsorb.inp
+/opt/quicksilver/Examples/Homogeneous/homogeneousProblem_v4_ts.inp
+/opt/quicksilver/Examples/Homogeneous/homogeneousProblem_v5_ts.inp
+/opt/quicksilver/Examples/Homogeneous/homogeneousProblem.inp
+/opt/quicksilver/Examples/Homogeneous/homogeneousProblem_v3_wq.inp
+/opt/quicksilver/Examples/Homogeneous/homogeneousProblem_v7_ts.inp
+/opt/quicksilver/Examples/Homogeneous/homogeneousProblem_v4_tm.inp
+/opt/quicksilver/Examples/Homogeneous/homogeneousProblem_v3.inp
+/opt/quicksilver/Examples/AllEscape/allEscape.inp
+/opt/quicksilver/Examples/NoFission/noFission.inp
+```
+
+You can also look more closely in the [GitHub repository](https://github.com/LLNL/Quicksilver/tree/master/Examples).
+
+#### app-pennant
+
+ - [Standalone Metric Set](user-guide.md#application-metric-set)
+ - *[app-pennant](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-pennant)*
+
+Pennant is an unstructured mesh hydrodynamics for advanced architectures. The documentation is sparse, but you
+can find the [source code on GitHub](https://github.com/llnl/pennant). 
+By default, akin to other apps we expose the entire mpirun prefix and command along with the working directory for you to adjust.
+
+| Name | Description | Option Key | Type | Default |
+|-----|-------------|------------|------|---------|
+| command | The pennant command (without mpirun) | options->command |string | (see below) |
+| mpirun | The mpirun command (and arguments) | options->mpirun | string | (see below) | 
+| workdir | The working directory for the command | options->workdir | string | /opt/AMG |
+
+By default, when not set, you will just run pennant on a test problem, represented by an input text file: 
+
+```bash
+# mpirun
+mpirun --hostfile ./hostlist.txt
+
+# command
+pennant /opt/pennant/test/sedovsmall/sedovsmall.pnt
+
+# Assembled into problem.sh as follows:
+mpirun --hostfile ./hostlist.txt ./problem.sh
+```
+
+There are many input files that come in the container, and here are the fullpaths in `/opt/pennant/test`:
+
+<details>
+
+<summary>Input files available to pennant</summary>
+
+```console
+|-- leblanc
+|   |-- leblanc.pnt
+|   |-- leblanc.xy.std
+|   `-- leblanc.xy.std4
+|-- leblancbig
+|   `-- leblancbig.pnt
+|-- leblancx16
+|   `-- leblancx16.pnt
+|-- leblancx4
+|   `-- leblancx4.pnt
+|-- leblancx48
+|   `-- leblancx48.pnt
+|-- leblancx64
+|   `-- leblancx64.pnt
+|-- noh
+|   |-- noh.pnt
+|   |-- noh.xy.std
+|   `-- noh.xy.std4
+|-- nohpoly
+|   `-- nohpoly.pnt
+|-- nohsmall
+|   |-- nohsmall.pnt
+|   |-- nohsmall.xy.std
+|   `-- nohsmall.xy.std4
+|-- nohsquare
+|   `-- nohsquare.pnt
+|-- sample_outputs
+|   |-- edison
+|   |   |-- leblancbig.thr1.out
+|   |   |-- leblancx16.thr1024.out
+|   |   |-- leblancx4.thr16.out
+|   |   |-- leblancx64.mpi2048.out
+|   |   `-- nohpoly.thr1.out
+|   `-- vulcan
+|       |-- leblancx16.out
+|       |-- leblancx48.out
+|       |-- sedovflat.out
+|       |-- sedovflatx16.out
+|       |-- sedovflatx4.out
+|       `-- sedovflatx40.out
+|-- sedov
+|   |-- sedov.pnt
+|   |-- sedov.xy.std
+|   `-- sedov.xy.std4
+|-- sedovbig
+|   `-- sedovbig.pnt
+|-- sedovflat
+|   `-- sedovflat.pnt
+|-- sedovflatx120
+|   `-- sedovflatx120.pnt
+|-- sedovflatx16
+|   `-- sedovflatx16.pnt
+|-- sedovflatx4
+|   `-- sedovflatx4.pnt
+|-- sedovflatx40
+|   `-- sedovflatx40.pnt
+`-- sedovsmall
+    |-- sedovsmall.pnt
+    |-- sedovsmall.xy
+    |-- sedovsmall.xy.std
+    `-- sedovsmall.xy.std4
+```
+
+</details>
+
+And likely you will need to adjust the mpirun parameters, etc.
 
 #### app-kripke
 

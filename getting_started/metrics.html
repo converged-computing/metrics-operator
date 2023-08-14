@@ -561,6 +561,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#app-quicksilver" class="md-nav__link">
+    <span title="/getting_started/metrics.md#app-quicksilver (reference label)" class="md-ellipsis">app-<wbr>quicksilver</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#app-pennant" class="md-nav__link">
+    <span title="/getting_started/metrics.md#app-pennant (reference label)" class="md-ellipsis">app-<wbr>pennant</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#app-kripke" class="md-nav__link">
     <span title="/getting_started/metrics.md#app-kripke (reference label)" class="md-ellipsis">app-<wbr>kripke</span>
   </a>
@@ -749,7 +763,7 @@
 <li class="toctree-l1"><a class="reference external" href="https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#standalone">Standalone Metrics</a></li>
 </ul>
 </div>
-<iframe src="../_static/data/table.html" style="width:100%; height:650px;" frameBorder="0"></iframe>
+<iframe src="../_static/data/table.html" style="width:100%; height:700px;" frameBorder="0"></iframe>
 <p>All metrics can be customized with the following variables</p>
 <table border="1" class="docutils">
 <thead>
@@ -1201,6 +1215,209 @@ mpirun<span class="w"> </span>--hostfile<span class="w"> </span>./hostlist.txt<s
 <p><strong>NOTE</strong> that the Python parser was written for the test case, and likely we need to extend it to problem 2 or larger sized problems. If you
 run a larger problem and the parser does not work as expected, please <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues">send us the output</a> and we will provide an updated parser.
 See <a class="reference external" href="https://asc.llnl.gov/sites/asc/files/2020-09/AMG_Summary_v1_7.pdf">this guide</a> for more detail.</p>
+<h4 id="app-quicksilver">app-quicksilver<a class="headerlink" href="#app-quicksilver" title="Permalink to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
+<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-quicksilver">app-quicksilver</a></em></p></li>
+</ul>
+<p>Quicksilver is a proxy app for Monte Carlo simulation code. You can learn more about it on the <a class="reference external" href="https://github.com/LLNL/Quicksilver/">GitHub repository</a>.
+By default, akin to other apps we expose the entire mpirun command along with the working directory for you to adjust.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Option Key</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>command</td>
+<td>The qs command (without mpirun)</td>
+<td>options-&gt;command</td>
+<td>string</td>
+<td>(see below)</td>
+</tr>
+<tr>
+<td>mpirun</td>
+<td>The mpirun command (and arguments)</td>
+<td>options-&gt;mpirun</td>
+<td>string</td>
+<td>(see below)</td>
+</tr>
+<tr>
+<td>workdir</td>
+<td>The working directory for the command</td>
+<td>options-&gt;workdir</td>
+<td>string</td>
+<td>/opt/AMG</td>
+</tr>
+</tbody>
+</table>
+<p>By default, when not set, you will just run the qs (quicksilver) binary on a sample problem, represented by an input text file:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span class="c1"># mpirun</span>
+mpirun<span class="w"> </span>--hostfile<span class="w"> </span>./hostlist.txt
+
+<span class="c1"># command</span>
+qs<span class="w"> </span>/opt/quicksilver/Examples/CORAL2_Benchmark/Problem1/Coral2_P1.inp
+
+<span class="c1"># Assembled into problem.sh as follows:</span>
+mpirun<span class="w"> </span>--hostfile<span class="w"> </span>./hostlist.txt<span class="w"> </span>./problem.sh
+</code></pre></div>
+</div>
+<p>There are many problems that come in the container, and here are the fullpaths:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="gp"># </span>Example<span class="w"> </span><span class="nb">command</span>
+<span class="go">qs /opt/quicksilver/Examples/CORAL2_Benchmark/Problem1/Coral2_P1.inp</span>
+
+<span class="gp"># </span>All<span class="w"> </span>examples:
+<span class="go">/opt/quicksilver/Examples/AllScattering/scatteringOnly.inp</span>
+<span class="go">/opt/quicksilver/Examples/NoCollisions/no.collisions.inp</span>
+<span class="go">/opt/quicksilver/Examples/NonFlatXC/NonFlatXC.inp</span>
+<span class="go">/opt/quicksilver/Examples/CORAL2_Benchmark/Problem2/Coral2_P2_4096.inp</span>
+<span class="go">/opt/quicksilver/Examples/CORAL2_Benchmark/Problem2/Coral2_P2.inp</span>
+<span class="go">/opt/quicksilver/Examples/CORAL2_Benchmark/Problem2/Coral2_P2_1.inp</span>
+<span class="go">/opt/quicksilver/Examples/CORAL2_Benchmark/Problem1/Coral2_P1.inp</span>
+<span class="go">/opt/quicksilver/Examples/CORAL2_Benchmark/Problem1/Coral2_P1_1.inp</span>
+<span class="go">/opt/quicksilver/Examples/CORAL2_Benchmark/Problem1/Coral2_P1_4096.inp</span>
+<span class="go">/opt/quicksilver/Examples/CTS2_Benchmark/CTS2.inp</span>
+<span class="go">/opt/quicksilver/Examples/CTS2_Benchmark/CTS2_36.inp</span>
+<span class="go">/opt/quicksilver/Examples/CTS2_Benchmark/CTS2_1.inp</span>
+<span class="go">/opt/quicksilver/Examples/AllAbsorb/allAbsorb.inp</span>
+<span class="go">/opt/quicksilver/Examples/Homogeneous/homogeneousProblem_v4_ts.inp</span>
+<span class="go">/opt/quicksilver/Examples/Homogeneous/homogeneousProblem_v5_ts.inp</span>
+<span class="go">/opt/quicksilver/Examples/Homogeneous/homogeneousProblem.inp</span>
+<span class="go">/opt/quicksilver/Examples/Homogeneous/homogeneousProblem_v3_wq.inp</span>
+<span class="go">/opt/quicksilver/Examples/Homogeneous/homogeneousProblem_v7_ts.inp</span>
+<span class="go">/opt/quicksilver/Examples/Homogeneous/homogeneousProblem_v4_tm.inp</span>
+<span class="go">/opt/quicksilver/Examples/Homogeneous/homogeneousProblem_v3.inp</span>
+<span class="go">/opt/quicksilver/Examples/AllEscape/allEscape.inp</span>
+<span class="go">/opt/quicksilver/Examples/NoFission/noFission.inp</span>
+</code></pre></div>
+</div>
+<p>You can also look more closely in the <a class="reference external" href="https://github.com/LLNL/Quicksilver/tree/master/Examples">GitHub repository</a>.</p>
+<h4 id="app-pennant">app-pennant<a class="headerlink" href="#app-pennant" title="Permalink to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
+<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-pennant">app-pennant</a></em></p></li>
+</ul>
+<p>Pennant is an unstructured mesh hydrodynamics for advanced architectures. The documentation is sparse, but you
+can find the <a class="reference external" href="https://github.com/llnl/pennant">source code on GitHub</a>.
+By default, akin to other apps we expose the entire mpirun prefix and command along with the working directory for you to adjust.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Option Key</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>command</td>
+<td>The pennant command (without mpirun)</td>
+<td>options-&gt;command</td>
+<td>string</td>
+<td>(see below)</td>
+</tr>
+<tr>
+<td>mpirun</td>
+<td>The mpirun command (and arguments)</td>
+<td>options-&gt;mpirun</td>
+<td>string</td>
+<td>(see below)</td>
+</tr>
+<tr>
+<td>workdir</td>
+<td>The working directory for the command</td>
+<td>options-&gt;workdir</td>
+<td>string</td>
+<td>/opt/AMG</td>
+</tr>
+</tbody>
+</table>
+<p>By default, when not set, you will just run pennant on a test problem, represented by an input text file:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span class="c1"># mpirun</span>
+mpirun<span class="w"> </span>--hostfile<span class="w"> </span>./hostlist.txt
+
+<span class="c1"># command</span>
+pennant<span class="w"> </span>/opt/pennant/test/sedovsmall/sedovsmall.pnt
+
+<span class="c1"># Assembled into problem.sh as follows:</span>
+mpirun<span class="w"> </span>--hostfile<span class="w"> </span>./hostlist.txt<span class="w"> </span>./problem.sh
+</code></pre></div>
+</div>
+<p>There are many input files that come in the container, and here are the fullpaths in <code class="docutils literal notranslate"><span class="pre">/opt/pennant/test</span></code>:</p>
+<details>
+<summary>Input files available to pennant</summary>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="go">|-- leblanc</span>
+<span class="go">|   |-- leblanc.pnt</span>
+<span class="go">|   |-- leblanc.xy.std</span>
+<span class="go">|   `-- leblanc.xy.std4</span>
+<span class="go">|-- leblancbig</span>
+<span class="go">|   `-- leblancbig.pnt</span>
+<span class="go">|-- leblancx16</span>
+<span class="go">|   `-- leblancx16.pnt</span>
+<span class="go">|-- leblancx4</span>
+<span class="go">|   `-- leblancx4.pnt</span>
+<span class="go">|-- leblancx48</span>
+<span class="go">|   `-- leblancx48.pnt</span>
+<span class="go">|-- leblancx64</span>
+<span class="go">|   `-- leblancx64.pnt</span>
+<span class="go">|-- noh</span>
+<span class="go">|   |-- noh.pnt</span>
+<span class="go">|   |-- noh.xy.std</span>
+<span class="go">|   `-- noh.xy.std4</span>
+<span class="go">|-- nohpoly</span>
+<span class="go">|   `-- nohpoly.pnt</span>
+<span class="go">|-- nohsmall</span>
+<span class="go">|   |-- nohsmall.pnt</span>
+<span class="go">|   |-- nohsmall.xy.std</span>
+<span class="go">|   `-- nohsmall.xy.std4</span>
+<span class="go">|-- nohsquare</span>
+<span class="go">|   `-- nohsquare.pnt</span>
+<span class="go">|-- sample_outputs</span>
+<span class="go">|   |-- edison</span>
+<span class="go">|   |   |-- leblancbig.thr1.out</span>
+<span class="go">|   |   |-- leblancx16.thr1024.out</span>
+<span class="go">|   |   |-- leblancx4.thr16.out</span>
+<span class="go">|   |   |-- leblancx64.mpi2048.out</span>
+<span class="go">|   |   `-- nohpoly.thr1.out</span>
+<span class="go">|   `-- vulcan</span>
+<span class="go">|       |-- leblancx16.out</span>
+<span class="go">|       |-- leblancx48.out</span>
+<span class="go">|       |-- sedovflat.out</span>
+<span class="go">|       |-- sedovflatx16.out</span>
+<span class="go">|       |-- sedovflatx4.out</span>
+<span class="go">|       `-- sedovflatx40.out</span>
+<span class="go">|-- sedov</span>
+<span class="go">|   |-- sedov.pnt</span>
+<span class="go">|   |-- sedov.xy.std</span>
+<span class="go">|   `-- sedov.xy.std4</span>
+<span class="go">|-- sedovbig</span>
+<span class="go">|   `-- sedovbig.pnt</span>
+<span class="go">|-- sedovflat</span>
+<span class="go">|   `-- sedovflat.pnt</span>
+<span class="go">|-- sedovflatx120</span>
+<span class="go">|   `-- sedovflatx120.pnt</span>
+<span class="go">|-- sedovflatx16</span>
+<span class="go">|   `-- sedovflatx16.pnt</span>
+<span class="go">|-- sedovflatx4</span>
+<span class="go">|   `-- sedovflatx4.pnt</span>
+<span class="go">|-- sedovflatx40</span>
+<span class="go">|   `-- sedovflatx40.pnt</span>
+<span class="go">`-- sedovsmall</span>
+<span class="go">    |-- sedovsmall.pnt</span>
+<span class="go">    |-- sedovsmall.xy</span>
+<span class="go">    |-- sedovsmall.xy.std</span>
+<span class="go">    `-- sedovsmall.xy.std4</span>
+</code></pre></div>
+</div>
+</details>
+<p>And likely you will need to adjust the mpirun parameters, etc.</p>
 <h4 id="app-kripke">app-kripke<a class="headerlink" href="#app-kripke" title="Permalink to this heading">¶</a></h4>
 <ul class="simple">
 <li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
@@ -1299,7 +1516,7 @@ For apps / metrics to be added, please see <a class="reference external" href="h
   <small>
     
       Last update:
-      Aug 13, 2023
+      Aug 14, 2023
     
   </small>
 </div>
