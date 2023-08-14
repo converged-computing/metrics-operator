@@ -2,6 +2,7 @@
  {
   "name": "app-amg",
   "description": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
+  "family": "simulation",
   "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-amg:latest",
   "url": "https://github.com/LLNL/AMG"
@@ -9,6 +10,7 @@
  {
   "name": "app-kripke",
   "description": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
+  "family": "simulation",
   "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-kripke:latest",
   "url": "https://github.com/LLNL/Kripke"
@@ -16,6 +18,7 @@
  {
   "name": "app-lammps",
   "description": "LAMMPS molecular dynamic simulation",
+  "family": "simulation",
   "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-lammps:latest",
   "url": "https://www.lammps.org/"
@@ -23,6 +26,7 @@
  {
   "name": "app-pennant",
   "description": "Unstructured mesh hydrodynamics for advanced architectures ",
+  "family": "simulation",
   "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-pennant:latest",
   "url": "https://github.com/LLNL/pennant"
@@ -30,6 +34,7 @@
  {
   "name": "app-quicksilver",
   "description": "A proxy app for the Monte Carlo Transport Code",
+  "family": "simulation",
   "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-quicksilver:latest",
   "url": "https://github.com/LLNL/Quicksilver"
@@ -37,6 +42,7 @@
  {
   "name": "io-fio",
   "description": "Flexible IO Tester (FIO)",
+  "family": "storage",
   "type": "storage",
   "image": "ghcr.io/converged-computing/metric-fio:latest",
   "url": "https://fio.readthedocs.io/en/latest/fio_doc.html"
@@ -44,6 +50,7 @@
  {
   "name": "io-sysstat",
   "description": "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
+  "family": "storage",
   "type": "storage",
   "image": "ghcr.io/converged-computing/metric-sysstat:latest",
   "url": "https://github.com/sysstat/sysstat"
@@ -51,6 +58,7 @@
  {
   "name": "network-netmark",
   "description": "point to point networking tool",
+  "family": "network",
   "type": "standalone",
   "image": "vanessa/netmark:latest",
   "url": ""
@@ -58,6 +66,7 @@
  {
   "name": "network-osu-benchmark",
   "description": "point to point MPI benchmarks",
+  "family": "network",
   "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-osu-benchmark:latest",
   "url": "https://mvapich.cse.ohio-state.edu/benchmarks/"
@@ -65,6 +74,7 @@
  {
   "name": "perf-sysstat",
   "description": "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
+  "family": "performance",
   "type": "application",
   "image": "ghcr.io/converged-computing/metric-sysstat:latest",
   "url": "https://github.com/sysstat/sysstat"
