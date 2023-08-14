@@ -80,30 +80,7 @@ func (m Lammps) EntrypointScripts(
 	// Metadata to add to beginning of run
 	metadata := metrics.Metadata(spec, metric)
 	hosts := m.GetHostlist(spec)
-
-	prefixTemplate := `#!/bin/bash
-# Start ssh daemon
-/usr/sbin/sshd -D &
-echo "%s"
-# Change directory to where we will run (and write hostfile)
-cd %s
-# Write the hosts file
-cat <<EOF > ./hostlist.txt
-%s
-EOF
-
-# Allow network to ready
-echo "Sleeping for 10 seconds waiting for network..."
-sleep 10
-echo "%s"
-`
-	prefix := fmt.Sprintf(
-		prefixTemplate,
-		metadata,
-		m.workdir,
-		hosts,
-		metrics.CollectionStart,
-	)
+	prefix := m.GetCommonPrefix(metadata, m.command, hosts)
 
 	// Template for the launcher
 	template := `

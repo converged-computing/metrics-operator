@@ -114,6 +114,46 @@ func (m *LauncherWorker) ensureDefaultNames() {
 	}
 }
 
+// GetCommonPrefix returns a common prefix for the worker/ launcher script, setting up hosts, etc.
+func (m LauncherWorker) GetCommonPrefix(
+	metadata string,
+	command string,
+	hosts string,
+) string {
+
+	prefixTemplate := `#!/bin/bash
+# Start ssh daemon
+/usr/sbin/sshd -D &
+echo "%s"
+# Change directory to where we will run (and write hostfile)
+cd %s
+# Write the hosts file
+cat <<EOF > ./hostlist.txt
+%s
+EOF
+
+# Write the command file for mpirun
+cat <<EOF > ./problem.sh
+#!/bin/bash
+%s
+EOF
+chmod +x ./problem.sh
+
+# Allow network to ready
+echo "Sleeping for 10 seconds waiting for network..."
+sleep 10
+echo "%s"
+`
+	return fmt.Sprintf(
+		prefixTemplate,
+		metadata,
+		m.WorkingDir(),
+		hosts,
+		command,
+		metrics.CollectionStart,
+	)
+}
+
 // Replicated Jobs are custom for this standalone metric
 func (m *LauncherWorker) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, error) {
 

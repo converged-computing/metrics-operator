@@ -24,7 +24,7 @@ type AMG struct {
 	// Custom Options
 	workdir string
 	command string
-	mpirun  string
+	prefix  string
 }
 
 func (m AMG) Url() string {
@@ -39,7 +39,7 @@ func (m *AMG) SetOptions(metric *api.Metric) {
 	m.AttributeSpec = &metric.Attributes
 
 	// Set user defined values or fall back to defaults
-	m.mpirun = "mpirun --hostfile ./hostlist.txt"
+	m.prefix = "mpirun --hostfile ./hostlist.txt"
 	m.command = "amg"
 	m.workdir = "/opt/AMG"
 
@@ -54,7 +54,7 @@ func (m *AMG) SetOptions(metric *api.Metric) {
 	}
 	mpirun, ok := metric.Options["mpirun"]
 	if ok {
-		m.mpirun = mpirun.StrVal
+		m.prefix = mpirun.StrVal
 	}
 }
 
@@ -69,7 +69,7 @@ func (m AMG) Options() map[string]intstr.IntOrString {
 		"rate":        intstr.FromInt(int(m.Rate)),
 		"completions": intstr.FromInt(int(m.Completions)),
 		"command":     intstr.FromString(m.command),
-		"mpirun":      intstr.FromString(m.mpirun),
+		"mpirun":      intstr.FromString(m.prefix),
 		"workdir":     intstr.FromString(m.workdir),
 	}
 }
@@ -82,41 +82,8 @@ func (m AMG) EntrypointScripts(
 
 	// Metadata to add to beginning of run
 	metadata := metrics.Metadata(spec, metric)
-
-	// Generate hostlists
 	hosts := m.GetHostlist(spec)
-
-	prefixTemplate := `#!/bin/bash
-# Start ssh daemon
-/usr/sbin/sshd -D &
-echo "%s"
-# Change directory to where we will run (and write hostfile)
-cd %s
-# Write the hosts file
-cat <<EOF > ./hostlist.txt
-%s
-EOF
-
-# Write the command file for mpirun
-cat <<EOF > ./problem.sh
-#!/bin/bash
-%s
-EOF
-chmod +x ./problem.sh
-
-# Allow network to ready
-echo "Sleeping for 10 seconds waiting for network..."
-sleep 10
-echo "%s"
-`
-	prefix := fmt.Sprintf(
-		prefixTemplate,
-		metadata,
-		m.workdir,
-		hosts,
-		m.command,
-		metrics.CollectionStart,
-	)
+	prefix := m.GetCommonPrefix(metadata, m.command, hosts)
 
 	// Template for the launcher
 	template := `
@@ -128,7 +95,7 @@ echo "%s"
 	launcherTemplate := prefix + fmt.Sprintf(
 		template,
 		metrics.Separator,
-		m.mpirun,
+		m.prefix,
 		metrics.CollectionEnd,
 		metrics.Interactive(spec.Spec.Logging.Interactive),
 	)
