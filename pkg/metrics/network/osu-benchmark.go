@@ -192,6 +192,11 @@ func (m OSUBenchmark) Validate(spec *api.MetricSet) bool {
 	return spec.Spec.Pods == 2
 }
 
+// Family returns the network family
+func (n OSUBenchmark) Family() string {
+	return metrics.NetworkFamily
+}
+
 // Return lookup of entrypoint scripts
 func (m OSUBenchmark) EntrypointScripts(
 	spec *api.MetricSet,

@@ -42,6 +42,11 @@ type Netmark struct {
 	storeEachTrial bool
 }
 
+// Family returns the network family
+func (n Netmark) Family() string {
+	return metrics.NetworkFamily
+}
+
 func (m Netmark) Url() string {
 	return ""
 }

@@ -35,6 +35,11 @@ func (m StorageGeneric) Name() string {
 	return m.Identifier
 }
 
+// Family returns the storage family
+func (m StorageGeneric) Family() string {
+	return metrics.StorageFamily
+}
+
 // Description returns the metric description
 func (m StorageGeneric) Description() string {
 	return m.Summary

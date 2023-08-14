@@ -25,6 +25,11 @@ type Pennant struct {
 	prefix  string
 }
 
+// I think this is a simulation?
+func (m Pennant) Family() string {
+	return metrics.SimulationFamily
+}
+
 func (m Pennant) Url() string {
 	return "https://github.com/LLNL/pennant"
 }

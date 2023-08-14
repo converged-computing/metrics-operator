@@ -31,6 +31,11 @@ func (m AMG) Url() string {
 	return "https://github.com/LLNL/AMG"
 }
 
+// I think this is a simulation?
+func (m AMG) Family() string {
+	return metrics.SimulationFamily
+}
+
 // Set custom options / attributes for the metric
 func (m *AMG) SetOptions(metric *api.Metric) {
 	m.Rate = metric.Rate

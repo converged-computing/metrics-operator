@@ -20,9 +20,18 @@ var (
 )
 
 const (
+	// Metric Design Types
 	ApplicationMetric = "application"
 	StorageMetric     = "storage"
 	StandaloneMetric  = "standalone"
+
+	// Metric Family Types (these likely can be changed)
+	StorageFamily    = "storage"
+	NetworkFamily    = "network"
+	SimulationFamily = "simulation"
+
+	// Generic (more than one type, CPU/io, etc)
+	PerformanceFamily = "performance"
 )
 
 // A MetricSet interface holds one or more Metrics

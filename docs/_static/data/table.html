@@ -416,6 +416,7 @@ table {
         <tr>
             <th>Name</th>
             <th>Type</th>
+            <th>Family</th>
             <th>Description</th>
             <th>Container</th>
         </tr>
@@ -440,6 +441,7 @@ $.getJSON("metrics.json", function(data) {
           return "<a href='" + row['url'] + "' target='_blank'>" + data +"</a>";},
       },
       { data: "type"},
+      { data: "family"},
       { data: "description"},
       { data: "image",
         render: function ( data, type, row ) {
@@ -453,14 +455,18 @@ $.getJSON("metrics.json", function(data) {
       }}
     ],
     'rowCallback': function(row, data, index){
-      if(data.type == 'storage'){
-        $(row).find('td:eq(1)').css('background-color', '#f5f580'); // yellow
+      // Distinguish family
+      if(data.family == 'storage'){
+        $(row).find('td:eq(2)').css('background-color', 'lavender');
       }
-      if(data.type == 'standalone'){
-        $(row).find('td:eq(1)').css('background-color', '#f79fb7'); // pinkish
+      if(data.family == 'performance'){
+        $(row).find('td:eq(2)').css('background-color', '#f79fb7');
       }
-      if(data.type == 'application'){
-        $(row).find('td:eq(1)').css('background-color', '#8af98a'); // lime green
+      if(data.family == 'network'){
+        $(row).find('td:eq(2)').css('background-color', 'orange');
+      }
+      if(data.family == 'simulation'){
+        $(row).find('td:eq(2)').css('background-color', 'skyblue');
       }
     }
   });
