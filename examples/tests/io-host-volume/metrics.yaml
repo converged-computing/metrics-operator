@@ -16,10 +16,9 @@ spec:
 
   metrics:
     - name: io-sysstat
-      rate: 10
-      completions: 2
-
-      # Add human readable output (in a table instead of json)
-      # options:
-      #  human: "true"
+      options:
+        rate: 10
+        completions: 2
+        # Add human readable output (in a table instead of json)
+        # human: "true"
 
