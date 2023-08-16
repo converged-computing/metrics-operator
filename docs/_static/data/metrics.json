@@ -24,14 +24,6 @@
   "url": "https://www.lammps.org/"
  },
  {
-  "name": "app-ovis-hpc",
-  "description": "provides LDMS, a low-overhead, low-latency framework for collecting, transferring, and storing metric data on a large distributed computer system.",
-  "family": "performance",
-  "type": "application",
-  "image": "ghcr.io/converged-computing/metric-ovis-hpc:latest",
-  "url": "https://github.com/LLNL/OvisHPC"
- },
- {
   "name": "app-pennant",
   "description": "Unstructured mesh hydrodynamics for advanced architectures ",
   "family": "simulation",
