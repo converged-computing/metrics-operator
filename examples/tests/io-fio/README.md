@@ -57,7 +57,7 @@ And see the fio result!
 
 ```console
 $ kubectl logs metricset-sample-m-0-4x56g 
-METADATA START {"pods":1,"completions":1,"storageVolumePath":"/workflow","storageVolumeHostPath":"/tmp/workflow","metricName":"io-fio","metricDescription":"Flexible IO Tester (FIO)","metricType":"storage","metricOptions":{"blocksize":"4k","completions":0,"directory":"/tmp","iodepth":64,"rate":10,"size":"4G","testname":"test"}}
+METADATA START {"pods":1,"completions":1,"storageVolumePath":"/workflow","storageVolumeHostPath":"/tmp/workflow","metricName":"io-fio","metricDescription":"Flexible IO Tester (FIO)","metricType":"storage","metricOptions":{"blocksize":"4k","completions":0,"directory":"/tmp","iodepth":64,"size":"4G","testname":"test"}}
 METADATA END
 FIO COMMAND START
 fio --randrepeat=1 --ioengine=libaio --direct=1 --gtod_reduce=1 --name=test --bs=4k --iodepth=64 --readwrite=randrw --rwmixread=75 --size=4G --filename=/tmp/test-b273108fb88ca182ac07dad8b6fe4e61 --output-format=json

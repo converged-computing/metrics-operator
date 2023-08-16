@@ -160,10 +160,6 @@ spec:
                           - privileged
                           type: object
                       type: object
-                    completions:
-                      description: Completions Number of completions to do, more relevant for service type applications that run forever, or a storage metric. If not set (0) then don't set a limit
-                      format: int32
-                      type: integer
                     listOptions:
                       additionalProperties:
                         items:
@@ -194,11 +190,6 @@ spec:
                         x-kubernetes-int-or-string: true
                       description: Metric Options Metric specific options
                       type: object
-                    rate:
-                      default: 10
-                      description: Global attributes shared by all metrics Sampling rate in seconds. Defaults to every 10 seconds
-                      format: int32
-                      type: integer
                     resources:
                       description: Resources include limits and requests for the metric container
                       properties:

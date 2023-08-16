@@ -57,7 +57,7 @@ and then AMG running a test, and the log is printed to the console.
 kubectl logs metricset-sample-l-0-0-lt782 -f
 ```
 ```console
-METADATA START {"pods":2,"completions":2,"metricName":"app-amg","metricDescription":"parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids","metricType":"standalone","metricOptions":{"command":"amg","completions":0,"mpirun":"mpirun --hostfile ./hostlist.txt","rate":10,"workdir":"/opt/AMG"}}
+METADATA START {"pods":2,"completions":2,"metricName":"app-amg","metricDescription":"parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids","metricType":"standalone","metricOptions":{"command":"amg","mpirun":"mpirun --hostfile ./hostlist.txt","workdir":"/opt/AMG"}}
 METADATA END
 Sleeping for 10 seconds waiting for network...
 METRICS OPERATOR COLLECTION START
@@ -129,7 +129,7 @@ find sections of data. Also note that the worker will only be alive long enough 
 finish, and once it does, the worker goes away! Here is what you'll see in its brief life:
 
 ```console
-METADATA START {"pods":2,"completions":2,"metricName":"app-amg","metricDescription":"parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids","metricType":"standalone","metricOptions":{"command":"amg","completions":0,"mpirun":"mpirun --hostfile ./hostlist.txt","rate":10,"workdir":"/opt/AMG"}}
+METADATA START {"pods":2,"completions":2,"metricName":"app-amg","metricDescription":"parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids","metricType":"standalone","metricOptions":{"command":"amg","mpirun":"mpirun --hostfile ./hostlist.txt","workdir":"/opt/AMG"}}
 METADATA END
 Sleeping for 10 seconds waiting for network...
 METRICS OPERATOR COLLECTION START

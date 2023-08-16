@@ -36,8 +36,6 @@ func (m Quicksilver) Url() string {
 
 // Set custom options / attributes for the metric
 func (m *Quicksilver) SetOptions(metric *api.Metric) {
-	m.Rate = metric.Rate
-	m.Completions = metric.Completions
 	m.ResourceSpec = &metric.Resources
 	m.AttributeSpec = &metric.Attributes
 
@@ -64,11 +62,9 @@ func (m *Quicksilver) SetOptions(metric *api.Metric) {
 // Exported options and list options
 func (m Quicksilver) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"rate":        intstr.FromInt(int(m.Rate)),
-		"completions": intstr.FromInt(int(m.Completions)),
-		"command":     intstr.FromString(m.command),
-		"mpirun":      intstr.FromString(m.mpirun),
-		"workdir":     intstr.FromString(m.Workdir),
+		"command": intstr.FromString(m.command),
+		"mpirun":  intstr.FromString(m.mpirun),
+		"workdir": intstr.FromString(m.Workdir),
 	}
 }
 func (n Quicksilver) ListOptions() map[string][]intstr.IntOrString {

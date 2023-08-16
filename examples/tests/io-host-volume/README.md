@@ -59,7 +59,7 @@ added by the Metrics operator for easy parsing by the metricsoperator Python mod
 
 ```console
 root
-METADATA START {"pods":2,"completions":2,"metricName":"network-netmark","metricDescription":"point to point networking tool","metricType":"standalone","metricOptions":{"completions":0,"messageSize":0,"rate":10,"sendReceiveCycles":20,"storeEachTrial":"true","tasks":2,"trials":20,"warmups":10}}
+METADATA START {"pods":2,"completions":2,"metricName":"network-netmark","metricDescription":"point to point networking tool","metricType":"standalone","metricOptions":{"messageSize":0,"rate":10,"sendReceiveCycles":20,"storeEachTrial":"true","tasks":2,"trials":20,"warmups":10}}
 METADATA END
 Sleeping for 10 seconds waiting for network...
 METRICS OPERATOR COLLECTION START
@@ -72,7 +72,7 @@ Error from server (BadRequest): container "io-sysstat" in pod "metricset-sample-
 (env) (base) vanessa@vanessa-ThinkPad-T490s:~/Desktop/Code/metrics-operator$ kubectl logs metricset-sample-m-0-tr58z -f
 Error from server (BadRequest): container "io-sysstat" in pod "metricset-sample-m-0-tr58z" is waiting to start: ContainerCreating
 (env) (base) vanessa@vanessa-ThinkPad-T490s:~/Desktop/Code/metrics-operator$ kubectl logs metricset-sample-m-0-tr58z -f
-METADATA START {"pods":1,"completions":1,"storageVolumePath":"/workflow","storageVolumeHostPath":"/tmp/workflow","metricName":"io-sysstat","metricDescription":"statistics for Linux tasks (processes) : I/O, CPU, memory, etc.","metricType":"storage","metricOptions":{"completions":2,"human":"false","rate":10}}
+METADATA START {"pods":1,"completions":1,"storageVolumePath":"/workflow","storageVolumeHostPath":"/tmp/workflow","metricName":"io-sysstat","metricDescription":"statistics for Linux tasks (processes) : I/O, CPU, memory, etc.","metricType":"storage","metricOptions":{"completions":2,"human":"false"}}
 METADATA END
 METRICS OPERATOR COLLECTION START
 METRICS OPERATOR TIMEPOINT
@@ -273,7 +273,7 @@ You'll see a more tabular format:
 <summary>Output with options->human set to "true"</summary>
 
 ```console
-METADATA START {"pods":1,"completions":1,"storageVolumePath":"/workflow","storageVolumeHostPath":"/tmp/workflow","metricName":"io-sysstat","metricDescription":"statistics for Linux tasks (processes) : I/O, CPU, memory, etc.","metricType":"storage","metricOptions":{"completions":2,"human":"true","rate":10}}
+METADATA START {"pods":1,"completions":1,"storageVolumePath":"/workflow","storageVolumeHostPath":"/tmp/workflow","metricName":"io-sysstat","metricDescription":"statistics for Linux tasks (processes) : I/O, CPU, memory, etc.","metricType":"storage","metricOptions":{"completions":2,"human":"true"}}
 METADATA END
 METRICS OPERATOR COLLECTION START
 ...

@@ -53,8 +53,6 @@ func (m Netmark) Url() string {
 
 // Set custom options / attributes for the metric
 func (m *Netmark) SetOptions(metric *api.Metric) {
-	m.Rate = metric.Rate
-	m.Completions = metric.Completions
 	m.ResourceSpec = &metric.Resources
 	m.AttributeSpec = &metric.Attributes
 	m.LauncherLetter = "n"
@@ -103,8 +101,6 @@ func (m *Netmark) SetOptions(metric *api.Metric) {
 // Exported options and list options
 func (n Netmark) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"rate":              intstr.FromInt(int(n.Rate)),
-		"completions":       intstr.FromInt(int(n.Completions)),
 		"tasks":             intstr.FromInt(int(n.tasks)),
 		"warmups":           intstr.FromInt(int(n.warmups)),
 		"trials":            intstr.FromInt(int(n.trials)),

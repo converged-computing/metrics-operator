@@ -130,8 +130,6 @@ func (m *OSUBenchmark) addCommand(command string) {
 
 // Set custom options / attributes for the metric
 func (m *OSUBenchmark) SetOptions(metric *api.Metric) {
-	m.Rate = metric.Rate
-	m.Completions = metric.Completions
 	m.lookup = map[string]bool{}
 	m.commands = []string{}
 	m.ResourceSpec = &metric.Resources
@@ -168,9 +166,7 @@ func (m *OSUBenchmark) SetOptions(metric *api.Metric) {
 // Exported options and list options
 func (m OSUBenchmark) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"rate":        intstr.FromInt(int(m.Rate)),
-		"completions": intstr.FromInt(int(m.Completions)),
-		"tasks":       intstr.FromInt(int(m.tasks)),
+		"tasks": intstr.FromInt(int(m.tasks)),
 	}
 }
 func (m OSUBenchmark) ListOptions() map[string][]intstr.IntOrString {

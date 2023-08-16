@@ -230,13 +230,6 @@ type Volume struct {
 type Metric struct {
 	Name string `json:"name"`
 
-	// Global attributes shared by all metrics
-	// Sampling rate in seconds. Defaults to every 10 seconds
-	// +kubebuilder:default=10
-	// +default=10
-	// +optional
-	Rate int32 `json:"rate"`
-
 	// Metric Options
 	// Metric specific options
 	// +optional
@@ -250,12 +243,6 @@ type Metric struct {
 	// Metric Map Options
 	// +optional
 	MapOptions map[string]map[string]intstr.IntOrString `json:"mapOptions"`
-
-	// Completions
-	// Number of completions to do, more relevant for service type applications
-	// that run forever, or a storage metric. If not set (0) then don't set a limit
-	// +optional
-	Completions int32 `json:"completions"`
 
 	// Container Spec has attributes for the container
 	//+optional
@@ -328,10 +315,8 @@ func (m *MetricSet) Validate() bool {
 		fmt.Printf("😥️ One or more metrics are required.\n")
 		return false
 	}
-
-	// Storage or an application can have completions (replicas)
 	if m.Spec.Pods < 1 {
-		fmt.Printf("😥️ Completions must be >= 1.")
+		fmt.Printf("😥️ Pods must be >= 1.")
 		return false
 	}
 
@@ -362,12 +347,6 @@ func (m *MetricSet) Validate() bool {
 	// If completions unset, set to parallelism
 	if m.Spec.Completions == 0 {
 		m.Spec.Completions = m.Spec.Pods
-	}
-	// Validation for each metric
-	for _, metric := range m.Spec.Metrics {
-		if metric.Rate <= 0 {
-			metric.Rate = 10
-		}
 	}
 
 	// A standalone metric by definition runs alone

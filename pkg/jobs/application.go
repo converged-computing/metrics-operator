@@ -20,9 +20,7 @@ import (
 // be accessible by other packages (and not conflict with function names)
 type SingleApplication struct {
 	Identifier    string
-	Rate          int32
 	Summary       string
-	Completions   int32
 	Container     string
 	Workdir       string
 	ResourceSpec  *api.ContainerResources

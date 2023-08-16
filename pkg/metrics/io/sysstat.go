@@ -24,6 +24,8 @@ import (
 type IOStat struct {
 	jobs.StorageGeneric
 	humanReadable bool
+	rate          int32
+	completions   int32
 }
 
 func (m IOStat) Url() string {
@@ -32,8 +34,8 @@ func (m IOStat) Url() string {
 
 // Set custom options / attributes for the metric
 func (m *IOStat) SetOptions(metric *api.Metric) {
-	m.Rate = metric.Rate
-	m.Completions = metric.Completions
+	m.rate = 10
+	m.completions = 0 // infinite
 	m.ResourceSpec = &metric.Resources
 	m.AttributeSpec = &metric.Attributes
 
@@ -44,6 +46,15 @@ func (m *IOStat) SetOptions(metric *api.Metric) {
 			m.humanReadable = true
 		}
 	}
+	rate, ok := metric.Options["rate"]
+	if ok {
+		m.rate = rate.IntVal
+	}
+	completions, ok := metric.Options["completions"]
+	if ok {
+		m.completions = completions.IntVal
+	}
+
 }
 
 // Generate the entrypoint for measuring the storage
@@ -86,13 +97,13 @@ done
 		template,
 		spec.Spec.Storage.Commands.Pre,
 		metadata,
-		m.Completions,
+		m.completions,
 		metrics.CollectionStart,
 		metrics.Separator,
 		command,
 		metrics.CollectionEnd,
 		spec.Spec.Storage.Commands.Post,
-		m.Rate,
+		m.rate,
 		spec.Spec.Storage.Commands.Post,
 		metrics.Interactive(spec.Spec.Logging.Interactive),
 	)
@@ -109,8 +120,8 @@ done
 // Exported options and list options
 func (m IOStat) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"rate":        intstr.FromInt(int(m.Rate)),
-		"completions": intstr.FromInt(int(m.Completions)),
+		"rate":        intstr.FromInt(int(m.rate)),
+		"completions": intstr.FromInt(int(m.completions)),
 		"human":       intstr.FromString(strconv.FormatBool(m.humanReadable)),
 	}
 }
