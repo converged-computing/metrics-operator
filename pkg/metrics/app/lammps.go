@@ -35,8 +35,6 @@ func (m Lammps) Family() string {
 
 // Set custom options / attributes for the metric
 func (m *Lammps) SetOptions(metric *api.Metric) {
-	m.Rate = metric.Rate
-	m.Completions = metric.Completions
 	m.ResourceSpec = &metric.Resources
 	m.AttributeSpec = &metric.Attributes
 
@@ -65,10 +63,8 @@ func (n Lammps) Validate(spec *api.MetricSet) bool {
 // Exported options and list options
 func (m Lammps) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"rate":        intstr.FromInt(int(m.Rate)),
-		"completions": intstr.FromInt(int(m.Completions)),
-		"command":     intstr.FromString(m.command),
-		"workdir":     intstr.FromString(m.Workdir),
+		"command": intstr.FromString(m.command),
+		"workdir": intstr.FromString(m.Workdir),
 	}
 }
 func (n Lammps) ListOptions() map[string][]intstr.IntOrString {

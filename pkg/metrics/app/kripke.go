@@ -31,13 +31,11 @@ func (m Kripke) Url() string {
 
 // I think this is a simulation?
 func (m Kripke) Family() string {
-	return metrics.SimulationFamily
+	return metrics.SolverFamily
 }
 
 // Set custom options / attributes for the metric
 func (m *Kripke) SetOptions(metric *api.Metric) {
-	m.Rate = metric.Rate
-	m.Completions = metric.Completions
 	m.ResourceSpec = &metric.Resources
 	m.AttributeSpec = &metric.Attributes
 
@@ -69,11 +67,9 @@ func (n Kripke) Validate(spec *api.MetricSet) bool {
 // Exported options and list options
 func (m Kripke) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"rate":        intstr.FromInt(int(m.Rate)),
-		"completions": intstr.FromInt(int(m.Completions)),
-		"command":     intstr.FromString(m.command),
-		"mpirun":      intstr.FromString(m.prefix),
-		"workdir":     intstr.FromString(m.Workdir),
+		"command": intstr.FromString(m.command),
+		"mpirun":  intstr.FromString(m.prefix),
+		"workdir": intstr.FromString(m.Workdir),
 	}
 }
 func (n Kripke) ListOptions() map[string][]intstr.IntOrString {

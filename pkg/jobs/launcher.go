@@ -34,9 +34,7 @@ var (
 // be accessible by other packages (and not conflict with function names)
 type LauncherWorker struct {
 	Identifier    string
-	Rate          int32
 	Summary       string
-	Completions   int32
 	Container     string
 	Workdir       string
 	ResourceSpec  *api.ContainerResources
@@ -137,14 +135,14 @@ cat <<EOF > ./hostlist.txt
 %s
 EOF
 
-# Write the command file for mpirun
+# Write the command file
 cat <<EOF > ./problem.sh
 #!/bin/bash
 %s
 EOF
 chmod +x ./problem.sh
 
-# Allow network to ready
+# Allow network to ready (this could be a variable)
 echo "Sleeping for 10 seconds waiting for network..."
 sleep 10
 echo "%s"
@@ -233,7 +231,11 @@ func (m LauncherWorker) ListOptions() map[string][]intstr.IntOrString {
 
 // Validate that we can run a network. At least one launcher and worker is required
 func (m LauncherWorker) Validate(spec *api.MetricSet) bool {
-	return spec.Spec.Pods >= 2
+	isValid := spec.Spec.Pods >= 2
+	if !isValid {
+		logger.Errorf("Pods for a Launcher Worker app must be >=2. This app is invalid.")
+	}
+	return isValid
 }
 
 // Given a full path, derive the key from the script name minus the extension

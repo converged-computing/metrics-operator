@@ -24,10 +24,12 @@ type PidStat struct {
 	jobs.SingleApplication
 
 	// Custom Options
-	useColor   bool
-	showPIDS   bool
-	useThreads bool
-	commands   map[string]intstr.IntOrString
+	useColor    bool
+	showPIDS    bool
+	useThreads  bool
+	rate        int32
+	completions int32
+	commands    map[string]intstr.IntOrString
 }
 
 func (m PidStat) Url() string {
@@ -36,8 +38,9 @@ func (m PidStat) Url() string {
 
 // Set custom options / attributes for the metric
 func (m *PidStat) SetOptions(metric *api.Metric) {
-	m.Rate = metric.Rate
-	m.Completions = metric.Completions
+	// Defaults for rate and completions
+	m.rate = 10
+	m.completions = 0 // infinite
 	m.ResourceSpec = &metric.Resources
 	m.AttributeSpec = &metric.Attributes
 
@@ -56,6 +59,14 @@ func (m *PidStat) SetOptions(metric *api.Metric) {
 	_, ok = metric.Options["threads"]
 	if ok {
 		m.useThreads = true
+	}
+	rate, ok := metric.Options["rate"]
+	if ok {
+		m.rate = rate.IntVal
+	}
+	completions, ok := metric.Options["completions"]
+	if ok {
+		m.completions = completions.IntVal
 	}
 
 	// Parse map options
@@ -80,8 +91,8 @@ func (m PidStat) Options() map[string]intstr.IntOrString {
 	}
 
 	return map[string]intstr.IntOrString{
-		"rate":        intstr.FromInt(int(m.Rate)),
-		"completions": intstr.FromInt(int(m.Completions)),
+		"rate":        intstr.FromInt(int(m.rate)),
+		"completions": intstr.FromInt(int(m.completions)),
 		"threads":     intstr.FromString(useThreads),
 		"pids":        intstr.FromString(showPIDS),
 	}
@@ -228,13 +239,13 @@ done
 		useThreads,
 		command,
 		useColor,
-		m.Completions,
+		m.completions,
 		metrics.CollectionStart,
 		metrics.Separator,
 		showPIDS,
 		metrics.CollectionEnd,
 		metrics.CollectionEnd,
-		m.Rate,
+		m.rate,
 		metrics.Interactive(spec.Spec.Logging.Interactive),
 	)
 

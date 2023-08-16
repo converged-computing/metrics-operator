@@ -56,7 +56,7 @@ and then AMG running a test, and the log is printed to the console.
 kubectl logs metricset-sample-l-0-0-lt782 -f
 ```
 ```console
-METADATA START {"pods":2,"completions":2,"metricName":"app-kripke","metricDescription":"parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids","metricType":"standalone","metricOptions":{"command":"kripke","completions":0,"mpirun":"","rate":10,"workdir":"/opt/kripke"}}
+METADATA START {"pods":2,"completions":2,"metricName":"app-kripke","metricDescription":"parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids","metricType":"standalone","metricOptions":{"command":"kripke","completions":0,"mpirun":"","workdir":"/opt/kripke"}}
 METADATA END
 /metrics_operator/kripke-launcher.sh: line 7: cd: /opt/kripke: No such file or directory
 Sleeping for 10 seconds waiting for network...

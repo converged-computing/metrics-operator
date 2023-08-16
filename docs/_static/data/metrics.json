@@ -2,7 +2,7 @@
  {
   "name": "app-amg",
   "description": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
-  "family": "simulation",
+  "family": "solver",
   "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-amg:latest",
   "url": "https://github.com/LLNL/AMG"
@@ -10,7 +10,7 @@
  {
   "name": "app-kripke",
   "description": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
-  "family": "simulation",
+  "family": "solver",
   "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-kripke:latest",
   "url": "https://github.com/LLNL/Kripke"
@@ -22,6 +22,14 @@
   "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-lammps:latest",
   "url": "https://www.lammps.org/"
+ },
+ {
+  "name": "app-ovis-hpc",
+  "description": "provides LDMS, a low-overhead, low-latency framework for collecting, transferring, and storing metric data on a large distributed computer system.",
+  "family": "performance",
+  "type": "application",
+  "image": "ghcr.io/converged-computing/metric-ovis-hpc:latest",
+  "url": "https://github.com/LLNL/OvisHPC"
  },
  {
   "name": "app-pennant",

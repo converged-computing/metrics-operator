@@ -19,12 +19,10 @@ import (
 // They define the interface of a Metric.
 
 type StorageGeneric struct {
-	Identifier  string
-	Rate        int32
-	Completions int32
-	Summary     string
-	Container   string
-	Workdir     string
+	Identifier string
+	Summary    string
+	Container  string
+	Workdir    string
 
 	ResourceSpec  *api.ContainerResources
 	AttributeSpec *api.ContainerSpec

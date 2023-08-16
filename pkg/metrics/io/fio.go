@@ -37,8 +37,6 @@ func (m Fio) Url() string {
 
 // Set custom options / attributes for the metric
 func (m *Fio) SetOptions(metric *api.Metric) {
-	m.Rate = metric.Rate
-	m.Completions = metric.Completions
 	m.ResourceSpec = &metric.Resources
 	m.AttributeSpec = &metric.Attributes
 
@@ -130,13 +128,11 @@ echo "%s"
 // Exported options and list options
 func (m Fio) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"rate":        intstr.FromInt(int(m.Rate)),
-		"completions": intstr.FromInt(int(m.Completions)),
-		"testname":    intstr.FromString(m.testname),
-		"blocksize":   intstr.FromString(m.blocksize),
-		"iodepth":     intstr.FromInt(m.iodepth),
-		"size":        intstr.FromString(m.size),
-		"directory":   intstr.FromString(m.directory),
+		"testname":  intstr.FromString(m.testname),
+		"blocksize": intstr.FromString(m.blocksize),
+		"iodepth":   intstr.FromInt(m.iodepth),
+		"size":      intstr.FromString(m.size),
+		"directory": intstr.FromString(m.directory),
 	}
 }
 

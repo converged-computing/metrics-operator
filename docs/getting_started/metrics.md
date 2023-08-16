@@ -13,12 +13,6 @@ We likely will tweak and improve upon these categories.
 
 <iframe src="../_static/data/table.html" style="width:100%; height:800px;" frameBorder="0"></iframe>
 
-All metrics can be customized with the following variables
-
-|Name | Description | Type | Default |
-|-----|-------------|------------|------|
-| completions | Number of times to run metric | int32 | unset (runs for lifetime of application or indefinitely) |
-| rate | Seconds to pause between measurements | int32 | 10 |
 
 ## Implemented Metrics
 
@@ -43,6 +37,8 @@ This metric provides the "pidstat" executable of the sysstat library. The follow
 | color | Set to turn on color parsing | Anything set | unset |
 | pids | For debugging, show consistent output of ps aux | Anything set | unset |
 | threads | add `-t` to each pidstat command to indicate wanting thread-level output | unset |
+| completions | Number of times to run metric | int32 | unset (runs for lifetime of application or indefinitely) |
+| rate | Seconds to pause between measurements | int32 | 10 |
 
 By default color and pids are set to false anticipating log parsing.
 And we also provide the option to see "commands" or specific commands based on a job index to the metric.
@@ -51,11 +47,14 @@ and the rest (workers).
 
 ```yaml
 - name: perf-sysstat
-  rate: 2
   options:
     pids: "true"
 
-  # Look for pids based on commands matched to index
+  # Custom options
+  options:
+    rate: 2
+
+# Look for pids based on commands matched to index
   mapOptions:
     commands:
        # First set all to use the worker command, but give the lead broker a special command
@@ -72,7 +71,7 @@ for how we use them.  If there is an option or command that is not exposed that 
 
 These metrics are intended to assess storage volumes.
 
-#### io-sfio
+#### io-fio
 
  - [Storage Metric Set](user-guide.md#application-metric-set)
  - *[io-host-volume](https://github.com/converged-computing/metrics-operator/tree/main/examples/storage/google/io-fusion)*
@@ -101,6 +100,8 @@ This is the "iostat" executable of the sysstat library.
 |Name | Description | Type | Default |
 |-----|-------------|------------|------|
 | human | Show tabular, human-readable output inside of json | string "true" or "false" | "false" |
+| completions | Number of times to run metric | int32 | unset (runs for lifetime of application or indefinitely) |
+| rate | Seconds to pause between measurements | int32 | 10 |
 
 This is good for mounted storage that can be seen by the operating system, but may not work for something like NFS.
 
