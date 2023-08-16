@@ -486,8 +486,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#io-sfio" class="md-nav__link">
-    <span title="/getting_started/metrics.md#io-sfio (reference label)" class="md-ellipsis">io-<wbr>sfio</span>
+  <a href="#io-fio" class="md-nav__link">
+    <span title="/getting_started/metrics.md#io-fio (reference label)" class="md-ellipsis">io-<wbr>fio</span>
   </a>
   
 </li>
@@ -766,32 +766,7 @@
 <p>Each of the above is a metric design, which is primarily represented in the Metrics Operator code. However, within each design
 there are different families of metrics (e.g., storage, network, performance, simulation) shown in the table below as the “Family” column.
 We likely will tweak and improve upon these categories.</p>
-<iframe src="../_static/data/table.html" style="width:100%; height:800px;" frameBorder="0"></iframe>
-<p>All metrics can be customized with the following variables</p>
-<table border="1" class="docutils">
-<thead>
-<tr>
-<th>Name</th>
-<th>Description</th>
-<th>Type</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>completions</td>
-<td>Number of times to run metric</td>
-<td>int32</td>
-<td>unset (runs for lifetime of application or indefinitely)</td>
-</tr>
-<tr>
-<td>rate</td>
-<td>Seconds to pause between measurements</td>
-<td>int32</td>
-<td>10</td>
-</tr>
-</tbody>
-</table>
+<iframe src="../_static/data/table.html" style="width:100%; height:850px;" frameBorder="0"></iframe>
 <h2 id="implemented-metrics">Implemented Metrics<a class="headerlink" href="#implemented-metrics" title="Permalink to this heading">¶</a></h2>
 <p>Each metric has a link to the type, along with (optionally) examples. These sections will better be organized by
 family once we decide on a more final set.</p>
@@ -832,6 +807,18 @@ family once we decide on a more final set.</p>
 <td>unset</td>
 <td></td>
 </tr>
+<tr>
+<td>completions</td>
+<td>Number of times to run metric</td>
+<td>int32</td>
+<td>unset (runs for lifetime of application or indefinitely)</td>
+</tr>
+<tr>
+<td>rate</td>
+<td>Seconds to pause between measurements</td>
+<td>int32</td>
+<td>10</td>
+</tr>
 </tbody>
 </table>
 <p>By default color and pids are set to false anticipating log parsing.
@@ -839,11 +826,14 @@ And we also provide the option to see “commands” or specific commands based 
 As an example, here is how we would ask to monitor two different commands for a launcher node (index 0)
 and the rest (workers).</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">perf-sysstat</span>
-<span class="w">  </span><span class="nt">rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
 <span class="w">  </span><span class="nt">options</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">pids</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;true&quot;</span>
 
-<span class="w">  </span><span class="c1"># Look for pids based on commands matched to index</span>
+<span class="w">  </span><span class="c1"># Custom options</span>
+<span class="w">  </span><span class="nt">options</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+
+<span class="c1"># Look for pids based on commands matched to index</span>
 <span class="w">  </span><span class="nt">mapOptions</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">commands</span><span class="p">:</span>
 <span class="w">       </span><span class="c1"># First set all to use the worker command, but give the lead broker a special command</span>
@@ -857,7 +847,7 @@ more information on this command, and <a class="reference external" href="https:
 for how we use them.  If there is an option or command that is not exposed that you would like, please <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues">open an issue</a>.</p>
 <h3 id="storage">Storage<a class="headerlink" href="#storage" title="Permalink to this heading">¶</a></h3>
 <p>These metrics are intended to assess storage volumes.</p>
-<h4 id="io-sfio">io-sfio<a class="headerlink" href="#io-sfio" title="Permalink to this heading">¶</a></h4>
+<h4 id="io-fio">io-fio<a class="headerlink" href="#io-fio" title="Permalink to this heading">¶</a></h4>
 <ul class="simple">
 <li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Storage Metric Set</span></a></p></li>
 <li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/storage/google/io-fusion">io-host-volume</a></em></p></li>
@@ -929,6 +919,18 @@ This allows for testing storage mounted from multiple metric pods without worryi
 <td>Show tabular, human-readable output inside of json</td>
 <td>string "true" or "false"</td>
 <td>"false"</td>
+</tr>
+<tr>
+<td>completions</td>
+<td>Number of times to run metric</td>
+<td>int32</td>
+<td>unset (runs for lifetime of application or indefinitely)</td>
+</tr>
+<tr>
+<td>rate</td>
+<td>Seconds to pause between measurements</td>
+<td>int32</td>
+<td>10</td>
 </tr>
 </tbody>
 </table>
@@ -1520,7 +1522,7 @@ For apps / metrics to be added, please see <a class="reference external" href="h
   <small>
     
       Last update:
-      Aug 15, 2023
+      Aug 16, 2023
     
   </small>
 </div>

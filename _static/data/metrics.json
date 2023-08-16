@@ -2,7 +2,7 @@
  {
   "name": "app-amg",
   "description": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
-  "family": "simulation",
+  "family": "solver",
   "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-amg:latest",
   "url": "https://github.com/LLNL/AMG"
@@ -10,7 +10,7 @@
  {
   "name": "app-kripke",
   "description": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
-  "family": "simulation",
+  "family": "solver",
   "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-kripke:latest",
   "url": "https://github.com/LLNL/Kripke"

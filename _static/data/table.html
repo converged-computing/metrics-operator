@@ -459,6 +459,9 @@ $.getJSON("metrics.json", function(data) {
       if(data.family == 'storage'){
         $(row).find('td:eq(2)').css('background-color', 'lavender');
       }
+      if(data.family == 'solver'){
+        $(row).find('td:eq(2)').css('background-color', 'lightgreen');
+      }
       if(data.family == 'performance'){
         $(row).find('td:eq(2)').css('background-color', '#f79fb7');
       }
