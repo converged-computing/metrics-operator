@@ -58,7 +58,7 @@ kubectl logs metricset-sample-n-0-0-lt782 -f
 ```
 ```console
 root
-METADATA START {"pods":2,"metricName":"network-netmark","metricDescription":"point to point networking tool","metricType":"standalone","metricOptions":{"messageSize":0,"sendReceiveCycles":20,"storeEachTrial":"true","tasks":2,"trials":20,"warmups":10}}
+METADATA START {"pods":2,"completions":2,"metricName":"network-netmark","metricDescription":"point to point networking tool","metricType":"standalone","metricOptions":{"messageSize":0,"sendReceiveCycles":20,"storeEachTrial":"true","tasks":2,"trials":20,"warmups":10}}
 METADATA END
 Sleeping for 10 seconds waiting for network...
 (env) (base) vanessa@vanessa-ThinkPad-T490s:~/Desktop/Code/metrics-operator$ kubectl logs metricset-sample-n-0-0-82jz4 -f
@@ -195,7 +195,7 @@ finish, and once it does, the worker goes away! Here is what you'll see in its b
 
 ```console
 root
-METADATA START {"pods":2, "metricName":"network-netmark","metricDescription":"point to point networking tool","metricType":"standalone","metricOptions":{"messageSize":0,"sendReceiveCycles":20,"storeEachTrial":"true","tasks":2,"trials":20,"warmups":10}}
+METADATA START {"pods":2,"completions":2,"metricName":"network-netmark","metricDescription":"point to point networking tool","metricType":"standalone","metricOptions":{"messageSize":0,"sendReceiveCycles":20,"storeEachTrial":"true","tasks":2,"trials":20,"warmups":10}}
 METADATA END
 Sleeping for 10 seconds waiting for network...
 METRICS OPERATOR COLLECTION START

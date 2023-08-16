@@ -52,7 +52,7 @@ and then LAMMPS running, and the log is printed to the console.
 kubectl logs metricset-sample-l-0-0-lt782 -f
 ```
 ```console
-METADATA START {"pods":2,"metricName":"app-lammps","metricDescription":"LAMMPS molecular dynamic simulation","metricType":"standalone","metricOptions":{"command":"mpirun --hostfile ./hostlist.txt -np 2 --map-by socket lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite","workdir":"/opt/lammps/examples/reaxff/HNS"}}
+METADATA START {"pods":2,"completions":2,"metricName":"app-lammps","metricDescription":"LAMMPS molecular dynamic simulation","metricType":"standalone","metricOptions":{"command":"mpirun --hostfile ./hostlist.txt -np 2 --map-by socket lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite","workdir":"/opt/lammps/examples/reaxff/HNS"}}
 METADATA END
 Sleeping for 10 seconds waiting for network...
 METRICS OPERATOR COLLECTION START
