@@ -1,0 +1,13 @@
+apiVersion: flux-framework.org/v1alpha1
+kind: MetricSet
+metadata:
+  labels:
+    app.kubernetes.io/name: metricset
+    app.kubernetes.io/instance: metricset-sample
+  name: metricset-sample
+spec:
+  metrics:
+    - name: app-ldms
+      options:
+        rate: 10
+        completions: 2   

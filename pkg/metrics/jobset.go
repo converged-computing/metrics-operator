@@ -136,6 +136,7 @@ func GetReplicatedJob(
 		podLabels[tenancyLabel] = soleTenancyValue
 	}
 
+	// Indexed mode if >=2 pods
 	completionMode := batchv1.NonIndexedCompletion
 	if set.Spec.Pods > 1 {
 		completionMode = batchv1.IndexedCompletion

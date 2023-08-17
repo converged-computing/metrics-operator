@@ -30,7 +30,7 @@ except Exception:
 if __name__ == "__main__":
     setup(
         name="metricsoperator",
-        version="0.0.17.3",
+        version="0.0.18",
         author="Vanessasaurus",
         author_email="vsoch@users.noreply.github.com",
         maintainer="Vanessasaurus",
