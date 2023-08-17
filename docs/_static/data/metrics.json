@@ -29,7 +29,7 @@
   "family": "performance",
   "type": "application",
   "image": "ghcr.io/converged-computing/metric-ovis-hpc:latest",
-  "url": "https://github.com/LLNL/LDMS"
+  "url": "https://github.com/ovis-hpc/ovis"
  },
  {
   "name": "app-pennant",
