@@ -24,7 +24,6 @@ type LDMS struct {
 	completions int32
 	command     string
 	rate        int32
-	prefix      string
 }
 
 // I think this is a simulation?
@@ -33,7 +32,7 @@ func (m LDMS) Family() string {
 }
 
 func (m LDMS) Url() string {
-	return "https://github.com/LLNL/LDMS"
+	return "https://github.com/ovis-hpc/ovis"
 }
 
 // Set custom options / attributes for the metric
@@ -47,7 +46,6 @@ func (m *LDMS) SetOptions(metric *api.Metric) {
 	m.command = "ldms_ls -h localhost -x sock -p 10444 -l -v"
 	m.Workdir = "/opt"
 
-	// This could be improved :)
 	command, ok := metric.Options["command"]
 	if ok {
 		m.command = command.StrVal
