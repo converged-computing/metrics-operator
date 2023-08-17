@@ -187,15 +187,16 @@ func GetReplicatedJob(
 		},
 	}
 
+	// Do we want to assign 1 node: 1 pod? We can use Pod Anti-affinity for that
 	// Add sole tenancy if desired (note this is not enabled for anything yet)
 	// as there is some bug with the selector, and I want to clarify how this works
 	if soleTenancy {
-		jobspec.Template.Spec.Affinity = getSoleTenancyAffinity()
+		jobspec.Template.Spec.Affinity = &corev1.Affinity{}
+		jobspec.Template.Spec.Affinity.PodAntiAffinity = getSoleTenancyAffinity()
 		jobspec.Selector = &metav1.LabelSelector{
 			MatchExpressions: []metav1.LabelSelectorRequirement{},
 		}
 		jobspec.Selector.MatchLabels = map[string]string{tenancyLabel: soleTenancyValue}
-		// jobspec.Template.Spec.TopologySpreadConstraints = getSoleTenancyConstraint()
 	}
 
 	// Do we have a pull secret for the application image?
@@ -209,22 +210,8 @@ func GetReplicatedJob(
 	return &job, nil
 }
 
-// getSoleTenancyConstraint determines spread based on hostname (not currently used)
-func getSoleTenancyConstraint() []corev1.TopologySpreadConstraint {
-	return []corev1.TopologySpreadConstraint{
-		{
-			MaxSkew:           1,
-			TopologyKey:       "kubernetes.io/hostname",
-			WhenUnsatisfiable: corev1.DoNotSchedule,
-			LabelSelector: &metav1.LabelSelector{
-				MatchLabels: map[string]string{tenancyLabel: soleTenancyValue},
-			},
-		},
-	}
-}
-
 // getSoleTenancyAffinity ensures one pod per node based on hostname
-func getSoleTenancyAffinity() *corev1.Affinity {
+func getSoleTenancyAffinity() *corev1.PodAntiAffinity {
 	terms := []corev1.PodAffinityTerm{
 		{
 			TopologyKey: "kubernetes.io/hostname",
@@ -233,12 +220,7 @@ func getSoleTenancyAffinity() *corev1.Affinity {
 			},
 		},
 	}
-	return &corev1.Affinity{
-		PodAntiAffinity: &corev1.PodAntiAffinity{
-			RequiredDuringSchedulingIgnoredDuringExecution: terms,
-		},
-		PodAffinity: &corev1.PodAffinity{
-			RequiredDuringSchedulingIgnoredDuringExecution: terms,
-		},
+	return &corev1.PodAntiAffinity{
+		RequiredDuringSchedulingIgnoredDuringExecution: terms,
 	}
 }
