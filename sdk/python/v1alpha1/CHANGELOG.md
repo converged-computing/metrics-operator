@@ -14,6 +14,7 @@ and **Merged pull requests**. Critical items to know are:
 The versions coincide with releases on pip. Only major versions will be released as tags on Github.
 
 ## [0.0.x](https://github.com/converged-computing/metrics-operator/tree/main) (0.0.x)
+ - Refactor of structure of Operator and addition of metrics (0.0.18)
  - Add wait for delete function to python parser (0.0.17)
  - LAMMPS python parser (0.0.16)
    - custom flags and multi example for osu-benchmarks (0.0.16.2)

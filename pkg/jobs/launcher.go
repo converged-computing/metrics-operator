@@ -115,6 +115,12 @@ func (m *LauncherWorker) ensureDefaultNames() {
 	if m.WorkerLetter == "" {
 		m.WorkerLetter = defaultWorkerLetter
 	}
+	if m.LauncherScript == "" {
+		m.LauncherScript = "/metrics_operator/launcher.sh"
+	}
+	if m.WorkerScript == "" {
+		m.WorkerScript = "/metrics_operator/worker.sh"
+	}
 }
 
 // GetCommonPrefix returns a common prefix for the worker/ launcher script, setting up hosts, etc.

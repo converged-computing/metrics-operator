@@ -11,7 +11,7 @@ Each of the above is a metric design, which is primarily represented in the Metr
 there are different families of metrics (e.g., storage, network, performance, simulation) shown in the table below as the "Family" column. 
 We likely will tweak and improve upon these categories.
 
-<iframe src="../_static/data/table.html" style="width:100%; height:850px;" frameBorder="0"></iframe>
+<iframe src="../_static/data/table.html" style="width:100%; height:900px;" frameBorder="0"></iframe>
 
 
 ## Implemented Metrics
@@ -21,7 +21,7 @@ family once we decide on a more final set.
 
 ### Performance
 
-These metrics are intended to assess application performance.
+These metrics are intended to assess application performance, where they run alongside an application of interest.
 
 #### perf-sysstat
 
@@ -32,7 +32,7 @@ These metrics are intended to assess application performance.
 This metric provides the "pidstat" executable of the sysstat library. The following options are available:
 
 
-|Name | Description | Type | Default |
+| Name | Description | Type | Default |
 |-----|-------------|------------|------|
 | color | Set to turn on color parsing | Anything set | unset |
 | pids | For debugging, show consistent output of ps aux | Anything set | unset |
@@ -82,7 +82,7 @@ Options you can set include:
 |Name | Description | Type | Default |
 |-----|-------------|------------|------|
 |testname | Name for the test | string | test |
-| blocksize | Size of block to write. It dfaults to 4k, but can be set from 256 to 8k.  | string | 4k |
+| blocksize | Size of block to write. It defaults to 4k, but can be set from 256 to 8k.  | string | 4k |
 | iodepth | Number of I/O units to keep in flight against the file. | int | 64 |
 | size | Total size of file to write | string | 4G |
 | directory | Directory (usually mounted) to test. | string | /tmp |
@@ -105,8 +105,10 @@ This is the "iostat" executable of the sysstat library.
 
 This is good for mounted storage that can be seen by the operating system, but may not work for something like NFS.
 
-
 ### Standalone
+
+Standalone metrics can take on many designs, from a launcher/worker design to test networking, to running
+a metric across nodes to assess the node performance.
 
 #### network-netmark
 
@@ -505,24 +507,31 @@ ex3_colored-indexset_solution  ex6_stencil-offset-layout_solution  ex9_matrix-tr
 (meaning on the PATH in `/opt/Kripke/build/bin` in the container).
 For apps / metrics to be added, please see [this issue](https://github.com/converged-computing/metrics-operator/issues/30).
 
+#### app-ldms
+
+ - [Standalone Metric Set](user-guide.md#application-metric-set)
+ - *[app-ldms](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-ldms)*
+
+
+LDMS is "a low-overhead, low-latency framework for collecting, transferring, and storing metric data on a large distributed computer system" 
+and is packaged alongside [ovis-hpc](https://github.com/ovis-hpc/ovis). While there are complex aggregator setups we could run,
+for this simple metric we simply run (on each separate pod/node). The following variables are supported:
+
+|Name | Description | Type | Default |
+|-----|-------------|------|------|
+| command | The command to issue to ldms_ls (or that) |string | (see below) |
+| workdir | The working directory for the command |  string | /opt |
+| completions | Number of times to run metric | int32 | unset (runs for lifetime of application or indefinitely) |
+| rate | Seconds to pause between measurements | int32 | 10 |
+
+
+The following is the default command:
+
+```bash
+ldms_ls -h localhost -x sock -p 10444 -l -v
+```
+
 ## Containers
 
-The following tools are folded into the metrics above. Often, one tool can be built into one container and used across multiple metrics.
-
-### Sysstat
-
- - [ghcr.io/converged-computing/metric-sysstat](https://github.com/converged-computing/metrics-operator/pkgs/container/metric-sysstat)
-
-Sysstat is stored as a general metrics analyzer, as it provides several different metric types; It generally provides utils to monitor system performance and usage, including:
-
-- *iostat* reports CPU statistics and input/output statistics for block devices and partitions.
-- *mpstat* reports individual or combined processor related statistics.
-- *pidstat* reports statistics for Linux tasks (processes) : I/O, CPU, memory, etc.
-- *tapestat* reports statistics for tape drives connected to the system.
-- *cifsiostat* reports CIFS statistics.
-
-## LLNL Storage / Filesystems
-
- - NFS
- - Vast
- - Lustre
+To see all associated app containers, look at the [converged-computing/metrics-container](https://github.com/converged-computing/metrics-containers)
+repository (with `Dockerfile`s  and automation) and associated packages.
