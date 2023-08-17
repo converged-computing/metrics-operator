@@ -39,7 +39,6 @@ func (m LDMS) Url() string {
 func (m *LDMS) SetOptions(metric *api.Metric) {
 	m.ResourceSpec = &metric.Resources
 	m.AttributeSpec = &metric.Attributes
-	m.completions = 10
 	m.rate = 10
 
 	// Set user defined values or fall back to defaults
