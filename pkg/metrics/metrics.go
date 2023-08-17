@@ -28,6 +28,7 @@ type Metric interface {
 
 	SetOptions(*api.Metric)
 	Validate(*api.MetricSet) bool
+	HasSoleTenancy() bool
 
 	// Attributes to expose for containers
 	WorkingDir() string

@@ -45,7 +45,7 @@ func GetJobSet(
 		successJobs := getSuccessJobs(set.Metrics())
 
 		// A base JobSet can hold one or more replicated jobs
-		js := getBaseJobSet(spec, successJobs)
+		js := getBaseJobSet(spec, successJobs, set.HasSoleTenancy())
 
 		// Get one or more replicated jobs, depending on the type
 		rjs, err := set.ReplicatedJobs(spec)
@@ -80,13 +80,13 @@ func getSuccessJobs(metrics []*Metric) []string {
 }
 
 // getBaseJobSet shared for either an application or isolated jobset
-func getBaseJobSet(set *api.MetricSet, successSet []string) *jobset.JobSet {
+func getBaseJobSet(set *api.MetricSet, successSet []string, soleTenancy bool) *jobset.JobSet {
 
 	// When suspend is true we have a hard time debugging jobs, so keep false
 	suspend := false
 	enableDNSHostnames := false
 
-	return &jobset.JobSet{
+	js := jobset.JobSet{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      set.Name,
 			Namespace: set.Namespace,
@@ -110,6 +110,12 @@ func getBaseJobSet(set *api.MetricSet, successSet []string) *jobset.JobSet {
 			Suspend: &suspend,
 		},
 	}
+
+	// Do we want to assign 1 node: 1 pod? We can use Pod Anti-affinity for that
+	if soleTenancy {
+		js.ObjectMeta.Annotations = map[string]string{jobset.ExclusiveKey: "kubernetes.io/hostname"}
+	}
+	return &js
 }
 
 // getReplicatedJob returns the base of the replicated job
@@ -119,7 +125,6 @@ func GetReplicatedJob(
 	pods int32,
 	completions int32,
 	jobname string,
-	soleTenancy bool,
 ) (*jobset.ReplicatedJob, error) {
 
 	// Default replicated job name, if not set
@@ -129,12 +134,6 @@ func GetReplicatedJob(
 
 	// Pod labels from the MetricSet
 	podLabels := set.GetPodLabels()
-
-	// If we are asking for single tenancy for this replicated job,
-	// This means just one pod / node
-	if soleTenancy {
-		podLabels[tenancyLabel] = soleTenancyValue
-	}
 
 	// Indexed mode if >=2 pods
 	completionMode := batchv1.NonIndexedCompletion
@@ -187,18 +186,6 @@ func GetReplicatedJob(
 		},
 	}
 
-	// Do we want to assign 1 node: 1 pod? We can use Pod Anti-affinity for that
-	// Add sole tenancy if desired (note this is not enabled for anything yet)
-	// as there is some bug with the selector, and I want to clarify how this works
-	if soleTenancy {
-		jobspec.Template.Spec.Affinity = &corev1.Affinity{}
-		jobspec.Template.Spec.Affinity.PodAntiAffinity = getSoleTenancyAffinity()
-		jobspec.Selector = &metav1.LabelSelector{
-			MatchExpressions: []metav1.LabelSelectorRequirement{},
-		}
-		jobspec.Selector.MatchLabels = map[string]string{tenancyLabel: soleTenancyValue}
-	}
-
 	// Do we have a pull secret for the application image?
 	if set.Spec.Application.PullSecret != "" {
 		jobspec.Template.Spec.ImagePullSecrets = []corev1.LocalObjectReference{
@@ -208,19 +195,4 @@ func GetReplicatedJob(
 	// Tie the jobspec to the job
 	job.Template.Spec = jobspec
 	return &job, nil
-}
-
-// getSoleTenancyAffinity ensures one pod per node based on hostname
-func getSoleTenancyAffinity() *corev1.PodAntiAffinity {
-	terms := []corev1.PodAffinityTerm{
-		{
-			TopologyKey: "kubernetes.io/hostname",
-			LabelSelector: &metav1.LabelSelector{
-				MatchLabels: map[string]string{tenancyLabel: soleTenancyValue},
-			},
-		},
-	}
-	return &corev1.PodAntiAffinity{
-		RequiredDuringSchedulingIgnoredDuringExecution: terms,
-	}
 }

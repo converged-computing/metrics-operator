@@ -43,7 +43,7 @@ func GetApplicationReplicatedJobs(
 	m := (*metric)
 
 	// This defaults to one replicated job, named "m", no custom replicated job name, and sole tenancy false
-	job, err := GetReplicatedJob(spec, shareProcessNamespace, spec.Spec.Pods, spec.Spec.Completions, "", false)
+	job, err := GetReplicatedJob(spec, shareProcessNamespace, spec.Spec.Pods, spec.Spec.Completions, "")
 	if err != nil {
 		return rjs, err
 	}

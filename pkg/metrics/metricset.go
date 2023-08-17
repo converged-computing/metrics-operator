@@ -47,6 +47,7 @@ type MetricSet interface {
 	Metrics() []*Metric
 	EntrypointScripts(*api.MetricSet) []EntrypointScript
 	ReplicatedJobs(*api.MetricSet) ([]jobset.ReplicatedJob, error)
+	HasSoleTenancy() bool
 }
 
 // ConsolidateEntrypointScripts from a metric set into one list
@@ -60,86 +61,58 @@ func consolidateEntrypointScripts(metrics []*Metric, set *api.MetricSet) []Entry
 	return scripts
 }
 
+// BaseMetricSet
+type BaseMetricSet struct {
+	name        string
+	metrics     []*Metric
+	metricNames map[string]bool
+}
+
+func (m BaseMetricSet) Metrics() []*Metric {
+	return m.metrics
+}
+func (m BaseMetricSet) Type() string {
+	return m.name
+}
+func (m BaseMetricSet) Exists(metric *Metric) bool {
+	_, ok := m.metricNames[(*metric).Name()]
+	return ok
+}
+
+// Determine if any metrics in the set need sole tenancy
+// This is defined on the level of the jobset for now
+func (m BaseMetricSet) HasSoleTenancy() bool {
+	for _, m := range m.metrics {
+		if (*m).HasSoleTenancy() {
+			return true
+		}
+	}
+	return false
+}
+
+func (m *BaseMetricSet) Add(metric *Metric) {
+	if !m.Exists(metric) {
+		m.metrics = append(m.metrics, metric)
+		m.metricNames[(*metric).Name()] = true
+	}
+}
+func (m *BaseMetricSet) EntrypointScripts(set *api.MetricSet) []EntrypointScript {
+	return consolidateEntrypointScripts(m.metrics, set)
+}
+
 // Types of Metrics: Storage, Application, and Standalone
 
 // StorageMetricSet defines a MetricSet to measure storage interfaces
 type StorageMetricSet struct {
-	name        string
-	metrics     []*Metric
-	metricNames map[string]bool
-}
-
-func (m StorageMetricSet) Metrics() []*Metric {
-	return m.metrics
-}
-func (m StorageMetricSet) Type() string {
-	return m.name
-}
-func (m StorageMetricSet) Exists(metric *Metric) bool {
-	_, ok := m.metricNames[(*metric).Name()]
-	return ok
-}
-func (m *StorageMetricSet) Add(metric *Metric) {
-	if !m.Exists(metric) {
-		m.metrics = append(m.metrics, metric)
-		m.metricNames[(*metric).Name()] = true
-	}
-}
-func (m *StorageMetricSet) EntrypointScripts(set *api.MetricSet) []EntrypointScript {
-	return consolidateEntrypointScripts(m.metrics, set)
+	BaseMetricSet
 }
 
 // ApplicationMetricSet defines a MetricSet to measure application performance
 type ApplicationMetricSet struct {
-	name        string
-	metrics     []*Metric
-	metricNames map[string]bool
+	BaseMetricSet
 }
-
-func (m ApplicationMetricSet) Metrics() []*Metric {
-	return m.metrics
-}
-func (m ApplicationMetricSet) Type() string {
-	return m.name
-}
-func (m *ApplicationMetricSet) EntrypointScripts(set *api.MetricSet) []EntrypointScript {
-	return consolidateEntrypointScripts(m.metrics, set)
-}
-func (m ApplicationMetricSet) Exists(metric *Metric) bool {
-	_, ok := m.metricNames[(*metric).Name()]
-	return ok
-}
-func (m *ApplicationMetricSet) Add(metric *Metric) {
-	if !m.Exists(metric) {
-		m.metrics = append(m.metrics, metric)
-		m.metricNames[(*metric).Name()] = true
-	}
-}
-
 type StandaloneMetricSet struct {
-	name        string
-	metrics     []*Metric
-	metricNames map[string]bool
-}
-
-func (m StandaloneMetricSet) Metrics() []*Metric {
-	return m.metrics
-}
-func (m StandaloneMetricSet) Type() string {
-	return m.name
-}
-func (m *StandaloneMetricSet) EntrypointScripts(set *api.MetricSet) []EntrypointScript {
-	return consolidateEntrypointScripts(m.metrics, set)
-}
-func (m StandaloneMetricSet) Exists(metric *Metric) bool {
-	_, ok := m.metricNames[(*metric).Name()]
-	return ok
-}
-func (m *StandaloneMetricSet) Add(metric *Metric) {
-	if !m.Exists(metric) {
-		m.metrics = append(m.metrics, metric)
-		m.metricNames[(*metric).Name()] = true
-	}
+	BaseMetricSet
 }
 
 // Register a new Metric type, adding it to the Registry
@@ -161,7 +134,7 @@ func GetMetricSet(name string) (MetricSet, error) {
 }
 
 func init() {
-	RegisterSet(&StorageMetricSet{name: StorageMetric, metricNames: map[string]bool{}})
-	RegisterSet(&ApplicationMetricSet{name: ApplicationMetric, metricNames: map[string]bool{}})
-	RegisterSet(&StandaloneMetricSet{name: StandaloneMetric, metricNames: map[string]bool{}})
+	RegisterSet(&StorageMetricSet{BaseMetricSet{name: StorageMetric, metricNames: map[string]bool{}}})
+	RegisterSet(&ApplicationMetricSet{BaseMetricSet{name: ApplicationMetric, metricNames: map[string]bool{}}})
+	RegisterSet(&StandaloneMetricSet{BaseMetricSet{name: StandaloneMetric, metricNames: map[string]bool{}}})
 }

@@ -50,6 +50,10 @@ type LauncherWorker struct {
 	WorkerLetter   string
 }
 
+func (m LauncherWorker) HasSoleTenancy() bool {
+	return m.SoleTenancy
+}
+
 // Name returns the metric name
 func (m LauncherWorker) Name() string {
 	return m.Identifier
@@ -173,12 +177,12 @@ func (m *LauncherWorker) ReplicatedJobs(spec *api.MetricSet) ([]jobset.Replicate
 	m.ensureDefaultNames()
 
 	// Generate a replicated job for the launcher (LauncherWorker) and workers
-	launcher, err := metrics.GetReplicatedJob(spec, false, 1, 1, m.LauncherLetter, m.SoleTenancy)
+	launcher, err := metrics.GetReplicatedJob(spec, false, 1, 1, m.LauncherLetter)
 	if err != nil {
 		return js, err
 	}
 
-	workers, err := metrics.GetReplicatedJob(spec, false, spec.Spec.Pods-1, spec.Spec.Pods-1, m.WorkerLetter, m.SoleTenancy)
+	workers, err := metrics.GetReplicatedJob(spec, false, spec.Spec.Pods-1, spec.Spec.Pods-1, m.WorkerLetter)
 	if err != nil {
 		return js, err
 	}
