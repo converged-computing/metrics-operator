@@ -513,7 +513,7 @@ For apps / metrics to be added, please see [this issue](https://github.com/conve
  - *[app-ldms](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-ldms)*
 
 
-LDMS is "a low-overhead, low-latency framework for collecting, transfering, and storing metric data on a large distributed computer system" 
+LDMS is "a low-overhead, low-latency framework for collecting, transferring, and storing metric data on a large distributed computer system" 
 and is packaged alongside [ovis-hpc](https://github.com/ovis-hpc/ovis). While there are complex aggregator setups we could run,
 for this simple metric we simply run (on each separate pod/node). The following variables are supported:
 
