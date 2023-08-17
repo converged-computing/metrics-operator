@@ -82,7 +82,7 @@ Options you can set include:
 |Name | Description | Type | Default |
 |-----|-------------|------------|------|
 |testname | Name for the test | string | test |
-| blocksize | Size of block to write. It dfaults to 4k, but can be set from 256 to 8k.  | string | 4k |
+| blocksize | Size of block to write. It defaults to 4k, but can be set from 256 to 8k.  | string | 4k |
 | iodepth | Number of I/O units to keep in flight against the file. | int | 64 |
 | size | Total size of file to write | string | 4G |
 | directory | Directory (usually mounted) to test. | string | /tmp |
