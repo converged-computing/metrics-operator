@@ -581,35 +581,9 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#containers" class="md-nav__link">
-    <span title="/getting_started/metrics.md#containers (reference label)" class="md-ellipsis">Containers</span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Containers">
-      <ul class="md-nav__list">
-        
           <li class="md-nav__item">
-  <a href="#sysstat" class="md-nav__link">
-    <span title="/getting_started/metrics.md#sysstat (reference label)" class="md-ellipsis">Sysstat</span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Sysstat">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="https://github.com/converged-computing/metrics-operator/pkgs/container/metric-sysstat" class="md-nav__link">
-    <span class="md-ellipsis">ghcr.<wbr>io/converged-<wbr>computing/metric-<wbr>sysstat</span>
+  <a href="#app-ldms" class="md-nav__link">
+    <span title="/getting_started/metrics.md#app-ldms (reference label)" class="md-ellipsis">app-<wbr>ldms</span>
   </a>
   
 </li>
@@ -625,8 +599,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#llnl-storage-filesystems" class="md-nav__link">
-    <span title="/getting_started/metrics.md#llnl-storage-filesystems (reference label)" class="md-ellipsis">LLNL Storage / Filesystems</span>
+  <a href="#containers" class="md-nav__link">
+    <span title="/getting_started/metrics.md#containers (reference label)" class="md-ellipsis">Containers</span>
   </a>
   
 </li>
@@ -766,12 +740,12 @@
 <p>Each of the above is a metric design, which is primarily represented in the Metrics Operator code. However, within each design
 there are different families of metrics (e.g., storage, network, performance, simulation) shown in the table below as the “Family” column.
 We likely will tweak and improve upon these categories.</p>
-<iframe src="../_static/data/table.html" style="width:100%; height:850px;" frameBorder="0"></iframe>
+<iframe src="../_static/data/table.html" style="width:100%; height:900px;" frameBorder="0"></iframe>
 <h2 id="implemented-metrics">Implemented Metrics<a class="headerlink" href="#implemented-metrics" title="Permalink to this heading">¶</a></h2>
 <p>Each metric has a link to the type, along with (optionally) examples. These sections will better be organized by
 family once we decide on a more final set.</p>
 <h3 id="performance">Performance<a class="headerlink" href="#performance" title="Permalink to this heading">¶</a></h3>
-<p>These metrics are intended to assess application performance.</p>
+<p>These metrics are intended to assess application performance, where they run alongside an application of interest.</p>
 <h4 id="perf-sysstat">perf-sysstat<a class="headerlink" href="#perf-sysstat" title="Permalink to this heading">¶</a></h4>
 <ul class="simple">
 <li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Application Metric Set</span></a></p></li>
@@ -872,7 +846,7 @@ Options you can set include:</p>
 </tr>
 <tr>
 <td>blocksize</td>
-<td>Size of block to write. It dfaults to 4k, but can be set from 256 to 8k.</td>
+<td>Size of block to write. It defaults to 4k, but can be set from 256 to 8k.</td>
 <td>string</td>
 <td>4k</td>
 </tr>
@@ -936,6 +910,8 @@ This allows for testing storage mounted from multiple metric pods without worryi
 </table>
 <p>This is good for mounted storage that can be seen by the operating system, but may not work for something like NFS.</p>
 <h3 id="standalone">Standalone<a class="headerlink" href="#standalone" title="Permalink to this heading">¶</a></h3>
+<p>Standalone metrics can take on many designs, from a launcher/worker design to test networking, to running
+a metric across nodes to assess the node performance.</p>
 <h4 id="network-netmark">network-netmark<a class="headerlink" href="#network-netmark" title="Permalink to this heading">¶</a></h4>
 <ul class="simple">
 <li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
@@ -1493,28 +1469,57 @@ on your specific command or problem size. Also note that we expose the following
 </div>
 <p>(meaning on the PATH in <code class="docutils literal notranslate"><span class="pre">/opt/Kripke/build/bin</span></code> in the container).
 For apps / metrics to be added, please see <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues/30">this issue</a>.</p>
-<h2 id="containers">Containers<a class="headerlink" href="#containers" title="Permalink to this heading">¶</a></h2>
-<p>The following tools are folded into the metrics above. Often, one tool can be built into one container and used across multiple metrics.</p>
-<h3 id="sysstat">Sysstat<a class="headerlink" href="#sysstat" title="Permalink to this heading">¶</a></h3>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference external" href="https://github.com/converged-computing/metrics-operator/pkgs/container/metric-sysstat">ghcr.io/converged-computing/metric-sysstat</a></li>
+<h4 id="app-ldms">app-ldms<a class="headerlink" href="#app-ldms" title="Permalink to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
+<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-ldms">app-ldms</a></em></p></li>
 </ul>
+<p>LDMS is “a low-overhead, low-latency framework for collecting, transferring, and storing metric data on a large distributed computer system”
+and is packaged alongside <a class="reference external" href="https://github.com/ovis-hpc/ovis">ovis-hpc</a>. While there are complex aggregator setups we could run,
+for this simple metric we simply run (on each separate pod/node). The following variables are supported:</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>command</td>
+<td>The command to issue to ldms_ls (or that)</td>
+<td>string</td>
+<td>(see below)</td>
+</tr>
+<tr>
+<td>workdir</td>
+<td>The working directory for the command</td>
+<td>string</td>
+<td>/opt</td>
+</tr>
+<tr>
+<td>completions</td>
+<td>Number of times to run metric</td>
+<td>int32</td>
+<td>unset (runs for lifetime of application or indefinitely)</td>
+</tr>
+<tr>
+<td>rate</td>
+<td>Seconds to pause between measurements</td>
+<td>int32</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<p>The following is the default command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>ldms_ls<span class="w"> </span>-h<span class="w"> </span>localhost<span class="w"> </span>-x<span class="w"> </span>sock<span class="w"> </span>-p<span class="w"> </span><span class="m">10444</span><span class="w"> </span>-l<span class="w"> </span>-v
+</code></pre></div>
 </div>
-<p>Sysstat is stored as a general metrics analyzer, as it provides several different metric types; It generally provides utils to monitor system performance and usage, including:</p>
-<ul class="simple">
-<li><p><em>iostat</em> reports CPU statistics and input/output statistics for block devices and partitions.</p></li>
-<li><p><em>mpstat</em> reports individual or combined processor related statistics.</p></li>
-<li><p><em>pidstat</em> reports statistics for Linux tasks (processes) : I/O, CPU, memory, etc.</p></li>
-<li><p><em>tapestat</em> reports statistics for tape drives connected to the system.</p></li>
-<li><p><em>cifsiostat</em> reports CIFS statistics.</p></li>
-</ul>
-<h2 id="llnl-storage-filesystems">LLNL Storage / Filesystems<a class="headerlink" href="#llnl-storage-filesystems" title="Permalink to this heading">¶</a></h2>
-<ul class="simple">
-<li><p>NFS</p></li>
-<li><p>Vast</p></li>
-<li><p>Lustre</p></li>
-</ul>
+<h2 id="containers">Containers<a class="headerlink" href="#containers" title="Permalink to this heading">¶</a></h2>
+<p>To see all associated app containers, look at the <a class="reference external" href="https://github.com/converged-computing/metrics-containers">converged-computing/metrics-container</a>
+repository (with <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code>s  and automation) and associated packages.</p>
 
 
   <hr>
@@ -1522,7 +1527,7 @@ For apps / metrics to be added, please see <a class="reference external" href="h
   <small>
     
       Last update:
-      Aug 16, 2023
+      Aug 17, 2023
     
   </small>
 </div>
