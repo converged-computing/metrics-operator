@@ -40,6 +40,9 @@ type LauncherWorker struct {
 	ResourceSpec  *api.ContainerResources
 	AttributeSpec *api.ContainerSpec
 
+	// If we ask for sole tenancy, we assign 1 pod / hostname
+	SoleTenancy bool
+
 	// Scripts
 	WorkerScript   string
 	LauncherScript string
@@ -170,12 +173,12 @@ func (m *LauncherWorker) ReplicatedJobs(spec *api.MetricSet) ([]jobset.Replicate
 	m.ensureDefaultNames()
 
 	// Generate a replicated job for the launcher (LauncherWorker) and workers
-	launcher, err := metrics.GetReplicatedJob(spec, false, 1, 1, m.LauncherLetter, false)
+	launcher, err := metrics.GetReplicatedJob(spec, false, 1, 1, m.LauncherLetter, m.SoleTenancy)
 	if err != nil {
 		return js, err
 	}
 
-	workers, err := metrics.GetReplicatedJob(spec, false, spec.Spec.Pods-1, spec.Spec.Pods-1, m.WorkerLetter, false)
+	workers, err := metrics.GetReplicatedJob(spec, false, spec.Spec.Pods-1, spec.Spec.Pods-1, m.WorkerLetter, m.SoleTenancy)
 	if err != nil {
 		return js, err
 	}

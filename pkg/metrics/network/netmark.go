@@ -57,6 +57,9 @@ func (m *Netmark) SetOptions(metric *api.Metric) {
 	m.AttributeSpec = &metric.Attributes
 	m.LauncherLetter = "n"
 
+	// One pod per hostname
+	m.SoleTenancy = true
+
 	// Set user defined values or fall back to defaults
 	// If we have tasks defined, use it! Otherwise fall back to 2 (likely demo)
 	m.tasks = 0

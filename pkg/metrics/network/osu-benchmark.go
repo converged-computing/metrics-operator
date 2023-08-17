@@ -135,6 +135,9 @@ func (m *OSUBenchmark) SetOptions(metric *api.Metric) {
 	m.ResourceSpec = &metric.Resources
 	m.AttributeSpec = &metric.Attributes
 
+	// One pod per hostname
+	m.SoleTenancy = true
+
 	// We are allowed to specify just one command
 	opts, ok := metric.ListOptions["commands"]
 	if ok {
