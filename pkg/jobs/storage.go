@@ -43,6 +43,10 @@ func (m StorageGeneric) Description() string {
 	return m.Summary
 }
 
+func (m StorageGeneric) HasSoleTenancy() bool {
+	return false
+}
+
 // Container
 func (m StorageGeneric) Image() string {
 	return m.Container

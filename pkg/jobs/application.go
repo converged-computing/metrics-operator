@@ -32,6 +32,10 @@ func (m SingleApplication) Name() string {
 	return m.Identifier
 }
 
+func (m SingleApplication) HasSoleTenancy() bool {
+	return false
+}
+
 // Description returns the metric description
 func (m SingleApplication) Description() string {
 	return m.Summary
