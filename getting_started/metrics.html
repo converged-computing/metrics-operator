@@ -595,6 +595,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#app-laghos" class="md-nav__link">
+    <span title="/getting_started/metrics.md#app-laghos (reference label)" class="md-ellipsis">app-<wbr>laghos</span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1544,7 +1551,7 @@ You can do this via these primary two commands:</p>
 <tbody>
 <tr>
 <td>command</td>
-<td>The full mpirun and lammps command</td>
+<td>The full mpirun and nekbone command</td>
 <td>options-&gt;command</td>
 <td>string</td>
 <td>(see below)</td>
@@ -1554,7 +1561,7 @@ You can do this via these primary two commands:</p>
 <td>The working directory for the command</td>
 <td>options-&gt;workdir</td>
 <td>string</td>
-<td>/opt/lammps/examples/reaxff/HNS#</td>
+<td>/root/nekbone-3.0/test</td>
 </tr>
 </tbody>
 </table>
@@ -1591,6 +1598,44 @@ You can do this via these primary two commands:</p>
 </table>
 <p>You can see the archived repository <a class="reference external" href="https://github.com/Nek5000/Nekbone">here</a>. If there are interesting metrics in this
 project it would be worth bringing it back to life I think.</p>
+<h4 id="app-laghos">app-laghos<a class="headerlink" href="#app-laghos" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
+<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-laghos">app-laghos</a></em></p></li>
+</ul>
+<p>From the <a class="reference external" href="https://github.com/CEED/Laghos">Laghos README</a>:</p>
+<blockquote>
+<div><p>Laghos (LAGrangian High-Order Solver) is a miniapp that solves the time-dependent Euler equations of compressible gas dynamics in a moving Lagrangian frame using unstructured high-order finite element spatial discretization and explicit high-order time-stepping.</p>
+</div></blockquote>
+<p>Akin to other apps, you can customize the command and workdir. Note that the <code class="docutils literal notranslate"><span class="pre">laghos</span></code> executable is at <code class="docutils literal notranslate"><span class="pre">/workflow/laghos</span></code> and not on
+the path, so the default references it as <code class="docutils literal notranslate"><span class="pre">./laghos</span></code>.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Option Key</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>command</td>
+<td>The full mpirun and laghos command</td>
+<td>options-&gt;command</td>
+<td>string</td>
+<td>(see below)</td>
+</tr>
+<tr>
+<td>workdir</td>
+<td>The working directory for the command</td>
+<td>options-&gt;workdir</td>
+<td>string</td>
+<td>/workdir/laghos</td>
+</tr>
+</tbody>
+</table>
 <h2 id="containers">Containers<a class="headerlink" href="#containers" title="Link to this heading">¶</a></h2>
 <p>To see all associated app containers, look at the <a class="reference external" href="https://github.com/converged-computing/metrics-containers">converged-computing/metrics-container</a>
 repository (with <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code>s  and automation) and associated packages.</p>

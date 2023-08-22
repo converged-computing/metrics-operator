@@ -541,8 +541,8 @@ You can do this via these primary two commands:
 
 | Name | Description | Option Key | Type | Default |
 |-----|-------------|------------|------|---------|
-| command | The full mpirun and lammps command | options->command |string | (see below) |
-| workdir | The working directory for the command | options->workdir | string | /opt/lammps/examples/reaxff/HNS# |
+| command | The full mpirun and nekbone command | options->command |string | (see below) |
+| workdir | The working directory for the command | options->workdir | string | /root/nekbone-3.0/test |
 
 And the following combinations are supported. Note that example1 did not build, and example2 is the default (if you don't set these variables).
 
@@ -556,6 +556,24 @@ And the following combinations are supported. Note that example1 did not build, 
 
 You can see the archived repository [here](https://github.com/Nek5000/Nekbone). If there are interesting metrics in this
 project it would be worth bringing it back to life I think.
+
+#### app-laghos
+
+ - [Standalone Metric Set](user-guide.md#application-metric-set)
+ - *[app-laghos](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-laghos)*
+
+From the [Laghos README](https://github.com/CEED/Laghos):
+
+> Laghos (LAGrangian High-Order Solver) is a miniapp that solves the time-dependent Euler equations of compressible gas dynamics in a moving Lagrangian frame using unstructured high-order finite element spatial discretization and explicit high-order time-stepping.
+
+Akin to other apps, you can customize the command and workdir. Note that the `laghos` executable is at `/workflow/laghos` and not on
+the path, so the default references it as `./laghos`.
+
+| Name | Description | Option Key | Type | Default |
+|-----|-------------|------------|------|---------|
+| command | The full mpirun and laghos command | options->command |string | (see below) |
+| workdir | The working directory for the command | options->workdir | string | /workdir/laghos |
+
 
 ## Containers
 
