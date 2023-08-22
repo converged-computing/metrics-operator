@@ -8,6 +8,8 @@ metadata:
 spec:
   # OSU benchmark is point to point and MUST be run with 2 pods
   pods: 2
+  logging:
+    interactive: true
   metrics:
    - name: network-osu-benchmark
 

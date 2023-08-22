@@ -11,7 +11,7 @@ Each of the above is a metric design, which is primarily represented in the Metr
 there are different families of metrics (e.g., storage, network, performance, simulation) shown in the table below as the "Family" column. 
 We likely will tweak and improve upon these categories.
 
-<iframe src="../_static/data/table.html" style="width:100%; height:900px;" frameBorder="0"></iframe>
+<iframe src="../_static/data/table.html" style="width:100%; height:1100px;" frameBorder="0"></iframe>
 
 
 ## Implemented Metrics
@@ -530,6 +530,32 @@ The following is the default command:
 ```bash
 ldms_ls -h localhost -x sock -p 10444 -l -v
 ```
+
+#### app-nekbone
+
+ - [Standalone Metric Set](user-guide.md#application-metric-set)
+ - *[app-nekbone](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-nekbone)*
+
+Nekbone comes with a set of example that primarily depend on you choosing the correct workikng directory and command to run from.
+You can do this via these primary two commands:
+
+| Name | Description | Option Key | Type | Default |
+|-----|-------------|------------|------|---------|
+| command | The full mpirun and lammps command | options->command |string | (see below) |
+| workdir | The working directory for the command | options->workdir | string | /opt/lammps/examples/reaxff/HNS# |
+
+And the following combinations are supported. Note that example1 did not build, and example2 is the default (if you don't set these variables).
+
+| Command | Workdir |
+|---------|---------|
+| mpiexec --hostfile ./hostlist.txt -np 2 ./nekbone | /root/nekbone-3.0/test/example2 |
+| mpiexec --hostfile ./hostlist.txt -np 2 ./nekbone | /root/nekbone-3.0/test/example3 |
+| mpiexec --hostfile ./hostlist.txt -np 2 ./nekbone | /root/nekbone-3.0/test/nek_comm |
+| mpiexec --hostfile ./hostlist.txt -np 2 ./nekbone | /root/nekbone-3.0/test/nek_mgrid |
+| mpiexec --hostfile ./hostlist.txt -np 2 ./nekbone | /root/nekbone-3.0/test/nek_delay |
+
+You can see the archived repository [here](https://github.com/Nek5000/Nekbone). If there are interesting metrics in this
+project it would be worth bringing it back to life I think.
 
 ## Containers
 
