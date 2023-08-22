@@ -32,6 +32,14 @@
   "url": "https://github.com/ovis-hpc/ovis"
  },
  {
+  "name": "app-nekbone",
+  "description": "A mini-app derived from the Nek5000 CFD code which is a high order, incompressible Navier-Stokes CFD solver based on the spectral element method. The conjugate gradiant solve is compute intense, contains small messages and frequent allreduces.",
+  "family": "simulation",
+  "type": "standalone",
+  "image": "ghcr.io/converged-computing/metric-nekbone:latest",
+  "url": "https://github.com/Nek5000/Nekbone"
+ },
+ {
   "name": "app-pennant",
   "description": "Unstructured mesh hydrodynamics for advanced architectures ",
   "family": "simulation",
@@ -78,6 +86,14 @@
   "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-osu-benchmark:latest",
   "url": "https://mvapich.cse.ohio-state.edu/benchmarks/"
+ },
+ {
+  "name": "perf-kit-benchmarker",
+  "description": "An open effort to define a canonical set of benchmarks to measure and compare cloud offerings.",
+  "family": "network",
+  "type": "standalone",
+  "image": "ghcr.io/converged-computing/metric-perf-kit-benchmarker:latest",
+  "url": "https://github.com/GoogleCloudPlatform/PerfKitBenchmarker"
  },
  {
   "name": "perf-sysstat",
