@@ -33,7 +33,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.9dcb20399d0097661.min.css?v=09738cfd" />
+        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.a60204c58f5e4ff66.min.css?v=f7c3c3dc" />
         <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=8eadf0a8" />
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -586,15 +586,15 @@
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
   </a>
 
-<h1 id="operator-creation">Operator Creation<a class="headerlink" href="#operator-creation" title="Permalink to this heading">¶</a></h1>
+<h1 id="operator-creation">Operator Creation<a class="headerlink" href="#operator-creation" title="Link to this heading">¶</a></h1>
 <p>These sections will walk through some of the steps that &#64;vsoch took to create the controller using the operator-sdk, and challenges she faced.</p>
-<h2 id="installation">1. Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h2>
+<h2 id="installation">1. Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
 <p>First, <a class="reference external" href="https://sdk.operatorframework.io/docs/installation/">install the operator-sdk</a> for your platform. At the end of this procedure it should be on your path.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>which<span class="w"> </span>operator-sdk
 /usr/local/bin/operator-sdk
 </code></pre></div>
 </div>
-<h2 id="start-a-development-cluster">2. Start A Development Cluster<a class="headerlink" href="#start-a-development-cluster" title="Permalink to this heading">¶</a></h2>
+<h2 id="start-a-development-cluster">2. Start A Development Cluster<a class="headerlink" href="#start-a-development-cluster" title="Link to this heading">¶</a></h2>
 <p>You can use <a class="reference external" href="https://minikube.sigs.k8s.io/docs/start/">minikube</a>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>minikube<span class="w"> </span>start
 
@@ -606,7 +606,7 @@ $<span class="w"> </span>minikube<span class="w"> </span>start<span class="w"> <
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>kind<span class="w"> </span>create<span class="w"> </span>cluster
 </code></pre></div>
 </div>
-<h2 id="local-workspace">3. Local Workspace<a class="headerlink" href="#local-workspace" title="Permalink to this heading">¶</a></h2>
+<h2 id="local-workspace">3. Local Workspace<a class="headerlink" href="#local-workspace" title="Link to this heading">¶</a></h2>
 <p>At this point, I made sure I was in this present working directory, and I created
 a new (v2) module and then “init” the operator:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>mkdir<span class="w"> </span>metrics-operator
@@ -616,7 +616,7 @@ $<span class="w"> </span>operator-sdk<span class="w"> </span>init<span class="w"
 </code></pre></div>
 </div>
 <p>Note that you don’t need to do this, obviously, if you are using the existing operator here!</p>
-<h2 id="create-controller">4. Create Controller<a class="headerlink" href="#create-controller" title="Permalink to this heading">¶</a></h2>
+<h2 id="create-controller">4. Create Controller<a class="headerlink" href="#create-controller" title="Link to this heading">¶</a></h2>
 <p>Now let’s create a controller, and call it Flux (again, no need to do this if you are using the one here).</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>operator-sdk<span class="w"> </span>create<span class="w"> </span>api<span class="w"> </span>--version<span class="w"> </span>v1alpha1<span class="w"> </span>--kind<span class="w"> </span>MetricSet<span class="w"> </span>--resource<span class="w"> </span>--controller
 </code></pre></div>
@@ -639,7 +639,7 @@ For the above steps (for my first operator), I found the following resources rea
   <small>
     
       Last update:
-      Aug 17, 2023
+      Aug 22, 2023
     
   </small>
 </div>
@@ -716,7 +716,7 @@ For the above steps (for my first operator), I found the following resources rea
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    7.1.2.
+    7.2.2.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   

@@ -33,7 +33,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.9dcb20399d0097661.min.css?v=09738cfd" />
+        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.a60204c58f5e4ff66.min.css?v=f7c3c3dc" />
         <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=8eadf0a8" />
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -638,11 +638,11 @@
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
   </a>
 
-<h1 id="user-guide">User Guide<a class="headerlink" href="#user-guide" title="Permalink to this heading">¶</a></h1>
+<h1 id="user-guide">User Guide<a class="headerlink" href="#user-guide" title="Link to this heading">¶</a></h1>
 <p>Welcome to the Metrics Operator user guide! If you come here, we are assuming you have a cluster
 with the Metrics Operator installed and are interested to submit your own <a class="reference internal" href="custom-resource-definition.html"><span class="std std-doc">custom resource</span></a> to create a MetricSet, or that someone has already done it for you. If you are a developer wanting to work on new functionality or features, see our <a class="reference internal" href="../development/index.html"><span class="std std-doc">Developer Guides</span></a> instead.</p>
-<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
-<h3 id="overview">Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h3>
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h2>
+<h3 id="overview">Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h3>
 <p>Our “MetricSet” is mirroring the design of a <a class="reference external" href="https://github.com/kubernetes-sigs/jobset/">JobSet</a>, which can combine multiple different things (i.e., metrics) into a cohesive unit.
 When you create a MetricSet using this operator, we assume that you are primarily interested in measuring an application performance, collecting storage metrics, or
 using a custom metric provided by the operator that has less stringent requirements.</p>
@@ -661,8 +661,8 @@ using a custom metric provided by the operator that has less stringent requireme
 </ul>
 </details>
 <p>Generally, you’ll be defining an application container with one or more metrics to assess performance, or a storage solution with the same, but metrics to assess IO. There are several modes of operation, depending on your choice of metrics.</p>
-<h3 id="install">Install<a class="headerlink" href="#install" title="Permalink to this heading">¶</a></h3>
-<h4 id="quick-install">Quick Install<a class="headerlink" href="#quick-install" title="Permalink to this heading">¶</a></h4>
+<h3 id="install">Install<a class="headerlink" href="#install" title="Link to this heading">¶</a></h3>
+<h4 id="quick-install">Quick Install<a class="headerlink" href="#quick-install" title="Link to this heading">¶</a></h4>
 <p>This works best for production Kubernetes clusters, and comes down to first installing JobSet (not yet part of Kubernetes)</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>kind<span class="w"> </span>create<span class="w"> </span>cluster
 <span class="nv">VERSION</span><span class="o">=</span>v0.2.0
@@ -678,7 +678,7 @@ kubectl<span class="w"> </span>apply<span class="w"> </span>--server-side<span c
 </code></pre></div>
 </div>
 <p>and then saved to the main branch where you retrieve it from.</p>
-<h4 id="helm-install">Helm Install<a class="headerlink" href="#helm-install" title="Permalink to this heading">¶</a></h4>
+<h4 id="helm-install">Helm Install<a class="headerlink" href="#helm-install" title="Link to this heading">¶</a></h4>
 <p>We optionally provide an install with helm, which you can do either from the charts in the repository:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/converged-computing/metrics-operator
 $<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>metrics-operator
@@ -706,7 +706,7 @@ $ helm pull oci://ghcr.io/converged-computing/metrics-operator-helm/chart
 <span class="go">TEST SUITE: None</span>
 </code></pre></div>
 </div>
-<h3 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this heading">¶</a></h3>
+<h3 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">¶</a></h3>
 <p>Let’s first review how this works.</p>
 <ol class="arabic simple">
 <li><p>We provide metrics here to assess performance, storage, networking, and other custom cases (called standalone).</p></li>
@@ -728,7 +728,7 @@ Once you are comfortable with the basics, you can browse our <a class="reference
 own, or <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues">request a metric be added</a>. Our goals are to
 make these easy to deploy with minimal complexity for you, so we are happy to help. We also encourage you to share examples
 and experiments that you put together here for others to use.</p>
-<h2 id="metrics">Metrics<a class="headerlink" href="#metrics" title="Permalink to this heading">¶</a></h2>
+<h2 id="metrics">Metrics<a class="headerlink" href="#metrics" title="Link to this heading">¶</a></h2>
 <p>For all metric types, the following applies:</p>
 <ol class="arabic simple">
 <li><p>You can create more than one pod (scale the metric) as you see fit.</p></li>
@@ -737,7 +737,7 @@ and experiments that you put together here for others to use.</p>
 <li><p>Each metric type in the list can take a rate, completions, and custom options.</p></li>
 </ol>
 <p>For another overview of these designs, please see the <a class="reference internal" href="../development/index.html"><span class="std std-doc">developer docs</span></a>.</p>
-<h3 id="application-metric-set">Application Metric Set<a class="headerlink" href="#application-metric-set" title="Permalink to this heading">¶</a></h3>
+<h3 id="application-metric-set">Application Metric Set<a class="headerlink" href="#application-metric-set" title="Link to this heading">¶</a></h3>
 <blockquote>
 <div><p>An application metric set includes one or more metrics for measuring application performance.</p>
 </div></blockquote>
@@ -785,7 +785,7 @@ you don’t need to customize or tweak your application container! By way of the
 executed, the sidecar containers can easily “peek in” to your application container to monitor the process and save metrics.
 For this application metric set design, all containers should complete to determine success of the JobSet, and we currently
 rely on pod logs to get output, however we hope to have a more solid solution for this in the future.</p>
-<h3 id="storage-metric">Storage Metric<a class="headerlink" href="#storage-metric" title="Permalink to this heading">¶</a></h3>
+<h3 id="storage-metric">Storage Metric<a class="headerlink" href="#storage-metric" title="Link to this heading">¶</a></h3>
 <blockquote>
 <div><p>A storage metric set includes one or more metrics for assessing one or more volumes</p>
 </div></blockquote>
@@ -826,7 +826,7 @@ Read/write is important here - e.g., if the metric needs to write to the volume,
 is complex, so it’s typically up for you to create the PVC and then the operator will create the volume for it. Keep in mind that you should
 honor RWX (read write many) vs just RW (read write) depending on the design you choose. Also note that by default, we only create one pod,
 but if appropriate you can scale up to more.</p>
-<h3 id="standalone-metric">Standalone Metric<a class="headerlink" href="#standalone-metric" title="Permalink to this heading">¶</a></h3>
+<h3 id="standalone-metric">Standalone Metric<a class="headerlink" href="#standalone-metric" title="Link to this heading">¶</a></h3>
 <blockquote>
 <div><p>A custom, standalone metric that doesn’t abide by any rules!</p>
 </div></blockquote>
@@ -868,7 +868,7 @@ The image below also demonstrates that this standalone metric (along with storag
 than one pod, if appropriate.</p>
 <p><img alt="img/standalone-metric-set.png" src="../_images/standalone-metric-set1.png" /></p>
 <p>For more detail about this design, see the <a class="reference internal" href="../development/index.html"><span class="std std-doc">developer docs</span></a>.</p>
-<h2 id="containers-available">Containers Available<a class="headerlink" href="#containers-available" title="Permalink to this heading">¶</a></h2>
+<h2 id="containers-available">Containers Available<a class="headerlink" href="#containers-available" title="Link to this heading">¶</a></h2>
 <p>All containers are provided under <a class="reference external" href="https://github.com/converged-computing/metrics-operator/pkgs/container/metrics-operator">ghcr.io/converged-computing/metrics-operator</a>. The latest tag is the current main branch, a “bleeding edge” version, and we will provide releases when the operator is more stable.</p>
 
 
@@ -877,7 +877,7 @@ than one pod, if appropriate.</p>
   <small>
     
       Last update:
-      Aug 17, 2023
+      Aug 22, 2023
     
   </small>
 </div>
@@ -954,7 +954,7 @@ than one pod, if appropriate.</p>
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    7.1.2.
+    7.2.2.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
