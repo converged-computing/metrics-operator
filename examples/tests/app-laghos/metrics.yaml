@@ -1,0 +1,15 @@
+apiVersion: flux-framework.org/v1alpha1
+kind: MetricSet
+metadata:
+  labels:
+    app.kubernetes.io/name: metricset
+    app.kubernetes.io/instance: metricset-sample
+  name: metricset-sample
+spec:
+  # Number of indexed jobs to run netmark on
+  pods: 2
+  metrics:
+   # This is the default command. note that laghos is in /workflow/laghos
+   - name: app-laghos
+     options:
+       command: mpirun -np 4 --hostfile ./hostlist.txt ./laghos
