@@ -11,7 +11,7 @@ Each of the above is a metric design, which is primarily represented in the Metr
 there are different families of metrics (e.g., storage, network, performance, simulation) shown in the table below as the "Family" column. 
 We likely will tweak and improve upon these categories.
 
-<iframe src="../_static/data/table.html" style="width:100%; height:900px;" frameBorder="0"></iframe>
+<iframe src="../_static/data/table.html" style="width:100%; height:1100px;" frameBorder="0"></iframe>
 
 
 ## Implemented Metrics

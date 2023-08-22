@@ -27,7 +27,7 @@ type Nekbone struct {
 
 // I think this is a simulation?
 func (m Nekbone) Family() string {
-	return metrics.SimulationFamily
+	return metrics.SolverFamily
 }
 
 func (m Nekbone) Url() string {
