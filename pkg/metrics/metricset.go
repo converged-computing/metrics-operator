@@ -26,10 +26,11 @@ const (
 	StandaloneMetric  = "standalone"
 
 	// Metric Family Types (these likely can be changed)
-	StorageFamily    = "storage"
-	NetworkFamily    = "network"
-	SimulationFamily = "simulation"
-	SolverFamily     = "solver"
+	StorageFamily         = "storage"
+	MachineLearningFamily = "machine-learning"
+	NetworkFamily         = "network"
+	SimulationFamily      = "simulation"
+	SolverFamily          = "solver"
 
 	// Generic (more than one type, CPU/io, etc)
 	ProxyAppFamily    = "proxyapp"
