@@ -602,6 +602,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#app-bdas" class="md-nav__link">
+    <span title="/getting_started/metrics.md#app-bdas (reference label)" class="md-ellipsis">app-<wbr>bdas</span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -754,7 +761,7 @@
 <p>Each of the above is a metric design, which is primarily represented in the Metrics Operator code. However, within each design
 there are different families of metrics (e.g., storage, network, performance, simulation) shown in the table below as the “Family” column.
 We likely will tweak and improve upon these categories.</p>
-<iframe src="../_static/data/table.html" style="width:100%; height:1100px;" frameBorder="0"></iframe>
+<iframe src="../_static/data/table.html" style="width:100%; height:1150px;" frameBorder="0"></iframe>
 <h2 id="implemented-metrics">Implemented Metrics<a class="headerlink" href="#implemented-metrics" title="Link to this heading">¶</a></h2>
 <p>Each metric has a link to the type, along with (optionally) examples. These sections will better be organized by
 family once we decide on a more final set.</p>
@@ -1636,6 +1643,53 @@ the path, so the default references it as <code class="docutils literal notransl
 </tr>
 </tbody>
 </table>
+<h4 id="app-bdas">app-bdas<a class="headerlink" href="#app-bdas" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
+<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-bdas">app-bdas</a></em></p></li>
+</ul>
+<p>BDAS standards for “Big Data Analysis Suite” and you can read more about it <a class="reference external" href="https://asc.llnl.gov/sites/asc/files/2020-09/BDAS_Summary_b4bcf27_0.pdf">here</a>.
+The container has machine learning analyses (provided in R) that work with MPI (openmpi),
+The benchmarks are in <code class="docutils literal notranslate"><span class="pre">/opt/bdas/benchmarks/r</span></code> in the container, and we provide an example for princomp
+(see default command below):</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Option Key</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>command</td>
+<td>The full mpirun and laghos command</td>
+<td>options-&gt;command</td>
+<td>string</td>
+<td>(see below)</td>
+</tr>
+<tr>
+<td>workdir</td>
+<td>The working directory for the command</td>
+<td>options-&gt;workdir</td>
+<td>string</td>
+<td>/opt/bdas/benchmarks/r</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="gp"># </span>This<span class="w"> </span>is<span class="w"> </span>the<span class="w"> </span>default<span class="w"> </span>command.<span class="w"> </span>You<span class="w"> </span>must<span class="w"> </span>target<span class="w"> </span>the<span class="w"> </span>--hostfile<span class="w"> </span>and<span class="w"> </span>use<span class="w"> </span>the<span class="w"> </span>allow<span class="w"> </span>as<span class="w"> </span>root<span class="w"> </span>flag!
+<span class="go">mpirun --allow-run-as-root -np 4 --hostfile ./hostlist.txt Rscript /opt/bdas/benchmarks/r/princomp.r 250 50</span>
+</code></pre></div>
+</div>
+<p>Try setting the logging-&gt;interactive: true option in the spec to keep the container running and explore other benchmarks.
+These are the ones I’ve tried:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="gp"># </span>This<span class="w"> </span>is<span class="w"> </span>the<span class="w"> </span>default<span class="w"> </span>command.<span class="w"> </span>You<span class="w"> </span>must<span class="w"> </span>target<span class="w"> </span>the<span class="w"> </span>--hostfile<span class="w"> </span>and<span class="w"> </span>use<span class="w"> </span>the<span class="w"> </span>allow<span class="w"> </span>as<span class="w"> </span>root<span class="w"> </span>flag!
+<span class="go">mpirun --allow-run-as-root -np 4 --hostfile ./hostlist.txt Rscript /opt/bdas/benchmarks/r/kmeans.r 250 50</span>
+<span class="go">mpirun --allow-run-as-root -np 4 --hostfile ./hostlist.txt Rscript /opt/bdas/benchmarks/r/svm.r 250 50</span>
+</code></pre></div>
+</div>
 <h2 id="containers">Containers<a class="headerlink" href="#containers" title="Link to this heading">¶</a></h2>
 <p>To see all associated app containers, look at the <a class="reference external" href="https://github.com/converged-computing/metrics-containers">converged-computing/metrics-container</a>
 repository (with <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code>s  and automation) and associated packages.</p>
@@ -1646,7 +1700,7 @@ repository (with <code class="docutils literal notranslate"><span class="pre">Do
   <small>
     
       Last update:
-      Aug 22, 2023
+      Aug 23, 2023
     
   </small>
 </div>

@@ -11,7 +11,7 @@ Each of the above is a metric design, which is primarily represented in the Metr
 there are different families of metrics (e.g., storage, network, performance, simulation) shown in the table below as the "Family" column. 
 We likely will tweak and improve upon these categories.
 
-<iframe src="../_static/data/table.html" style="width:100%; height:1100px;" frameBorder="0"></iframe>
+<iframe src="../_static/data/table.html" style="width:100%; height:1150px;" frameBorder="0"></iframe>
 
 
 ## Implemented Metrics
@@ -574,6 +574,33 @@ the path, so the default references it as `./laghos`.
 | command | The full mpirun and laghos command | options->command |string | (see below) |
 | workdir | The working directory for the command | options->workdir | string | /workdir/laghos |
 
+#### app-bdas
+
+ - [Standalone Metric Set](user-guide.md#application-metric-set)
+ - *[app-bdas](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-bdas)*
+
+BDAS standards for "Big Data Analysis Suite" and you can read more about it [here](https://asc.llnl.gov/sites/asc/files/2020-09/BDAS_Summary_b4bcf27_0.pdf).
+The container has machine learning analyses (provided in R) that work with MPI (openmpi),
+The benchmarks are in `/opt/bdas/benchmarks/r` in the container, and we provide an example for princomp
+(see default command below):
+
+| Name | Description | Option Key | Type | Default |
+|-----|-------------|------------|------|---------|
+| command | The full mpirun and laghos command | options->command |string | (see below) |
+| workdir | The working directory for the command | options->workdir | string | /opt/bdas/benchmarks/r |
+
+```console
+# This is the default command. You must target the --hostfile and use the allow as root flag!
+mpirun --allow-run-as-root -np 4 --hostfile ./hostlist.txt Rscript /opt/bdas/benchmarks/r/princomp.r 250 50
+```
+Try setting the logging->interactive: true option in the spec to keep the container running and explore other benchmarks.
+These are the ones I've tried:
+
+```console
+# This is the default command. You must target the --hostfile and use the allow as root flag!
+mpirun --allow-run-as-root -np 4 --hostfile ./hostlist.txt Rscript /opt/bdas/benchmarks/r/kmeans.r 250 50
+mpirun --allow-run-as-root -np 4 --hostfile ./hostlist.txt Rscript /opt/bdas/benchmarks/r/svm.r 250 50
+```
 
 ## Containers
 
