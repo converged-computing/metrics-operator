@@ -17,4 +17,6 @@ spec:
   metrics:
      # Fio just runs once - no concept of completions / rate
     - name: io-ior
+      options:
+        workdir: /tmp/workflow
 

@@ -3,7 +3,7 @@
 This will show running [Ior](https://github.com/hpc/ior) on a host volume.
 We will first create the volume, and then reference it for our metric of interest.
 
-![../../../docs/getting_started/img/ior.jpeg](../../../docs/getting_started/img/ior.jpeg )
+![../../../docs/getting_started/img/ior.jpeg](../../../docs/getting_started/img/ior.jpeg)
 
 ## Usage
 
