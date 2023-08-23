@@ -93,7 +93,7 @@ This allows for testing storage mounted from multiple metric pods without worryi
 #### io-ior
 
  - [Storage Metric Set](user-guide.md#application-metric-set)
- - *[io-host-volume](https://github.com/converged-computing/metrics-operator/tree/main/examples/storage/google/io-ior)*
+ - *[io-host-volume](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/io-ior)*
 
 ![img/ior.jpeg](img/ior.jpeg)
 
