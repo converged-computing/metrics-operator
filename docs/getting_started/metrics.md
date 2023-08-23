@@ -11,7 +11,7 @@ Each of the above is a metric design, which is primarily represented in the Metr
 there are different families of metrics (e.g., storage, network, performance, simulation) shown in the table below as the "Family" column. 
 We likely will tweak and improve upon these categories.
 
-<iframe src="../_static/data/table.html" style="width:100%; height:1150px;" frameBorder="0"></iframe>
+<iframe src="../_static/data/table.html" style="width:100%; height:1100px;" frameBorder="0"></iframe>
 
 
 ## Implemented Metrics
@@ -586,7 +586,7 @@ The benchmarks are in `/opt/bdas/benchmarks/r` in the container, and we provide 
 
 | Name | Description | Option Key | Type | Default |
 |-----|-------------|------------|------|---------|
-| command | The full mpirun and laghos command | options->command |string | (see below) |
+| command | The full mpirun and Rscript command | options->command |string | (see below) |
 | workdir | The working directory for the command | options->workdir | string | /opt/bdas/benchmarks/r |
 
 ```console

@@ -431,7 +431,7 @@ $(document).ready(function () {
 $.getJSON("metrics.json", function(data) {
   $('#metrics').DataTable({
     data: data,
-    pageLength: 50,
+    pageLength: 10,
     columns: [
       { data: "name",
         render: function ( data, type, row ) {
