@@ -87,10 +87,6 @@ echo "%s"
 		spec.Spec.Storage.Commands.Prefix,
 		metrics.Interactive(spec.Spec.Logging.Interactive),
 	)
-	// The entrypoint is the entrypoint for the container, while
-	// the command is expected to be what we are monitoring. Often
-	// they are the same thing. We return an empty Name so it's automatically
-	// assigned
 	return []metrics.EntrypointScript{
 		{Script: script},
 	}
