@@ -465,6 +465,9 @@ $.getJSON("metrics.json", function(data) {
       if(data.family == 'performance'){
         $(row).find('td:eq(2)').css('background-color', '#f79fb7');
       }
+      if(data.family == 'machine-learning'){
+        $(row).find('td:eq(2)').css('background-color', 'palegoldenrod');
+      }
       if(data.family == 'network'){
         $(row).find('td:eq(2)').css('background-color', 'orange');
       }
