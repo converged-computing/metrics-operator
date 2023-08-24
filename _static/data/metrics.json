@@ -80,6 +80,14 @@
   "url": "https://fio.readthedocs.io/en/latest/fio_doc.html"
  },
  {
+  "name": "io-ior",
+  "description": "HPC IO Benchmark",
+  "family": "storage",
+  "type": "storage",
+  "image": "ghcr.io/converged-computing/metric-ior:latest",
+  "url": "https://github.com/hpc/ior"
+ },
+ {
   "name": "io-sysstat",
   "description": "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
   "family": "storage",

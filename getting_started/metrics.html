@@ -493,6 +493,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#io-ior" class="md-nav__link">
+    <span title="/getting_started/metrics.md#io-ior (reference label)" class="md-ellipsis">io-<wbr>ior</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#io-sysstat" class="md-nav__link">
     <span title="/getting_started/metrics.md#io-sysstat (reference label)" class="md-ellipsis">io-<wbr>sysstat</span>
   </a>
@@ -893,6 +900,42 @@ Options you can set include:</p>
 </table>
 <p>For the last “directory” we use this location to write a temporary file, which will be cleaned up.
 This allows for testing storage mounted from multiple metric pods without worrying about a name conflict.</p>
+<h4 id="io-ior">io-ior<a class="headerlink" href="#io-ior" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Storage Metric Set</span></a></p></li>
+<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/io-ior">io-host-volume</a></em></p></li>
+</ul>
+<p><img alt="img/ior.jpeg" src="../_images/ior.jpeg" /></p>
+<p><a class="reference external" href="https://github.com/hpc/ior">Ior</a> is a really nice IO tool that is now a combination of its previous self and the <a class="reference external" href="https://github.com/llnl/mdtest">mdtest</a>
+tool. We expose a simple set of the working directory and command that you want to run, and the rest is up to you!</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>command</td>
+<td>The default ior command</td>
+<td>string</td>
+<td>ior -w -r -o testfile</td>
+</tr>
+<tr>
+<td>workdir</td>
+<td>The working directory for the command</td>
+<td>string</td>
+<td>/opt/ior</td>
+</tr>
+</tbody>
+</table>
+<p>The <a class="reference external" href="https://ior.readthedocs.io/en/latest/userDoc/tutorial.html">getting started</a> tutorial is great for seeing how
+basic commands are done. Note that the container does have mpirun if you want to use it. We don’t have support
+for this across nodes, but this could be added. <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues">Let us know</a>
+if this would be interesting to you.</p>
 <h4 id="io-sysstat">io-sysstat<a class="headerlink" href="#io-sysstat" title="Link to this heading">¶</a></h4>
 <ul class="simple">
 <li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Storage Metric Set</span></a></p></li>
@@ -1700,7 +1743,7 @@ repository (with <code class="docutils literal notranslate"><span class="pre">Do
   <small>
     
       Last update:
-      Aug 23, 2023
+      Aug 24, 2023
     
   </small>
 </div>
@@ -1777,7 +1820,7 @@ repository (with <code class="docutils literal notranslate"><span class="pre">Do
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    7.2.2.
+    7.2.3.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
