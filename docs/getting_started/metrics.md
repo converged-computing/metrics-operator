@@ -90,6 +90,26 @@ Options you can set include:
 For the last "directory" we use this location to write a temporary file, which will be cleaned up.
 This allows for testing storage mounted from multiple metric pods without worrying about a name conflict.
 
+#### io-ior
+
+ - [Storage Metric Set](user-guide.md#application-metric-set)
+ - *[io-host-volume](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/io-ior)*
+
+![img/ior.jpeg](img/ior.jpeg)
+
+[Ior](https://github.com/hpc/ior) is a really nice IO tool that is now a combination of its previous self and the [mdtest](https://github.com/llnl/mdtest) 
+tool. We expose a simple set of the working directory and command that you want to run, and the rest is up to you!
+
+|Name | Description | Type | Default |
+|-----|-------------|------------|------|
+| command | The default ior command  |string | ior -w -r -o testfile |
+| workdir | The working directory for the command | string | /opt/ior |
+
+The [getting started](https://ior.readthedocs.io/en/latest/userDoc/tutorial.html) tutorial is great for seeing how
+basic commands are done. Note that the container does have mpirun if you want to use it. We don't have support
+for this across nodes, but this could be added. [Let us know](https://github.com/converged-computing/metrics-operator/issues) 
+if this would be interesting to you.
+
 #### io-sysstat
 
  - [Storage Metric Set](user-guide.md#application-metric-set)
