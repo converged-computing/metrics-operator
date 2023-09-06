@@ -59,6 +59,11 @@ func (m LauncherWorker) Name() string {
 	return m.Identifier
 }
 
+// GetVolumes (if necessary) this is likely only for application metric types
+func (m LauncherWorker) GetVolumes() map[string]api.Volume {
+	return map[string]api.Volume{}
+}
+
 // Description returns the metric description
 func (m LauncherWorker) Description() string {
 	return m.Summary
@@ -220,14 +225,14 @@ func (m *LauncherWorker) ReplicatedJobs(spec *api.MetricSet) ([]jobset.Replicate
 		},
 	}
 
-	// Derive the containers, one per metric
-	// This will also include mounts for volumes
-	launcherContainers, err := metrics.GetContainers(spec, launcherSpec, v, false)
+	// Derive the containers, one per metric, and this includes mounts for volumes
+	// false and false is disabling shared process namespace and cap sys_admin
+	launcherContainers, err := metrics.GetContainers(spec, launcherSpec, v, false, false)
 	if err != nil {
 		fmt.Printf("issue creating launcher containers %s", err)
 		return js, err
 	}
-	workerContainers, err := metrics.GetContainers(spec, workerSpec, v, false)
+	workerContainers, err := metrics.GetContainers(spec, workerSpec, v, false, false)
 	if err != nil {
 		fmt.Printf("issue creating worker containers %s", err)
 		return js, err

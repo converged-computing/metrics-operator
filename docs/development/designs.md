@@ -36,11 +36,21 @@ are most strongly assessed together are:
 
 ### Performance
 
-For a performance metric, we create a separate container for each metric (these are pre-built and provided alongside the operator) and then add the application container to the set. This means that the set of metrics containers and application containers serve as sidecars in the same pod:
+For a performance metric, the general pattern we use is to create a separate container for each metric (these are pre-built and provided alongside the operator) and then add the application container to the set. This means that the set of metrics containers and application containers serve as sidecars in the same pod. Within this design, there are two sub-designs that a metric can use:
+
+1. Interact with the application via a shared process namespace (supports greater than one metric)
+2. Allow the metric to share a volume (and some modular, portable filesystem asset) with the application (recommended for one metric only)
+
+Here is what the case 1 looks like. Note the shared process namespace between the two containers.
 
 ![img/application-metric-set.png](img/application-metric-set.png)
 
-In the above, the metrics pods have `SYS_PTRACE` added and a flag is set to share the process
+Here is the second design. Note that we still have the shared application process namespace, but we also allow the metric to add a shared volume. We do this by way of adding an empty volume,
+and then allowing the metric to customize the application entrypoint to do some custom logic (e.g., copy an entire tree to the shared volume):
+
+![img/application-metric-volume.png](img/application-metric-volume.png)
+
+For both of the above, the metrics pods have `SYS_PTRACE` added and a flag is set to share the process
 namespace, so we can read and write to the application container from a metrics pod. We should
 be able to see things in the opposite direction, but without permissions. I've tested this
 setup with more than one metric container, and it seems to work. You can read more about some of this [early testing here](https://vsoch.github.io/2023/shared-process-namespace/) and think this is a good idea, at least to start.  This means, generally for a "perf" metric design, we deploy
@@ -101,4 +111,4 @@ I don't want anything complicated (I don't want to re-create prometheus or a mon
 
 ## Design Links
 
- - Original diagrams (August 2023) are available on [Excalidraw](https://excalidraw.com/#json=ldENW1vScvb123alpXeHm,Q8k9VqoRGQSPrP23CztV5Q)
+ - Original diagrams (August 2023) are available on [Excalidraw](https://excalidraw.com/#json=kvaus7c1bSLvw64tz_jHa,Lx5vjCos2QNaCO6iUFT_SQ)

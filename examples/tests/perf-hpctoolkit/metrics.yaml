@@ -1,0 +1,21 @@
+apiVersion: flux-framework.org/v1alpha1
+kind: MetricSet
+metadata:
+  labels:
+    app.kubernetes.io/name: metricset
+    app.kubernetes.io/instance: metricset-sample
+  name: metricset-sample
+spec:
+  # Keep it running after to shell in and inspect outputs
+  logging:
+    interactive: true
+  application:
+    image: ghcr.io/rse-ops/vanilla-lammps:tag-latest
+    command: lmp -v x 1 -v y 1 -v z 1 -in in.reaxc.hns -nocite
+  metrics:
+    - name: perf-hpctoolkit
+      options:
+        # The events are required
+        events: "-e IO"
+        # Custom mount path - cannot be /opt/view or under for this metric
+        # mount: /opt/mnt

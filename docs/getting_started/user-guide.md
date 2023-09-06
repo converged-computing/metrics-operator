@@ -126,7 +126,10 @@ For another overview of these designs, please see the [developer docs](../develo
 
 ### Application Metric Set
 
-> An application metric set includes one or more metrics for measuring application performance.
+> An application metric set includes one or more metrics for measuring application performance. We take two strategies:
+
+ - Share the process namespace, giving access of the metric container to the process space of the application
+ - Share a volume on the filesystem, allowing content from the metrics container to be used in the application container
 
 Let's walk through an example. In the image below, you want to run one or more custom metrics to measure performance for your application of choice.
 

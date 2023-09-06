@@ -38,6 +38,10 @@ func (m StorageGeneric) Family() string {
 	return metrics.StorageFamily
 }
 
+func (m StorageGeneric) GetVolumes() map[string]api.Volume {
+	return map[string]api.Volume{}
+}
+
 // Description returns the metric description
 func (m StorageGeneric) Description() string {
 	return m.Summary

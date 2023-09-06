@@ -13,10 +13,8 @@ To learn more:
 ## Dinosaur TODO
 
 - We need a way for the entrypoint command to monitor (based on the container) to differ (potentially)
-- make flux operator command generator
 - For larger metric collections, we should have a log streaming mode (and not wait for Completed/Successful)
 - For services we are measuring, we likely need to be able to kill after N seconds (to complete job) or to specify the success policy on the metrics containers instead of the application
-- Look into pod affinity/anti-affintiy vs. topology constraint (which do we want)?
 - Add assertions checking for python tests
 - Plotting examples (python parsers) needed for
   - io-sysstat

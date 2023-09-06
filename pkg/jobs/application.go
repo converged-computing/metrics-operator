@@ -32,6 +32,10 @@ func (m SingleApplication) Name() string {
 	return m.Identifier
 }
 
+func (m SingleApplication) GetVolumes() map[string]api.Volume {
+	return map[string]api.Volume{}
+}
+
 func (m SingleApplication) HasSoleTenancy() bool {
 	return false
 }
@@ -57,6 +61,33 @@ func (m SingleApplication) Attributes() *api.ContainerSpec {
 // Validation
 func (m SingleApplication) Validate(spec *api.MetricSet) bool {
 	return true
+}
+
+// If we have an application container, return that plus custom logic
+// custom: is any custom code (environment, waiting, etc.)
+// prefix: is a wrapper to the actual entrypoint command
+func (m SingleApplication) ApplicationEntrypoint(
+	spec *api.MetricSet,
+	custom string,
+	prefix string,
+	suffix string,
+) metrics.EntrypointScript {
+
+	template := `#!/bin/bash`
+
+	// If we have custom logic (environment, sleep, etc) add it here
+	if custom != "" {
+		template = template + "\n" + custom
+	}
+	// Add the actual entrypoint
+	template = template + "\n" + prefix + " " + spec.Spec.Application.Entrypoint + "\n" + suffix
+
+	// If we do, add the custom logic first
+	return metrics.EntrypointScript{
+		Script: template,
+		Path:   metrics.DefaultApplicationEntrypoint,
+		Name:   metrics.DefaultApplicationName,
+	}
 }
 
 // Container variables
