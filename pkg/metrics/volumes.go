@@ -42,9 +42,6 @@ func getVolumeMounts(
 // Get MetricsKeyToPath assumes we have a predictible listing of metrics
 // scripts. This is applicable for storage and application metrics
 func GetMetricsKeyToPath(metrics []*Metric) []corev1.KeyToPath {
-	// Runner start scripts
-	makeExecutable := int32(0777)
-
 	// Each metric has an entrypoint script
 	runnerScripts := []corev1.KeyToPath{}
 	for i, _ := range metrics {
@@ -59,7 +56,7 @@ func GetMetricsKeyToPath(metrics []*Metric) []corev1.KeyToPath {
 	return runnerScripts
 }
 
-// getVolumes adds expected entrypoints along with addedvolumes (storage or applications)
+// getVolumes adds expected entrypoints along with added volumes (storage or applications)
 // This function is intended for a set with a listing of metrics
 func GetVolumes(
 	set *api.MetricSet,
@@ -145,7 +142,17 @@ func getExistingVolumes(existing map[string]api.Volume) []corev1.Volume {
 	for volumeName, volumeMeta := range existing {
 
 		var newVolume corev1.Volume
-		if volumeMeta.HostPath != "" {
+
+		// Empty vol is typically used internally for an application share
+		if volumeMeta.EmptyVol {
+			newVolume = corev1.Volume{
+				Name: volumeName,
+				VolumeSource: corev1.VolumeSource{
+					EmptyDir: &corev1.EmptyDirVolumeSource{},
+				},
+			}
+
+		} else if volumeMeta.HostPath != "" {
 
 			newVolume = corev1.Volume{
 				Name: volumeName,

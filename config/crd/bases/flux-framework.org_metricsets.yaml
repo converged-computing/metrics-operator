@@ -84,8 +84,7 @@ spec:
                   volumes:
                     additionalProperties:
                       description: 'A Volume should correspond with an existing volume,
-                        either: config map, secret, or claim name. This will be added
-                        soon.'
+                        either: config map, secret, or claim name.'
                       properties:
                         claimName:
                           description: Claim name if the existing volume is a PVC
@@ -95,6 +94,11 @@ spec:
                             config map You should also define items if you are using
                             this
                           type: string
+                        emptyVol:
+                          default: false
+                          description: EmptyVol if true generates an empty volume
+                            at the path
+                          type: boolean
                         hostPath:
                           description: Hostpath volume on the host to bind to path
                           type: string
@@ -282,6 +286,11 @@ spec:
                         description: Config map name if the existing volume is a config
                           map You should also define items if you are using this
                         type: string
+                      emptyVol:
+                        default: false
+                        description: EmptyVol if true generates an empty volume at
+                          the path
+                        type: boolean
                       hostPath:
                         description: Hostpath volume on the host to bind to path
                         type: string

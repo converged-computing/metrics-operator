@@ -9,15 +9,28 @@ package metrics
 
 import (
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
+)
+
+var (
+	DefaultApplicationEntrypoint = "/metrics_operator/application-0.sh"
+	DefaultApplicationName       = "application-0"
+	makeExecutable               = int32(0777)
 )
 
 // Get ReplicatedJobs intended to run a performance metric for an application
 // For this setup, we expect to create a container for each metric
 func (m *ApplicationMetricSet) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, error) {
 	rjs := []jobset.ReplicatedJob{}
+
+	// If no application volumes defined, need to init here
+	appVols := spec.Spec.Application.Volumes
+	if len(appVols) == 0 {
+		appVols = map[string]api.Volume{}
+	}
 	for _, metric := range m.Metrics() {
-		jobs, err := GetApplicationReplicatedJobs(spec, metric, spec.Spec.Application.Volumes, true)
+		jobs, err := GetApplicationReplicatedJobs(spec, metric, appVols, true)
 		if err != nil {
 			return rjs, err
 		}
@@ -48,10 +61,28 @@ func GetApplicationReplicatedJobs(
 		return rjs, err
 	}
 
+	// Add metric volumes to the list! This is usually for sharing metric assets with the application
+	// as an empty volume. Note that we do not check for overlapping keys - up to user.
+	// It is the responsibility of the metric to determine the mount location and entrypoint additions
+	metricVolumes := m.GetVolumes()
+	for k, v := range metricVolumes {
+		volumes[k] = v
+	}
+
 	// Add volumes expecting an application. GetVolumes creates metric entrypoint volumes
 	// and adds existing volumes (application) to our set of mounts. We need both
 	// for the jobset.
 	runnerScripts := GetMetricsKeyToPath([]*Metric{metric})
+
+	// Add the application entrypoint
+	appScript := corev1.KeyToPath{
+		Key:  DefaultApplicationName,
+		Path: DefaultApplicationName + ".sh",
+		Mode: &makeExecutable,
+	}
+	runnerScripts = append(runnerScripts, appScript)
+
+	// Each metric has an entrypoint script
 	job.Template.Spec.Template.Spec.Volumes = GetVolumes(spec, runnerScripts, volumes)
 
 	// Derive the containers for the metric
@@ -73,6 +104,9 @@ func GetApplicationReplicatedJobs(
 		volumes,
 
 		// Allow ptrace
+		true,
+
+		// Allow sysadmin
 		true,
 	)
 

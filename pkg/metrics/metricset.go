@@ -51,13 +51,38 @@ type MetricSet interface {
 	HasSoleTenancy() bool
 }
 
+// get an application default entrypoint, if not determined by metric
+// NOTE: if the default is not used, we currently just support one metric
+// that requires a volume or custom logic. This could be changed
+// but my brain is too goobley right now.
+func getApplicationDefaultEntrypoint(set *api.MetricSet) string {
+	template := `#!/bin/bash
+	exec %s	
+`
+	return fmt.Sprintf(template, set.Spec.Application.Entrypoint)
+}
+
 // ConsolidateEntrypointScripts from a metric set into one list
 func consolidateEntrypointScripts(metrics []*Metric, set *api.MetricSet) []EntrypointScript {
 	scripts := []EntrypointScript{}
+	seenApplicationEntry := false
 	for _, metric := range metrics {
 		for _, script := range (*metric).EntrypointScripts(set, metric) {
+			if script.Path == DefaultApplicationEntrypoint {
+				seenApplicationEntry = true
+			}
 			scripts = append(scripts, script)
 		}
+	}
+
+	// If we have an application and we haven't seen the application-0.sh, add it
+	if set.HasApplication() && !seenApplicationEntry {
+		script := getApplicationDefaultEntrypoint(set)
+		scripts = append(scripts, EntrypointScript{
+			Script: script,
+			Path:   DefaultApplicationEntrypoint,
+			Name:   DefaultApplicationName,
+		})
 	}
 	return scripts
 }

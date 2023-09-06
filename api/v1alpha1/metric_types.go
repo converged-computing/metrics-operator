@@ -189,7 +189,7 @@ type Commands struct {
 type ContainerResource map[string]intstr.IntOrString
 
 // A Volume should correspond with an existing volume, either:
-// config map, secret, or claim name. This will be added soon.
+// config map, secret, or claim name.
 type Volume struct {
 
 	// Path and claim name are always required if a secret isn't defined
@@ -216,6 +216,12 @@ type Volume struct {
 	// An existing secret
 	// +optional
 	SecretName string `json:"secretName,omitempty"`
+
+	// EmptyVol if true generates an empty volume at the path
+	// +kubebuilder:default=false
+	// +default=false
+	// +optional
+	EmptyVol bool `json:"emptyVol,omitempty"`
 
 	// +kubebuilder:default=false
 	// +default=false
@@ -387,6 +393,12 @@ func (m *MetricSet) validateVolumes(volumes map[string]Volume) bool {
 		// Case 5: reverse of the above
 		if volume.ClaimName != "" && volume.Path == "" {
 			fmt.Printf("😥️ Found existing volume %s with claimName %s that is missing a path\n", key, volume.ClaimName)
+			valid = false
+		}
+
+		// Case 6: empty volume needs path
+		if volume.EmptyVol && volume.Path == "" {
+			fmt.Printf("😥️ Found empty volume %s that is missing a path\n", key)
 			valid = false
 		}
 	}

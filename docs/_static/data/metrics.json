@@ -112,6 +112,14 @@
   "url": "https://mvapich.cse.ohio-state.edu/benchmarks/"
  },
  {
+  "name": "perf-hpctoolkit",
+  "description": "performance tools for measurement and analysis",
+  "family": "performance",
+  "type": "application",
+  "image": "ghcr.io/converged-computing/metric-hpctoolkit-view:latest",
+  "url": "https://gitlab.com/hpctoolkit/hpctoolkit"
+ },
+ {
   "name": "perf-sysstat",
   "description": "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
   "family": "performance",
