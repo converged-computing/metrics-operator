@@ -673,9 +673,17 @@ are most strongly assessed together are:</p>
 <li><p><strong>standalone</strong> a more complex metric that might require custom JobSet logic, and is intended to be run in isolation.</p></li>
 </ul>
 <h3 id="performance">Performance<a class="headerlink" href="#performance" title="Link to this heading">¶</a></h3>
-<p>For a performance metric, we create a separate container for each metric (these are pre-built and provided alongside the operator) and then add the application container to the set. This means that the set of metrics containers and application containers serve as sidecars in the same pod:</p>
+<p>For a performance metric, the general pattern we use is to create a separate container for each metric (these are pre-built and provided alongside the operator) and then add the application container to the set. This means that the set of metrics containers and application containers serve as sidecars in the same pod. Within this design, there are two sub-designs that a metric can use:</p>
+<ol class="arabic simple">
+<li><p>Interact with the application via a shared process namespace (supports greater than one metric)</p></li>
+<li><p>Allow the metric to share a volume (and some modular, portable filesystem asset) with the application (recommended for one metric only)</p></li>
+</ol>
+<p>Here is what the case 1 looks like. Note the shared process namespace between the two containers.</p>
 <p><img alt="img/application-metric-set.png" src="../_images/application-metric-set.png" /></p>
-<p>In the above, the metrics pods have <code class="docutils literal notranslate"><span class="pre">SYS_PTRACE</span></code> added and a flag is set to share the process
+<p>Here is the second design. Note that we still have the shared application process namespace, but we also allow the metric to add a shared volume. We do this by way of adding an empty volume,
+and then allowing the metric to customize the application entrypoint to do some custom logic (e.g., copy an entire tree to the shared volume):</p>
+<p><img alt="img/application-metric-volume.png" src="../_images/application-metric-volume.png" /></p>
+<p>For both of the above, the metrics pods have <code class="docutils literal notranslate"><span class="pre">SYS_PTRACE</span></code> added and a flag is set to share the process
 namespace, so we can read and write to the application container from a metrics pod. We should
 be able to see things in the opposite direction, but without permissions. I’ve tested this
 setup with more than one metric container, and it seems to work. You can read more about some of this <a class="reference external" href="https://vsoch.github.io/2023/shared-process-namespace/">early testing here</a> and think this is a good idea, at least to start.  This means, generally for a “perf” metric design, we deploy
@@ -720,7 +728,7 @@ separately. Best case, we can manage it for them, or (better) not require it at 
 I don’t want anything complicated (I don’t want to re-create prometheus or a monitoring service!)</p>
 <h2 id="design-links">Design Links<a class="headerlink" href="#design-links" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Original diagrams (August 2023) are available on <a class="reference external" href="https://excalidraw.com/#json=ldENW1vScvb123alpXeHm,Q8k9VqoRGQSPrP23CztV5Q">Excalidraw</a></p></li>
+<li><p>Original diagrams (August 2023) are available on <a class="reference external" href="https://excalidraw.com/#json=kvaus7c1bSLvw64tz_jHa,Lx5vjCos2QNaCO6iUFT_SQ">Excalidraw</a></p></li>
 </ul>
 
 
@@ -729,7 +737,7 @@ I don’t want anything complicated (I don’t want to re-create prometheus or a
   <small>
     
       Last update:
-      Aug 24, 2023
+      Sep 06, 2023
     
   </small>
 </div>
@@ -806,7 +814,7 @@ I don’t want anything complicated (I don’t want to re-create prometheus or a
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    7.2.3.
+    7.2.5.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   

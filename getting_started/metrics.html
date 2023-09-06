@@ -466,6 +466,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#perf-hpctoolkit" class="md-nav__link">
+    <span title="/getting_started/metrics.md#perf-hpctoolkit (reference label)" class="md-ellipsis">perf-<wbr>hpctoolkit</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#perf-sysstat" class="md-nav__link">
     <span title="/getting_started/metrics.md#perf-sysstat (reference label)" class="md-ellipsis">perf-<wbr>sysstat</span>
   </a>
@@ -774,6 +781,65 @@ We likely will tweak and improve upon these categories.</p>
 family once we decide on a more final set.</p>
 <h3 id="performance">Performance<a class="headerlink" href="#performance" title="Link to this heading">¶</a></h3>
 <p>These metrics are intended to assess application performance, where they run alongside an application of interest.</p>
+<h4 id="perf-hpctoolkit">perf-hpctoolkit<a class="headerlink" href="#perf-hpctoolkit" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Application Metric Set</span></a></p></li>
+<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-hpctoolkit">perf-hpctoolkit</a></em></p></li>
+</ul>
+<p>This metric provides <a class="reference external" href="https://gitlab.com/hpctoolkit/hpctoolkit">HPCToolkit</a> for your application to use. This is the first metric of its type
+to use a shared volume approach. Specifically, we:</p>
+<ul class="simple">
+<li><p>add a new ability for an application metric to define an empty volume, and have the metrics container copy stuff to it</p></li>
+<li><p>also add an ability for this kind of application metric to customize the application entrypoint (e.g., copy volume contents to destinations)</p></li>
+<li><p>build a spack copy view into the <a class="reference external" href="https://github.com/converged-computing/metrics-containers/blob/main/hpctoolkit-containerize/Dockerfile">hpctoolkit metrics container</a></p></li>
+<li><p>move the <code class="docutils literal notranslate"><span class="pre">/opt/software</span></code> and <code class="docutils literal notranslate"><span class="pre">/opt/views/view</span></code> roots into the application container, this is a modular install of HPCToolkit.</p></li>
+<li><p>copy over <code class="docutils literal notranslate"><span class="pre">/opt/share/software</span></code> (provided via the shared empty volume) to <code class="docutils literal notranslate"><span class="pre">/opt/software``</span> <span class="pre">where</span> <span class="pre">spack</span> <span class="pre">expects</span> <span class="pre">it.</span> <span class="pre">We</span> <span class="pre">also</span> <span class="pre">add</span> </code>/opt/share/view/bin` to the path (where hpcrun is)</p></li>
+</ul>
+<p>After those steps are done, HPCToolkit is essentially installed, on the fly, in the application container. Since the <code class="docutils literal notranslate"><span class="pre">hpcrun</span></code> command is using <code class="docutils literal notranslate"><span class="pre">LD_AUDIT</span></code> we need
+all libraries to be in the same system (the shared process namespace would not work). We can then run it, and generate a database. Here is an example
+given <code class="docutils literal notranslate"><span class="pre">hpctoolkit-lmp-measurements</span></code> in the present working directory of the container.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>hpcstruct<span class="w"> </span>hpctoolkit-lmp-measurements
+
+<span class="c1"># Run &quot;the professor!&quot; 🤓️</span>
+hpcprof<span class="w"> </span>hpctoolkit-lmp-measurements
+</code></pre></div>
+</div>
+<p>The above generates a database, <code class="docutils literal notranslate"><span class="pre">hpctoolkit-lmp-database</span></code> that you can copy to your machine for further interaction with hpcviewer
+(or some future tool that doesn’t use Java)!</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>cp<span class="w"> </span>-c<span class="w"> </span>app<span class="w"> </span>metricset-sample-m-0-npbc9:/opt/lammps/examples/reaxff/HNS/hpctoolkit-lmp-database<span class="w"> </span>hpctoolkit-lmp-database
+hpcviewer<span class="w"> </span>./hpctoolkit-lmp-database
+</code></pre></div>
+</div>
+<p>Here are the acceptable parameters.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>mount</td>
+<td>Path to mount hpctoolview view in application container</td>
+<td>string</td>
+<td>/opt/share</td>
+</tr>
+<tr>
+<td>events</td>
+<td>Events for hpctoolkit</td>
+<td>string</td>
+<td><code>-e IO</code></td>
+</tr>
+</tbody>
+</table>
+<p>Note that you can see events available with <code class="docutils literal notranslate"><span class="pre">hpcrun</span> <span class="pre">-L</span></code>, and use the container for this metric.
+There is a brief listing on <a class="reference external" href="https://hpc.llnl.gov/software/development-environment-software/hpc-toolkit">this page</a>.
+We recommend that you do not pair hpctoolkit with another metric, primarily because it is customizing the application
+entrypoint. If you add a process-namespace based metric, you likely need to account for the hpcrun command being the
+wrapper to the actual executable.</p>
 <h4 id="perf-sysstat">perf-sysstat<a class="headerlink" href="#perf-sysstat" title="Link to this heading">¶</a></h4>
 <ul class="simple">
 <li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Application Metric Set</span></a></p></li>
@@ -1743,7 +1809,7 @@ repository (with <code class="docutils literal notranslate"><span class="pre">Do
   <small>
     
       Last update:
-      Aug 24, 2023
+      Sep 06, 2023
     
   </small>
 </div>
@@ -1820,7 +1886,7 @@ repository (with <code class="docutils literal notranslate"><span class="pre">Do
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    7.2.3.
+    7.2.5.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   

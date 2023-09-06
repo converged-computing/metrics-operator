@@ -739,8 +739,12 @@ and experiments that you put together here for others to use.</p>
 <p>For another overview of these designs, please see the <a class="reference internal" href="../development/index.html"><span class="std std-doc">developer docs</span></a>.</p>
 <h3 id="application-metric-set">Application Metric Set<a class="headerlink" href="#application-metric-set" title="Link to this heading">¶</a></h3>
 <blockquote>
-<div><p>An application metric set includes one or more metrics for measuring application performance.</p>
+<div><p>An application metric set includes one or more metrics for measuring application performance. We take two strategies:</p>
 </div></blockquote>
+<ul class="simple">
+<li><p>Share the process namespace, giving access of the metric container to the process space of the application</p></li>
+<li><p>Share a volume on the filesystem, allowing content from the metrics container to be used in the application container</p></li>
+</ul>
 <p>Let’s walk through an example. In the image below, you want to run one or more custom metrics to measure performance for your application of choice.</p>
 <p><img alt="img/application-metric-set-diagram.png" src="../_images/application-metric-set-diagram.png" /></p>
 <p>You’ll do this by writing a metrics.yaml file (left panel) that defines the application of interest, which in this case in LAMMPS.
@@ -877,7 +881,7 @@ than one pod, if appropriate.</p>
   <small>
     
       Last update:
-      Aug 24, 2023
+      Sep 06, 2023
     
   </small>
 </div>
@@ -954,7 +958,7 @@ than one pod, if appropriate.</p>
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    7.2.3.
+    7.2.5.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
