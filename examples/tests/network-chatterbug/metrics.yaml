@@ -1,0 +1,23 @@
+apiVersion: flux-framework.org/v1alpha1
+kind: MetricSet
+metadata:
+  labels:
+    app.kubernetes.io/name: metricset
+    app.kubernetes.io/instance: metricset-sample
+  name: metricset-sample
+spec:
+  pods: 2
+  metrics:
+   - name: network-chatterbug
+
+     # mpirun --hostfile ./hostfile.txt --allow-run-as-root -N 4 /root/chatterbug/stencil3d/stencil3d.x 1 2 2 10 10 10 4 1
+     # Custom options for chatterbug
+     options:
+       # Given specific arguments, only one command is supported
+       command: stencil3d
+       # Args to stencil3d
+       args: "1 2 2 10 10 10 4 1"
+       sole-tenancy: "false"
+       # mpirun arguments
+       mpirun: "-N 4"
+

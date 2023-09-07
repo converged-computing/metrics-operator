@@ -96,6 +96,14 @@
   "url": "https://github.com/sysstat/sysstat"
  },
  {
+  "name": "network-chatterbug",
+  "description": "A suite of communication proxies for HPC applications",
+  "family": "network",
+  "type": "standalone",
+  "image": "ghcr.io/converged-computing/metric-chatterbug:latest",
+  "url": "https://github.com/hpcgroup/chatterbug"
+ },
+ {
   "name": "network-netmark",
   "description": "point to point networking tool",
   "family": "network",
