@@ -72,7 +72,7 @@ jobs:
                ["io-ior", "ghcr.io/converged-computing/metric-ior:latest", 120],                            # storage test
                # ["network-chatterbug", "ghcr.io/converged-computing/metric-chatterbug:latest", 120],         # network app test
                ["app-nekbone", "ghcr.io/converged-computing/metric-nekbone:latest", 120],                   # standalone app test
-               #["app-ldms", "ghcr.io/converged-computing/metric-ovis-hpc:latest", 120],                     # standalone app test
+               ["app-ldms", "ghcr.io/converged-computing/metric-ovis-hpc:latest", 120],                     # standalone app test
                ["app-amg", "ghcr.io/converged-computing/metric-amg:latest", 120],                           # standalone app test
                ["app-kripke", "ghcr.io/converged-computing/metric-kripke:latest", 120],                     # standalone app test
                ["app-pennant", "ghcr.io/converged-computing/metric-pennant:latest", 120],                   # standalone app test
@@ -92,6 +92,14 @@ jobs:
     - name: Start minikube
       uses: medyagh/setup-minikube@697f2b7aaed5f70bf2a94ee21a4ec3dde7b12f92 # v0.0.9
 
+    - name: Install JobSet
+      run: |
+        export SHELL=/bin/bash
+        eval $(minikube -p minikube docker-env)
+        VERSION=v0.2.0
+        kubectl apply --server-side -f https://github.com/kubernetes-sigs/jobset/releases/download/$VERSION/manifests.yaml
+        sleep 5
+
     - name: Pull Docker Containers to MiniKube
       env:
         container: ${{ matrix.test[1] }}
@@ -104,11 +112,6 @@ jobs:
         make deploy-local
         minikube image load ghcr.io/converged-computing/metrics-operator:test
         kubectl apply -f examples/dist/metrics-operator-local.yaml
-
-    - name: Install JobSet
-      run: |
-        VERSION=v0.2.0
-        kubectl apply --server-side -f https://github.com/kubernetes-sigs/jobset/releases/download/$VERSION/manifests.yaml
 
     - name: Test ${{ matrix.test[0] }}
       env:
