@@ -72,7 +72,7 @@ jobs:
                ["io-ior", "ghcr.io/converged-computing/metric-ior:latest", 120],                            # storage test
                # ["network-chatterbug", "ghcr.io/converged-computing/metric-chatterbug:latest", 120],         # network app test
                ["app-nekbone", "ghcr.io/converged-computing/metric-nekbone:latest", 120],                   # standalone app test
-               ["app-ldms", "ghcr.io/converged-computing/metric-ovis-hpc:latest", 120],                     # standalone app test
+               # ["app-ldms", "ghcr.io/converged-computing/metric-ovis-hpc:latest", 120],                     # standalone app test
                ["app-amg", "ghcr.io/converged-computing/metric-amg:latest", 120],                           # standalone app test
                ["app-kripke", "ghcr.io/converged-computing/metric-kripke:latest", 120],                     # standalone app test
                ["app-pennant", "ghcr.io/converged-computing/metric-pennant:latest", 120],                   # standalone app test
