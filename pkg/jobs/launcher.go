@@ -175,6 +175,40 @@ echo "%s"
 	)
 }
 
+// AddWorkers generates worker jobs, only if we have them
+func (m *LauncherWorker) AddWorkers(
+	spec *api.MetricSet,
+	v map[string]api.Volume,
+	volumes []corev1.Volume,
+) (*jobset.ReplicatedJob, error) {
+
+	numWorkers := spec.Spec.Pods - 1
+	workers, err := metrics.GetReplicatedJob(spec, false, numWorkers, numWorkers, m.WorkerLetter)
+	if err != nil {
+		return workers, err
+	}
+	workers.Template.Spec.Template.Spec.Volumes = volumes
+
+	// ContainerSpec for workers
+	workerSpec := []metrics.ContainerSpec{
+		{
+			Image:      m.Container,
+			Name:       "workers",
+			Command:    []string{"/bin/bash", m.WorkerScript},
+			Resources:  m.ResourceSpec,
+			Attributes: m.AttributeSpec,
+		},
+	}
+	// Prepare containers for workers to add to replicated job
+	workerContainers, err := metrics.GetContainers(spec, workerSpec, v, false, false)
+	if err != nil {
+		fmt.Printf("issue creating worker containers %s", err)
+		return workers, err
+	}
+	workers.Template.Spec.Template.Spec.Containers = workerContainers
+	return workers, nil
+}
+
 // Replicated Jobs are custom for this standalone metric
 func (m *LauncherWorker) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, error) {
 
@@ -187,11 +221,6 @@ func (m *LauncherWorker) ReplicatedJobs(spec *api.MetricSet) ([]jobset.Replicate
 		return js, err
 	}
 
-	workers, err := metrics.GetReplicatedJob(spec, false, spec.Spec.Pods-1, spec.Spec.Pods-1, m.WorkerLetter)
-	if err != nil {
-		return js, err
-	}
-
 	// Add volumes defined under storage.
 	v := map[string]api.Volume{}
 	if spec.HasStorage() {
@@ -200,10 +229,8 @@ func (m *LauncherWorker) ReplicatedJobs(spec *api.MetricSet) ([]jobset.Replicate
 
 	// runnerScripts are custom for a LauncherWorker jobset
 	runnerScripts := m.getMetricsKeyToPath()
-
 	volumes := metrics.GetVolumes(spec, runnerScripts, v)
 	launcher.Template.Spec.Template.Spec.Volumes = volumes
-	workers.Template.Spec.Template.Spec.Volumes = volumes
 
 	// Prepare container specs, one for launcher and one for workers
 	launcherSpec := []metrics.ContainerSpec{
@@ -211,15 +238,6 @@ func (m *LauncherWorker) ReplicatedJobs(spec *api.MetricSet) ([]jobset.Replicate
 			Image:      m.Container,
 			Name:       "launcher",
 			Command:    []string{"/bin/bash", m.LauncherScript},
-			Resources:  m.ResourceSpec,
-			Attributes: m.AttributeSpec,
-		},
-	}
-	workerSpec := []metrics.ContainerSpec{
-		{
-			Image:      m.Container,
-			Name:       "workers",
-			Command:    []string{"/bin/bash", m.WorkerScript},
 			Resources:  m.ResourceSpec,
 			Attributes: m.AttributeSpec,
 		},
@@ -232,14 +250,21 @@ func (m *LauncherWorker) ReplicatedJobs(spec *api.MetricSet) ([]jobset.Replicate
 		fmt.Printf("issue creating launcher containers %s", err)
 		return js, err
 	}
-	workerContainers, err := metrics.GetContainers(spec, workerSpec, v, false, false)
-	if err != nil {
-		fmt.Printf("issue creating worker containers %s", err)
-		return js, err
-	}
 	launcher.Template.Spec.Template.Spec.Containers = launcherContainers
-	workers.Template.Spec.Template.Spec.Containers = workerContainers
-	js = []jobset.ReplicatedJob{*launcher, *workers}
+
+	numWorkers := spec.Spec.Pods - 1
+	var workers *jobset.ReplicatedJob
+
+	// Generate the replicated job with just a launcher, or launcher and workers
+	if numWorkers > 0 {
+		workers, err = m.AddWorkers(spec, v, volumes)
+		if err != nil {
+			return js, err
+		}
+		js = []jobset.ReplicatedJob{*launcher, *workers}
+	} else {
+		js = []jobset.ReplicatedJob{*launcher}
+	}
 	return js, nil
 }
 

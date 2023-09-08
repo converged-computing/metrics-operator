@@ -48,6 +48,8 @@ if [[ "${status}" != "True" ]] || [[ "${type}" != "Completed" ]]; then
     echo "LOGS for JobSet Operator pod"
     jobset_pod=$(kubectl get -n jobset-system pods -o json | jq -r .items[0].metadata.name)
     kubectl logs -n jobset-system ${jobset_pod}
+    echo "DESCRIBE for JobSet Operator pod"    
+    kubectl describe pods -n jobset-system
     exit 1
 fi
 
