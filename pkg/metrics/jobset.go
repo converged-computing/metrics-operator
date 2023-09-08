@@ -135,11 +135,8 @@ func GetReplicatedJob(
 	// Pod labels from the MetricSet
 	podLabels := set.GetPodLabels()
 
-	// Indexed mode if >=2 pods
-	completionMode := batchv1.NonIndexedCompletion
-	if set.Spec.Pods > 1 {
-		completionMode = batchv1.IndexedCompletion
-	}
+	// Always indexed completion mode to have predictable hostnames
+	completionMode := batchv1.IndexedCompletion
 
 	// We only expect one replicated job (for now) so give it a short name for DNS
 	job := jobset.ReplicatedJob{
