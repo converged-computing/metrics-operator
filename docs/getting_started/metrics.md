@@ -177,48 +177,6 @@ This is good for mounted storage that can be seen by the operating system, but m
 Standalone metrics can take on many designs, from a launcher/worker design to test networking, to running
 a metric across nodes to assess the node performance.
 
-#### network-chatterbug
-
- - [Standalone Metric Set](user-guide.md#application-metric-set)
- - *[network-chatterbug](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-chatterbug)*
-
-Chatterbug provides a [suite of communication proxy applications](https://github.com/hpcgroup/chatterbug) for HPC.
-We use a launcher/worker design.
-
-|Name | Description  | Type | Default |
-|-----|--------------|------|---------|
-| mpirun | The options to give to mpirun (includes tasks) | string | `-N 8` |
-| command | The chatterbug command (subdirectory) to run, see options below | string | stencil3d |
-| args | Arguments for the command | string | `1 2 2 10 10 10 4 1` |
-| sole-tenancy | Require sole tenancy | string ("true" or "false") | "true" |
-
-By default, we require sole-tenancy, but you can disable this. Note that the best place to look for "documentation"
-on the commands seems to be [the source code]((https://github.com/hpcgroup/chatterbug)). The following command options
-are available for `command`:
-
-- pairs
-- ping-ping
-- spread
-- stencil3d
-- stencil4d
-- subcom2d-coll
-- subcom2d-a2a
-- unstr-mesh
-
-We have tested mostly stencil3d. Note that the mpirun command is parsed as follows:
-
-```bash
-$ mpirun --hostfile ./hostfile.txt --allow-run-as-root -N 4 /root/chatterbug/${command}/${executable} ${args}
-```
-
-Thus for the defaults, you'd get this command (on one pod):
-
-```bash
-$ mpirun --hostfile ./hostfile.txt --allow-run-as-root -N 4 /root/chatterbug/stencil3d/stencil3d.x 1 2 2 10 10 10 4 1
-```
-
-See the example linked in the header for a metrics.yaml example.
-
 #### network-netmark
 
  - [Standalone Metric Set](user-guide.md#application-metric-set)
