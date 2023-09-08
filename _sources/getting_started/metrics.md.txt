@@ -205,6 +205,10 @@ Variables to customize include:
 |Name | Description | Option Key | Type | Default |
 |-----|-------------|------------|------|---------|
 | commands | Custom list of osu-benchmark one-sided commands to run | listOptions->commands | array | unset uses default set |
+| sole-tenancy | Turn off sole tenancy (one pod/node) | string ("false" or "no") | "true" |
+| all | Run ALL benchmarks with defaults | string ("true" or "yes") | "false" |
+| flags | Overwrite defaults flags (experts only!)| string | Defaults to an ideal set per metric (see [osu-benchmark.go](https://github.com/converged-computing/metrics-operator/blob/main/pkg/metrics/network/osu-benchmark.go))|
+| timed | String "true" or "yes" to add time prefix to mpirun (for debugging, etc) | string | "false" |
 
 By default, we run a subset of commands:
 
