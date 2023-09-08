@@ -254,6 +254,7 @@ done
 	// they are the same thing.
 	return []metrics.EntrypointScript{
 		{Script: script},
+		m.ApplicationEntrypoint(spec, "", "", ""),
 	}
 }
 

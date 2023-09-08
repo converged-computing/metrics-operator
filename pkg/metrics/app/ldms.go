@@ -131,6 +131,7 @@ echo "%s"
 	)
 	return []metrics.EntrypointScript{
 		{Script: script},
+		m.ApplicationEntrypoint(spec, "", "hpcrun $events", ""),
 	}
 }
 
