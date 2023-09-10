@@ -276,6 +276,9 @@ func (m HPL) EntrypointScripts(
 	// Template for the launcher
 	// TODO need to finish adding here when HPL rebuild done
 	template := `
+# Source spack environment
+. /opt/spack-environment/activate.sh
+
 # Calculate memory, if not defined
 memory=%d
 if [[ $memory -eq 0 ]]; then
@@ -298,12 +301,12 @@ echo "Number of tasks total (across $pods nodes) is $np"
 blocksize=%d
 ratio=%s
 
-# This calculates the compute value
-compute_script="/opt/tutorials/benchmarks/HPL/scripts/compute_N -m ${memory} -NB ${blocksize} -r ${ratio} -N ${pods}"
+# This calculates the compute value - retrieved from tutorials in /opt/view/bin
+compute_script="compute_N -m ${memory} -NB ${blocksize} -r ${ratio} -N ${pods}"
 echo $compute_script
 # This is the size, variable "N" in the hpl.dat (not confusing or anything)
 size=$(${compute_script})
-echo "Compute size is ${size}:
+echo "Compute size is ${size}"
 
 # Define rest of envars we need for template
 row_or_colmajor_pmapping=%d
@@ -319,18 +322,18 @@ L1_transposed=%d
 U_transposed=%d
 mem_alignment=%d
 
-# Write the input file
-cat <<EOF > ./hpl-template.dat
+# Write the input file (this parses environment variables too)
+cat <<EOF > ./hpl.dat
 %s
 EOF
 
-# Template
-envsubst < ./hpl-template.dat > ./hpl.dat
-cat ./hpl.dat
+cp ./hostlist.txt ./hostnames.txt
+rm ./hostlist.txt
+%s
 
 echo "%s"
 # This is in /root/hpl/bin/linux/xhpl
-mpirun --allow-run-as-root --hostfile ./hostfile.txt -np $np %s xhpl"
+mpirun --allow-run-as-root --hostfile ./hostlist.txt -np $np %s xhpl
 echo "%s"
 %s
 `
@@ -355,6 +358,7 @@ echo "%s"
 		m.utransposed,
 		m.memAlignment,
 		inputData,
+		metrics.TemplateConvertHostnames,
 		metrics.Separator,
 		m.mpiargs,
 		metrics.CollectionEnd,
@@ -370,7 +374,7 @@ func init() {
 	launcher := jobs.LauncherWorker{
 		Identifier: "app-hpl",
 		Summary:    "High-Performance Linpack (HPL)",
-		Container:  "ghcr.io/converged-computing/metric-hpl:latest",
+		Container:  "ghcr.io/converged-computing/metric-hpl-spack:latest",
 	}
 
 	HPL := HPL{LauncherWorker: launcher}

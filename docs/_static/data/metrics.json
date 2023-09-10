@@ -20,7 +20,7 @@
   "description": "High-Performance Linpack (HPL)",
   "family": "solver",
   "type": "standalone",
-  "image": "ghcr.io/converged-computing/metric-hpl:latest",
+  "image": "ghcr.io/converged-computing/metric-hpl-spack:latest",
   "url": "https://www.netlib.org/benchmark/hpl/"
  },
  {
@@ -126,6 +126,14 @@
   "type": "application",
   "image": "ghcr.io/converged-computing/metric-hpctoolkit-view:latest",
   "url": "https://gitlab.com/hpctoolkit/hpctoolkit"
+ },
+ {
+  "name": "perf-kit-benchmarker",
+  "description": "An open effort to define a canonical set of benchmarks to measure and compare cloud offerings.",
+  "family": "network",
+  "type": "standalone",
+  "image": "ghcr.io/converged-computing/metric-perf-kit-benchmarker:latest",
+  "url": "https://github.com/GoogleCloudPlatform/PerfKitBenchmarker"
  },
  {
   "name": "perf-sysstat",
