@@ -142,6 +142,16 @@ func (m LauncherWorker) GetCommonPrefix(
 	hosts string,
 ) string {
 
+	// Generate problem.sh with command only if we have one!
+	if command != "" {
+		command = fmt.Sprintf(`# Write the command file
+cat <<EOF > ./problem.sh
+#!/bin/bash
+%s
+EOF
+chmod +x ./problem.sh`, command)
+	}
+
 	prefixTemplate := `#!/bin/bash
 # Start ssh daemon
 /usr/sbin/sshd -D &
@@ -153,12 +163,7 @@ cat <<EOF > ./hostlist.txt
 %s
 EOF
 
-# Write the command file
-cat <<EOF > ./problem.sh
-#!/bin/bash
 %s
-EOF
-chmod +x ./problem.sh
 
 # Allow network to ready (this could be a variable)
 echo "Sleeping for 10 seconds waiting for network..."

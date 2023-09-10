@@ -1,0 +1,15 @@
+apiVersion: flux-framework.org/v1alpha1
+kind: MetricSet
+metadata:
+  labels:
+    app.kubernetes.io/name: metricset
+    app.kubernetes.io/instance: metricset-sample
+  name: metricset-sample
+spec:
+  pods: 2
+  logging:
+    interactive: true
+
+  # This is not currently fully working, hence why we do not have it documented yet, etc.
+  metrics:
+   - name: app-hpl

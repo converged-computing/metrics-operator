@@ -369,7 +369,6 @@ More likely you want an actual problem size on a specific number of node and tas
 run a larger problem and the parser does not work as expected, please [send us the output](https://github.com/converged-computing/metrics-operator/issues) and we will provide an updated parser.
 See [this guide](https://asc.llnl.gov/sites/asc/files/2020-09/AMG_Summary_v1_7.pdf) for more detail.
 
-
 #### app-quicksilver
 
  - [Standalone Metric Set](user-guide.md#application-metric-set)
