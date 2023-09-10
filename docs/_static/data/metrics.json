@@ -16,6 +16,14 @@
   "url": "https://asc.llnl.gov/sites/asc/files/2020-09/BDAS_Summary_b4bcf27_0.pdf"
  },
  {
+  "name": "app-hpl",
+  "description": "High-Performance Linpack (HPL)",
+  "family": "solver",
+  "type": "standalone",
+  "image": "ghcr.io/converged-computing/metric-hpl:latest",
+  "url": "https://www.netlib.org/benchmark/hpl/"
+ },
+ {
   "name": "app-kripke",
   "description": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
   "family": "solver",

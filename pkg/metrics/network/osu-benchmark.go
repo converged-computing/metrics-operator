@@ -50,57 +50,57 @@ var (
 	osuBenchmarkCommands = map[string]BenchmarkConfig{
 
 		// Single Sided (all require exactly 2 processes)
-		"osu_get_acc_latency": {Workdir: singleSidedDir, Flags: "-N 2 -np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"},
-		"osu_acc_latency":     {Workdir: singleSidedDir, Flags: "-N 2 -np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"}, // Latency Test for Accumulate
-		"osu_fop_latency":     {Workdir: singleSidedDir, Flags: "-N 2 -np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"},
-		"osu_get_latency":     {Workdir: singleSidedDir, Flags: "-N 2 -np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"}, // Latency Test for Get
-		"osu_put_latency":     {Workdir: singleSidedDir, Flags: "-N 2 -np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"}, // Latency Test for Put
-		"osu_cas_latency":     {Workdir: singleSidedDir, Flags: "-N 2 -np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"},
-		"osu_get_bw":          {Workdir: singleSidedDir, Flags: "-N 2 -np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"},
-		"osu_put_bibw":        {Workdir: singleSidedDir, Flags: "-N 2 -np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"},
-		"osu_put_bw":          {Workdir: singleSidedDir, Flags: "-N 2 -np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"},
+		"osu_get_acc_latency": {Workdir: singleSidedDir, Flags: "-np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"},
+		"osu_acc_latency":     {Workdir: singleSidedDir, Flags: "-np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"}, // Latency Test for Accumulate
+		"osu_fop_latency":     {Workdir: singleSidedDir, Flags: "-np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"},
+		"osu_get_latency":     {Workdir: singleSidedDir, Flags: "-np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"}, // Latency Test for Get
+		"osu_put_latency":     {Workdir: singleSidedDir, Flags: "-np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"}, // Latency Test for Put
+		"osu_cas_latency":     {Workdir: singleSidedDir, Flags: "-np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"},
+		"osu_get_bw":          {Workdir: singleSidedDir, Flags: "-np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"},
+		"osu_put_bibw":        {Workdir: singleSidedDir, Flags: "-np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"},
+		"osu_put_bw":          {Workdir: singleSidedDir, Flags: "-np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"},
 
 		// Collective
 		// For allreduce this should work, need to test -np $np -map-by ppr:1:node -rank-by core
-		"osu_allreduce":      {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"}, // MPI_Allreduce Latency Test
-		"osu_allgather":      {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_allgatherv":     {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_alltoall":       {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_alltoallv":      {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_barrier":        {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_bcast":          {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_gather":         {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_gatherv":        {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_iallgather":     {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_iallgatherv":    {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_iallreduce":     {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_ialltoall":      {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_ialltoallv":     {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_ialltoallw":     {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_ibarrier":       {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_ibcast":         {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_igather":        {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_igatherv":       {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_ireduce":        {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_iscatter":       {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_iscatterv":      {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_reduce":         {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_reduce_scatter": {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_scatter":        {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_scatterv":       {Workdir: collectiveDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_allreduce":      {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"}, // MPI_Allreduce Latency Test
+		"osu_allgather":      {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_allgatherv":     {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_alltoall":       {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_alltoallv":      {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_barrier":        {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_bcast":          {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_gather":         {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_gatherv":        {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_iallgather":     {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_iallgatherv":    {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_iallreduce":     {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_ialltoall":      {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_ialltoallv":     {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_ialltoallw":     {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_ibarrier":       {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_ibcast":         {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_igather":        {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_igatherv":       {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_ireduce":        {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_iscatter":       {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_iscatterv":      {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_reduce":         {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_reduce_scatter": {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_scatter":        {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_scatterv":       {Workdir: collectiveDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
 
 		// Point to Point (commented if requires 2 processes)
-		"osu_latency":    {Workdir: pointToPointDir, Flags: "-N 2 -np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"}, // Latency Test (requires 2)
-		"osu_bibw":       {Workdir: pointToPointDir, Flags: "-N 2 -np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"}, // Bidirectional Bandwidth Test (requires 2)
-		"osu_bw":         {Workdir: pointToPointDir, Flags: "-N 2 -np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"}, // Bandwidth Test (requires 2)
-		"osu_latency_mp": {Workdir: pointToPointDir, Flags: "-N 2 -np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"}, // requires 2
-		"osu_latency_mt": {Workdir: pointToPointDir, Flags: "-N 2 -np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"}, // requires 2
-		"osu_mbw_mr":     {Workdir: pointToPointDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_multi_lat":  {Workdir: pointToPointDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_latency":    {Workdir: pointToPointDir, Flags: "-np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"}, // Latency Test (requires 2)
+		"osu_bibw":       {Workdir: pointToPointDir, Flags: "-np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"}, // Bidirectional Bandwidth Test (requires 2)
+		"osu_bw":         {Workdir: pointToPointDir, Flags: "-np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"}, // Bandwidth Test (requires 2)
+		"osu_latency_mp": {Workdir: pointToPointDir, Flags: "-np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"}, // requires 2
+		"osu_latency_mt": {Workdir: pointToPointDir, Flags: "-np 2 -map-by ppr:1:node", HostFile: "./hostlist-pairs.txt"}, // requires 2
+		"osu_mbw_mr":     {Workdir: pointToPointDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_multi_lat":  {Workdir: pointToPointDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
 
 		// Startup
-		"osu_hello": {Workdir: startupDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
-		"osu_init":  {Workdir: startupDir, Flags: "-N $pods -np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_hello": {Workdir: startupDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
+		"osu_init":  {Workdir: startupDir, Flags: "-np $np -map-by ppr:$tasks:node -rank-by core", HostFile: "./hostlist.txt"},
 	}
 )
 
@@ -258,9 +258,9 @@ fi
 echo "Number of tasks (nproc on one node) is $tasks"
 echo "Number of tasks total (across $pods nodes) is $np"
 
-# Allow network to ready
-echo "Sleeping for 10 seconds waiting for network..."
-sleep 10
+# Allow network to ready (we need the hostnames / ip addresses to be there)
+echo "Sleeping for 60 seconds waiting for network..."
+sleep 60
 
 # Write the hosts file.
 cat <<EOF > ./hostnames.txt
@@ -268,13 +268,20 @@ cat <<EOF > ./hostnames.txt
 EOF
 
 # openmpi is evil and we need the ip addresses
+echo "Starting to look for ip addresses..."
 for h in $(cat ./hostnames.txt); do
-   if [[ "$h" == "" ]]; then
+    if [[ "$h" == "" ]]; then
       continue
-   fi
-   address=$(getent hosts $h | awk '{ print $1 }')
-   echo "${address}" >> ./hostlist.txt
+    fi
+    address=""
+    # keep trying until we have an ip address
+	while [ "$address" == "" ]; do
+        address=$(getent hosts $h | awk '{ print $1 }')
+    done
+	echo "${address}" >> ./hostlist.txt
 done 
+num_address=$(cat hostlist.txt | wc -l)
+echo "Done finding ${num_address} ip addresses"
 
 # prepare hostlist for pair to pair
 cat hostlist.txt | head -2 > ./hostlist-pairs.txt
