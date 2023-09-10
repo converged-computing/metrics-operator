@@ -1,6 +1,7 @@
 # Chatterbug Networking Example
 
 This will demonstrate running a [Chatterbug](https://github.com/hpcgroup/chatterbug) metric.
+This metric is experimental and not working in all contexts.
 
 ## Usage
 

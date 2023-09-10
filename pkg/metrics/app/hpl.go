@@ -27,7 +27,7 @@ var (
 	inputData = `HPLinpack benchmark input file
 Innovative Computing Laboratory, University of Tennessee
 HPL.out      output file name (if any)
-0            device out (6=stdout,7=stderr,file)
+6           device out (6=stdout,7=stderr,file)
 1            # of problems sizes (N)
 ${size}        Ns
 1            # of NBs
@@ -120,9 +120,6 @@ func (m HPL) Url() string {
 func (m *HPL) SetOptions(metric *api.Metric) {
 	m.ResourceSpec = &metric.Resources
 	m.AttributeSpec = &metric.Attributes
-
-	// Set user defined values or fall back to defaults
-	m.Workdir = "/opt/tutorials/benchmarks/HPL"
 
 	// Defaults for hpl.dat values.
 	// memory and pods (nodes) calculated on the fly, unless otherwise provided
