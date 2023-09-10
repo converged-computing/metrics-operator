@@ -8,6 +8,7 @@ any questions, please [let us know](https://github.com/converged-computing/metri
 :maxdepth: 3
 developer-guide
 designs
+metrics
 debugging
 creation
 ```
