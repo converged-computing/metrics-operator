@@ -136,14 +136,6 @@
   "url": "https://gitlab.com/hpctoolkit/hpctoolkit"
  },
  {
-  "name": "perf-kit-benchmarker",
-  "description": "An open effort to define a canonical set of benchmarks to measure and compare cloud offerings.",
-  "family": "network",
-  "type": "standalone",
-  "image": "ghcr.io/converged-computing/metric-perf-kit-benchmarker:latest",
-  "url": "https://github.com/GoogleCloudPlatform/PerfKitBenchmarker"
- },
- {
   "name": "perf-sysstat",
   "description": "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
   "family": "performance",
