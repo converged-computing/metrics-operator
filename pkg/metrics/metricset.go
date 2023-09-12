@@ -48,7 +48,6 @@ type MetricSet interface {
 	Metrics() []*Metric
 	EntrypointScripts(*api.MetricSet) []EntrypointScript
 	ReplicatedJobs(*api.MetricSet) ([]jobset.ReplicatedJob, error)
-	HasSoleTenancy() bool
 }
 
 // get an application default entrypoint, if not determined by metric

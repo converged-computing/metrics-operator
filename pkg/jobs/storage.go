@@ -47,6 +47,7 @@ func (m StorageGeneric) Description() string {
 	return m.Summary
 }
 
+// By default assume storage does not have sole tenancy
 func (m StorageGeneric) HasSoleTenancy() bool {
 	return false
 }

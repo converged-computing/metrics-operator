@@ -28,6 +28,8 @@ var (
 	soleTenancyValue  = "sole-tenancy"
 )
 
+const podLabelAppName = "app.kubernetes.io/name"
+
 // GetJobSet is called by the controller to return some JobSet based
 // on the type: application, storage, or standalone
 func GetJobSet(
@@ -45,7 +47,7 @@ func GetJobSet(
 		successJobs := getSuccessJobs(set.Metrics())
 
 		// A base JobSet can hold one or more replicated jobs
-		js := getBaseJobSet(spec, successJobs, set.HasSoleTenancy())
+		js := getBaseJobSet(spec, successJobs)
 
 		// Get one or more replicated jobs, depending on the type
 		rjs, err := set.ReplicatedJobs(spec)
@@ -80,7 +82,7 @@ func getSuccessJobs(metrics []*Metric) []string {
 }
 
 // getBaseJobSet shared for either an application or isolated jobset
-func getBaseJobSet(set *api.MetricSet, successSet []string, soleTenancy bool) *jobset.JobSet {
+func getBaseJobSet(set *api.MetricSet, successSet []string) *jobset.JobSet {
 
 	// When suspend is true we have a hard time debugging jobs, so keep false
 	suspend := false
@@ -112,9 +114,6 @@ func getBaseJobSet(set *api.MetricSet, successSet []string, soleTenancy bool) *j
 	}
 
 	// Do we want to assign 1 node: 1 pod? We can use Pod Anti-affinity for that
-	if soleTenancy {
-		js.ObjectMeta.Annotations = map[string]string{jobset.ExclusiveKey: "kubernetes.io/hostname"}
-	}
 	return &js
 }
 
@@ -125,6 +124,7 @@ func GetReplicatedJob(
 	pods int32,
 	completions int32,
 	jobname string,
+	soleTenancy bool,
 ) (*jobset.ReplicatedJob, error) {
 
 	// Default replicated job name, if not set
@@ -183,6 +183,11 @@ func GetReplicatedJob(
 		},
 	}
 
+	// Do we want sole tenancy?
+	if soleTenancy {
+		jobspec.Template.Spec.Affinity = getAffinity(set)
+	}
+
 	// Do we have a pull secret for the application image?
 	if set.Spec.Application.PullSecret != "" {
 		jobspec.Template.Spec.ImagePullSecrets = []corev1.LocalObjectReference{
@@ -192,4 +197,52 @@ func GetReplicatedJob(
 	// Tie the jobspec to the job
 	job.Template.Spec = jobspec
 	return &job, nil
+}
+
+// getAffinity returns to pod affinity to ensure 1 address / node
+func getAffinity(set *api.MetricSet) *corev1.Affinity {
+	return &corev1.Affinity{
+		// Prefer to schedule pods on the same zone
+		PodAffinity: &corev1.PodAffinity{
+			PreferredDuringSchedulingIgnoredDuringExecution: []corev1.WeightedPodAffinityTerm{
+				{
+					Weight: 100,
+					PodAffinityTerm: corev1.PodAffinityTerm{
+						LabelSelector: &metav1.LabelSelector{
+							MatchExpressions: []metav1.LabelSelectorRequirement{
+								{
+									// added in getPodLabels
+									Key:      podLabelAppName,
+									Operator: metav1.LabelSelectorOpIn,
+									Values:   []string{set.Name},
+								},
+							},
+						},
+						TopologyKey: "topology.kubernetes.io/zone",
+					},
+				},
+			},
+		},
+		// Prefer to schedule pods on different nodes
+		PodAntiAffinity: &corev1.PodAntiAffinity{
+			PreferredDuringSchedulingIgnoredDuringExecution: []corev1.WeightedPodAffinityTerm{
+				{
+					Weight: 100,
+					PodAffinityTerm: corev1.PodAffinityTerm{
+						LabelSelector: &metav1.LabelSelector{
+							MatchExpressions: []metav1.LabelSelectorRequirement{
+								{
+									// added in getPodLabels
+									Key:      podLabelAppName,
+									Operator: metav1.LabelSelectorOpIn,
+									Values:   []string{set.Name},
+								},
+							},
+						},
+						TopologyKey: "kubernetes.io/hostname",
+					},
+				},
+			},
+		},
+	}
 }
