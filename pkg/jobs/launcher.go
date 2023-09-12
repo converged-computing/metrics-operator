@@ -188,7 +188,7 @@ func (m *LauncherWorker) AddWorkers(
 ) (*jobset.ReplicatedJob, error) {
 
 	numWorkers := spec.Spec.Pods - 1
-	workers, err := metrics.GetReplicatedJob(spec, false, numWorkers, numWorkers, m.WorkerLetter)
+	workers, err := metrics.GetReplicatedJob(spec, false, numWorkers, numWorkers, m.WorkerLetter, m.SoleTenancy)
 	if err != nil {
 		return workers, err
 	}
@@ -221,7 +221,7 @@ func (m *LauncherWorker) ReplicatedJobs(spec *api.MetricSet) ([]jobset.Replicate
 	m.ensureDefaultNames()
 
 	// Generate a replicated job for the launcher (LauncherWorker) and workers
-	launcher, err := metrics.GetReplicatedJob(spec, false, 1, 1, m.LauncherLetter)
+	launcher, err := metrics.GetReplicatedJob(spec, false, 1, 1, m.LauncherLetter, m.SoleTenancy)
 	if err != nil {
 		return js, err
 	}
