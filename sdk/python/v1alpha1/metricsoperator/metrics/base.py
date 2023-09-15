@@ -64,9 +64,9 @@ class MetricBase:
         """
         If the parser doesn't have anything, just return the lines
         """
-        # Get the log metadata
+        # Get the log metadata, split lines by newline so not so hefty a log!
         metadata = self.get_log_metadata(lines)
-        return {"data": lines, "metadata": metadata, "spec": self.spec}
+        return {"data": lines.split(), "metadata": metadata, "spec": self.spec}
 
     @property
     def core_v1(self):
