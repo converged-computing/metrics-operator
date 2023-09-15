@@ -22,14 +22,20 @@ class MetricsOperator:
         self.spec = utils.read_yaml(self.yaml_file)
         config.load_kube_config()
 
-    def watch(self):
+    def watch(self, raw_logs=False, pod_prefix=None):
         """
         Wait for (and yield parsed) metric logs.
         """
+        if raw_logs and not pod_prefix:
+            raise ValueError('You must provide a pod_prefix to ask for raw logs.')
+
         for metric in self.spec["spec"]["metrics"]:
-            parser = mutils.get_metric(metric["name"])(self.spec)
+            if raw_logs:
+                parser = mutils.get_metric()(self.spec)
+            else: 
+                parser = mutils.get_metric(metric["name"])(self.spec)
             print("Watching %s" % metric["name"])
-            for pod, container in parser.logging_containers():
+            for pod, container in parser.logging_containers(pod_prefix=pod_prefix):
                 yield parser.parse(pod=pod, container=container)
 
     def create(self):
@@ -65,7 +71,7 @@ class MetricsOperator:
     def name(self):
         return self.spec["metadata"]["name"]
 
-    def delete(self):
+    def delete(self, pod_prefix=None):
         """
         Delete the associated YAML file.
         """
@@ -77,14 +83,14 @@ class MetricsOperator:
             plural=self.plural,
             name=self.name,
         )
-        self.wait_for_delete()
+        self.wait_for_delete(pod_prefix)
         return result
 
-    def wait_for_delete(self):
+    def wait_for_delete(self, pod_prefix=None):
         """
         Wait for pods to be gone (deleted)
         """
         for metric in self.spec["spec"]["metrics"]:
             parser = mutils.get_metric(metric["name"])(self.spec)
             print("Watching %s for deletion" % metric["name"])
-            parser.wait_for_delete()
+            parser.wait_for_delete(pod_prefix=pod_prefix)
