@@ -2,10 +2,10 @@
 # (c.f. AUTHORS, NOTICE.LLNS, COPYING)
 
 import metricsoperator.metrics.app as apps
+import metricsoperator.metrics.base as base
 import metricsoperator.metrics.network as network
 import metricsoperator.metrics.perf as perf
 import metricsoperator.metrics.storage as storage
-import metricsoperator.metrics.base as base
 
 metrics = {
     "io-sysstat": storage.io_sysstat,

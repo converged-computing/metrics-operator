@@ -22,18 +22,20 @@ class MetricsOperator:
         self.spec = utils.read_yaml(self.yaml_file)
         config.load_kube_config()
 
-    def watch(self, raw_logs=False, pod_prefix=None):
+    def watch(self, raw_logs=False, pod_prefix=None, container_name=None):
         """
         Wait for (and yield parsed) metric logs.
         """
         if raw_logs and not pod_prefix:
-            raise ValueError('You must provide a pod_prefix to ask for raw logs.')
+            raise ValueError("You must provide a pod_prefix to ask for raw logs.")
 
         for metric in self.spec["spec"]["metrics"]:
             if raw_logs:
-                parser = mutils.get_metric()(self.spec)
-            else: 
-                parser = mutils.get_metric(metric["name"])(self.spec)
+                parser = mutils.get_metric()(self.spec, container_name=container_name)
+            else:
+                parser = mutils.get_metric(metric["name"])(
+                    self.spec, container_name=container_name
+                )
             print("Watching %s" % metric["name"])
             for pod, container in parser.logging_containers(pod_prefix=pod_prefix):
                 yield parser.parse(pod=pod, container=container)

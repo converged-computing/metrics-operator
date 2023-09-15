@@ -13,6 +13,7 @@ class MetricBase:
     collection_end = "METRICS OPERATOR COLLECTION END"
     metadata_start = "METADATA START"
     metadata_end = "METADATA END"
+    container_name = None
 
     def __init__(self, spec=None, **kwargs):
         """
@@ -22,6 +23,10 @@ class MetricBase:
         """
         self.spec = spec
         self._core_v1 = kwargs.get("core_v1_api")
+
+        # If we don't have a default container name...
+        if not self.container_name:
+            self.container_name = kwargs.get("container_name") or "launcher"
 
         # Load kubeconfig on Metricbase init only
         if self.spec is not None:
@@ -46,12 +51,6 @@ class MetricBase:
     def container(self):
         return self.classname.replace("-", "_")
 
-    def parse_log(self, lines):
-        """
-        If the parser doesn't have anything, just return the lines
-        """
-        return lines
-
     def parse(self, pod, container):
         """
         Retrieve logs output and call parsing function
@@ -60,6 +59,14 @@ class MetricBase:
             name=pod.metadata.name, namespace=self.namespace, container=container.name
         )
         return self.parse_log(lines)
+
+    def parse_log(self, lines):
+        """
+        If the parser doesn't have anything, just return the lines
+        """
+        # Get the log metadata
+        metadata = self.get_log_metadata(lines)
+        return {"data": lines, "metadata": metadata, "spec": self.spec}
 
     @property
     def core_v1(self):
@@ -75,7 +82,9 @@ class MetricBase:
         self._core_v1 = core_v1_api.CoreV1Api()
         return self._core_v1
 
-    def logging_containers(self, namespace=None, states=None, retry_seconds=5, pod_prefix=None):
+    def logging_containers(
+        self, namespace=None, states=None, retry_seconds=5, pod_prefix=None
+    ):
         """
         Return list of containers intended to get logs from
         """
