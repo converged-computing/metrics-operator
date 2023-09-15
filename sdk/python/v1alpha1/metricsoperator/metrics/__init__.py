@@ -2,6 +2,7 @@
 # (c.f. AUTHORS, NOTICE.LLNS, COPYING)
 
 import metricsoperator.metrics.app as apps
+import metricsoperator.metrics.base as base
 import metricsoperator.metrics.network as network
 import metricsoperator.metrics.perf as perf
 import metricsoperator.metrics.storage as storage
@@ -17,11 +18,12 @@ metrics = {
 }
 
 
-def get_metric(name):
+def get_metric(name=None):
     """
     Get a named metric parser.
     """
     metric = metrics.get(name)
+    # If we don't have a matching metric, return base (for raw logs)
     if not metric:
-        raise ValueError(f"Metric {name} does not have a known parser")
+        return base.MetricBase
     return metric

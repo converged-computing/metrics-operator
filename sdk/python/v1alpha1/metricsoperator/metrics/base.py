@@ -13,6 +13,7 @@ class MetricBase:
     collection_end = "METRICS OPERATOR COLLECTION END"
     metadata_start = "METADATA START"
     metadata_end = "METADATA END"
+    container_name = None
 
     def __init__(self, spec=None, **kwargs):
         """
@@ -22,6 +23,10 @@ class MetricBase:
         """
         self.spec = spec
         self._core_v1 = kwargs.get("core_v1_api")
+
+        # If we don't have a default container name...
+        if not self.container_name:
+            self.container_name = kwargs.get("container_name") or "launcher"
 
         # Load kubeconfig on Metricbase init only
         if self.spec is not None:
@@ -55,6 +60,14 @@ class MetricBase:
         )
         return self.parse_log(lines)
 
+    def parse_log(self, lines):
+        """
+        If the parser doesn't have anything, just return the lines
+        """
+        # Get the log metadata, split lines by newline so not so hefty a log!
+        metadata = self.get_log_metadata(lines)
+        return {"data": lines.split("\n"), "metadata": metadata, "spec": self.spec}
+
     @property
     def core_v1(self):
         """
@@ -69,12 +82,14 @@ class MetricBase:
         self._core_v1 = core_v1_api.CoreV1Api()
         return self._core_v1
 
-    def logging_containers(self, namespace=None, states=None, retry_seconds=5):
+    def logging_containers(
+        self, namespace=None, states=None, retry_seconds=5, pod_prefix=None
+    ):
         """
         Return list of containers intended to get logs from
         """
         containers = []
-        pods = self.wait(namespace, states, retry_seconds)
+        pods = self.wait(namespace, states, retry_seconds, pod_prefix=pod_prefix)
         container_name = getattr(self, "container_name", self.container)
         print(f"Looking for container name {container_name}...")
         for pod in pods.items:
@@ -90,7 +105,16 @@ class MetricBase:
                     )
         return containers
 
-    def wait(self, namespace=None, states=None, retry_seconds=5):
+    def get_pod_prefix(self, pod_prefix=None):
+        """
+        Return the default or a custom pod prefix.
+        """
+        pod_prefix = pod_prefix or getattr(self, "pod_prefix", None)
+        if not pod_prefix:
+            raise ValueError("A pod prefix 'pod_prefix' is required to wait for pods.")
+        return pod_prefix
+
+    def wait(self, namespace=None, states=None, retry_seconds=5, pod_prefix=None):
         """
         Wait for one or more pods of interest to be done.
 
@@ -98,9 +122,10 @@ class MetricBase:
         particular state. If looking for Termination -> gone, use
         wait_for_delete.
         """
+        pod_prefix = self.get_pod_prefix(pod_prefix)
         namespace = namespace or self.namespace
-        print(f"Looking for prefix {self.pod_prefix} in namespace {namespace}")
-        pod_list = self.get_pods(namespace, self.pod_prefix)
+        print(f"Looking for prefix {pod_prefix} in namespace {namespace}")
+        pod_list = self.get_pods(namespace, pod_prefix)
         size = len(pod_list.items)
 
         # We only want logs when they are completed
@@ -111,7 +136,7 @@ class MetricBase:
         ready = set()
         while len(ready) != size:
             print(f"{len(ready)} pods are ready, out of {size}")
-            pod_list = self.get_pods(name=self.pod_prefix, namespace=namespace)
+            pod_list = self.get_pods(name=pod_prefix, namespace=namespace)
 
             for pod in pod_list.items:
                 print(f"{pod.metadata.name} is in phase {pod.status.phase}")
@@ -126,16 +151,17 @@ class MetricBase:
         print(f'All pods are in states "{states}"')
         return pod_list
 
-    def wait_for_delete(self, namespace=None, retry_seconds=5):
+    def wait_for_delete(self, namespace=None, retry_seconds=5, pod_prefix=None):
         """
         Wait for one or more pods of interest to be gone
         """
+        pod_prefix = self.get_pod_prefix(pod_prefix)
         namespace = namespace or self.namespace
-        print(f"Looking for prefix {self.pod_prefix} in namespace {namespace}")
-        pod_list = self.get_pods(namespace, name=self.pod_prefix)
+        print(f"Looking for prefix {pod_prefix} in namespace {namespace}")
+        pod_list = self.get_pods(namespace, name=pod_prefix)
         while len(pod_list.items) != 0:
             print(f"{len(pod_list.items)} pods exist, waiting for termination.")
-            pod_list = self.get_pods(name=self.pod_prefix, namespace=namespace)
+            pod_list = self.get_pods(name=pod_prefix, namespace=namespace)
             time.sleep(retry_seconds)
         print("All pods are terminated.")
 
