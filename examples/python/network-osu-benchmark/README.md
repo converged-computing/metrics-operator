@@ -40,3 +40,5 @@ $ python run-metric-multiple.py --iter 5
 ![img/multiple/OSU-MPI_Put-Latency-Test-v5.8.png](img/multiple/OSU-MPI_Put-Latency-Test-v5.8.png)
 
 
+Note that if you add the option `timed: true` this will add extra 'wrapper' times around the above,
+and an extra data output for it in your results.
