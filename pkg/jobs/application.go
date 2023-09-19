@@ -19,6 +19,8 @@ import (
 // SingleApplication is a Metric base for a simple application metric
 // be accessible by other packages (and not conflict with function names)
 type SingleApplication struct {
+	BaseMetric
+
 	Identifier    string
 	Summary       string
 	Container     string

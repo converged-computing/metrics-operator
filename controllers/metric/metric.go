@@ -21,7 +21,7 @@ import (
 func (r *MetricSetReconciler) ensureMetricSet(
 	ctx context.Context,
 	spec *api.MetricSet,
-	sets *map[string]mctrl.MetricSet,
+	set *mctrl.MetricSet,
 ) (ctrl.Result, error) {
 
 	// First ensure config maps, typically entrypoints for custom metrics containers.
@@ -29,7 +29,7 @@ func (r *MetricSetReconciler) ensureMetricSet(
 	// and named by metric index or custom metric script key name
 	// We could theoretically allow creating more than one JobSet here
 	// and change the name to include the group type.
-	_, result, err := r.ensureConfigMaps(ctx, spec, sets)
+	_, result, err := r.ensureConfigMaps(ctx, spec, set)
 	if err != nil {
 		return result, err
 	}
@@ -45,7 +45,7 @@ func (r *MetricSetReconciler) ensureMetricSet(
 	// Ensure we create the JobSet for the MetricSet
 	// either application, storage, or standalone based
 	// This could be updated to support > 1
-	_, result, err = r.ensureJobSet(ctx, spec, sets)
+	_, result, err = r.ensureJobSet(ctx, spec, set)
 	if err != nil {
 		return result, err
 	}
@@ -74,7 +74,7 @@ func (r *MetricSetReconciler) getExistingJob(
 func (r *MetricSetReconciler) ensureJobSet(
 	ctx context.Context,
 	spec *api.MetricSet,
-	sets *map[string]mctrl.MetricSet,
+	set *mctrl.MetricSet,
 ) ([]*jobset.JobSet, ctrl.Result, error) {
 
 	// Look for an existing job
@@ -93,7 +93,7 @@ func (r *MetricSetReconciler) ensureJobSet(
 		)
 
 		// Get one JobSet to create (can eventually support > 1)
-		jobsets, err := mctrl.GetJobSet(spec, sets)
+		jobsets, err := mctrl.GetJobSet(spec, set)
 		if err != nil {
 			return jobsets, ctrl.Result{}, err
 		}

@@ -39,7 +39,6 @@ func main() {
 			Name:        metric.Name(),
 			Description: metric.Description(),
 			Family:      metric.Family(),
-			Type:        metric.Type(),
 			Image:       metric.Image(),
 			Url:         metric.Url(),
 		}

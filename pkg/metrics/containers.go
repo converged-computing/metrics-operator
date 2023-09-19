@@ -21,23 +21,6 @@ var (
 	capPtrace = corev1.Capability("SYS_PTRACE")
 )
 
-// A ContainerSpec is used by a metric to define a container
-type ContainerSpec struct {
-	Command    []string
-	Image      string
-	Name       string
-	WorkingDir string
-	Resources  *api.ContainerResources
-	Attributes *api.ContainerSpec
-}
-
-// Named entrypoint script for a container
-type EntrypointScript struct {
-	Name   string
-	Path   string
-	Script string
-}
-
 // getContainers gets containers for a set of metrics
 func getContainers(
 	set *api.MetricSet,

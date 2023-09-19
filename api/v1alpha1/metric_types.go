@@ -18,7 +18,6 @@ package v1alpha1
 
 import (
 	"fmt"
-	"reflect"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -51,18 +50,9 @@ type MetricSetSpec struct {
 	// +optional
 	DeadlineSeconds int64 `json:"deadlineSeconds,omitempty"`
 
-	// A storage setup that we want to measure performance for.
-	// and binding to storage metrics
-	// +optional
-	Storage Storage `json:"storage"`
-
 	// Pod spec for the application, standalone, or storage metrics
 	//+optional
 	Pod Pod `json:"pod"`
-
-	// For metrics that require an application, we need a container and name (for now)
-	// +optional
-	Application Application `json:"application"`
 
 	// Parallelism (e.g., pods)
 	// +kubebuilder:default=1
@@ -78,11 +68,6 @@ type MetricSetSpec struct {
 	// Right now we just include an interactive option
 	//+optional
 	Logging Logging `json:"logging"`
-
-	// Single pod completion, meaning the jobspec completions is unset
-	// and we only require one main completion
-	// +optional
-	Completions int32 `json:"completions"`
 }
 
 type Logging struct {
@@ -115,6 +100,25 @@ type ContainerSpec struct {
 
 type SecurityContext struct {
 	Privileged bool `json:"privileged"`
+}
+
+// A Metric addon is an interface that exposes extra volumes for a metric. Examples include:
+// A storage volume to be mounted on one or more of the replicated jobs
+// A single application container.
+type MetricAddon struct {
+	Name string `json:"name"`
+
+	// Metric Addon Options
+	// +optional
+	Options map[string]intstr.IntOrString `json:"options"`
+
+	// Addon List Options
+	// +optional
+	ListOptions map[string][]intstr.IntOrString `json:"listOptions"`
+
+	// Addon Map Options
+	// +optional
+	MapOptions map[string]map[string]intstr.IntOrString `json:"mapOptions"`
 }
 
 // Storage that will be monitored, or storage alongside a standalone metric
@@ -233,6 +237,12 @@ type Volume struct {
 // A metric is more a measurment, and the benchmark is the comparison value.
 // I don't have strong opinions but I think we are doing more measurment
 // not necessarily with benchmarks
+
+// A metric is basically a container. It minimally provides:
+// In the simplest case, a sidecar container (e.g., service or similar)
+// Optionally: Possibly additional volumes that can be mounted in
+// With a shared process namespace, ability to monitor
+
 type Metric struct {
 	Name string `json:"name"`
 
@@ -240,6 +250,12 @@ type Metric struct {
 	// Metric specific options
 	// +optional
 	Options map[string]intstr.IntOrString `json:"options"`
+
+	// A Metric addon can be storage (volume) or an application,
+	// It's an additional entity that can customize a replicated job,
+	// either adding assets / features or entire containers to the pod
+	//+optional
+	Addons []MetricAddon `json:"addons"`
 
 	// Metric List Options
 	// Metric specific options
@@ -287,35 +303,8 @@ type MetricSet struct {
 	Status MetricSetStatus `json:"status,omitempty"`
 }
 
-// Determine if an application or storage is present, or standalone
-func (m *MetricSet) HasApplication() bool {
-	return !reflect.DeepEqual(m.Spec.Application, Application{})
-}
-func (m *MetricSet) HasStorage() bool {
-	return !reflect.DeepEqual(m.Spec.Storage, Storage{})
-}
-func (m *MetricSet) HasStorageVolume() bool {
-	return !reflect.DeepEqual(m.Spec.Storage.Volume, Volume{})
-}
-func (m *MetricSet) IsStandalone() bool {
-	return !m.HasStorage() && !m.HasApplication()
-}
-
 // Validate a requested metricset
 func (m *MetricSet) Validate() bool {
-
-	// An application or storage setup is required
-	if !m.HasApplication() && !m.HasStorage() && !m.IsStandalone() {
-		fmt.Printf("😥️ An application OR storage OR standalone entry is required.\n")
-		return false
-	}
-
-	// We don't currently support running both at once
-	// (but should be fine to allow extra standalone)
-	if m.HasApplication() && m.HasStorage() {
-		fmt.Printf("😥️ An application OR storage entry is required, not both.\n")
-		return false
-	}
 
 	if len(m.Spec.Metrics) == 0 {
 		fmt.Printf("😥️ One or more metrics are required.\n")
@@ -325,42 +314,6 @@ func (m *MetricSet) Validate() bool {
 		fmt.Printf("😥️ Pods must be >= 1.")
 		return false
 	}
-
-	// Validation for application
-	if m.HasApplication() {
-		if m.Spec.Application.Command == "" {
-			fmt.Printf("😥️ Application is missing a command.")
-			return false
-		}
-
-		if m.Spec.Application.Entrypoint == "" {
-			m.Spec.Application.Entrypoint = m.Spec.Application.Command
-		}
-
-		// For existing volumes, if it's a claim, a path is required.
-		if !m.validateVolumes(m.Spec.Application.Volumes) {
-			fmt.Printf("😥️ Application container volumes are not valid\n")
-			return false
-		}
-	}
-
-	// Validate for storage
-	if m.HasStorage() && !m.validateVolumes(map[string]Volume{"storage": m.Spec.Storage.Volume}) {
-		fmt.Printf("😥️ Storage volumes are not valid\n")
-		return false
-	}
-
-	// If completions unset, set to parallelism
-	if m.Spec.Completions == 0 {
-		m.Spec.Completions = m.Spec.Pods
-	}
-
-	// A standalone metric by definition runs alone
-	if len(m.Spec.Metrics) > 1 && m.IsStandalone() {
-		fmt.Printf("😥️ A standalone metric by definition runs on its own\n")
-		return false
-	}
-
 	return true
 }
 

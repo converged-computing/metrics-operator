@@ -12,6 +12,10 @@ To learn more:
 
 ## Dinosaur TODO
 
+- Document and automate docs for addons (options, etc.)
+- Addons likely needs to be a list to support > 1 of one type! Then subsequent changes so it's not 1:1
+- Is there any reason we cannot generate the names for the addon volumes?
+
 - We need a way for the entrypoint command to monitor (based on the container) to differ (potentially)
 - For larger metric collections, we should have a log streaming mode (and not wait for Completed/Successful)
 - For services we are measuring, we likely need to be able to kill after N seconds (to complete job) or to specify the success policy on the metrics containers instead of the application

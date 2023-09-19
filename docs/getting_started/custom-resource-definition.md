@@ -31,22 +31,12 @@ spec:
 
 ### Spec
 
-Under the spec, there are several variables to define. Descriptions are included below, and we recommend that you look at [examples](https://github.com/converged-computing/metrics-operator/tree/main/examples) in the repository for more.
+Under the spec, there are several variables to define. Descriptions are included below, and we recommend that you look at [examples](https://github.com/converged-computing/metrics-operator/tree/main/examples) in the repository for more. Note that the general design takes one or more metrics, and each metric can have additional addons for storage volumes, additional containers, or other addon types.
 Specifically, you must choose ONE of:
-
- - application
- - storage
-
-Where an application will be run for some number of pods (completions) and measured by metrics pods (separate pods) OR a storage metric will run directly, and with some
-number of pods (completions) to bind to the storage and measure.
 
 ### pods
 
 The number of pods for an application or storage metric test will correspond with the parallelism of the indexed job (which comes down to pods) for the storage or application JobSet. This defaults to 1, meaning we run in a non-indexed mode. The indexed mode is determined automatically by this variable, where "1" indicates non-indexed, and >1 is indexed.
-
-### completions
-
-When running as an indexed job, indicate the number of successful pods (completions) for the Job to be successful.  Note that if you set 1, your parallelism will default to 1 too, which isn't ideal. I've opened an issue [here](https://github.com/kubernetes-sigs/jobset).
 
 ### logging
 
@@ -73,104 +63,6 @@ spec:
 
 By default it is false, meaning we use fully qualified domain names.
 
-### application
-
-When you want to measure application performance, you'll need to add an "application" section to your MetricSet. This is the container that houses some application that you want to measure performance for. This means that minimally, you are required to define the application container image and command:
-
-
-```yaml
-spec:
-  application:
-    image: ghcr.io/rse-ops/vanilla-lammps:tag-latest
-    command: mpirun lmp -v x 1 -v y 1 -v z 1 -in in.reaxc.hns -nocite
-```
-
-In the above example, we target a container with LAMMPS and mpi, and we are going to run MPIrun.
-The command will be used by the metrics sidecar containers to find the PID of interest to measure.
-
-#### workingDir
-
-To add a working directory for your application:
-
-```yaml
-spec:
-  application:
-    image: ghcr.io/rse-ops/vanilla-lammps:tag-latest
-    command: mpirun lmp -v x 1 -v y 1 -v z 1 -in in.reaxc.hns -nocite
-    workingDir: /opt/lammps/examples/reaxff/HNS
-```
-
-#### volumes
-
-An application is allowed to have one or more existing volumes. An existing volume can be any of the types described in [existing volumes](#existing-volumes)
-
-#### resources
-
-You can define resources for an application or a metric container. Known keys include "memory" and "cpu" (should be provided in some string format that can be parsed) and all others are considered some kind of quantity request.
-
-```yaml
-application:
-  resources:
-    memory: 500M
-    cpu: 4
-```
-
-Metrics can also take resource requests.
-
-```yaml
-metrics:
-  - name: io-fio
-    resources:
-      memory: 500M
-      cpu: 4
-```
-
-If you wanted to, for example, request a GPU, that might look like:
-
-```yaml
-resources:
-  limits:
-    gpu-vendor.example/example-gpu: 1
-```
-
-Or for a particular type of networking fabric:
-
-```yaml
-resources:
-  limits:
-    vpc.amazonaws.com/efa: 1
-```
-
-Both limits and resources are flexible to accept a string or an integer value, and you'll get an error if you
-provide something else. If you need something else, [let us know](https://github.com/converged-computing/metrics-operator/issues).
-If you are requesting GPU, [this documentation](https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/) is helpful.
-
-### storage
-
-When you want to measure some storage performance, you'll want to add a "storage" section to your MetricSet. This will typically just be a reference to some existing storage (see [existing volumes](#existing-volumes)) that we want to measure, and can also be done for some number of completions and metrics for storage.
-
-#### commands
-
-If you need to add some special logic to create or cleanup for a storage volume, you are free to define them for storage in each of pre and post sections, which will happen before and after the metric runs, respectively.
-
-```yaml
-storage:
-  volume:
-    claimName: data 
-    path: /data
-  commands:
-    pre: |
-      apt-get update && apt-get install -y mymounter-tool
-      mymounter-tool mount /data
-    post: mymounter-tool unmount /data
-    # Wrap the storage metric in this prefix
-    prefix: myprefix
-```
-
-All of the above are strings. The pipe allows for multiple lines, if appropriate.
-Note that while a "volume" is typical, you might have a storage setup that is done via a set of custom commands, in which case
-you don't need to define the volume too.
-
 ### metrics
 
 The core of the MetricSet of course is the metrics! Since we can measure more than one thing at once, this is a list of named metrics known to the operator. As an example, here is how to run the `perf-sysstat` metric:
@@ -183,35 +75,9 @@ spec:
 
 To see all the metrics available, see [metrics](metrics.md). We will be adding many more as the operator is developed.
 
-#### rate
-
-A metric will be collected at some rate (in seconds) and this defaults to 10.
-To change the rate for a metric:
-
-```yaml
-spec:
-  metrics:
-    - name: perf-sysstat
-      rate: 20
-```
-
-#### completions
-
-Completions for a metric are relevant if you are assessing storage (which doesn't have an application runtime) or a service application that will continue to run forever. When this value is set to 0, it essentially indicates no set number of completions (meaning we run forever). Any non-zero value will ensure the metric
-runs for that many completions before exiting.
-
-```yaml
-spec:
-  metrics:
-    - name: io-sysstat
-      completions: 5
-```
-
-This is usually suggested to provide for a storage metric.
-
 #### options
 
-Metrics can take custom options, which are key value pairs of a string key and either string or integer value. These come in three types:
+Generally, the specific parameters for any given metric are defined via the options, including:
 
  - options (key value pairs, where the value is an integer/string type)
  - listOptions (key value pairs, where the value is a list of integer/string types)
@@ -236,136 +102,27 @@ spec:
 ```
 
 Presence of absence of an option type depends on the metric. Metrics are free to use these custom
-options as they see fit.
+options as they see fit, and validate in the same manner.
 
+#### addons
 
-## Existing Volumes
+An addon is a flexible interface to define everything from volumes to containers to be deployed alongside the metric.
+If you are curious, a metric will generate one or more replicated Jobs in a Jobset, and the addon is free to customize these.
+Akin to [metric options](#options) addons support the same types:
 
-An existing volume can be provided to support an application (multiple) or one can be provided for assessing its performance (single).
+ - options
+ - listOptions
+ - mapOptions
 
- - a persistent volume claim (PVC) and persistent volume (PV) that you've created
- - a secret that you've created
- - a config map that you've created
- - a host volume (typically for testing)
-
-and for all of the above, you want to provide it to the operator, which will ensure the volume is available for your application or storage. For an application, you'd define your volumes as such:
-
-```yaml
-spec:
-  application:
-    image: ghcr.io/rse-ops/vanilla-lammps:tag-latest
-    command: nginx -g daemon off;
-    volumes:
-      data:
-        path: /workflow
-        claimName: data
-```
-
-The use case above, for an application, is that it requires some kind of data or storage alongside it to function. The volumes spec above is a key value (e.g., "data" is the key) to ensure that names are unique. For storage, you'll only be defining one volume:
+As an example, here is a metric with a few named addons - an empty volume, and adding hpctoolkit to run alongside lammps.
 
 ```yaml
-spec:
-  storage:
-    volume:
-      path: /workflow
-      claimName: data
+metrics:
+ - name: app-lammps
+   addons:
+     - name: volume-empty
+     - name: perf-hpctoolkit
 ```
 
-And the implicit name would be "storage" (although it's probably not important for you to know that). For the remaining examples, we will provide examples for application volumes, however know that the examples are also valid for the second
-storage format.
-
-#### persistent volume claim example
-
-As an example, here is how to provide the name of an existing claim (you created separately) to a container:
-
-```yaml
-spec:
-  application:
-    image: ghcr.io/rse-ops/vanilla-lammps:tag-latest
-    command: nginx -g daemon off;
-
-    # This is an existing PVC (and associated PV) we created before the MetricSet
-    volumes:
-      data:
-        path: /workflow
-        claimName: data
-```
-
-The above would add a claim named "data" to the application container(s).
-
-#### config map example
-
-Here is an example of providing a config map to an application container In layman's terms, we are deploying vanilla nginx, but adding a configuration file
-to `/etc/nginx/conf.d`
-
-```yaml
-spec:
-  application:
-    image: nginx
-    command: nginx -g daemon off;
-
-    # This is an existing PVC (and associated PV) we created before the MetricSet
-    volumes:
-      nginx-conf:
-        configMapName: nginx-conf
-        path: /etc/nginx/conf.d
-        items:
-          flux.conf: flux.conf
-```
-
-
-You would have created this config map first, before the MetricSet. Here is an example:
-
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: nginx-conf
-  namespace: metrics-operator
-data:
-  flux.conf: |
-    server {
-        listen       80;
-        server_name  localhost;
-        location / {
-          root   /usr/share/nginx/html;
-          index  index.html index.htm;
-        }
-    }
-```
-
-#### secret example
-
-Here is an example of providing an existing secret (in the metrics-operator namespace)
-to the application container(s):
-
-```yaml
-spec:
-  application:
-    image: nginx
-    command: nginx -g daemon off;
-
-    volumes:
-      certs:
-        path: /etc/certs
-        secretName: certs
-```
-
-The above shows an existing secret named "certs" that we will mount into `/etc/certs`.
-
-#### hostpath volume example
-
-Here is how to use a host path:
-
-```yaml
-spec:
-  application:
-    image: ghcr.io/rse-ops/vanilla-lammps:tag-latest
-    command: nginx -g daemon off;
-
-    # This is an existing PVC (and associated PV) we created before the MetricSet
-    volumes:
-      data:
-        hostPath: true
-        path: /workflow
-```
+Each addon has its own custom options. You can look at examples and at our [addons documentation](addons.md) for more detail on how to add existing volumes
+or other custom functionality.

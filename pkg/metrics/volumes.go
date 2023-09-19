@@ -39,23 +39,6 @@ func getVolumeMounts(
 	return mounts
 }
 
-// Get MetricsKeyToPath assumes we have a predictible listing of metrics
-// scripts. This is applicable for storage and application metrics
-func GetMetricsKeyToPath(metrics []*Metric) []corev1.KeyToPath {
-	// Each metric has an entrypoint script
-	runnerScripts := []corev1.KeyToPath{}
-	for i, _ := range metrics {
-		key := fmt.Sprintf("entrypoint-%d", i)
-		runnerScript := corev1.KeyToPath{
-			Key:  key,
-			Path: key + ".sh",
-			Mode: &makeExecutable,
-		}
-		runnerScripts = append(runnerScripts, runnerScript)
-	}
-	return runnerScripts
-}
-
 // getVolumes adds expected entrypoints along with added volumes (storage or applications)
 // This function is intended for a set with a listing of metrics
 func GetVolumes(

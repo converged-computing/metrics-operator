@@ -9,9 +9,11 @@ package metrics
 
 import (
 	"fmt"
-	"log"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	batchv1 "k8s.io/api/batch/v1"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 )
 
@@ -20,10 +22,6 @@ var (
 )
 
 const (
-	// Metric Design Types
-	ApplicationMetric = "application"
-	StorageMetric     = "storage"
-	StandaloneMetric  = "standalone"
 
 	// Metric Family Types (these likely can be changed)
 	StorageFamily         = "storage"
@@ -37,17 +35,123 @@ const (
 	PerformanceFamily = "performance"
 )
 
-// A MetricSet interface holds one or more Metrics
-// and exposes the JobSet
-type MetricSet interface {
+// A MetricSet includes one or more metrics that are assembled into a JobSet
+type MetricSet struct {
+	name        string
+	metrics     []*Metric
+	metricNames map[string]bool
+}
 
-	// Metric Set Type (string)
-	Type() string
-	Add(m *Metric)
-	Exists(m *Metric) bool
-	Metrics() []*Metric
-	EntrypointScripts(*api.MetricSet) []EntrypointScript
-	ReplicatedJobs(*api.MetricSet) ([]jobset.ReplicatedJob, error)
+func (m MetricSet) Metrics() []*Metric {
+	return m.metrics
+}
+func (m MetricSet) Exists(metric *Metric) bool {
+	_, ok := m.metricNames[(*metric).Name()]
+	return ok
+}
+
+// Determine if any metrics in the set need sole tenancy
+// This is defined on the level of the jobset for now
+func (m MetricSet) HasSoleTenancy() bool {
+	for _, m := range m.metrics {
+		if (*m).HasSoleTenancy() {
+			return true
+		}
+	}
+	return false
+}
+
+func (m *MetricSet) Add(metric *Metric) {
+	if !m.Exists(metric) {
+		m.metrics = append(m.metrics, metric)
+		m.metricNames[(*metric).Name()] = true
+	}
+}
+func (m *MetricSet) EntrypointScripts(set *api.MetricSet) []EntrypointScript {
+	return consolidateEntrypointScripts(m.metrics, set)
+}
+
+// AssembleReplicatedJob is used by metrics to assemble a custom, replicated job.
+func AssembleReplicatedJob(
+	set *api.MetricSet,
+	shareProcessNamespace bool,
+	pods int32,
+	completions int32,
+	jobname string,
+	soleTenancy bool,
+) (*jobset.ReplicatedJob, error) {
+
+	// Default replicated job name, if not set
+	if jobname == "" {
+		jobname = ReplicatedJobName
+	}
+
+	// Pod labels from the MetricSet
+	podLabels := set.GetPodLabels()
+
+	// Always indexed completion mode to have predictable hostnames
+	completionMode := batchv1.IndexedCompletion
+
+	// We only expect one replicated job (for now) so give it a short name for DNS
+	job := jobset.ReplicatedJob{
+		Name: jobname,
+		Template: batchv1.JobTemplateSpec{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      set.Name,
+				Namespace: set.Namespace,
+			},
+		},
+		// This is the default, but let's be explicit
+		Replicas: 1,
+	}
+
+	// This should default to true
+	setAsFDQN := !set.Spec.DontSetFQDN
+
+	// Create the JobSpec for the job -> Template -> Spec
+	jobspec := batchv1.JobSpec{
+		BackoffLimit:          &backoffLimit,
+		Parallelism:           &pods,
+		Completions:           &completions,
+		CompletionMode:        &completionMode,
+		ActiveDeadlineSeconds: &set.Spec.DeadlineSeconds,
+
+		// Note there is parameter to limit runtime
+		Template: corev1.PodTemplateSpec{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      set.Name,
+				Namespace: set.Namespace,
+				Labels:    podLabels,
+			},
+			Spec: corev1.PodSpec{
+				// matches the service
+				Subdomain:     set.Spec.ServiceName,
+				RestartPolicy: corev1.RestartPolicyOnFailure,
+
+				// This is important to share the process namespace!
+				SetHostnameAsFQDN:     &setAsFDQN,
+				ShareProcessNamespace: &shareProcessNamespace,
+				ServiceAccountName:    set.Spec.Pod.ServiceAccountName,
+				NodeSelector:          set.Spec.Pod.NodeSelector,
+			},
+		},
+	}
+
+	// Do we want sole tenancy?
+	if soleTenancy {
+		jobspec.Template.Spec.Affinity = getAffinity(set)
+	}
+
+	// Do we have a pull secret for the application image?
+	// Metric containers are currently required to be public
+	if set.Spec.Application.PullSecret != "" {
+		jobspec.Template.Spec.ImagePullSecrets = []corev1.LocalObjectReference{
+			{Name: set.Spec.Application.PullSecret},
+		}
+	}
+	// Tie the jobspec to the job
+	job.Template.Spec = jobspec
+	return &job, nil
 }
 
 // get an application default entrypoint, if not determined by metric
@@ -61,7 +165,7 @@ func getApplicationDefaultEntrypoint(set *api.MetricSet) string {
 	return fmt.Sprintf(template, set.Spec.Application.Entrypoint)
 }
 
-// ConsolidateEntrypointScripts from a metric set into one list
+// consolidateEntrypointScripts from a metric set into one list
 func consolidateEntrypointScripts(metrics []*Metric, set *api.MetricSet) []EntrypointScript {
 	scripts := []EntrypointScript{}
 	seenApplicationEntry := false
@@ -84,82 +188,4 @@ func consolidateEntrypointScripts(metrics []*Metric, set *api.MetricSet) []Entry
 		})
 	}
 	return scripts
-}
-
-// BaseMetricSet
-type BaseMetricSet struct {
-	name        string
-	metrics     []*Metric
-	metricNames map[string]bool
-}
-
-func (m BaseMetricSet) Metrics() []*Metric {
-	return m.metrics
-}
-func (m BaseMetricSet) Type() string {
-	return m.name
-}
-func (m BaseMetricSet) Exists(metric *Metric) bool {
-	_, ok := m.metricNames[(*metric).Name()]
-	return ok
-}
-
-// Determine if any metrics in the set need sole tenancy
-// This is defined on the level of the jobset for now
-func (m BaseMetricSet) HasSoleTenancy() bool {
-	for _, m := range m.metrics {
-		if (*m).HasSoleTenancy() {
-			return true
-		}
-	}
-	return false
-}
-
-func (m *BaseMetricSet) Add(metric *Metric) {
-	if !m.Exists(metric) {
-		m.metrics = append(m.metrics, metric)
-		m.metricNames[(*metric).Name()] = true
-	}
-}
-func (m *BaseMetricSet) EntrypointScripts(set *api.MetricSet) []EntrypointScript {
-	return consolidateEntrypointScripts(m.metrics, set)
-}
-
-// Types of Metrics: Storage, Application, and Standalone
-
-// StorageMetricSet defines a MetricSet to measure storage interfaces
-type StorageMetricSet struct {
-	BaseMetricSet
-}
-
-// ApplicationMetricSet defines a MetricSet to measure application performance
-type ApplicationMetricSet struct {
-	BaseMetricSet
-}
-type StandaloneMetricSet struct {
-	BaseMetricSet
-}
-
-// Register a new Metric type, adding it to the Registry
-func RegisterSet(m MetricSet) {
-	name := m.Type()
-	if _, ok := RegistrySet[name]; ok {
-		log.Fatalf("MetricSet: %s has already been added to the registry", name)
-	}
-	RegistrySet[name] = m
-}
-
-// GetMetric returns the Component specified by name from `Registry`.
-func GetMetricSet(name string) (MetricSet, error) {
-	if _, ok := RegistrySet[name]; ok {
-		m := RegistrySet[name]
-		return m, nil
-	}
-	return nil, fmt.Errorf("%s is not a registered MetricSet type", name)
-}
-
-func init() {
-	RegisterSet(&StorageMetricSet{BaseMetricSet{name: StorageMetric, metricNames: map[string]bool{}}})
-	RegisterSet(&ApplicationMetricSet{BaseMetricSet{name: ApplicationMetric, metricNames: map[string]bool{}}})
-	RegisterSet(&StandaloneMetricSet{BaseMetricSet{name: StandaloneMetric, metricNames: map[string]bool{}}})
 }

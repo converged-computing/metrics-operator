@@ -33,12 +33,17 @@ var (
 // LauncherWorker is a launcher + worker setup for apps. These need to
 // be accessible by other packages (and not conflict with function names)
 type LauncherWorker struct {
+	BaseMetric
+
 	Identifier    string
 	Summary       string
 	Container     string
 	Workdir       string
 	ResourceSpec  *api.ContainerResources
 	AttributeSpec *api.ContainerSpec
+
+	// A metric can have one or more addons
+	Addons []*api.MetricAddon
 
 	// If we ask for sole tenancy, we assign 1 pod / hostname
 	SoleTenancy bool
@@ -81,9 +86,6 @@ func (m *LauncherWorker) SuccessJobs() []string {
 }
 
 // Container variables
-func (n LauncherWorker) Type() string {
-	return metrics.StandaloneMetric
-}
 func (n LauncherWorker) Image() string {
 	return n.Container
 }
@@ -188,7 +190,7 @@ func (m *LauncherWorker) AddWorkers(
 ) (*jobset.ReplicatedJob, error) {
 
 	numWorkers := spec.Spec.Pods - 1
-	workers, err := metrics.GetReplicatedJob(spec, false, numWorkers, numWorkers, m.WorkerLetter, m.SoleTenancy)
+	workers, err := metrics.AssembleReplicatedJob(spec, false, numWorkers, numWorkers, m.WorkerLetter, m.SoleTenancy)
 	if err != nil {
 		return workers, err
 	}
@@ -214,14 +216,14 @@ func (m *LauncherWorker) AddWorkers(
 	return workers, nil
 }
 
-// Replicated Jobs are custom for this standalone metric
+// Replicated Jobs are custom for a launcher worker
 func (m *LauncherWorker) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, error) {
 
 	js := []jobset.ReplicatedJob{}
 	m.ensureDefaultNames()
 
 	// Generate a replicated job for the launcher (LauncherWorker) and workers
-	launcher, err := metrics.GetReplicatedJob(spec, false, 1, 1, m.LauncherLetter, m.SoleTenancy)
+	launcher, err := metrics.AssembleReplicatedJob(spec, false, 1, 1, m.LauncherLetter, m.SoleTenancy)
 	if err != nil {
 		return js, err
 	}

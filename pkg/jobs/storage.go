@@ -19,6 +19,8 @@ import (
 // They define the interface of a Metric.
 
 type StorageGeneric struct {
+	BaseMetric
+
 	Identifier string
 	Summary    string
 	Container  string

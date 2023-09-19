@@ -23,8 +23,8 @@ import (
 // ensureConfigMap ensures we've generated the read only entrypoints
 func (r *MetricSetReconciler) ensureConfigMaps(
 	ctx context.Context,
-	set *api.MetricSet,
-	sets *map[string]mctrl.MetricSet,
+	spec *api.MetricSet,
+	set *mctrl.MetricSet,
 ) (*corev1.ConfigMap, ctrl.Result, error) {
 
 	// Look for the config map by name
@@ -32,8 +32,8 @@ func (r *MetricSetReconciler) ensureConfigMaps(
 	err := r.Get(
 		ctx,
 		types.NamespacedName{
-			Name:      set.Name,
-			Namespace: set.Namespace,
+			Name:      spec.Name,
+			Namespace: spec.Namespace,
 		},
 		existing,
 	)
@@ -45,18 +45,17 @@ func (r *MetricSetReconciler) ensureConfigMaps(
 		// Prepare lookup of entrypoints, one per application/storage,
 		// or possible multiple for a standalone metric
 		data := map[string]string{}
-		count := 0
-		for _, s := range *sets {
-			for _, es := range s.EntrypointScripts(set) {
-				key := es.Name
-				if key == "" {
-					key = fmt.Sprintf("entrypoint-%d", count)
-				}
-				data[key] = es.Script
+
+		// Go through each entrypoint script
+		for count, es := range set.EntrypointScripts(spec) {
+			key := es.Name
+			if key == "" {
+				key = fmt.Sprintf("entrypoint-%d", count)
 			}
-			count += 1
+			data[key] = es.Script
 		}
-		cm, result, err := r.getConfigMap(ctx, set, data)
+
+		cm, result, err := r.getConfigMap(ctx, spec, data)
 		if err != nil {
 			r.Log.Error(
 				err, "🟥️ Failed to get config map",
