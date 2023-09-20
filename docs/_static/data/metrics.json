@@ -47,5 +47,12 @@
   "family": "performance",
   "image": "ghcr.io/converged-computing/metric-ovis-hpc:latest",
   "url": "https://github.com/ovis-hpc/ovis"
+ },
+ {
+  "name": "app-nekbone",
+  "description": "A mini-app derived from the Nek5000 CFD code which is a high order, incompressible Navier-Stokes CFD solver based on the spectral element method. The conjugate gradiant solve is compute intense, contains small messages and frequent allreduces.",
+  "family": "solver",
+  "image": "ghcr.io/converged-computing/metric-nekbone:latest",
+  "url": "https://github.com/Nek5000/Nekbone"
  }
 ]
