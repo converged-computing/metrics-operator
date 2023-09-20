@@ -112,8 +112,12 @@ func (a *HPCToolkit) customizeEntrypoint(
 	rj *jobset.ReplicatedJob,
 ) {
 
+	// Generate addon metadata
+	meta := Metadata(a)
+
 	// This should be run after the pre block of the script
 	preBlock := `
+echo "%s"
 # Ensure hpcrun and software exists. This is rough, but should be OK with enough wait time
 wget https://github.com/converged-computing/goshare/releases/download/2023-09-06/wait-fs
 chmod +x ./wait-fs
@@ -152,6 +156,7 @@ echo "%s"
 # hpcviewer ./hpctoolkit-lmp-database
 `
 	preBlock = fmt.Sprintf(
+		meta,
 		preBlock,
 		a.mount,
 		a.mount,
@@ -177,7 +182,7 @@ echo "%s"
 func (a *HPCToolkit) AssembleContainers() []specs.ContainerSpec {
 
 	// The entrypoint script
-	// This is the metric container entrypoint.
+	// This is the addon container entrypoint, we don't care about metadata here
 	// The sole purpose is just to provide the volume, meaning copying content there
 	template := `#!/bin/bash
 

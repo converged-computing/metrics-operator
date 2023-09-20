@@ -20,7 +20,6 @@ import (
 
 // Consistent logging identifiers that should be echoed to have newline after
 var (
-	handle *zap.Logger
 	logger *zap.SugaredLogger
 )
 
