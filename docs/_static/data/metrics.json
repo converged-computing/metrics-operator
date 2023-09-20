@@ -32,6 +32,14 @@
   "url": "https://github.com/LLNL/Kripke"
  },
  {
+  "name": "app-laghos",
+  "description": "LAGrangian High-Order Solver",
+  "family": "solver",
+  "type": "",
+  "image": "ghcr.io/converged-computing/metric-laghos:latest",
+  "url": "https://github.com/CEED/Laghos"
+ },
+ {
   "name": "app-lammps",
   "description": "LAMMPS molecular dynamic simulation",
   "family": "simulation",
