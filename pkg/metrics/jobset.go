@@ -10,11 +10,11 @@ package metrics
 // Each type of metric returns a replicated job that can be put into a common JobSet
 
 import (
-	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 )
@@ -36,10 +36,11 @@ const podLabelAppName = "app.kubernetes.io/name"
 func GetJobSet(
 	spec *api.MetricSet,
 	set *MetricSet,
-) ([]*jobset.JobSet, error) {
+) ([]*jobset.JobSet, []*specs.ContainerSpec, error) {
 
 	// Assume we can eventually support >1 jobset
 	jobsets := []*jobset.JobSet{}
+	containerSpecs := []*specs.ContainerSpec{}
 
 	// TODO each metric needs to provide some listing of success jobs...
 	// Success Set we expect some subset of the replicated job names
@@ -59,26 +60,38 @@ func GetJobSet(
 		m := (*metric)
 		jobs, err := m.ReplicatedJobs(spec)
 		if err != nil {
-			return jobsets, err
+			return jobsets, containerSpecs, err
 		}
+
+		// Generate container specs for the metric, each is associated with a replicated job
+		// The containers are paired with entrypoints, and also with the replicated jobs
+		// We do this so we can match addons easily. The only reason we do this outside
+		// of the loop below is to allow shared logic.
+		cs := m.PrepareContainers(spec, &m)
 
 		// Prepare container and volume specs (that are changeable) e.g.,
 		// 1. Create VolumeSpec across metrics and addons that can predefine volumes
 		// 2. Create ContainerSpec across metrics that can predefine containers, entrypoints, volumes
-
-		// Add addons!
-		for _, rj := range jobs {
-			m.AddAddons(&rj)
+		err = m.AddAddons(spec, jobs, cs)
+		if err != nil {
+			return jobsets, containerSpecs, err
 		}
 
-		// Add the final set of jobs
-		rjs = append(rjs, jobs...)
+		// Add the finalized container specs for the entire set of replicated jobs
+		// We need this at the end to hand back to generate config maps
+		// TODO if containers are specific to jobs, maybe need to have based on key...
+		containerSpecs = append(containerSpecs, cs...)
+
+		// Add the final set of jobs (bad decision for the pointer here, oops)
+		for _, job := range jobs {
+			rjs = append(rjs, (*job))
+		}
 	}
 
 	// Get those replicated Jobs.
 	js.Spec.ReplicatedJobs = rjs
 	jobsets = append(jobsets, js)
-	return jobsets, nil
+	return jobsets, containerSpecs, nil
 }
 
 // Get list of strings that define successful for a jobset.
@@ -133,93 +146,6 @@ func getBaseJobSet(set *api.MetricSet, successSet []string) *jobset.JobSet {
 
 	// Do we want to assign 1 node: 1 pod? We can use Pod Anti-affinity for that
 	return &js
-}
-
-// getReplicatedJob returns the base of the replicated job
-func GetReplicatedJob(spec *api.MetricSet, set *MetricSet) (*jobset.ReplicatedJob, error) {
-
-	// TODO add way to customize replicated job name, is it needed?
-	// Pod labels from the MetricSet
-	podLabels := spec.GetPodLabels()
-
-	// Always indexed completion mode to have predictable hostnames
-	completionMode := batchv1.IndexedCompletion
-
-	// We only expect one replicated job (for now) so give it a short name for DNS
-	job := jobset.ReplicatedJob{
-		Name: ReplicatedJobName,
-		Template: batchv1.JobTemplateSpec{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      spec.Name,
-				Namespace: spec.Namespace,
-			},
-		},
-		// This is the default, but let's be explicit
-		Replicas: 1,
-	}
-
-	// This should default to true
-	setAsFDQN := !spec.Spec.DontSetFQDN
-
-	// Is there an application that might warrant sharing the namespace?
-	// TODO we could add logic from metrics here too, if use case arises
-	shareProcessNamespace := spec.HasApplication()
-
-	// Create the JobSpec for the job -> Template -> Spec
-	jobspec := batchv1.JobSpec{
-		BackoffLimit: &backoffLimit,
-		Parallelism:  &spec.Spec.Pods,
-
-		// For now assume completions == pods
-		Completions:           &spec.Spec.Pods,
-		CompletionMode:        &completionMode,
-		ActiveDeadlineSeconds: &spec.Spec.DeadlineSeconds,
-
-		// Note there is parameter to limit runtime
-		Template: corev1.PodTemplateSpec{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      spec.Name,
-				Namespace: spec.Namespace,
-				Labels:    podLabels,
-			},
-			Spec: corev1.PodSpec{
-				// matches the service
-				Subdomain:     spec.Spec.ServiceName,
-				RestartPolicy: corev1.RestartPolicyOnFailure,
-
-				// This is important to share the process namespace!
-				SetHostnameAsFQDN:     &setAsFDQN,
-				ShareProcessNamespace: &shareProcessNamespace,
-				ServiceAccountName:    spec.Spec.Pod.ServiceAccountName,
-				NodeSelector:          spec.Spec.Pod.NodeSelector,
-			},
-		},
-	}
-
-	// Do we want sole tenancy?
-	if set.HasSoleTenancy() {
-		jobspec.Template.Spec.Affinity = getAffinity(spec)
-	}
-
-	// Assemble pull secrets for the application.
-	// Metric containers are required to be public.
-	jobspec.Template.Spec.ImagePullSecrets = GetPullSecrets(spec, set)
-
-	// Tie the jobspec to the job
-	job.Template.Spec = jobspec
-	return &job, nil
-}
-
-// GetPullSecrets for a metric set (and optionally an application container)
-func GetPullSecrets(spec *api.MetricSet, set *MetricSet) []corev1.LocalObjectReference {
-
-	secrets := []corev1.LocalObjectReference{}
-	if spec.Spec.Application.PullSecret != "" {
-		secrets = append(secrets, corev1.LocalObjectReference{Name: spec.Spec.Application.PullSecret})
-	}
-
-	// For now we require metric containers to be public.
-	return secrets
 }
 
 // getAffinity returns to pod affinity to ensure 1 address / node

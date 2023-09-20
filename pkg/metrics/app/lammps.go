@@ -13,12 +13,13 @@ import (
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/converged-computing/metrics-operator/pkg/jobs"
+	"github.com/converged-computing/metrics-operator/pkg/metadata"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 )
 
 type Lammps struct {
-	jobs.LauncherWorker
+	metrics.LauncherWorker
 
 	// Options
 	command string
@@ -71,41 +72,57 @@ func (n Lammps) ListOptions() map[string][]intstr.IntOrString {
 	return map[string][]intstr.IntOrString{}
 }
 
-// Return lookup of entrypoint scripts
-func (m Lammps) EntrypointScripts(
+// Prepare containers with jobs and entrypoint scripts
+func (m Lammps) PrepareContainers(
 	spec *api.MetricSet,
 	metric *metrics.Metric,
-) []metrics.EntrypointScript {
+) []*specs.ContainerSpec {
 
 	// Metadata to add to beginning of run
-	metadata := metrics.Metadata(spec, metric)
+	meta := metrics.Metadata(spec, metric)
 	hosts := m.GetHostlist(spec)
-	prefix := m.GetCommonPrefix(metadata, m.command, hosts)
+	prefix := m.GetCommonPrefix(meta, m.command, hosts)
 
-	// Template for the launcher
-	template := `
+	// Template blocks for launcher script
+	preBlock := `
 echo "%s"
-%s
+`
+
+	postBlock := `
 echo "%s"
 %s
 `
-	launcherTemplate := prefix + fmt.Sprintf(
-		template,
-		metrics.Separator,
-		m.command,
-		metrics.CollectionEnd,
-		metrics.Interactive(spec.Spec.Logging.Interactive),
-	)
+	interactive := metadata.Interactive(spec.Spec.Logging.Interactive)
+	preBlock = prefix + fmt.Sprintf(preBlock, metadata.Separator)
+	postBlock = fmt.Sprintf(postBlock, metadata.CollectionEnd, interactive)
 
-	// The worker just has sleep infinity added
-	workerTemplate := prefix + "\nsleep infinity"
+	// Entrypoint for the launcher
+	launcherEntrypoint := specs.EntrypointScript{
+		Name:    specs.DeriveScriptKey(m.LauncherScript),
+		Path:    m.LauncherScript,
+		Pre:     preBlock,
+		Command: m.command,
+		Post:    postBlock,
+	}
+
+	// Entrypoint for the worker
+	// Just has a sleep infinity added to the prefix
+	workerEntrypoint := specs.EntrypointScript{
+		Name:    specs.DeriveScriptKey(m.WorkerScript),
+		Path:    m.WorkerScript,
+		Pre:     prefix,
+		Command: "sleep infinity",
+	}
+
+	launcherContainer := m.GetLauncherContainerSpec(launcherEntrypoint)
+	workerContainer := m.GetWorkerContainerSpec(workerEntrypoint)
 
 	// Return the script templates for each of launcher and worker
-	return m.FinalizeEntrypoints(launcherTemplate, workerTemplate)
+	return []*specs.ContainerSpec{&launcherContainer, &workerContainer}
 }
 
 func init() {
-	launcher := jobs.LauncherWorker{
+	launcher := metrics.LauncherWorker{
 		Identifier:     "app-lammps",
 		Summary:        "LAMMPS molecular dynamic simulation",
 		Container:      "ghcr.io/converged-computing/metric-lammps:latest",

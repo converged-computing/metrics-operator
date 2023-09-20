@@ -12,8 +12,10 @@ import (
 	"log"
 
 	corev1 "k8s.io/api/core/v1"
+	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
@@ -38,6 +40,9 @@ type Addon interface {
 
 	// What addons can control:
 	GetVolumes() []corev1.Volume
+	AssembleVolumes() []specs.VolumeSpec
+	AssembleContainers() []specs.ContainerSpec
+	CustomizeEntrypoints([]*specs.ContainerSpec, []*jobset.ReplicatedJob)
 
 	// Instead of exposing individual pieces (volumes, settings, etc)
 	// We simply allow it to modify the job
@@ -56,13 +61,20 @@ type AddonBase struct {
 	mapOptions  map[string]map[string]intstr.IntOrString
 }
 
-func (b AddonBase) SetOptions(metric *api.MetricAddon) {}
+func (b AddonBase) SetOptions(metric *api.MetricAddon)                                   {}
+func (b AddonBase) CustomizeEntrypoints([]*specs.ContainerSpec, []*jobset.ReplicatedJob) {}
 
 func (b AddonBase) Validate() bool {
 	return true
 }
 func (b AddonBase) GetVolumes() []corev1.Volume {
 	return []corev1.Volume{}
+}
+func (b AddonBase) AssembleContainers() []specs.ContainerSpec {
+	return []specs.ContainerSpec{}
+}
+func (b AddonBase) AssembleVolumes() []specs.VolumeSpec {
+	return []specs.VolumeSpec{}
 }
 
 func (b AddonBase) Description() string {

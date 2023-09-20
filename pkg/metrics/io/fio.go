@@ -13,7 +13,6 @@ import (
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/converged-computing/metrics-operator/pkg/jobs"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 
@@ -21,7 +20,7 @@ import (
 // https://docs.gitlab.com/ee/administration/operations/filesystem_benchmarking.html
 
 type Fio struct {
-	jobs.StorageGeneric
+	metrics.StorageGeneric
 
 	// Options
 	testname  string
@@ -137,7 +136,7 @@ func (m Fio) Options() map[string]intstr.IntOrString {
 }
 
 func init() {
-	storage := jobs.StorageGeneric{
+	storage := metrics.StorageGeneric{
 		Identifier: "io-fio",
 		Summary:    "Flexible IO Tester (FIO)",
 		Container:  "ghcr.io/converged-computing/metric-fio:latest",

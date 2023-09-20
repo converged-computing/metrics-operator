@@ -13,6 +13,7 @@ import (
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	addons "github.com/converged-computing/metrics-operator/pkg/addons"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 )
@@ -36,8 +37,6 @@ type Metric interface {
 
 	// Customizations / exposure for other containers in the JobSet
 	GetVolumes() map[string]api.Volume
-	GetEntrypointName() string
-	GetEntrypointScript() string
 
 	// Options and exportable attributes
 	SetOptions(*api.Metric)
@@ -47,18 +46,19 @@ type Metric interface {
 	// Validation and append addons
 	Validate(*api.MetricSet) bool
 	RegisterAddon(*addons.Addon)
-	AddAddons(*jobset.ReplicatedJob) *jobset.ReplicatedJob
-	Addons() []*addons.Addon
+	AddAddons(*api.MetricSet, []*jobset.ReplicatedJob, []*specs.ContainerSpec) error
+	GetAddons() []*addons.Addon
 
 	// Attributes for JobSet, etc.
 	HasSoleTenancy() bool
-	ReplicatedJobs(*api.MetricSet) ([]jobset.ReplicatedJob, error)
+	ReplicatedJobs(*api.MetricSet) ([]*jobset.ReplicatedJob, error)
 	SuccessJobs() []string
 	Resources() *api.ContainerResources
 	Attributes() *api.ContainerSpec
 
-	// EntrypointScripts are required to generate ConfigMaps
-	// EntrypointScripts(*api.MetricSet, *Metric) []EntrypointScript
+	// Prepare Containers. These are used to generate configmaps,
+	// and populate the respective replicated jobs with containers!
+	PrepareContainers(*api.MetricSet, *Metric) []*specs.ContainerSpec
 }
 
 // GetMetric returns a metric, if it is known to the metrics operator

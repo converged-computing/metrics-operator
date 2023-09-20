@@ -8,9 +8,10 @@ SPDX-License-Identifier: MIT
 package addons
 
 import (
-	corev1 "k8s.io/api/core/v1"
+	"fmt"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
@@ -39,8 +40,6 @@ type ApplicationAddon struct {
 	// Container Spec has attributes for the container
 	// Do we run this in privileged mode?
 	privileged bool
-
-	// TOOD how to support volumes here?
 }
 
 // Validate we have an executable provided, and args and optional
@@ -100,11 +99,14 @@ func (a *ApplicationAddon) SetDefaultOptions(metric *api.MetricAddon) {
 			a.resources["requests"][key] = value
 		}
 	}
-
-	// TODO do we still need this if we write a script for it?
 	if a.entrypoint == "" {
-		a.entrypoint = a.command
+		a.setDefaultEntrypoint()
 	}
+}
+
+// Set the default entrypoint
+func (a *ApplicationAddon) setDefaultEntrypoint() {
+	a.entrypoint = fmt.Sprintf("/metrics_operator/%s-entrypoint.sh", a.Identifier)
 }
 
 // Calling the default allows a custom application that uses this to do the same
@@ -149,10 +151,9 @@ func (a *ApplicationAddon) MapOptions() map[string]map[string]intstr.IntOrString
 	}
 }
 
-// GetVolumes for an application
-func (a *ApplicationAddon) GetVolumes() []corev1.Volume {
-	// TODO how to specify volumes???
-	return []corev1.Volume{}
+// AssembleVolumes for an application
+func (a *ApplicationAddon) AssembleVolumes() []specs.VolumeSpec {
+	return []specs.VolumeSpec{}
 }
 
 func init() {

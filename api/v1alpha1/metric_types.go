@@ -99,7 +99,15 @@ type ContainerSpec struct {
 }
 
 type SecurityContext struct {
+
+	//+optional
 	Privileged bool `json:"privileged"`
+
+	//+optional
+	AllowPtrace bool `json:"allowPtrace"`
+
+	//+optional
+	AllowAdmin bool `json:"allowAdmin"`
 }
 
 // A Metric addon is an interface that exposes extra volumes for a metric. Examples include:

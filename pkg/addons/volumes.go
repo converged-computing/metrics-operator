@@ -8,15 +8,52 @@ SPDX-License-Identifier: MIT
 package addons
 
 import (
+	"path/filepath"
+
 	corev1 "k8s.io/api/core/v1"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 type VolumeBase struct {
 	AddonBase
 	readOnly bool
+	name     string
+	path     string
+}
+
+func (v *VolumeBase) DefaultValidate() bool {
+	if v.name == "" {
+		logger.Error("All volume addons require a 'name' for reference.")
+		return false
+	}
+	if v.path == "" {
+		logger.Error("All volume addons require a 'path' for the container mount.")
+		return false
+	}
+	return true
+}
+
+// DefaultSetOptions across volume types for shared attributes
+func (v *VolumeBase) DefaultSetOptions(metric *api.MetricAddon) {
+
+	// ConfigMap names
+	name, ok := metric.Options["name"]
+	if ok {
+		v.name = name.StrVal
+	}
+	path, ok := metric.Options["path"]
+	if ok {
+		v.path = path.StrVal
+	}
+	readOnly, ok := metric.Options["readOnly"]
+	if ok {
+		if readOnly.StrVal == "yes" || readOnly.StrVal == "true" {
+			v.readOnly = true
+		}
+	}
 }
 
 // A general metric is a container added to a JobSet
@@ -41,19 +78,11 @@ func (v *ConfigMapVolume) Validate() bool {
 		logger.Error("The volume-cm volume addon requires a 'configMapName' for the existing config map.")
 		return false
 	}
-	if v.name == "" {
-		logger.Error("The volume-cm volume addon requires a 'name' for the existing config map.")
-		return false
-	}
-	if v.path == "" {
-		logger.Error("The volume-cm volume addon requires a 'path' for the existing config map.")
-		return false
-	}
 	if len(v.items) == 0 {
 		logger.Error("The volume-cm volume addon requires at least one entry in mapOptions->items, with key value pairs.")
 		return false
 	}
-	return true
+	return v.DefaultValidate()
 }
 
 // Set custom options / attributes for the metric
@@ -62,12 +91,7 @@ func (v *ConfigMapVolume) SetOptions(metric *api.MetricAddon) {
 	// Set an empty list of items
 	v.items = map[string]string{}
 
-	// ConfigMap names
-	name, ok := metric.Options["name"]
-	if ok {
-		v.name = name.StrVal
-	}
-	name, ok = metric.Options["configMapName"]
+	name, ok := metric.Options["configMapName"]
 	if ok {
 		v.configMapName = name.StrVal
 	}
@@ -79,11 +103,13 @@ func (v *ConfigMapVolume) SetOptions(metric *api.MetricAddon) {
 			v.items[k] = value.StrVal
 		}
 	}
+	v.DefaultSetOptions(metric)
 }
 
 // Exported options and list options
 func (v *ConfigMapVolume) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
+		"path":          intstr.FromString(v.path),
 		"name":          intstr.FromString(v.name),
 		"configMapName": intstr.FromString(v.configMapName),
 	}
@@ -100,8 +126,8 @@ func (v *ConfigMapVolume) MapOptions() map[string]map[string]intstr.IntOrString 
 	}
 }
 
-// GetVolumes for a config map
-func (v *ConfigMapVolume) GetVolumes() []corev1.Volume {
+// AssembleVolumes for a config map
+func (v *ConfigMapVolume) AssembleVolumes() []specs.VolumeSpec {
 
 	// Prepare items as key to path
 	items := []corev1.KeyToPath{}
@@ -125,7 +151,14 @@ func (v *ConfigMapVolume) GetVolumes() []corev1.Volume {
 			},
 		},
 	}
-	return []corev1.Volume{newVolume}
+
+	// ConfigMaps have to be read only!
+	return []specs.VolumeSpec{{
+		Volume:   newVolume,
+		Path:     filepath.Dir(v.path),
+		ReadOnly: true,
+		Mount:    true,
+	}}
 }
 
 // An existing peristent volume claim
@@ -135,47 +168,45 @@ type PersistentVolumeClaim struct {
 	// Path and claim name are always required if a secret isn't defined
 	name      string
 	claimName string
+	path      string
 }
 
 // Validate we have an executable provided, and args and optional
 func (v *PersistentVolumeClaim) Validate() bool {
-	if v.name == "" {
-		logger.Error("The volume-pvc volume addon requires a 'name' for the existing persistent volume claim (pvc).")
-		return false
-	}
 	if v.claimName == "" {
 		logger.Error("The volume-pvc volume addon requires a 'claimName' for the existing persistent volume claim (pvc).")
 		return false
 	}
-	return true
+	return v.DefaultValidate()
 }
 
 // Set custom options / attributes
 func (v *PersistentVolumeClaim) SetOptions(metric *api.MetricAddon) {
-
-	// Name and claimName are required!
-	name, ok := metric.Options["name"]
-	if ok {
-		v.name = name.StrVal
-	}
 	claimName, ok := metric.Options["claimName"]
 	if ok {
 		v.claimName = claimName.StrVal
 	}
+	v.DefaultSetOptions(metric)
 }
 
-// GetVolumes for a pvc
-func (v *PersistentVolumeClaim) GetVolumes() []corev1.Volume {
-	return []corev1.Volume{
-		{
-			Name: v.name,
-			VolumeSource: corev1.VolumeSource{
-				PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-					ClaimName: v.claimName,
-				},
+// AssembleVolumes for a pvc
+func (v *PersistentVolumeClaim) AssembleVolumes() []specs.VolumeSpec {
+	volume := corev1.Volume{
+		Name: v.name,
+		VolumeSource: corev1.VolumeSource{
+			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+				ClaimName: v.claimName,
 			},
 		},
 	}
+
+	// ConfigMaps have to be read only!
+	return []specs.VolumeSpec{{
+		Volume:   volume,
+		Path:     filepath.Dir(v.path),
+		ReadOnly: v.readOnly,
+		Mount:    true,
+	}}
 }
 
 // An existing secret
@@ -190,47 +221,38 @@ type SecretVolume struct {
 
 // Validate we have an executable provided, and args and optional
 func (v *SecretVolume) Validate() bool {
-	if v.name == "" {
-		logger.Error("The volume-secret addon requires a 'name' for the existing secret.")
-		return false
-	}
-	if v.path == "" {
-		logger.Error("The volume-secret addon requires a 'path' for the existing secret.")
-		return false
-	}
 	if v.secretName == "" {
 		logger.Error("The volume-secret addon requires a 'secretName' for the existing secret.")
 		return false
 	}
-	return true
+	return v.DefaultValidate()
 }
 
 // Set custom options / attributes
 func (v *SecretVolume) SetOptions(metric *api.MetricAddon) {
-
-	// Name is required!
-	name, ok := metric.Options["name"]
-	if ok {
-		v.name = name.StrVal
-	}
 	secretName, ok := metric.Options["secretName"]
 	if ok {
 		v.secretName = secretName.StrVal
 	}
+	v.DefaultSetOptions(metric)
 }
 
-// GetVolumes for a Secret
-func (v *SecretVolume) GetVolumes() []corev1.Volume {
-	return []corev1.Volume{
-		{
-			Name: v.name,
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName: v.secretName,
-				},
+// AssembleVolumes for a Secret
+func (v *SecretVolume) AssembleVolumes() []specs.VolumeSpec {
+	volume := corev1.Volume{
+		Name: v.name,
+		VolumeSource: corev1.VolumeSource{
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: v.secretName,
 			},
 		},
 	}
+	return []specs.VolumeSpec{{
+		Volume:   volume,
+		ReadOnly: v.readOnly,
+		Path:     v.path,
+		Mount:    true,
+	}}
 }
 
 // A hostPath volume
@@ -251,11 +273,7 @@ func (v *HostPathVolume) Validate() bool {
 		logger.Error("The volume-hostpath addon requires a 'hostPath' for the host path.")
 		return false
 	}
-	if v.path == "" {
-		logger.Error("The volume-hostpath addon requires a 'path' for the host path.")
-		return false
-	}
-	return true
+	return v.DefaultValidate()
 }
 
 // Set custom options / attributes
@@ -277,24 +295,29 @@ func (v *HostPathVolume) SetOptions(metric *api.MetricAddon) {
 	}
 }
 
-// GetVolumes for a host volume
-func (v *HostPathVolume) GetVolumes() []corev1.Volume {
-	return []corev1.Volume{
-		{
-			Name: v.name,
-			VolumeSource: corev1.VolumeSource{
-				HostPath: &corev1.HostPathVolumeSource{
-					Path: v.hostPath,
-				},
+// AssembleVolumes for a host volume
+func (v *HostPathVolume) AssembleVolumes() []specs.VolumeSpec {
+	volume := corev1.Volume{
+		Name: v.name,
+		VolumeSource: corev1.VolumeSource{
+			HostPath: &corev1.HostPathVolumeSource{
+				Path: v.hostPath,
 			},
 		},
 	}
+	return []specs.VolumeSpec{{
+		Volume:   volume,
+		Mount:    true,
+		Path:     v.path,
+		ReadOnly: v.readOnly,
+	}}
 }
 
 // An empty volume requires nothing! Nice!
 type EmptyVolume struct {
 	VolumeBase
 	name string
+	path string
 }
 
 // Validate we have an executable provided, and args and optional
@@ -303,7 +326,7 @@ func (v *EmptyVolume) Validate() bool {
 		logger.Error("The volume-empty addon requires a 'name'.")
 		return false
 	}
-	return true
+	return v.DefaultValidate()
 }
 
 // Set custom options / attributes
@@ -314,16 +337,21 @@ func (v *EmptyVolume) SetOptions(metric *api.MetricAddon) {
 	}
 }
 
-// GetVolumes for an empty volume
-func (v *EmptyVolume) GetVolumes() []corev1.Volume {
-	return []corev1.Volume{
-		{
-			Name: v.name,
-			VolumeSource: corev1.VolumeSource{
-				EmptyDir: &corev1.EmptyDirVolumeSource{},
-			},
+// AssembleVolumes for an empty volume
+func (v *EmptyVolume) AssembleVolumes() []specs.VolumeSpec {
+	volume := corev1.Volume{
+		Name: v.name,
+		VolumeSource: corev1.VolumeSource{
+			EmptyDir: &corev1.EmptyDirVolumeSource{},
 		},
 	}
+	return []specs.VolumeSpec{{
+		Volume:   volume,
+		Mount:    true,
+		Path:     v.path,
+		ReadOnly: v.readOnly,
+	}}
+
 }
 
 // TODO likely we need to carry around entrypoints to customize?

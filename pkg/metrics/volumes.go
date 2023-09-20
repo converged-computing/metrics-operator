@@ -8,17 +8,23 @@ SPDX-License-Identifier: MIT
 package metrics
 
 import (
-	"fmt"
-
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 	corev1 "k8s.io/api/core/v1"
+)
+
+var (
+	makeExecutable = int32(0777)
 )
 
 // GetVolumeMounts returns read only volume for entrypoint scripts, etc.
 func getVolumeMounts(
 	set *api.MetricSet,
-	volumes map[string]api.Volume,
+	volumes []specs.VolumeSpec,
 ) []corev1.VolumeMount {
+
+	// This is for the core entrypoints (that are generated as config maps here)
+	// TODO an addon that generates a volume needs to be added to this set...
 	mounts := []corev1.VolumeMount{
 		{
 			Name:      set.Name,
@@ -27,74 +33,49 @@ func getVolumeMounts(
 		},
 	}
 
-	// Add on application volumes/claims
-	for volumeName, volume := range volumes {
-		mount := corev1.VolumeMount{
-			Name:      volumeName,
-			MountPath: volume.Path,
-			ReadOnly:  volume.ReadOnly,
+	// This is for any extra or special entrypoints
+	for _, vs := range volumes {
+
+		// Is this volume indicated for mount?
+		// This might not be necessary...
+		if vs.Mount {
+			mount := corev1.VolumeMount{
+				Name:      vs.Volume.Name,
+				MountPath: vs.Path,
+				ReadOnly:  vs.ReadOnly,
+			}
+			mounts = append(mounts, mount)
 		}
-		mounts = append(mounts, mount)
 	}
 	return mounts
 }
 
-// getVolumes adds expected entrypoints along with added volumes (storage or applications)
-// This function is intended for a set with a listing of metrics
-func GetVolumes(
-	set *api.MetricSet,
-	runnerScripts []corev1.KeyToPath,
-	addedVolumes map[string]api.Volume,
-) []corev1.Volume {
-
-	// TODO will need to add volumes to here for storage requests / metrics
-	volumes := []corev1.Volume{
-		{
-			Name: set.Name,
-			VolumeSource: corev1.VolumeSource{
-				ConfigMap: &corev1.ConfigMapVolumeSource{
-
-					// Namespace based on the cluster
-					LocalObjectReference: corev1.LocalObjectReference{
-						Name: set.Name,
-					},
-					Items: runnerScripts,
-				},
-			},
-		},
-	}
-	existingVolumes := getExistingVolumes(addedVolumes)
-	volumes = append(volumes, existingVolumes...)
-	return volumes
-}
-
-// GetStandaloneVolumes is intended for a single metric, where the volumes
-// are provided as custom EntrypointScripts
-func GetStandaloneVolumes(
-	set *api.MetricSet,
-	scripts []EntrypointScript,
-	addedVolumes map[string]api.Volume,
-) []corev1.Volume {
-
-	// Runner start scripts
-	makeExecutable := int32(0777)
-
+// Get MetricsKeyToPath assumes we have a predictible listing of metrics
+// scripts. This is applicable for storage and application metrics
+func generateOperatorItems(containerSpecs []*specs.ContainerSpec) []corev1.KeyToPath {
 	// Each metric has an entrypoint script
 	runnerScripts := []corev1.KeyToPath{}
-	for i, script := range scripts {
-		key := script.Name
-		if key == "" {
-			key = fmt.Sprintf("entrypoint-%d", i)
-		}
+	for _, cs := range containerSpecs {
 		runnerScript := corev1.KeyToPath{
-			Key:  key,
-			Path: key + ".sh",
+			Key:  cs.EntrypointScript.Name,
+			Path: cs.EntrypointScript.Script,
 			Mode: &makeExecutable,
 		}
 		runnerScripts = append(runnerScripts, runnerScript)
 	}
+	return runnerScripts
+}
 
-	// TODO will need to add volumes to here for storage requests / metrics
+// getVolumes adds expected entrypoints along with added volumes (storage or applications)
+// This function is intended for a set with a listing of metrics
+func getReplicatedJobVolumes(
+	set *api.MetricSet,
+	cs []*specs.ContainerSpec,
+	addedVolumes []specs.VolumeSpec,
+) []corev1.Volume {
+
+	// These are for the main entrypoints in /metrics_operator
+	runnerScripts := generateOperatorItems(cs)
 	volumes := []corev1.Volume{
 		{
 			Name: set.Name,
@@ -110,90 +91,16 @@ func GetStandaloneVolumes(
 			},
 		},
 	}
-
-	existingVolumes := getExistingVolumes(addedVolumes)
+	existingVolumes := getAddonVolumes(addedVolumes)
 	volumes = append(volumes, existingVolumes...)
 	return volumes
 }
 
-// Get Existing volumes for the cluster. This can include:
-// config maps
-// secrets
-// persistent volumes / claims
-func getExistingVolumes(existing map[string]api.Volume) []corev1.Volume {
+// Get Addon Volumes for the cluster. This can include:
+func getAddonVolumes(vs []specs.VolumeSpec) []corev1.Volume {
 	volumes := []corev1.Volume{}
-	for volumeName, volumeMeta := range existing {
-
-		var newVolume corev1.Volume
-
-		// Empty vol is typically used internally for an application share
-		if volumeMeta.EmptyVol {
-			newVolume = corev1.Volume{
-				Name: volumeName,
-				VolumeSource: corev1.VolumeSource{
-					EmptyDir: &corev1.EmptyDirVolumeSource{},
-				},
-			}
-
-		} else if volumeMeta.HostPath != "" {
-
-			newVolume = corev1.Volume{
-				Name: volumeName,
-				VolumeSource: corev1.VolumeSource{
-					HostPath: &corev1.HostPathVolumeSource{
-						Path: volumeMeta.HostPath,
-					},
-				},
-			}
-
-		} else if volumeMeta.SecretName != "" {
-			newVolume = corev1.Volume{
-				Name: volumeName,
-				VolumeSource: corev1.VolumeSource{
-					Secret: &corev1.SecretVolumeSource{
-						SecretName: volumeMeta.SecretName,
-					},
-				},
-			}
-
-		} else if volumeMeta.ConfigMapName != "" {
-
-			// Prepare items as key to path
-			items := []corev1.KeyToPath{}
-			for key, path := range volumeMeta.Items {
-				newItem := corev1.KeyToPath{
-					Key:  key,
-					Path: path,
-				}
-				items = append(items, newItem)
-			}
-
-			// This is a config map volume with items
-			newVolume = corev1.Volume{
-				Name: volumeName,
-				VolumeSource: corev1.VolumeSource{
-					ConfigMap: &corev1.ConfigMapVolumeSource{
-						LocalObjectReference: corev1.LocalObjectReference{
-							Name: volumeMeta.ConfigMapName,
-						},
-						Items: items,
-					},
-				},
-			}
-
-		} else {
-
-			// Fall back to persistent volume claim
-			newVolume = corev1.Volume{
-				Name: volumeName,
-				VolumeSource: corev1.VolumeSource{
-					PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-						ClaimName: volumeMeta.ClaimName,
-					},
-				},
-			}
-		}
-		volumes = append(volumes, newVolume)
+	for _, volume := range vs {
+		volumes = append(volumes, volume.Volume)
 	}
 	return volumes
 }

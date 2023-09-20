@@ -20,6 +20,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
+// TODO this should take the final entrypoint scripts
 // ensureConfigMap ensures we've generated the read only entrypoints
 func (r *MetricSetReconciler) ensureConfigMaps(
 	ctx context.Context,
@@ -47,13 +48,14 @@ func (r *MetricSetReconciler) ensureConfigMaps(
 		data := map[string]string{}
 
 		// Go through each entrypoint script
-		for count, es := range set.EntrypointScripts(spec) {
+		// TODO update this using the containerspec provided above
+		/*for count, es := range set.EntrypointScripts(spec) {
 			key := es.Name
 			if key == "" {
 				key = fmt.Sprintf("entrypoint-%d", count)
 			}
 			data[key] = es.Script
-		}
+		}*/
 
 		cm, result, err := r.getConfigMap(ctx, spec, data)
 		if err != nil {

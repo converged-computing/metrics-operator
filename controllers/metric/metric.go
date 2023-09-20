@@ -12,6 +12,7 @@ import (
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	mctrl "github.com/converged-computing/metrics-operator/pkg/metrics"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
@@ -24,20 +25,10 @@ func (r *MetricSetReconciler) ensureMetricSet(
 	set *mctrl.MetricSet,
 ) (ctrl.Result, error) {
 
-	// First ensure config maps, typically entrypoints for custom metrics containers.
-	// They are all bound to the same config map (read only volume)
-	// and named by metric index or custom metric script key name
-	// We could theoretically allow creating more than one JobSet here
-	// and change the name to include the group type.
-	_, result, err := r.ensureConfigMaps(ctx, spec, set)
-	if err != nil {
-		return result, err
-	}
-
 	// Create headless service for the metrics set (which is a JobSet)
 	// If we create > 1 JobSet, this should be updated
 	selector := map[string]string{"metricset-name": spec.Name}
-	result, err = r.exposeServices(ctx, spec, selector)
+	result, err := r.exposeServices(ctx, spec, selector)
 	if err != nil {
 		return result, err
 	}
@@ -45,10 +36,22 @@ func (r *MetricSetReconciler) ensureMetricSet(
 	// Ensure we create the JobSet for the MetricSet
 	// either application, storage, or standalone based
 	// This could be updated to support > 1
-	_, result, err = r.ensureJobSet(ctx, spec, set)
+	scripts, _, result, err = r.ensureJobSet(ctx, spec, set)
 	if err != nil {
 		return result, err
 	}
+
+	// TODO this should take entrypointScripts nad run Finalize() or something
+	// First ensure config maps, typically entrypoints for custom metrics containers.
+	// They are all bound to the same config map (read only volume)
+	// and named by metric index or custom metric script key name
+	// We could theoretically allow creating more than one JobSet here
+	// and change the name to include the group type.
+	_, result, err := r.ensureConfigMaps(ctx, spec, set, cms)
+	if err != nil {
+		return result, err
+	}
+
 	return ctrl.Result{}, nil
 }
 
@@ -75,13 +78,14 @@ func (r *MetricSetReconciler) ensureJobSet(
 	ctx context.Context,
 	spec *api.MetricSet,
 	set *mctrl.MetricSet,
-) ([]*jobset.JobSet, ctrl.Result, error) {
+) ([]*jobset.JobSet, []specs.EntrypointScript, ctrl.Result, error) {
 
 	// Look for an existing job
 	// We only care about the set Name/Namespace matched to one
 	// This can eventually update to support > 1 if needed
 	existing, err := r.getExistingJob(ctx, spec)
 	jobsets := []*jobset.JobSet{existing}
+	scripts := []specs.EntrypointScript{}
 
 	// Create a new job if it does not exist
 	if err != nil {
@@ -93,17 +97,19 @@ func (r *MetricSetReconciler) ensureJobSet(
 		)
 
 		// Get one JobSet to create (can eventually support > 1)
-		jobsets, err := mctrl.GetJobSet(spec, set)
+		// The scripts are paired here. If we already made the jobsets,
+		// the scripts (config maps) should exist too.
+		jobsets, scripts, err := mctrl.GetJobSet(spec, set)
 		if err != nil {
-			return jobsets, ctrl.Result{}, err
+			return jobsets, scripts, ctrl.Result{}, err
 		}
 		for _, js := range jobsets {
 			err = r.createJobSet(ctx, spec, js)
 			if err != nil {
-				return jobsets, ctrl.Result{}, err
+				return jobsets, scripts, ctrl.Result{}, err
 			}
 		}
-		return jobsets, ctrl.Result{}, err
+		return jobsets, scripts, ctrl.Result{}, err
 
 	} else {
 		r.Log.Info(
@@ -112,7 +118,7 @@ func (r *MetricSetReconciler) ensureJobSet(
 			"Name:", existing.Name,
 		)
 	}
-	return jobsets, ctrl.Result{}, err
+	return jobsets, scripts, ctrl.Result{}, err
 }
 
 // createJobSet handles the creation operator

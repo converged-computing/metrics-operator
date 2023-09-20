@@ -5,7 +5,7 @@ Copyright 2023 Lawrence Livermore National Security, LLC
 SPDX-License-Identifier: MIT
 */
 
-package jobs
+package metrics
 
 import (
 	"fmt"
@@ -14,11 +14,11 @@ import (
 	"strings"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	"github.com/converged-computing/metrics-operator/pkg/metadata"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
-
-	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 
 // These are common templates for standalone apps.
@@ -49,10 +49,12 @@ type LauncherWorker struct {
 	SoleTenancy bool
 
 	// Scripts
-	WorkerScript   string
-	LauncherScript string
-	LauncherLetter string
-	WorkerLetter   string
+	WorkerScript      string
+	LauncherScript    string
+	LauncherLetter    string
+	WorkerContainer   string
+	LauncherContainer string
+	WorkerLetter      string
 }
 
 func (m LauncherWorker) HasSoleTenancy() bool {
@@ -76,7 +78,7 @@ func (m LauncherWorker) Description() string {
 
 // Family returns a generic performance family
 func (m LauncherWorker) Family() string {
-	return metrics.PerformanceFamily
+	return PerformanceFamily
 }
 
 // Jobs required for success condition (n is the LauncherWorker run)
@@ -135,11 +137,17 @@ func (m *LauncherWorker) ensureDefaultNames() {
 	if m.WorkerScript == "" {
 		m.WorkerScript = "/metrics_operator/worker.sh"
 	}
+	if m.LauncherContainer == "" {
+		m.LauncherContainer = "launcher"
+	}
+	if m.WorkerContainer == "" {
+		m.WorkerContainer = "workers"
+	}
 }
 
 // GetCommonPrefix returns a common prefix for the worker/ launcher script, setting up hosts, etc.
 func (m LauncherWorker) GetCommonPrefix(
-	metadata string,
+	meta string,
 	command string,
 	hosts string,
 ) string {
@@ -174,103 +182,78 @@ echo "%s"
 `
 	return fmt.Sprintf(
 		prefixTemplate,
-		metadata,
+		meta,
 		m.WorkingDir(),
 		hosts,
 		command,
-		metrics.CollectionStart,
+		metadata.CollectionStart,
 	)
 }
 
 // AddWorkers generates worker jobs, only if we have them
-func (m *LauncherWorker) AddWorkers(
-	spec *api.MetricSet,
-	v map[string]api.Volume,
-	volumes []corev1.Volume,
-) (*jobset.ReplicatedJob, error) {
+func (m *LauncherWorker) AddWorkers(spec *api.MetricSet) (*jobset.ReplicatedJob, error) {
 
 	numWorkers := spec.Spec.Pods - 1
-	workers, err := metrics.AssembleReplicatedJob(spec, false, numWorkers, numWorkers, m.WorkerLetter, m.SoleTenancy)
+	workers, err := AssembleReplicatedJob(spec, false, numWorkers, numWorkers, m.WorkerLetter, m.SoleTenancy)
 	if err != nil {
 		return workers, err
 	}
-	workers.Template.Spec.Template.Spec.Volumes = volumes
-
-	// ContainerSpec for workers
-	workerSpec := []metrics.ContainerSpec{
-		{
-			Image:      m.Container,
-			Name:       "workers",
-			Command:    []string{"/bin/bash", m.WorkerScript},
-			Resources:  m.ResourceSpec,
-			Attributes: m.AttributeSpec,
-		},
-	}
-	// Prepare containers for workers to add to replicated job
-	workerContainers, err := metrics.GetContainers(spec, workerSpec, v, false, false)
-	if err != nil {
-		fmt.Printf("issue creating worker containers %s", err)
-		return workers, err
-	}
-	workers.Template.Spec.Template.Spec.Containers = workerContainers
 	return workers, nil
 }
 
-// Replicated Jobs are custom for a launcher worker
-func (m *LauncherWorker) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, error) {
+func (m *LauncherWorker) GetLauncherContainerSpec(
+	entrypoint specs.EntrypointScript,
+) specs.ContainerSpec {
+	return specs.ContainerSpec{
+		JobName:          m.LauncherLetter,
+		Image:            m.Image(),
+		Name:             m.LauncherContainer,
+		WorkingDir:       m.Workdir,
+		EntrypointScript: entrypoint,
+		Resources:        m.ResourceSpec,
+		Attributes:       m.AttributeSpec,
+	}
+}
+func (m *LauncherWorker) GetWorkerContainerSpec(
+	entrypoint specs.EntrypointScript,
+) specs.ContainerSpec {
 
-	js := []jobset.ReplicatedJob{}
+	// Container spec for the launcher
+	return specs.ContainerSpec{
+		JobName:          m.WorkerLetter,
+		Image:            m.Image(),
+		Name:             m.WorkerContainer,
+		WorkingDir:       m.Workdir,
+		EntrypointScript: entrypoint,
+		Resources:        m.ResourceSpec,
+		Attributes:       m.AttributeSpec,
+	}
+}
+
+// Replicated Jobs are custom for a launcher worker
+func (m *LauncherWorker) ReplicatedJobs(spec *api.MetricSet) ([]*jobset.ReplicatedJob, error) {
+
+	js := []*jobset.ReplicatedJob{}
 	m.ensureDefaultNames()
 
 	// Generate a replicated job for the launcher (LauncherWorker) and workers
-	launcher, err := metrics.AssembleReplicatedJob(spec, false, 1, 1, m.LauncherLetter, m.SoleTenancy)
+	launcher, err := AssembleReplicatedJob(spec, false, 1, 1, m.LauncherLetter, m.SoleTenancy)
 	if err != nil {
 		return js, err
 	}
-
-	// Add volumes defined under storage.
-	v := map[string]api.Volume{}
-	if spec.HasStorage() {
-		v["storage"] = spec.Spec.Storage.Volume
-	}
-
-	// runnerScripts are custom for a LauncherWorker jobset
-	runnerScripts := m.getMetricsKeyToPath()
-	volumes := metrics.GetVolumes(spec, runnerScripts, v)
-	launcher.Template.Spec.Template.Spec.Volumes = volumes
-
-	// Prepare container specs, one for launcher and one for workers
-	launcherSpec := []metrics.ContainerSpec{
-		{
-			Image:      m.Container,
-			Name:       "launcher",
-			Command:    []string{"/bin/bash", m.LauncherScript},
-			Resources:  m.ResourceSpec,
-			Attributes: m.AttributeSpec,
-		},
-	}
-
-	// Derive the containers, one per metric, and this includes mounts for volumes
-	// false and false is disabling shared process namespace and cap sys_admin
-	launcherContainers, err := metrics.GetContainers(spec, launcherSpec, v, false, false)
-	if err != nil {
-		fmt.Printf("issue creating launcher containers %s", err)
-		return js, err
-	}
-	launcher.Template.Spec.Template.Spec.Containers = launcherContainers
 
 	numWorkers := spec.Spec.Pods - 1
 	var workers *jobset.ReplicatedJob
 
 	// Generate the replicated job with just a launcher, or launcher and workers
 	if numWorkers > 0 {
-		workers, err = m.AddWorkers(spec, v, volumes)
+		workers, err = m.AddWorkers(spec)
 		if err != nil {
 			return js, err
 		}
-		js = []jobset.ReplicatedJob{*launcher, *workers}
+		js = []*jobset.ReplicatedJob{launcher, workers}
 	} else {
-		js = []jobset.ReplicatedJob{*launcher}
+		js = []*jobset.ReplicatedJob{launcher}
 	}
 	return js, nil
 }
@@ -296,21 +279,6 @@ func deriveScriptKey(path string) string {
 
 	// Remove the extension, and this assumes we don't have double .
 	return strings.Split(path, ".")[0]
-}
-
-func (m LauncherWorker) FinalizeEntrypoints(launcherTemplate string, workerTemplate string) []metrics.EntrypointScript {
-	return []metrics.EntrypointScript{
-		{
-			Name:   deriveScriptKey(m.LauncherScript),
-			Path:   m.LauncherScript,
-			Script: launcherTemplate,
-		},
-		{
-			Name:   deriveScriptKey(m.WorkerScript),
-			Path:   m.WorkerScript,
-			Script: workerTemplate,
-		},
-	}
 }
 
 // Get common hostlist for launcher/worker app

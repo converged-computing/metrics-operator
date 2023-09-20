@@ -8,8 +8,6 @@ SPDX-License-Identifier: MIT
 package metrics
 
 import (
-	"fmt"
-
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -66,9 +64,6 @@ func (m *MetricSet) Add(metric *Metric) {
 		m.metrics = append(m.metrics, metric)
 		m.metricNames[(*metric).Name()] = true
 	}
-}
-func (m *MetricSet) EntrypointScripts(set *api.MetricSet) []EntrypointScript {
-	return consolidateEntrypointScripts(m.metrics, set)
 }
 
 // AssembleReplicatedJob is used by metrics to assemble a custom, replicated job.
@@ -142,50 +137,7 @@ func AssembleReplicatedJob(
 		jobspec.Template.Spec.Affinity = getAffinity(set)
 	}
 
-	// Do we have a pull secret for the application image?
-	// Metric containers are currently required to be public
-	if set.Spec.Application.PullSecret != "" {
-		jobspec.Template.Spec.ImagePullSecrets = []corev1.LocalObjectReference{
-			{Name: set.Spec.Application.PullSecret},
-		}
-	}
 	// Tie the jobspec to the job
 	job.Template.Spec = jobspec
 	return &job, nil
-}
-
-// get an application default entrypoint, if not determined by metric
-// NOTE: if the default is not used, we currently just support one metric
-// that requires a volume or custom logic. This could be changed
-// but my brain is too goobley right now.
-func getApplicationDefaultEntrypoint(set *api.MetricSet) string {
-	template := `#!/bin/bash
-	exec %s	
-`
-	return fmt.Sprintf(template, set.Spec.Application.Entrypoint)
-}
-
-// consolidateEntrypointScripts from a metric set into one list
-func consolidateEntrypointScripts(metrics []*Metric, set *api.MetricSet) []EntrypointScript {
-	scripts := []EntrypointScript{}
-	seenApplicationEntry := false
-	for _, metric := range metrics {
-		for _, script := range (*metric).EntrypointScripts(set, metric) {
-			if script.Path == DefaultApplicationEntrypoint {
-				seenApplicationEntry = true
-			}
-			scripts = append(scripts, script)
-		}
-	}
-
-	// If we have an application and we haven't seen the application-0.sh, add it
-	if set.HasApplication() && !seenApplicationEntry {
-		script := getApplicationDefaultEntrypoint(set)
-		scripts = append(scripts, EntrypointScript{
-			Script: script,
-			Path:   DefaultApplicationEntrypoint,
-			Name:   DefaultApplicationName,
-		})
-	}
-	return scripts
 }
