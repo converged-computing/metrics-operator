@@ -61,5 +61,12 @@
   "family": "simulation",
   "image": "ghcr.io/converged-computing/metric-pennant:latest",
   "url": "https://github.com/LLNL/pennant"
+ },
+ {
+  "name": "app-quicksilver",
+  "description": "A proxy app for the Monte Carlo Transport Code",
+  "family": "simulation",
+  "image": "ghcr.io/converged-computing/metric-quicksilver:latest",
+  "url": "https://github.com/LLNL/Quicksilver"
  }
 ]

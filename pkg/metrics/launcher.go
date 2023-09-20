@@ -40,6 +40,10 @@ type LauncherWorker struct {
 	// A metric can have one or more addons
 	Addons []*api.MetricAddon
 
+	// Most laucher workers have a command
+	command string
+	prefix  string
+
 	// Scripts
 	WorkerScript      string
 	LauncherScript    string
@@ -86,6 +90,25 @@ func (m LauncherWorker) Attributes() *api.ContainerSpec {
 	return m.AttributeSpec
 }
 
+// Set default options / attributes for the launcher metric
+func (m *LauncherWorker) SetDefaultOptions(metric *api.Metric) {
+	m.ResourceSpec = &metric.Resources
+	m.AttributeSpec = &metric.Attributes
+
+	command, ok := metric.Options["command"]
+	if ok {
+		m.command = command.StrVal
+	}
+	workdir, ok := metric.Options["workdir"]
+	if ok {
+		m.Workdir = workdir.StrVal
+	}
+	prefix, ok := metric.Options["prefix"]
+	if ok {
+		m.prefix = prefix.StrVal
+	}
+}
+
 // Ensure the worker and launcher default names are set
 func (m *LauncherWorker) ensureDefaultNames() {
 	// Ensure we set the default launcher letter, if not set
@@ -107,6 +130,54 @@ func (m *LauncherWorker) ensureDefaultNames() {
 	if m.WorkerContainer == "" {
 		m.WorkerContainer = "workers"
 	}
+}
+
+func (m LauncherWorker) PrepareContainers(
+	spec *api.MetricSet,
+	metric *Metric,
+) []*specs.ContainerSpec {
+
+	// Metadata to add to beginning of run
+	meta := Metadata(spec, metric)
+	hosts := m.GetHostlist(spec)
+	prefix := m.GetCommonPrefix(meta, m.command, hosts)
+
+	preBlock := `
+echo "%s"
+`
+
+	postBlock := `
+echo "%s"
+%s
+`
+	command := fmt.Sprintf("%s ./problem.sh", m.prefix)
+	interactive := metadata.Interactive(spec.Spec.Logging.Interactive)
+	preBlock = prefix + fmt.Sprintf(preBlock, metadata.Separator)
+	postBlock = fmt.Sprintf(postBlock, metadata.CollectionEnd, interactive)
+
+	// Entrypoint for the launcher
+	launcherEntrypoint := specs.EntrypointScript{
+		Name:    specs.DeriveScriptKey(m.LauncherScript),
+		Path:    m.LauncherScript,
+		Pre:     preBlock,
+		Command: command,
+		Post:    postBlock,
+	}
+
+	// Entrypoint for the worker
+	workerEntrypoint := specs.EntrypointScript{
+		Name:    specs.DeriveScriptKey(m.WorkerScript),
+		Path:    m.WorkerScript,
+		Pre:     prefix,
+		Command: "sleep infinity",
+	}
+
+	// Container spec for the launcher
+	launcherContainer := m.GetLauncherContainerSpec(launcherEntrypoint)
+	workerContainer := m.GetWorkerContainerSpec(workerEntrypoint)
+
+	// Return the script templates for each of launcher and worker
+	return []*specs.ContainerSpec{&launcherContainer, &workerContainer}
 }
 
 // GetCommonPrefix returns a common prefix for the worker/ launcher script, setting up hosts, etc.

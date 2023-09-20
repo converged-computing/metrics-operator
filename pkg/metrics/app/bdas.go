@@ -37,8 +37,6 @@ func (m BDAS) Url() string {
 
 // Set custom options / attributes for the metric
 func (m *BDAS) SetOptions(metric *api.Metric) {
-	m.ResourceSpec = &metric.Resources
-	m.AttributeSpec = &metric.Attributes
 
 	// Set user defined values or fall back to defaults
 	m.prefix = "/bin/bash"
@@ -48,20 +46,7 @@ func (m *BDAS) SetOptions(metric *api.Metric) {
 	// Examples from guide
 	// mpirun -np num_ranks Rscript princomp.r num_local_rows num_global_cols
 	// mpirun -np 16 Rscript princomp.r 1000 250
-
-	// This could be improved :)
-	command, ok := metric.Options["command"]
-	if ok {
-		m.command = command.StrVal
-	}
-	workdir, ok := metric.Options["workdir"]
-	if ok {
-		m.Workdir = workdir.StrVal
-	}
-	prefix, ok := metric.Options["prefix"]
-	if ok {
-		m.prefix = prefix.StrVal
-	}
+	m.SetDefaultOptions(metric)
 }
 
 // Exported options and list options

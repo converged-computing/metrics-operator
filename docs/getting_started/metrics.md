@@ -344,7 +344,7 @@ By default, akin to LAMMPS we expose the entire mpirun command along with the wo
 | Name | Description | Option Key | Type | Default |
 |-----|-------------|------------|------|---------|
 | command | The amg command (without mpirun) | options->command |string | (see below) |
-| mpirun | The mpirun command (and arguments) | options->mpirun | string | (see below) | 
+| prefix | The prefix (mpirun command and arguments) | options->mpirun | string | (see below) | 
 | workdir | The working directory for the command | options->workdir | string | /opt/AMG |
 
 By default, when not set, you will just run the amg binary to get a test case run: 
@@ -380,7 +380,7 @@ By default, akin to other apps we expose the entire mpirun command along with th
 | Name | Description | Option Key | Type | Default |
 |-----|-------------|------------|------|---------|
 | command | The qs command (without mpirun) | options->command |string | (see below) |
-| mpirun | The mpirun command (and arguments) | options->mpirun | string | (see below) | 
+| prefix | The prefix (mpirun command and arguments) | options->mpirun | string | (see below) | 
 | workdir | The working directory for the command | options->workdir | string | /opt/AMG |
 
 By default, when not set, you will just run the qs (quicksilver) binary on a sample problem, represented by an input text file: 
@@ -441,7 +441,7 @@ By default, akin to other apps we expose the entire mpirun prefix and command al
 | Name | Description | Option Key | Type | Default |
 |-----|-------------|------------|------|---------|
 | command | The pennant command (without mpirun) | options->command |string | (see below) |
-| mpirun | The mpirun command (and arguments) | options->mpirun | string | (see below) | 
+| prefix | The prefix (mpirun command and arguments) | options->mpirun | string | (see below) | 
 | workdir | The working directory for the command | options->workdir | string | /opt/AMG |
 
 By default, when not set, you will just run pennant on a test problem, represented by an input text file: 
@@ -545,7 +545,7 @@ Akin to AMG, we allow you to modify each of the mpirun and kripke commands via:
 | Name | Description | Option Key | Type | Default |
 |-----|-------------|------------|------|---------|
 | command | The amg command (without mpirun) | options->command |string | (see below) |
-| mpirun | The mpirun command (and arguments) | options->mpirun | string | (see below) | 
+| prefix | The prefix (mpirun command and arguments) | options->mpirun | string | (see below) | 
 | workdir | The working directory for the command | options->workdir | string | /opt/AMG |
 
 By default, when not set, you will just run the kripke binary to get a test case run, so mpirun is set to be blank.

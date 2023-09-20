@@ -14,7 +14,7 @@ import (
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 
-type Nekbone struct {
+type Quicksilver struct {
 	metrics.LauncherWorker
 
 	// Custom Options
@@ -23,25 +23,25 @@ type Nekbone struct {
 }
 
 // I think this is a simulation?
-func (m Nekbone) Family() string {
-	return metrics.SolverFamily
+func (m Quicksilver) Family() string {
+	return metrics.SimulationFamily
 }
 
-func (m Nekbone) Url() string {
-	return "https://github.com/Nek5000/Nekbone"
+func (m Quicksilver) Url() string {
+	return "https://github.com/LLNL/Quicksilver"
 }
 
 // Set custom options / attributes for the metric
-func (m *Nekbone) SetOptions(metric *api.Metric) {
+func (m *Quicksilver) SetOptions(metric *api.Metric) {
 	// Set user defined values or fall back to defaults
-	m.prefix = "/bin/bash"
-	m.command = "mpiexec --hostfile ./hostlist.txt -np 2 ./nekbone"
-	m.Workdir = "/root/nekbone-3.0/test/example2"
+	m.prefix = "mpirun --hostfile ./hostlist.txt"
+	m.command = "qs /opt/quicksilver/Examples/CORAL2_Benchmark/Problem1/Coral2_P1.inp"
+	m.Workdir = "/opt/quicksilver/Examples"
 	m.SetDefaultOptions(metric)
 }
 
 // Exported options and list options
-func (m Nekbone) Options() map[string]intstr.IntOrString {
+func (m Quicksilver) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
 		"command": intstr.FromString(m.command),
 		"prefix":  intstr.FromString(m.prefix),
@@ -51,10 +51,12 @@ func (m Nekbone) Options() map[string]intstr.IntOrString {
 
 func init() {
 	launcher := metrics.LauncherWorker{
-		Identifier: "app-nekbone",
-		Summary:    "A mini-app derived from the Nek5000 CFD code which is a high order, incompressible Navier-Stokes CFD solver based on the spectral element method. The conjugate gradiant solve is compute intense, contains small messages and frequent allreduces.",
-		Container:  "ghcr.io/converged-computing/metric-nekbone:latest",
+		Identifier:     "app-quicksilver",
+		Summary:        "A proxy app for the Monte Carlo Transport Code",
+		Container:      "ghcr.io/converged-computing/metric-quicksilver:latest",
+		WorkerScript:   "/metrics_operator/quicksilver-worker.sh",
+		LauncherScript: "/metrics_operator/quicksilver-launcher.sh",
 	}
-	Nekbone := Nekbone{LauncherWorker: launcher}
-	metrics.Register(&Nekbone)
+	Quicksilver := Quicksilver{LauncherWorker: launcher}
+	metrics.Register(&Quicksilver)
 }
