@@ -35,9 +35,6 @@ type Metric interface {
 	Image() string
 	WorkingDir() string
 
-	// Customizations / exposure for other containers in the JobSet
-	GetVolumes() map[string]api.Volume
-
 	// Options and exportable attributes
 	SetOptions(*api.Metric)
 	Options() map[string]intstr.IntOrString

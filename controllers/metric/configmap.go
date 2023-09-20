@@ -13,6 +13,7 @@ import (
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	mctrl "github.com/converged-computing/metrics-operator/pkg/metrics"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -26,6 +27,7 @@ func (r *MetricSetReconciler) ensureConfigMaps(
 	ctx context.Context,
 	spec *api.MetricSet,
 	set *mctrl.MetricSet,
+	containerSpecs []*specs.ContainerSpec,
 ) (*corev1.ConfigMap, ctrl.Result, error) {
 
 	// Look for the config map by name
@@ -47,15 +49,10 @@ func (r *MetricSetReconciler) ensureConfigMaps(
 		// or possible multiple for a standalone metric
 		data := map[string]string{}
 
-		// Go through each entrypoint script
-		// TODO update this using the containerspec provided above
-		/*for count, es := range set.EntrypointScripts(spec) {
-			key := es.Name
-			if key == "" {
-				key = fmt.Sprintf("entrypoint-%d", count)
-			}
-			data[key] = es.Script
-		}*/
+		// Go through each container spec entrypoint
+		for _, cs := range containerSpecs {
+			data[cs.EntrypointScript.Name] = cs.EntrypointScript.Script
+		}
 
 		cm, result, err := r.getConfigMap(ctx, spec, data)
 		if err != nil {

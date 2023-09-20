@@ -129,50 +129,6 @@ type MetricAddon struct {
 	MapOptions map[string]map[string]intstr.IntOrString `json:"mapOptions"`
 }
 
-// Storage that will be monitored, or storage alongside a standalone metric
-type Storage struct {
-
-	// Volume type to test (not all storage interfaces require one explicitly)
-	//+optional
-	Volume Volume `json:"volume"`
-
-	// Commands to run (pre is supported to make bind)
-	// +optional
-	Commands Commands `json:"commands"`
-}
-
-// Application that will be monitored
-type Application struct {
-	Image string `json:"image"`
-
-	// command to execute and monitor (if consistent across pods)
-	Command string `json:"command"`
-
-	// Working Directory
-	//+optional
-	WorkingDir string `json:"workingDir"`
-
-	// Entrypoint of container, if different from command
-	//+optional
-	Entrypoint string `json:"entrypoint"`
-
-	// A pull secret for the application container
-	//+optional
-	PullSecret string `json:"pullSecret"`
-
-	// Resources include limits and requests for the application
-	// +optional
-	Resources ContainerResources `json:"resources"`
-
-	// Container Spec has attributes for the container
-	//+optional
-	Attributes ContainerSpec `json:"attributes"`
-
-	// Existing Volumes for the application
-	// +optional
-	Volumes map[string]Volume `json:"volumes"`
-}
-
 // ContainerResources include limits and requests
 type ContainerResources struct {
 
@@ -199,47 +155,6 @@ type Commands struct {
 }
 
 type ContainerResource map[string]intstr.IntOrString
-
-// A Volume should correspond with an existing volume, either:
-// config map, secret, or claim name.
-type Volume struct {
-
-	// Path and claim name are always required if a secret isn't defined
-	// +optional
-	Path string `json:"path,omitempty"`
-
-	// Hostpath volume on the host to bind to path
-	// +optional
-	HostPath string `json:"hostPath"`
-
-	// Config map name if the existing volume is a config map
-	// You should also define items if you are using this
-	// +optional
-	ConfigMapName string `json:"configMapName,omitempty"`
-
-	// Items (key and paths) for the config map
-	// +optional
-	Items map[string]string `json:"items"`
-
-	// Claim name if the existing volume is a PVC
-	// +optional
-	ClaimName string `json:"claimName,omitempty"`
-
-	// An existing secret
-	// +optional
-	SecretName string `json:"secretName,omitempty"`
-
-	// EmptyVol if true generates an empty volume at the path
-	// +kubebuilder:default=false
-	// +default=false
-	// +optional
-	EmptyVol bool `json:"emptyVol,omitempty"`
-
-	// +kubebuilder:default=false
-	// +default=false
-	// +optional
-	ReadOnly bool `json:"readOnly,omitempty"`
-}
 
 // The difference between benchmark and metric is subtle.
 // A metric is more a measurment, and the benchmark is the comparison value.
@@ -323,47 +238,6 @@ func (m *MetricSet) Validate() bool {
 		return false
 	}
 	return true
-}
-
-// validateExistingVolumes ensures secret names vs. volume paths are valid
-func (m *MetricSet) validateVolumes(volumes map[string]Volume) bool {
-
-	valid := true
-	for key, volume := range volumes {
-
-		// Case 1: it's a secret and we only need that
-		if volume.SecretName != "" {
-			continue
-		}
-
-		// Case 2: it's a config map (and will have items too, but we don't hard require them)
-		if volume.ConfigMapName != "" {
-			continue
-		}
-
-		// Case 3: Hostpath volume (mostly for testing)
-		if volume.HostPath != "" {
-			continue
-		}
-
-		// Case 4: claim desired without path
-		if volume.ClaimName == "" && volume.Path != "" {
-			fmt.Printf("😥️ Found existing volume %s with path %s that is missing a claim name\n", key, volume.Path)
-			valid = false
-		}
-		// Case 5: reverse of the above
-		if volume.ClaimName != "" && volume.Path == "" {
-			fmt.Printf("😥️ Found existing volume %s with claimName %s that is missing a path\n", key, volume.ClaimName)
-			valid = false
-		}
-
-		// Case 6: empty volume needs path
-		if volume.EmptyVol && volume.Path == "" {
-			fmt.Printf("😥️ Found empty volume %s that is missing a path\n", key)
-			valid = false
-		}
-	}
-	return valid
 }
 
 //+kubebuilder:object:root=true

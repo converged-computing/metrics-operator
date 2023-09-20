@@ -34,9 +34,8 @@ func (r *MetricSetReconciler) ensureMetricSet(
 	}
 
 	// Ensure we create the JobSet for the MetricSet
-	// either application, storage, or standalone based
-	// This could be updated to support > 1
-	scripts, _, result, err = r.ensureJobSet(ctx, spec, set)
+	// We get back container specs to use for generating configmaps
+	_, cs, result, err := r.ensureJobSet(ctx, spec, set)
 	if err != nil {
 		return result, err
 	}
@@ -47,7 +46,7 @@ func (r *MetricSetReconciler) ensureMetricSet(
 	// and named by metric index or custom metric script key name
 	// We could theoretically allow creating more than one JobSet here
 	// and change the name to include the group type.
-	_, result, err := r.ensureConfigMaps(ctx, spec, set, cms)
+	_, result, err = r.ensureConfigMaps(ctx, spec, set, cs)
 	if err != nil {
 		return result, err
 	}
@@ -78,14 +77,14 @@ func (r *MetricSetReconciler) ensureJobSet(
 	ctx context.Context,
 	spec *api.MetricSet,
 	set *mctrl.MetricSet,
-) ([]*jobset.JobSet, []specs.EntrypointScript, ctrl.Result, error) {
+) ([]*jobset.JobSet, []*specs.ContainerSpec, ctrl.Result, error) {
 
 	// Look for an existing job
 	// We only care about the set Name/Namespace matched to one
 	// This can eventually update to support > 1 if needed
 	existing, err := r.getExistingJob(ctx, spec)
 	jobsets := []*jobset.JobSet{existing}
-	scripts := []specs.EntrypointScript{}
+	cs := []*specs.ContainerSpec{}
 
 	// Create a new job if it does not exist
 	if err != nil {
@@ -97,19 +96,18 @@ func (r *MetricSetReconciler) ensureJobSet(
 		)
 
 		// Get one JobSet to create (can eventually support > 1)
-		// The scripts are paired here. If we already made the jobsets,
-		// the scripts (config maps) should exist too.
-		jobsets, scripts, err := mctrl.GetJobSet(spec, set)
+		// container specs allow us to create config maps
+		jobsets, cs, err := mctrl.GetJobSet(spec, set)
 		if err != nil {
-			return jobsets, scripts, ctrl.Result{}, err
+			return jobsets, cs, ctrl.Result{}, err
 		}
 		for _, js := range jobsets {
 			err = r.createJobSet(ctx, spec, js)
 			if err != nil {
-				return jobsets, scripts, ctrl.Result{}, err
+				return jobsets, cs, ctrl.Result{}, err
 			}
 		}
-		return jobsets, scripts, ctrl.Result{}, err
+		return jobsets, cs, ctrl.Result{}, err
 
 	} else {
 		r.Log.Info(
@@ -118,7 +116,7 @@ func (r *MetricSetReconciler) ensureJobSet(
 			"Name:", existing.Name,
 		)
 	}
-	return jobsets, scripts, ctrl.Result{}, err
+	return jobsets, cs, ctrl.Result{}, err
 }
 
 // createJobSet handles the creation operator

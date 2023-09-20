@@ -66,11 +66,6 @@ func (m LauncherWorker) Name() string {
 	return m.Identifier
 }
 
-// GetVolumes (if necessary) this is likely only for application metric types
-func (m LauncherWorker) GetVolumes() map[string]api.Volume {
-	return map[string]api.Volume{}
-}
-
 // Description returns the metric description
 func (m LauncherWorker) Description() string {
 	return m.Summary
