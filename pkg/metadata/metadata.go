@@ -26,8 +26,7 @@ var (
 type MetricExport struct {
 
 	// Global
-	Pods        int32 `json:"pods"`
-	Completions int32 `json:"completions"`
+	Pods int32 `json:"pods"`
 
 	// Application
 	ApplicationImage   string `json:"applicationImage,omitempty"`

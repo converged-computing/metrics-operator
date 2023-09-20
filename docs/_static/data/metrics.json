@@ -8,6 +8,14 @@
   "url": "https://github.com/LLNL/AMG"
  },
  {
+  "name": "app-bdas",
+  "description": "The big data analytic suite contains the K-Means observation label, PCA, and SVM benchmarks.",
+  "family": "machine-learning",
+  "type": "",
+  "image": "ghcr.io/converged-computing/metric-bdas:latest",
+  "url": "https://asc.llnl.gov/sites/asc/files/2020-09/BDAS_Summary_b4bcf27_0.pdf"
+ },
+ {
   "name": "app-lammps",
   "description": "LAMMPS molecular dynamic simulation",
   "family": "simulation",
