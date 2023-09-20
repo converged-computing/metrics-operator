@@ -8,6 +8,8 @@ SPDX-License-Identifier: MIT
 package metrics
 
 import (
+	"path/filepath"
+
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	"github.com/converged-computing/metrics-operator/pkg/specs"
 	corev1 "k8s.io/api/core/v1"
@@ -56,9 +58,12 @@ func generateOperatorItems(containerSpecs []*specs.ContainerSpec) []corev1.KeyTo
 	// Each metric has an entrypoint script
 	runnerScripts := []corev1.KeyToPath{}
 	for _, cs := range containerSpecs {
+
+		// This is relative to the directory
+		path := filepath.Base(cs.EntrypointScript.Path)
 		runnerScript := corev1.KeyToPath{
 			Key:  cs.EntrypointScript.Name,
-			Path: cs.EntrypointScript.Script,
+			Path: path,
 			Mode: &makeExecutable,
 		}
 		runnerScripts = append(runnerScripts, runnerScript)

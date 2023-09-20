@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
 package specs
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -52,6 +53,12 @@ type EntrypointScript struct {
 
 	// Anything after the command!
 	Post string
+}
+
+// WriteScript writes the final script, combining the pre, command, and post
+func (e EntrypointScript) WriteScript() string {
+	return fmt.Sprintf("%s\n%s\n%s\n", e.Pre, e.Command, e.Post)
+
 }
 
 // Given a full path, derive the key from the script name minus the extension

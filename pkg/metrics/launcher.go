@@ -9,15 +9,10 @@ package metrics
 
 import (
 	"fmt"
-	"path"
-	"path/filepath"
-	"strings"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	"github.com/converged-computing/metrics-operator/pkg/metadata"
 	"github.com/converged-computing/metrics-operator/pkg/specs"
-	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/util/intstr"
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 )
 
@@ -96,25 +91,6 @@ func (m LauncherWorker) Resources() *api.ContainerResources {
 }
 func (m LauncherWorker) Attributes() *api.ContainerSpec {
 	return m.AttributeSpec
-}
-
-func (m LauncherWorker) getMetricsKeyToPath() []corev1.KeyToPath {
-	// Runner start scripts
-	makeExecutable := int32(0777)
-
-	// Each metric has an entrypoint script
-	return []corev1.KeyToPath{
-		{
-			Key:  deriveScriptKey(m.LauncherScript),
-			Path: path.Base(m.LauncherScript),
-			Mode: &makeExecutable,
-		},
-		{
-			Key:  deriveScriptKey(m.WorkerScript),
-			Path: path.Base(m.WorkerScript),
-			Mode: &makeExecutable,
-		},
-	}
 }
 
 // Ensure the worker and launcher default names are set
@@ -253,10 +229,6 @@ func (m *LauncherWorker) ReplicatedJobs(spec *api.MetricSet) ([]*jobset.Replicat
 	return js, nil
 }
 
-func (m LauncherWorker) ListOptions() map[string][]intstr.IntOrString {
-	return map[string][]intstr.IntOrString{}
-}
-
 // Validate that we can run a network. At least one launcher and worker is required
 func (m LauncherWorker) Validate(spec *api.MetricSet) bool {
 	isValid := spec.Spec.Pods >= 2
@@ -264,16 +236,6 @@ func (m LauncherWorker) Validate(spec *api.MetricSet) bool {
 		logger.Errorf("Pods for a Launcher Worker app must be >=2. This app is invalid.")
 	}
 	return isValid
-}
-
-// Given a full path, derive the key from the script name minus the extension
-func deriveScriptKey(path string) string {
-
-	// Basename
-	path = filepath.Base(path)
-
-	// Remove the extension, and this assumes we don't have double .
-	return strings.Split(path, ".")[0]
 }
 
 // Get common hostlist for launcher/worker app

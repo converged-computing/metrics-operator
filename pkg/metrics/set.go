@@ -35,7 +35,6 @@ const (
 
 // A MetricSet includes one or more metrics that are assembled into a JobSet
 type MetricSet struct {
-	name        string
 	metrics     []*Metric
 	metricNames map[string]bool
 }
@@ -59,10 +58,14 @@ func (m MetricSet) HasSoleTenancy() bool {
 	return false
 }
 
-func (m *MetricSet) Add(metric *Metric) {
-	if !m.Exists(metric) {
-		m.metrics = append(m.metrics, metric)
-		m.metricNames[(*metric).Name()] = true
+func (ms *MetricSet) Add(metric *Metric) {
+	if ms.metricNames == nil {
+		ms.metricNames = map[string]bool{}
+	}
+	m := (*metric)
+	if !ms.Exists(metric) {
+		ms.metrics = append(ms.metrics, metric)
+		ms.metricNames[m.Name()] = true
 	}
 }
 

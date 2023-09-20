@@ -114,6 +114,7 @@ echo "%s"
 		Command: "sleep infinity",
 	}
 
+	// These are associated with replicated jobs via JobName
 	launcherContainer := m.GetLauncherContainerSpec(launcherEntrypoint)
 	workerContainer := m.GetWorkerContainerSpec(workerEntrypoint)
 

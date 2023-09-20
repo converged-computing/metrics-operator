@@ -43,95 +43,6 @@ spec:
           spec:
             description: MetricSpec defines the desired state of Metric
             properties:
-              application:
-                description: For metrics that require an application, we need a container and name (for now)
-                properties:
-                  attributes:
-                    description: Container Spec has attributes for the container
-                    properties:
-                      securityContext:
-                        description: Security context for the pod
-                        properties:
-                          privileged:
-                            type: boolean
-                        required:
-                        - privileged
-                        type: object
-                    type: object
-                  command:
-                    description: command to execute and monitor (if consistent across pods)
-                    type: string
-                  entrypoint:
-                    description: Entrypoint of container, if different from command
-                    type: string
-                  image:
-                    type: string
-                  pullSecret:
-                    description: A pull secret for the application container
-                    type: string
-                  resources:
-                    description: Resources include limits and requests for the application
-                    properties:
-                      limits:
-                        additionalProperties:
-                          anyOf:
-                          - type: integer
-                          - type: string
-                          x-kubernetes-int-or-string: true
-                        type: object
-                      requests:
-                        additionalProperties:
-                          anyOf:
-                          - type: integer
-                          - type: string
-                          x-kubernetes-int-or-string: true
-                        type: object
-                    type: object
-                  volumes:
-                    additionalProperties:
-                      description: 'A Volume should correspond with an existing volume, either: config map, secret, or claim name.'
-                      properties:
-                        claimName:
-                          description: Claim name if the existing volume is a PVC
-                          type: string
-                        configMapName:
-                          description: Config map name if the existing volume is a config map You should also define items if you are using this
-                          type: string
-                        emptyVol:
-                          default: false
-                          description: EmptyVol if true generates an empty volume at the path
-                          type: boolean
-                        hostPath:
-                          description: Hostpath volume on the host to bind to path
-                          type: string
-                        items:
-                          additionalProperties:
-                            type: string
-                          description: Items (key and paths) for the config map
-                          type: object
-                        path:
-                          description: Path and claim name are always required if a secret isn't defined
-                          type: string
-                        readOnly:
-                          default: false
-                          type: boolean
-                        secretName:
-                          description: An existing secret
-                          type: string
-                      type: object
-                    description: Existing Volumes for the application
-                    type: object
-                  workingDir:
-                    description: Working Directory
-                    type: string
-                required:
-                - command
-                - image
-                type: object
-              completions:
-                description: Single pod completion, meaning the jobspec completions is unset and we only require one main completion
-                format: int32
-                type: integer
               deadlineSeconds:
                 default: 31500000
                 description: Should the job be limited to a particular number of seconds? Approximately one year. This cannot be zero or job won't start
@@ -150,18 +61,58 @@ spec:
               metrics:
                 description: The name of the metric (that will be associated with a flavor like storage)
                 items:
-                  description: The difference between benchmark and metric is subtle. A metric is more a measurment, and the benchmark is the comparison value. I don't have strong opinions but I think we are doing more measurment not necessarily with benchmarks
                   properties:
+                    addons:
+                      description: A Metric addon can be storage (volume) or an application, It's an additional entity that can customize a replicated job, either adding assets / features or entire containers to the pod
+                      items:
+                        description: 'A Metric addon is an interface that exposes extra volumes for a metric. Examples include: A storage volume to be mounted on one or more of the replicated jobs A single application container.'
+                        properties:
+                          listOptions:
+                            additionalProperties:
+                              items:
+                                anyOf:
+                                - type: integer
+                                - type: string
+                                x-kubernetes-int-or-string: true
+                              type: array
+                            description: Addon List Options
+                            type: object
+                          mapOptions:
+                            additionalProperties:
+                              additionalProperties:
+                                anyOf:
+                                - type: integer
+                                - type: string
+                                x-kubernetes-int-or-string: true
+                              type: object
+                            description: Addon Map Options
+                            type: object
+                          name:
+                            type: string
+                          options:
+                            additionalProperties:
+                              anyOf:
+                              - type: integer
+                              - type: string
+                              x-kubernetes-int-or-string: true
+                            description: Metric Addon Options
+                            type: object
+                        required:
+                        - name
+                        type: object
+                      type: array
                     attributes:
                       description: Container Spec has attributes for the container
                       properties:
                         securityContext:
                           description: Security context for the pod
                           properties:
+                            allowAdmin:
+                              type: boolean
+                            allowPtrace:
+                              type: boolean
                             privileged:
                               type: boolean
-                          required:
-                          - privileged
                           type: object
                       type: object
                     listOptions:
@@ -245,54 +196,6 @@ spec:
                 default: ms
                 description: Service name for the JobSet (MetricsSet) cluster network
                 type: string
-              storage:
-                description: A storage setup that we want to measure performance for. and binding to storage metrics
-                properties:
-                  commands:
-                    description: Commands to run (pre is supported to make bind)
-                    properties:
-                      post:
-                        description: post happens at end (after collection end)
-                        type: string
-                      pre:
-                        description: pre command happens at start (before anything else)
-                        type: string
-                      prefix:
-                        description: Command prefix to put in front of a metric main command (not applicable for all)
-                        type: string
-                    type: object
-                  volume:
-                    description: Volume type to test (not all storage interfaces require one explicitly)
-                    properties:
-                      claimName:
-                        description: Claim name if the existing volume is a PVC
-                        type: string
-                      configMapName:
-                        description: Config map name if the existing volume is a config map You should also define items if you are using this
-                        type: string
-                      emptyVol:
-                        default: false
-                        description: EmptyVol if true generates an empty volume at the path
-                        type: boolean
-                      hostPath:
-                        description: Hostpath volume on the host to bind to path
-                        type: string
-                      items:
-                        additionalProperties:
-                          type: string
-                        description: Items (key and paths) for the config map
-                        type: object
-                      path:
-                        description: Path and claim name are always required if a secret isn't defined
-                        type: string
-                      readOnly:
-                        default: false
-                        type: boolean
-                      secretName:
-                        description: An existing secret
-                        type: string
-                    type: object
-                type: object
             type: object
           status:
             description: MetricStatus defines the observed state of Metric

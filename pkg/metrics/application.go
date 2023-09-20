@@ -26,10 +26,6 @@ func (m SingleApplication) Name() string {
 	return m.Identifier
 }
 
-func (m SingleApplication) GetVolumes() map[string]api.Volume {
-	return map[string]api.Volume{}
-}
-
 func (m SingleApplication) HasSoleTenancy() bool {
 	return false
 }

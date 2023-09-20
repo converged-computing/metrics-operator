@@ -51,7 +51,7 @@ func (r *MetricSetReconciler) ensureConfigMaps(
 
 		// Go through each container spec entrypoint
 		for _, cs := range containerSpecs {
-			data[cs.EntrypointScript.Name] = cs.EntrypointScript.Script
+			data[cs.EntrypointScript.Name] = cs.EntrypointScript.WriteScript()
 		}
 
 		cm, result, err := r.getConfigMap(ctx, spec, data)

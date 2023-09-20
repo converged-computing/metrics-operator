@@ -97,7 +97,7 @@ func (b AddonBase) MapOptions() map[string]map[string]intstr.IntOrString {
 func GetAddon(a *api.MetricAddon) (Addon, error) {
 	addon, ok := Registry[a.Name]
 	if !ok {
-		return nil, fmt.Errorf("%s is not a known addon", addon.Name)
+		return nil, fmt.Errorf("%s is not a known addon", a.Name)
 	}
 
 	// Set options before validation

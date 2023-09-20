@@ -45,6 +45,10 @@ func getReplicatedJobContainers(
 	// Each needs to have the sys trace capability to see the application pids
 	for _, cs := range containerSpecs {
 
+		// Skip containers not intended for the replicated job
+		if cs.JobName != "" && cs.JobName != rj.Name {
+			continue
+		}
 		hasPrivileged = hasPrivileged || cs.Attributes.SecurityContext.Privileged
 		resources, err := getContainerResources(cs.Resources)
 		if err != nil {
@@ -82,8 +86,7 @@ func getReplicatedJobContainers(
 			newContainer.WorkingDir = cs.WorkingDir
 		}
 
-		// Ports and environment
-		// TODO this should be added when needed
+		// Ports and environment (add when needed)
 		ports := []corev1.ContainerPort{}
 		envars := []corev1.EnvVar{}
 		newContainer.Ports = ports

@@ -31,15 +31,10 @@ var (
 const podLabelAppName = "app.kubernetes.io/name"
 
 // GetJobSet is called by the controller to return a JobSet for the MetricSet
-// Although we currently just support 1 (and return an array of 1)
-// this could eventually support > 1 for cases that warrant it.
 func GetJobSet(
 	spec *api.MetricSet,
 	set *MetricSet,
-) ([]*jobset.JobSet, []*specs.ContainerSpec, error) {
-
-	// Assume we can eventually support >1 jobset
-	jobsets := []*jobset.JobSet{}
+) (*jobset.JobSet, []*specs.ContainerSpec, error) {
 	containerSpecs := []*specs.ContainerSpec{}
 
 	// TODO each metric needs to provide some listing of success jobs...
@@ -60,7 +55,7 @@ func GetJobSet(
 		m := (*metric)
 		jobs, err := m.ReplicatedJobs(spec)
 		if err != nil {
-			return jobsets, containerSpecs, err
+			return js, containerSpecs, err
 		}
 
 		// Generate container specs for the metric, each is associated with a replicated job
@@ -74,7 +69,7 @@ func GetJobSet(
 		// 2. Create ContainerSpec across metrics that can predefine containers, entrypoints, volumes
 		err = m.AddAddons(spec, jobs, cs)
 		if err != nil {
-			return jobsets, containerSpecs, err
+			return js, containerSpecs, err
 		}
 
 		// Add the finalized container specs for the entire set of replicated jobs
@@ -90,8 +85,7 @@ func GetJobSet(
 
 	// Get those replicated Jobs.
 	js.Spec.ReplicatedJobs = rjs
-	jobsets = append(jobsets, js)
-	return jobsets, containerSpecs, nil
+	return js, containerSpecs, nil
 }
 
 // Get list of strings that define successful for a jobset.

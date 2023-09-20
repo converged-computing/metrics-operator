@@ -87,8 +87,7 @@ func (m BaseMetric) AddAddons(
 	rjs []*jobset.ReplicatedJob,
 
 	// These container specs include all replicated jobs
-	containerSpecs []*specs.ContainerSpec,
-) error {
+	containerSpecs []*specs.ContainerSpec) error {
 
 	// VolumeMounts can be generated from container specs
 	// For each addon, do custom logic depending on the type

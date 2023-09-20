@@ -26,7 +26,7 @@ How to see metrics operator logs:
 $ kubectl logs -n metrics-system metrics-controller-manager-859c66464c-7rpbw
 ```
 
-Then create the metrics set. This is going to run a single run of LAMMPS over MPI!
+Then create the metrics set. This is going to run a single run of LAMMPS over MPI.
 as lammps runs.
 
 ```bash
