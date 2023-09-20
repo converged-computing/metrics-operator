@@ -9,11 +9,14 @@ package metrics
 
 import (
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
-	"k8s.io/apimachinery/pkg/util/intstr"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 )
 
 // These are common templates for application metrics
+var (
+	DefaultEntrypointScript = "/metrics_operator/entrypoint-0.sh"
+)
 
 // SingleApplication is a Metric base for a simple application metric
 // be accessible by other packages (and not conflict with function names)
@@ -21,18 +24,8 @@ type SingleApplication struct {
 	BaseMetric
 }
 
-// Name returns the metric name
-func (m SingleApplication) Name() string {
-	return m.Identifier
-}
-
 func (m SingleApplication) HasSoleTenancy() bool {
 	return false
-}
-
-// Description returns the metric description
-func (m SingleApplication) Description() string {
-	return m.Summary
 }
 
 // Default SingleApplication is generic performance family
@@ -40,35 +33,42 @@ func (m SingleApplication) Family() string {
 	return PerformanceFamily
 }
 
-// Return container resources for the metric container
-func (m SingleApplication) Resources() *api.ContainerResources {
-	return m.ResourceSpec
-}
-func (m SingleApplication) Attributes() *api.ContainerSpec {
-	return m.AttributeSpec
+func (m *SingleApplication) ApplicationContainerSpec(
+	preBlock string,
+	command string,
+	postBlock string,
+) []*specs.ContainerSpec {
+
+	entrypoint := specs.EntrypointScript{
+		Name:    specs.DeriveScriptKey(DefaultEntrypointScript),
+		Path:    DefaultEntrypointScript,
+		Pre:     preBlock,
+		Command: command,
+		Post:    postBlock,
+	}
+
+	return []*specs.ContainerSpec{{
+		JobName:          ReplicatedJobName,
+		Image:            m.Image(),
+		Name:             "app",
+		WorkingDir:       m.Workdir,
+		EntrypointScript: entrypoint,
+		Resources:        m.ResourceSpec,
+		Attributes:       m.AttributeSpec,
+	}}
+
 }
 
-// Validation
-func (m SingleApplication) Validate(spec *api.MetricSet) bool {
-	return true
-}
+// Replicated Jobs are custom for a launcher worker
+func (m *SingleApplication) ReplicatedJobs(spec *api.MetricSet) ([]*jobset.ReplicatedJob, error) {
 
-// Container variables
-func (m SingleApplication) Image() string {
-	return m.Container
-}
-func (m SingleApplication) WorkingDir() string {
-	return m.Workdir
-}
+	js := []*jobset.ReplicatedJob{}
 
-func (m SingleApplication) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, error) {
-	return []jobset.ReplicatedJob{}, nil
-}
-
-func (m SingleApplication) ListOptions() map[string][]intstr.IntOrString {
-	return map[string][]intstr.IntOrString{}
-}
-
-func (m SingleApplication) SuccessJobs() []string {
-	return []string{}
+	// Generate a replicated job for the applicatino
+	rj, err := AssembleReplicatedJob(spec, true, spec.Spec.Pods, spec.Spec.Pods, "", m.SoleTenancy)
+	if err != nil {
+		return js, err
+	}
+	js = []*jobset.ReplicatedJob{rj}
+	return js, nil
 }

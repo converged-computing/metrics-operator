@@ -25,6 +25,9 @@ type BaseMetric struct {
 	ResourceSpec  *api.ContainerResources
 	AttributeSpec *api.ContainerSpec
 
+	// If we ask for sole tenancy, we assign 1 pod / hostname
+	SoleTenancy bool
+
 	// A metric can have one or more addons
 	Addons map[string]*addons.Addon
 }
@@ -79,6 +82,21 @@ func (m BaseMetric) SuccessJobs() []string {
 
 func (m BaseMetric) ReplicatedJobs(set *api.MetricSet) ([]*jobset.ReplicatedJob, error) {
 	return []*jobset.ReplicatedJob{}, nil
+}
+
+func (m BaseMetric) HasSoleTenancy() bool {
+	return m.SoleTenancy
+}
+
+// SetDefaultOptions that are shared (possibly)
+func (m BaseMetric) SetDefaultOptions(metric *api.Metric) {
+	st, ok := metric.Options["soleTenancy"]
+	if ok && st.StrVal == "false" || st.StrVal == "no" {
+		m.SoleTenancy = false
+	}
+	if ok && st.StrVal == "true" || st.StrVal == "yes" {
+		m.SoleTenancy = true
+	}
 }
 
 // Add registered addons to replicated jobs

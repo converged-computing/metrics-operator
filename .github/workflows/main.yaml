@@ -73,7 +73,7 @@ jobs:
                #["io-ior", "ghcr.io/converged-computing/metric-ior:latest", 120],
                ## ["network-chatterbug", "ghcr.io/converged-computing/metric-chatterbug:latest", 120],
                #["app-nekbone", "ghcr.io/converged-computing/metric-nekbone:latest", 120],
-               # ["app-ldms", "ghcr.io/converged-computing/metric-ovis-hpc:latest", 120],
+               ["app-ldms", "ghcr.io/converged-computing/metric-ovis-hpc:latest", 120],
                ["app-amg", "ghcr.io/converged-computing/metric-amg:latest", 120],
                ["app-kripke", "ghcr.io/converged-computing/metric-kripke:latest", 120],
                #["app-pennant", "ghcr.io/converged-computing/metric-pennant:latest", 120],

@@ -415,7 +415,6 @@ table {
     <thead>
         <tr>
             <th>Name</th>
-            <th>Type</th>
             <th>Family</th>
             <th>Description</th>
             <th>Container</th>
@@ -440,7 +439,6 @@ $.getJSON("metrics.json", function(data) {
           }
           return "<a href='" + row['url'] + "' target='_blank'>" + data +"</a>";},
       },
-      { data: "type"},
       { data: "family"},
       { data: "description"},
       { data: "image",

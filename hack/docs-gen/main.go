@@ -24,7 +24,6 @@ type MetricOutput struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Family      string `json:"family"`
-	Type        string `json:"type"`
 	Image       string `json:"image"`
 	Url         string `json:"url"`
 }

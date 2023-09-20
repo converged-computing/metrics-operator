@@ -40,9 +40,6 @@ type LauncherWorker struct {
 	// A metric can have one or more addons
 	Addons []*api.MetricAddon
 
-	// If we ask for sole tenancy, we assign 1 pod / hostname
-	SoleTenancy bool
-
 	// Scripts
 	WorkerScript      string
 	LauncherScript    string
@@ -50,10 +47,6 @@ type LauncherWorker struct {
 	WorkerContainer   string
 	LauncherContainer string
 	WorkerLetter      string
-}
-
-func (m LauncherWorker) HasSoleTenancy() bool {
-	return m.SoleTenancy
 }
 
 // Name returns the metric name

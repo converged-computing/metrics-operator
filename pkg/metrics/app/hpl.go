@@ -271,63 +271,63 @@ func (m HPL) PrepareContainers(
 	memoryCmd := `awk '/MemFree/ { printf "%.3f \n", $2/1024/1024 }' /proc/meminfo`
 
 	preBlock := `
-		# Source spack environment
-		. /opt/spack-environment/activate.sh
+# Source spack environment
+. /opt/spack-environment/activate.sh
 		
-		# Calculate memory, if not defined
-		memory=%d
-		if [[ $memory -eq 0 ]]; then
-			memory=$(%s)
-		fi
+# Calculate memory, if not defined
+memory=%d
+if [[ $memory -eq 0 ]]; then
+	memory=$(%s)
+fi
 		
-		echo "Memory is ${memory}"
+echo "Memory is ${memory}"
 		
-		np=%d
-		pods=%d
-		# Tasks per node, not total
-		tasks=$(nproc)
-		if [[ $np -eq 0 ]]; then
-			np=$(( $pods*$tasks ))
-		fi
+np=%d
+pods=%d
+# Tasks per node, not total
+tasks=$(nproc)
+if [[ $np -eq 0 ]]; then
+	np=$(( $pods*$tasks ))
+fi
 		
-		echo "Number of tasks (nproc on one node) is $tasks"
-		echo "Number of tasks total (across $pods nodes) is $np"
+echo "Number of tasks (nproc on one node) is $tasks"
+echo "Number of tasks total (across $pods nodes) is $np"
 		
-		blocksize=%d
-		ratio=%s
+blocksize=%d
+ratio=%s
 		
-		# This calculates the compute value - retrieved from tutorials in /opt/view/bin
-		compute_script="compute_N -m ${memory} -NB ${blocksize} -r ${ratio} -N ${pods}"
-		echo $compute_script
-		# This is the size, variable "N" in the hpl.dat (not confusing or anything)
-		size=$(${compute_script})
-		echo "Compute size is ${size}"
+# This calculates the compute value - retrieved from tutorials in /opt/view/bin
+compute_script="compute_N -m ${memory} -NB ${blocksize} -r ${ratio} -N ${pods}"
+echo $compute_script
+# This is the size, variable "N" in the hpl.dat (not confusing or anything)
+size=$(${compute_script})
+echo "Compute size is ${size}"
 		
-		# Define rest of envars we need for template
-		row_or_colmajor_pmapping=%d
-		pfact=%d
-		nbmin=%d
-		ndiv=%d
-		rfact=%d
-		bcast=%d
-		depth=%d
-		swap=%d
-		swapping_threshold=%d
-		L1_transposed=%d
-		U_transposed=%d
-		mem_alignment=%d
+# Define rest of envars we need for template
+row_or_colmajor_pmapping=%d
+pfact=%d
+nbmin=%d
+ndiv=%d
+rfact=%d
+bcast=%d
+depth=%d
+swap=%d
+swapping_threshold=%d
+L1_transposed=%d
+U_transposed=%d
+mem_alignment=%d
 		
-		# Write the input file (this parses environment variables too)
-		cat <<EOF > ./hpl.dat
-		%s
-		EOF
+# Write the input file (this parses environment variables too)
+cat <<EOF > ./hpl.dat
+%s
+EOF
 		
-		cp ./hostlist.txt ./hostnames.txt
-		rm ./hostlist.txt
-		%s
+cp ./hostlist.txt ./hostnames.txt
+rm ./hostlist.txt
+%s
 		
-		echo "%s"
-		# This is in /root/hpl/bin/linux/xhpl
+echo "%s"
+# This is in /root/hpl/bin/linux/xhpl
 `
 
 	postBlock := `
