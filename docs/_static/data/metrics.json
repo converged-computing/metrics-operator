@@ -16,6 +16,14 @@
   "url": "https://asc.llnl.gov/sites/asc/files/2020-09/BDAS_Summary_b4bcf27_0.pdf"
  },
  {
+  "name": "app-hpl",
+  "description": "High-Performance Linpack (HPL)",
+  "family": "solver",
+  "type": "",
+  "image": "ghcr.io/converged-computing/metric-hpl-spack:latest",
+  "url": "https://www.netlib.org/benchmark/hpl/"
+ },
+ {
   "name": "app-lammps",
   "description": "LAMMPS molecular dynamic simulation",
   "family": "simulation",
