@@ -77,7 +77,7 @@ jobs:
                ["app-amg", "ghcr.io/converged-computing/metric-amg:latest", 120],
                ["app-kripke", "ghcr.io/converged-computing/metric-kripke:latest", 120],
                ["app-pennant", "ghcr.io/converged-computing/metric-pennant:latest", 120],
-               ["app-bdas", "ghcr.io/converged-computing/metric-bdas:latest", 120]
+               ["app-bdas", "ghcr.io/converged-computing/metric-bdas:latest", 120],
                ["app-quicksilver", "ghcr.io/converged-computing/metric-quicksilver:latest", 120]]
 
     steps:
