@@ -24,6 +24,14 @@
   "url": "https://www.netlib.org/benchmark/hpl/"
  },
  {
+  "name": "app-kripke",
+  "description": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
+  "family": "solver",
+  "type": "",
+  "image": "ghcr.io/converged-computing/metric-kripke:latest",
+  "url": "https://github.com/LLNL/Kripke"
+ },
+ {
   "name": "app-lammps",
   "description": "LAMMPS molecular dynamic simulation",
   "family": "simulation",
