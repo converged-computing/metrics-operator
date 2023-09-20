@@ -54,5 +54,12 @@
   "family": "solver",
   "image": "ghcr.io/converged-computing/metric-nekbone:latest",
   "url": "https://github.com/Nek5000/Nekbone"
+ },
+ {
+  "name": "app-pennant",
+  "description": "Unstructured mesh hydrodynamics for advanced architectures ",
+  "family": "simulation",
+  "image": "ghcr.io/converged-computing/metric-pennant:latest",
+  "url": "https://github.com/LLNL/pennant"
  }
 ]
