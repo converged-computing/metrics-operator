@@ -75,5 +75,12 @@
   "family": "storage",
   "image": "ghcr.io/converged-computing/metric-fio:latest",
   "url": "https://fio.readthedocs.io/en/latest/fio_doc.html"
+ },
+ {
+  "name": "io-sysstat",
+  "description": "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
+  "family": "storage",
+  "image": "ghcr.io/converged-computing/metric-sysstat:latest",
+  "url": "https://github.com/sysstat/sysstat"
  }
 ]

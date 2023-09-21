@@ -6,19 +6,15 @@ metadata:
     app.kubernetes.io/instance: metricset-sample
   name: metricset-sample
 spec:
-  storage:
-    volume:
-      # This is the path on the host (e.g., inside kind container)
-      hostPath: /tmp/workflow
-
-      # This is the path in the container
-      path: /workflow
-
   metrics:
     - name: io-sysstat
       options:
         rate: 10
         completions: 2
-        # Add human readable output (in a table instead of json)
-        # human: "true"
 
+      addons:
+       - name: volume-hostpath
+         options:
+           name: io-mount
+           hostPath: /tmp/workflow
+           path: /workflow
