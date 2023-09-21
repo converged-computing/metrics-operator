@@ -98,6 +98,13 @@
   "url": "https://github.com/hpcgroup/chatterbug"
  },
  {
+  "name": "network-netmark",
+  "description": "point to point networking tool",
+  "family": "network",
+  "image": "vanessa/netmark:latest",
+  "url": ""
+ },
+ {
   "name": "network-osu-benchmark",
   "description": "point to point MPI benchmarks",
   "family": "network",

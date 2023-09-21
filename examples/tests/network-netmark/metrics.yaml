@@ -15,3 +15,4 @@ spec:
      # see pkg/metrics/network/netmark.go
      options:
        tasks: 2
+       soleTenancy: "false"

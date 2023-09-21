@@ -198,6 +198,7 @@ Variables to customize include:
 | sendReceiveCycles | Number of send-receive cycles | options-sendReceiveCycles | int32 | 20 |
 | messageSize | Message size in bytes | options->messageSize | int32 | 0 |
 | storeEachTrial | Flag to indicate storing each trial data | options->storeEachTrial | string (true/false) | "true" |
+| soleTenancy | Turn off sole tenancy (one pod/node) | options->soleTenancy | string ("false" or "no") | "true" |
 
 #### network-osu-benchmark
 
