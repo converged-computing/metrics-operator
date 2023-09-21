@@ -27,7 +27,7 @@ spec:
     singular: metricset
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - name: v1alpha2
     schema:
       openAPIV3Schema:
         description: MetricSet is the Schema for the metrics API

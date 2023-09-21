@@ -17,6 +17,6 @@ resources:
   controller: true
   domain: flux-framework.org
   kind: MetricSet
-  path: github.com/converged-computing/metrics-operator/api/v1alpha1
-  version: v1alpha1
+  path: github.com/converged-computing/metrics-operator/api/v1alpha2
+  version: v1alpha2
 version: "3"
