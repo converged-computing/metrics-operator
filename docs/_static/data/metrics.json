@@ -91,6 +91,13 @@
   "url": "https://github.com/sysstat/sysstat"
  },
  {
+  "name": "network-chatterbug",
+  "description": "A suite of communication proxies for HPC applications",
+  "family": "network",
+  "image": "ghcr.io/converged-computing/metric-chatterbug:latest",
+  "url": "https://github.com/hpcgroup/chatterbug"
+ },
+ {
   "name": "network-osu-benchmark",
   "description": "point to point MPI benchmarks",
   "family": "network",
