@@ -11,7 +11,6 @@ import (
 	"fmt"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
-	"github.com/converged-computing/metrics-operator/pkg/specs"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
@@ -149,11 +148,6 @@ func (a *ApplicationAddon) MapOptions() map[string]map[string]intstr.IntOrString
 		"resourceLimits":   limits,
 		"resourceRequests": requests,
 	}
-}
-
-// AssembleVolumes for an application
-func (a *ApplicationAddon) AssembleVolumes() []specs.VolumeSpec {
-	return []specs.VolumeSpec{}
 }
 
 func init() {

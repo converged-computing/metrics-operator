@@ -50,10 +50,13 @@ func (m Quicksilver) Options() map[string]intstr.IntOrString {
 }
 
 func init() {
+	base := metrics.BaseMetric{
+		Identifier: "app-quicksilver",
+		Summary:    "A proxy app for the Monte Carlo Transport Code",
+		Container:  "ghcr.io/converged-computing/metric-quicksilver:latest",
+	}
 	launcher := metrics.LauncherWorker{
-		Identifier:     "app-quicksilver",
-		Summary:        "A proxy app for the Monte Carlo Transport Code",
-		Container:      "ghcr.io/converged-computing/metric-quicksilver:latest",
+		BaseMetric:     base,
 		WorkerScript:   "/metrics_operator/quicksilver-worker.sh",
 		LauncherScript: "/metrics_operator/quicksilver-launcher.sh",
 	}

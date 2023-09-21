@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"log"
 
-	corev1 "k8s.io/api/core/v1"
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
@@ -39,8 +38,7 @@ type Addon interface {
 	MapOptions() map[string]map[string]intstr.IntOrString
 
 	// What addons can control:
-	GetVolumes() []corev1.Volume
-	AssembleVolumes() []specs.VolumeSpec
+	AssembleVolumes() specs.VolumeSpec
 	AssembleContainers() []specs.ContainerSpec
 	CustomizeEntrypoints([]*specs.ContainerSpec, []*jobset.ReplicatedJob)
 
@@ -67,14 +65,13 @@ func (b AddonBase) CustomizeEntrypoints([]*specs.ContainerSpec, []*jobset.Replic
 func (b AddonBase) Validate() bool {
 	return true
 }
-func (b AddonBase) GetVolumes() []corev1.Volume {
-	return []corev1.Volume{}
-}
 func (b AddonBase) AssembleContainers() []specs.ContainerSpec {
 	return []specs.ContainerSpec{}
 }
-func (b AddonBase) AssembleVolumes() []specs.VolumeSpec {
-	return []specs.VolumeSpec{}
+
+// Assemble Volumes (for now) just generates one
+func (b AddonBase) AssembleVolumes() specs.VolumeSpec {
+	return specs.VolumeSpec{}
 }
 
 func (b AddonBase) Description() string {

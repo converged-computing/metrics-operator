@@ -59,10 +59,13 @@ func (n Kripke) ListOptions() map[string][]intstr.IntOrString {
 }
 
 func init() {
+	base := metrics.BaseMetric{
+		Identifier: "app-kripke",
+		Summary:    "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
+		Container:  "ghcr.io/converged-computing/metric-kripke:latest",
+	}
 	launcher := metrics.LauncherWorker{
-		Identifier:     "app-kripke",
-		Summary:        "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
-		Container:      "ghcr.io/converged-computing/metric-kripke:latest",
+		BaseMetric:     base,
 		WorkerScript:   "/metrics_operator/kripke-worker.sh",
 		LauncherScript: "/metrics_operator/kripke-launcher.sh",
 	}

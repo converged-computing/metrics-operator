@@ -69,7 +69,7 @@ jobs:
         test: [["app-lammps", "ghcr.io/converged-computing/metric-lammps:latest", 120],
                #[["perf-hello-world", "ghcr.io/converged-computing/metric-sysstat:latest", 60],
                #["io-host-volume", "ghcr.io/converged-computing/metric-sysstat:latest", 60],
-               #["io-fio", "ghcr.io/converged-computing/metric-fio:latest", 120],
+               ["io-fio", "ghcr.io/converged-computing/metric-fio:latest", 120],
                #["io-ior", "ghcr.io/converged-computing/metric-ior:latest", 120],
                ## ["network-chatterbug", "ghcr.io/converged-computing/metric-chatterbug:latest", 120],
                ["app-nekbone", "ghcr.io/converged-computing/metric-nekbone:latest", 120],

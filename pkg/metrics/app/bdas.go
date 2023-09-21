@@ -121,12 +121,12 @@ echo "%s"
 }
 
 func init() {
-	launcher := metrics.LauncherWorker{
+	base := metrics.BaseMetric{
 		Identifier: "app-bdas",
 		Summary:    "The big data analytic suite contains the K-Means observation label, PCA, and SVM benchmarks.",
 		Container:  "ghcr.io/converged-computing/metric-bdas:latest",
 	}
-
+	launcher := metrics.LauncherWorker{BaseMetric: base}
 	BDAS := BDAS{LauncherWorker: launcher}
 	metrics.Register(&BDAS)
 }

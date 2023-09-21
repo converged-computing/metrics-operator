@@ -137,12 +137,12 @@ echo "%s"
 }
 
 func init() {
-	app := metrics.BaseMetric{
+	base := metrics.BaseMetric{
 		Identifier: "app-ldms",
 		Summary:    "provides LDMS, a low-overhead, low-latency framework for collecting, transferring, and storing metric data on a large distributed computer system.",
 		Container:  "ghcr.io/converged-computing/metric-ovis-hpc:latest",
 	}
-	single := metrics.SingleApplication{BaseMetric: app}
+	single := metrics.SingleApplication{BaseMetric: base}
 	LDMS := LDMS{SingleApplication: single}
 	metrics.Register(&LDMS)
 }

@@ -105,7 +105,9 @@ func getReplicatedJobVolumes(
 func getAddonVolumes(vs []specs.VolumeSpec) []corev1.Volume {
 	volumes := []corev1.Volume{}
 	for _, volume := range vs {
+		logger.Infof("Adding volume %s\n", &volume.Volume)
 		volumes = append(volumes, volume.Volume)
 	}
+	logger.Infof("Volumes %s\n", volumes)
 	return volumes
 }

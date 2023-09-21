@@ -53,16 +53,6 @@ type LauncherWorker struct {
 	WorkerLetter      string
 }
 
-// Name returns the metric name
-func (m LauncherWorker) Name() string {
-	return m.Identifier
-}
-
-// Description returns the metric description
-func (m LauncherWorker) Description() string {
-	return m.Summary
-}
-
 // Family returns a generic performance family
 func (m LauncherWorker) Family() string {
 	return PerformanceFamily
@@ -72,22 +62,6 @@ func (m LauncherWorker) Family() string {
 func (m *LauncherWorker) SuccessJobs() []string {
 	m.ensureDefaultNames()
 	return []string{m.LauncherLetter}
-}
-
-// Container variables
-func (n LauncherWorker) Image() string {
-	return n.Container
-}
-func (m LauncherWorker) WorkingDir() string {
-	return m.Workdir
-}
-
-// Return container resources for the metric container
-func (m LauncherWorker) Resources() *api.ContainerResources {
-	return m.ResourceSpec
-}
-func (m LauncherWorker) Attributes() *api.ContainerSpec {
-	return m.AttributeSpec
 }
 
 // Set default options / attributes for the launcher metric

@@ -66,10 +66,13 @@ func (m Lammps) Options() map[string]intstr.IntOrString {
 }
 
 func init() {
+	base := metrics.BaseMetric{
+		Identifier: "app-lammps",
+		Summary:    "LAMMPS molecular dynamic simulation",
+		Container:  "ghcr.io/converged-computing/metric-lammps:latest",
+	}
 	launcher := metrics.LauncherWorker{
-		Identifier:     "app-lammps",
-		Summary:        "LAMMPS molecular dynamic simulation",
-		Container:      "ghcr.io/converged-computing/metric-lammps:latest",
+		BaseMetric:     base,
 		WorkerScript:   "/metrics_operator/lammps-worker.sh",
 		LauncherScript: "/metrics_operator/lammps-launcher.sh",
 	}

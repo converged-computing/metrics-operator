@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	Registry = make(map[string]Metric)
+	Registry = map[string]Metric{}
 )
 
 // A general metric is a container added to a JobSet
@@ -61,6 +61,7 @@ type Metric interface {
 // GetMetric returns a metric, if it is known to the metrics operator
 // We also confirm that the addon exists, validate, and instantiate it.
 func GetMetric(metric *api.Metric, set *api.MetricSet) (Metric, error) {
+
 	if _, ok := Registry[metric.Name]; ok {
 		m := Registry[metric.Name]
 
@@ -90,7 +91,7 @@ func GetMetric(metric *api.Metric, set *api.MetricSet) (Metric, error) {
 func Register(m Metric) {
 	name := m.Name()
 	if _, ok := Registry[name]; ok {
-		log.Fatalf("Metric: %s has already been added to the registry", name)
+		log.Fatalf("Metric: %s has already been added to the registry\n", m)
 	}
 	Registry[name] = m
 }

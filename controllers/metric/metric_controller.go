@@ -108,7 +108,8 @@ func (r *MetricSetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	set := mctrl.MetricSet{}
 	for _, metric := range spec.Spec.Metrics {
 
-		// Get the individual metric, the type will determine the set we add it to
+		// Get the individual metric
+		r.Log.Info(fmt.Sprintf("🟦️ Looking for metric %s\n", metric.Name))
 		m, err := mctrl.GetMetric(&metric, &spec)
 		if err != nil {
 			r.Log.Error(err, fmt.Sprintf("🟥️ We had an issue loading that metric %s!", metric.Name))

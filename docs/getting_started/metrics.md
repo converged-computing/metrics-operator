@@ -128,13 +128,16 @@ Options you can set include:
 
 |Name | Description | Type | Default |
 |-----|-------------|------------|------|
-|testname | Name for the test | string | test |
+| testname | Name for the test | string | test |
 | blocksize | Size of block to write. It defaults to 4k, but can be set from 256 to 8k.  | string | 4k |
 | iodepth | Number of I/O units to keep in flight against the file. | int | 64 |
 | size | Total size of file to write | string | 4G |
 | directory | Directory (usually mounted) to test. | string | /tmp |
+| pre | Custom logic / command to run before Fio | string | unset |
+| post | Custom logic / command to run after Fio (e.g., cleanup) | string | unset |
+| prefix | Prefix to add to running fio commands (like a wrapper) | string | unset |
 
-For the last "directory" we use this location to write a temporary file, which will be cleaned up.
+For the "directory" we use this location to write a temporary file, which will be cleaned up.
 This allows for testing storage mounted from multiple metric pods without worrying about a name conflict.
 
 #### io-ior
@@ -205,7 +208,7 @@ Variables to customize include:
 |Name | Description | Option Key | Type | Default |
 |-----|-------------|------------|------|---------|
 | commands | Custom list of osu-benchmark one-sided commands to run | listOptions->commands | array | unset uses default set |
-| sole-tenancy | Turn off sole tenancy (one pod/node) | string ("false" or "no") | "true" |
+| soleTenancy | Turn off sole tenancy (one pod/node) | string ("false" or "no") | "true" |
 | all | Run ALL benchmarks with defaults | string ("true" or "yes") | "false" |
 | flags | Overwrite defaults flags (experts only!)| string | Defaults to an ideal set per metric (see [osu-benchmark.go](https://github.com/converged-computing/metrics-operator/blob/main/pkg/metrics/network/osu-benchmark.go))|
 | timed | String "true" or "yes" to add time prefix to mpirun (for debugging, etc) | string | "false" |

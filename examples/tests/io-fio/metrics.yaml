@@ -6,19 +6,17 @@ metadata:
     app.kubernetes.io/instance: metricset-sample
   name: metricset-sample
 spec:
-  storage:
-    volume:
-      # This is the path on the host (e.g., inside kind container)
-      hostPath: /tmp/workflow
-
-      # This is the path in the container
-      path: /tmp/workflow
-
   metrics:
-     # Fio just runs once - no concept of completions / rate
     - name: io-fio
       options:
         size: 1M
         blocksize: 1K
         directory: /tmp/workflow
 
+      # Fio usually will have a volume as an addon, let's do hostpath here
+      addons:
+       - name: volume-hostpath
+         options:
+           name: fio-mount
+           hostPath: /tmp/workflow
+           path: /tmp/workflow

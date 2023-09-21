@@ -65,6 +65,7 @@ func (m *SingleApplication) ReplicatedJobs(spec *api.MetricSet) ([]*jobset.Repli
 	js := []*jobset.ReplicatedJob{}
 
 	// Generate a replicated job for the applicatino
+	// An empty jobname will default to "m" the ReplicatedJobName provided by the operator
 	rj, err := AssembleReplicatedJob(spec, true, spec.Spec.Pods, spec.Spec.Pods, "", m.SoleTenancy)
 	if err != nil {
 		return js, err

@@ -50,11 +50,12 @@ func (m Nekbone) Options() map[string]intstr.IntOrString {
 }
 
 func init() {
-	launcher := metrics.LauncherWorker{
+	base := metrics.BaseMetric{
 		Identifier: "app-nekbone",
 		Summary:    "A mini-app derived from the Nek5000 CFD code which is a high order, incompressible Navier-Stokes CFD solver based on the spectral element method. The conjugate gradiant solve is compute intense, contains small messages and frequent allreduces.",
 		Container:  "ghcr.io/converged-computing/metric-nekbone:latest",
 	}
+	launcher := metrics.LauncherWorker{BaseMetric: base}
 	Nekbone := Nekbone{LauncherWorker: launcher}
 	metrics.Register(&Nekbone)
 }

@@ -389,12 +389,12 @@ echo "%s"
 }
 
 func init() {
-	launcher := metrics.LauncherWorker{
+	base := metrics.BaseMetric{
 		Identifier: "app-hpl",
 		Summary:    "High-Performance Linpack (HPL)",
 		Container:  "ghcr.io/converged-computing/metric-hpl-spack:latest",
 	}
-
+	launcher := metrics.LauncherWorker{BaseMetric: base}
 	HPL := HPL{LauncherWorker: launcher}
 	metrics.Register(&HPL)
 }

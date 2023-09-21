@@ -33,8 +33,12 @@ type BaseMetric struct {
 }
 
 // RegisterAddon adds an addon to the set, assuming it's already validated
-func (m BaseMetric) RegisterAddon(addon *addons.Addon) {
+func (m *BaseMetric) RegisterAddon(addon *addons.Addon) {
 	a := (*addon)
+	if m.Addons == nil {
+		m.Addons = map[string]*addons.Addon{}
+	}
+	logger.Infof("🟧️ Registering addon %s", a)
 	m.Addons[a.Name()] = addon
 }
 
@@ -68,6 +72,10 @@ func (m BaseMetric) Attributes() *api.ContainerSpec {
 
 // Validation
 func (m BaseMetric) Validate(set *api.MetricSet) bool {
+	if m.Identifier == "" {
+		logger.Errorf("Metric %s is missing an identifier.\n", m)
+		return false
+	}
 	return true
 }
 
@@ -80,12 +88,22 @@ func (m BaseMetric) SuccessJobs() []string {
 	return []string{}
 }
 
-func (m BaseMetric) ReplicatedJobs(set *api.MetricSet) ([]*jobset.ReplicatedJob, error) {
-	return []*jobset.ReplicatedJob{}, nil
-}
-
 func (m BaseMetric) HasSoleTenancy() bool {
 	return m.SoleTenancy
+}
+
+// Default replicated jobs will generate for N pods, with no shared process namespace (e.g., storage)
+func (m *BaseMetric) ReplicatedJobs(spec *api.MetricSet) ([]*jobset.ReplicatedJob, error) {
+
+	js := []*jobset.ReplicatedJob{}
+
+	// An empty jobname will default to "m" the ReplicatedJobName provided by the operator
+	rj, err := AssembleReplicatedJob(spec, false, spec.Spec.Pods, spec.Spec.Pods, "", m.SoleTenancy)
+	if err != nil {
+		return js, err
+	}
+	js = []*jobset.ReplicatedJob{rj}
+	return js, nil
 }
 
 // SetDefaultOptions that are shared (possibly)
@@ -110,17 +128,20 @@ func (m BaseMetric) AddAddons(
 	// VolumeMounts can be generated from container specs
 	// For each addon, do custom logic depending on the type
 	// These are the main set of volumes, containers we are going to add
-	volumes := []specs.VolumeSpec{}
+	// Organize volumes by unique name
+	volumes := map[string]specs.VolumeSpec{}
 
 	// These are addon container specs
 	addonContainers := []specs.ContainerSpec{}
-	for _, addon := range m.Addons {
 
+	logger.Infof("🟧️ Addons to include %s\n", m.Addons)
+	for _, addon := range m.Addons {
 		a := (*addon)
 
-		// Assemble volume specs that addons provide
-		// These are assumed to exist, and we create mounts for them only
-		volumes = append(volumes, a.AssembleVolumes()...)
+		assembledVolume := a.AssembleVolumes()
+		if assembledVolume.Volume.Name != "" {
+			volumes[a.Name()] = assembledVolume
+		}
 
 		// Assemble containers that addons provide, also as specs
 		addonContainers = append(addonContainers, a.AssembleContainers()...)
@@ -128,6 +149,13 @@ func (m BaseMetric) AddAddons(
 		// Allow the addons to customize the container entrypoints, specific to the job name
 		// It's important that this set does not include other addon container specs
 		a.CustomizeEntrypoints(containerSpecs, rjs)
+	}
+
+	// There is a bug here showing lots of nil but I don't know why
+	logger.Infof("🟧️ Volumes that are going to be added %s\n", volumes)
+	listing := []specs.VolumeSpec{}
+	for _, volume := range volumes {
+		listing = append(listing, volume)
 	}
 
 	// Add containers to the replicated job (filtered based on matching names)
@@ -140,7 +168,7 @@ func (m BaseMetric) AddAddons(
 	for _, rj := range rjs {
 
 		// We also include the addon volumes, which generally need mount points
-		rjContainers, err := getReplicatedJobContainers(spec, rj, containers, volumes)
+		rjContainers, err := getReplicatedJobContainers(spec, rj, containers, listing)
 		if err != nil {
 			return err
 		}
@@ -149,7 +177,7 @@ func (m BaseMetric) AddAddons(
 		// And volumes!
 		// containerSpecs are used to generate our metric entrypoint volumes
 		// volumes indicate existing volumes
-		rj.Template.Spec.Template.Spec.Volumes = getReplicatedJobVolumes(spec, containerSpecs, volumes)
+		rj.Template.Spec.Template.Spec.Volumes = getReplicatedJobVolumes(spec, containerSpecs, listing)
 	}
 	return nil
 }

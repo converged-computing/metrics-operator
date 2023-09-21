@@ -50,10 +50,13 @@ func (m Pennant) Options() map[string]intstr.IntOrString {
 }
 
 func init() {
+	base := metrics.BaseMetric{
+		Identifier: "app-pennant",
+		Summary:    "Unstructured mesh hydrodynamics for advanced architectures ",
+		Container:  "ghcr.io/converged-computing/metric-pennant:latest",
+	}
 	launcher := metrics.LauncherWorker{
-		Identifier:     "app-pennant",
-		Summary:        "Unstructured mesh hydrodynamics for advanced architectures ",
-		Container:      "ghcr.io/converged-computing/metric-pennant:latest",
+		BaseMetric:     base,
 		WorkerScript:   "/metrics_operator/pennant-worker.sh",
 		LauncherScript: "/metrics_operator/pennant-launcher.sh",
 	}

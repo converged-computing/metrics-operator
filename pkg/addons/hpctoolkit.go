@@ -32,7 +32,7 @@ type HPCToolkit struct {
 }
 
 // AssembleVolumes to provide an empty volume for the application to share
-func (m HPCToolkit) AssembleVolumes() []specs.VolumeSpec {
+func (m HPCToolkit) AssembleVolumes() specs.VolumeSpec {
 	volume := corev1.Volume{
 		Name: "hpctoolkit",
 		VolumeSource: corev1.VolumeSource{
@@ -40,10 +40,10 @@ func (m HPCToolkit) AssembleVolumes() []specs.VolumeSpec {
 		},
 	}
 	// EmptyDir should be ReadOnly False, and we don't need a mount for it
-	return []specs.VolumeSpec{{
+	return specs.VolumeSpec{
 		Volume: volume,
 		Mount:  false,
-	}}
+	}
 }
 
 // Validate we have an executable provided, and args and optional

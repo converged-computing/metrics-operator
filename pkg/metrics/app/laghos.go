@@ -50,12 +50,12 @@ func (m Laghos) Options() map[string]intstr.IntOrString {
 }
 
 func init() {
-	launcher := metrics.LauncherWorker{
+	base := metrics.BaseMetric{
 		Identifier: "app-laghos",
 		Summary:    "LAGrangian High-Order Solver",
 		Container:  "ghcr.io/converged-computing/metric-laghos:latest",
 	}
-
+	launcher := metrics.LauncherWorker{BaseMetric: base}
 	Laghos := Laghos{LauncherWorker: launcher}
 	metrics.Register(&Laghos)
 }
