@@ -1,5 +1,17 @@
 # Addons
 
+An addon is a generic way to customize a metric. An addon can do everything from:
+
+- generating new application or sidecar containers
+- adding volumes, including writing new config maps
+- customizing entrypoints, to the granularity of a jobset or a container
+
+And as an example, if you wanted to use an IO benchmark, you would test that against different storage
+solutions by way of using a volume added. The different groups available are discussed below, and if you
+have a request for an addon please [let us know](https://github.com/converged-computing/metrics-operator/issues). 
+
+<iframe src="../_static/data/addons.html" style="width:100%; height:500px;" frameBorder="0"></iframe>
+
 ## Existing Volumes
 
 An existing volume addon can be provided to a metric. As an example, it would make sense to run an IO benchmarks with

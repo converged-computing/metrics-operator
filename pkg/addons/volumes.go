@@ -26,6 +26,10 @@ type VolumeBase struct {
 	path     string
 }
 
+func (m VolumeBase) Family() string {
+	return AddonFamilyVolume
+}
+
 func (v *VolumeBase) DefaultValidate() bool {
 
 	// We require the user to provide a name to ensure they enforce uniqueness

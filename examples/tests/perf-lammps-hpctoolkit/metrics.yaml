@@ -15,7 +15,7 @@ spec:
    # Running more scaled lammps is our main goal
    - name: app-lammps
      options:
-       command: mpirun --hostfile /root/hostlist.txt -np 2 --map-by socket lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite
+       command: lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite
        workdir: /opt/lammps/examples/reaxff/HNS
 
      # Add on hpctoolkit, will mount a volume and wrap lammps
@@ -24,6 +24,10 @@ spec:
          options:
            mount: /opt/mnt
            events: "-e IO"
+
+           # hpcrun needs to have mpirun in front of hpcrun <command> e.g.,
+           # mpirun <MPI args> hpcrun <hpcrun args> <app> <app args>
+           prefix: mpirun --hostfile /root/hostlist.txt -np 2 --map-by socket
 
            # Ensure the working directory is consistent
            workdir: /opt/lammps/examples/reaxff/HNS

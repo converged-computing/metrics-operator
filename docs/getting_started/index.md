@@ -8,5 +8,6 @@ This documentation includes a developer guide, and user guide. If you have any q
 :maxdepth: 2
 user-guide
 metrics
+addons
 custom-resource-definition
 ```

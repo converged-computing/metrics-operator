@@ -33,6 +33,14 @@ type HPCToolkit struct {
 	mount           string
 	entrypointPath  string
 	volumeName      string
+
+	// For mpirun and similar, mpirun needs to wrap hpcrun and the command, e.g.,
+	// mpirun <MPI args> hpcrun <hpcrun args> <app> <app args>
+	prefix string
+}
+
+func (m HPCToolkit) Family() string {
+	return AddonFamilyPerformance
 }
 
 // AssembleVolumes to provide an empty volume for the application to share
@@ -105,6 +113,10 @@ func (a *HPCToolkit) SetOptions(metric *api.MetricAddon) {
 	if ok {
 		a.mount = mount.StrVal
 	}
+	prefix, ok := metric.Options["prefix"]
+	if ok {
+		a.prefix = prefix.StrVal
+	}
 	workdir, ok := metric.Options["workdir"]
 	if ok {
 		a.workdir = workdir.StrVal
@@ -128,6 +140,7 @@ func (a *HPCToolkit) Options() map[string]intstr.IntOrString {
 	options := a.DefaultOptions()
 	options["events"] = intstr.FromString(a.events)
 	options["mount"] = intstr.FromString(a.mount)
+	options["prefix"] = intstr.FromString(a.prefix)
 	return options
 }
 
@@ -168,6 +181,7 @@ mv ./wait-fs /usr/bin/goshare-wait-fs
 viewbase="%s"
 software="${viewbase}/software"
 viewbin="${viewbase}/view/bin"
+hpcrunpath=${viewbin}/hpcrun
 
 # Important to add AFTER in case software in container duplicated
 export PATH=$PATH:${viewbin}
@@ -217,8 +231,7 @@ cd ${workdir}
 `, a.workdir)
 	}
 
-	// TODO we may want to target specific entrypoint scripts here
-	// Right now we target all scripts associated with the job
+	// We use container names to target specific entrypoint scripts here
 	for _, containerSpec := range cs {
 
 		// First check - is this the right replicated job?
@@ -226,12 +239,14 @@ cd ${workdir}
 			continue
 		}
 
+		// Always copy over the pre block - we need the logic to copy software
+		containerSpec.EntrypointScript.Pre += "\n" + preBlock
+
 		// Next check if we have a target set (for the container)
 		if a.containerTarget != "" && containerSpec.Name != "" && a.containerTarget != containerSpec.Name {
 			continue
 		}
-		containerSpec.EntrypointScript.Pre += "\n" + preBlock
-		containerSpec.EntrypointScript.Command = fmt.Sprintf("hpcrun $events %s", containerSpec.EntrypointScript.Command)
+		containerSpec.EntrypointScript.Command = fmt.Sprintf("%s $hpcrunpath $events %s", a.prefix, containerSpec.EntrypointScript.Command)
 	}
 }
 

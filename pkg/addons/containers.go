@@ -80,6 +80,10 @@ func (a ApplicationAddon) AssembleContainers() []specs.ContainerSpec {
 	}}
 }
 
+func (m ApplicationAddon) Family() string {
+	return AddonFamilyApplication
+}
+
 // Set custom options / attributes for the metric
 func (a *ApplicationAddon) SetDefaultOptions(metric *api.MetricAddon) {
 	a.resources = map[string]map[string]intstr.IntOrString{}

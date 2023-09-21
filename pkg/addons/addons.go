@@ -21,7 +21,10 @@ import (
 // An addon can support adding volumes, containers, or otherwise customizing the jobset.
 
 var (
-	Registry = make(map[string]Addon)
+	Registry               = make(map[string]Addon)
+	AddonFamilyPerformance = "performance"
+	AddonFamilyVolume      = "volume"
+	AddonFamilyApplication = "application"
 )
 
 // A general metric is a container added to a JobSet
@@ -29,6 +32,7 @@ type Addon interface {
 
 	// Metadata
 	Name() string
+	Family() string
 	Description() string
 
 	// Options and exportable attributes
@@ -53,6 +57,7 @@ type AddonBase struct {
 	Identifier string
 	Url        string
 	Summary    string
+	Family     string
 
 	options     map[string]intstr.IntOrString
 	listOptions map[string][]intstr.IntOrString
