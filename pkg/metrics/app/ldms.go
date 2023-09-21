@@ -44,7 +44,7 @@ func (m *LDMS) SetOptions(metric *api.Metric) {
 
 	// Set user defined values or fall back to defaults
 	m.command = "ldms_ls -h localhost -x sock -p 10444 -l -v"
-	m.Workdir = "/opt"
+	m.WorkingDir = "/opt"
 
 	command, ok := metric.Options["command"]
 	if ok {
@@ -52,7 +52,7 @@ func (m *LDMS) SetOptions(metric *api.Metric) {
 	}
 	workdir, ok := metric.Options["workdir"]
 	if ok {
-		m.Workdir = workdir.StrVal
+		m.WorkingDir = workdir.StrVal
 	}
 	completions, ok := metric.Options["completions"]
 	if ok {
@@ -72,7 +72,7 @@ func (m LDMS) Options() map[string]intstr.IntOrString {
 		"rate":        intstr.FromInt(int(m.rate)),
 		"completions": intstr.FromInt(int(m.completions)),
 		"command":     intstr.FromString(m.command),
-		"workdir":     intstr.FromString(m.Workdir),
+		"workdir":     intstr.FromString(m.WorkingDir),
 	}
 }
 func (n LDMS) ListOptions() map[string][]intstr.IntOrString {

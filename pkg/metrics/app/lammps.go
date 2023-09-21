@@ -33,9 +33,6 @@ func (m Lammps) Family() string {
 
 // Set custom options / attributes for the metric
 func (m *Lammps) SetOptions(metric *api.Metric) {
-	m.ResourceSpec = &metric.Resources
-	m.AttributeSpec = &metric.Attributes
-
 	// Set user defined values or fall back to defaults
 	// This is a more manual approach that puts the user in charge of determining the entire command
 	// This more closely matches what we might do on HPC :)
@@ -70,6 +67,8 @@ func (m Lammps) PrepareContainers(
 	meta := metrics.Metadata(spec, metric)
 	hosts := m.GetHostlist(spec)
 	prefix := m.GetCommonPrefix(meta, m.Command, hosts)
+	fmt.Printf("COMMAND %s", m.Command)
+	fmt.Printf("WORKING DIR %s", m.Workdir)
 
 	// Template blocks for launcher script
 	preBlock := `

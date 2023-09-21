@@ -48,7 +48,7 @@ func (m *StorageGeneric) StorageContainerSpec(
 		JobName:          ReplicatedJobName,
 		Image:            m.Image(),
 		Name:             "storage",
-		WorkingDir:       m.Workdir,
+		WorkingDir:       m.WorkingDir,
 		EntrypointScript: entrypoint,
 		Resources:        m.ResourceSpec,
 		Attributes:       m.AttributeSpec,

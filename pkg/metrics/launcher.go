@@ -156,7 +156,7 @@ echo "%s"
 }
 
 // GetCommonPrefix returns a common prefix for the worker/ launcher script, setting up hosts, etc.
-func (m LauncherWorker) GetCommonPrefix(
+func (m *LauncherWorker) GetCommonPrefix(
 	meta string,
 	command string,
 	hosts string,
@@ -176,8 +176,6 @@ chmod +x ./problem.sh`, command)
 # Start ssh daemon
 /usr/sbin/sshd -D &
 echo "%s"
-# Change directory to where we will run (and write hostfile)
-cd %s
 # Write the hosts file
 cat <<EOF > ./hostlist.txt
 %s
@@ -193,7 +191,6 @@ echo "%s"
 	return fmt.Sprintf(
 		prefixTemplate,
 		meta,
-		m.WorkingDir(),
 		hosts,
 		command,
 		metadata.CollectionStart,

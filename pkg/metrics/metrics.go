@@ -33,7 +33,6 @@ type Metric interface {
 
 	// Container attributes
 	Image() string
-	WorkingDir() string
 
 	// Options and exportable attributes
 	SetOptions(*api.Metric)

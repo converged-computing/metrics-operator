@@ -20,7 +20,7 @@ type BaseMetric struct {
 	Identifier string
 	Summary    string
 	Container  string
-	Workdir    string
+	WorkingDir string
 
 	ResourceSpec  *api.ContainerResources
 	AttributeSpec *api.ContainerSpec
@@ -55,11 +55,6 @@ func (m BaseMetric) Description() string {
 // Container
 func (m BaseMetric) Image() string {
 	return m.Container
-}
-
-// WorkingDir does not matter
-func (m BaseMetric) WorkingDir() string {
-	return m.Workdir
 }
 
 // Return container resources for the metric container
