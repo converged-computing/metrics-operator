@@ -6,8 +6,13 @@ metadata:
     app.kubernetes.io/instance: metricset-sample
   name: metricset-sample
 spec:
-  application:
-    image: ghcr.io/rse-ops/vanilla-lammps:tag-latest
-    command: mpirun lmp -v x 1 -v y 1 -v z 1 -in in.reaxc.hns -nocite
   metrics:
     - name: perf-sysstat
+      options:
+        command: mpirun lmp -v x 1 -v y 1 -v z 1 -in in.reaxc.hns -nocite
+      addons:
+      - name: application
+        options:
+          image: ghcr.io/rse-ops/vanilla-lammps:tag-latest 
+          command: mpirun lmp -v x 1 -v y 1 -v z 1 -in in.reaxc.hns -nocite
+

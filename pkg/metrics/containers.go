@@ -55,6 +55,11 @@ func getReplicatedJobContainers(
 			return containers, err
 		}
 
+		// If a command is provided, use it first
+		command := []string{"/bin/bash", cs.EntrypointScript.Path}
+		if len(cs.Command) > 0 {
+			command = cs.Command
+		}
 		// Create the actual container from the spec
 		newContainer := corev1.Container{
 			Name:            cs.Name,
@@ -63,7 +68,7 @@ func getReplicatedJobContainers(
 			VolumeMounts:    mounts,
 			Stdin:           true,
 			TTY:             true,
-			Command:         []string{"/bin/bash", cs.EntrypointScript.Path},
+			Command:         command,
 			SecurityContext: &corev1.SecurityContext{
 				Privileged: &cs.Attributes.SecurityContext.Privileged,
 			},

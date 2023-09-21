@@ -9,8 +9,10 @@ package addons
 
 import (
 	"fmt"
+	"strings"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
@@ -20,6 +22,9 @@ type ApplicationAddon struct {
 
 	// Container image
 	image string
+
+	// Name for container
+	name string
 
 	// command to execute
 	command string
@@ -47,11 +52,32 @@ func (a *ApplicationAddon) Validate() bool {
 		logger.Error("The application addon requires a container 'image'.")
 		return false
 	}
+	if a.name == "" {
+		a.name = "app-addon"
+	}
 	if a.command == "" {
 		logger.Error("The application addon requires a container 'command'.")
 		return false
 	}
 	return true
+}
+
+// AssembleContainers adds the addon application container
+func (a ApplicationAddon) AssembleContainers() []specs.ContainerSpec {
+	return []specs.ContainerSpec{{
+		Image:      a.image,
+		Name:       a.name,
+		WorkingDir: a.workingDir,
+		Command:    strings.Split(a.command, " "),
+		// TODO these need to be mapped from m.resources
+		Resources: &api.ContainerResources{},
+		Attributes: &api.ContainerSpec{
+			SecurityContext: api.SecurityContext{
+				Privileged: a.privileged,
+				// TODO add the caps here ptrace admin
+			},
+		},
+	}}
 }
 
 // Set custom options / attributes for the metric

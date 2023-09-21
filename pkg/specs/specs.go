@@ -27,8 +27,12 @@ type ContainerSpec struct {
 	Name             string
 	WorkingDir       string
 	EntrypointScript EntrypointScript
-	Resources        *api.ContainerResources
-	Attributes       *api.ContainerSpec
+
+	// If a command is provided, it's likely an addon (and EntrypointScript is ignored)
+	Command []string
+
+	Resources  *api.ContainerResources
+	Attributes *api.ContainerSpec
 }
 
 // VolumeSpec includes one or more volumes and mount, etc. location

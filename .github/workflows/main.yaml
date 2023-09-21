@@ -67,7 +67,7 @@ jobs:
       fail-fast: false
       matrix:
         test: [["app-lammps", "ghcr.io/converged-computing/metric-lammps:latest", 120],
-               #[["perf-hello-world", "ghcr.io/converged-computing/metric-sysstat:latest", 60],
+               ["perf-hello-world", "ghcr.io/converged-computing/metric-sysstat:latest", 60],
                ["io-host-volume", "ghcr.io/converged-computing/metric-sysstat:latest", 60],
                ["io-fio", "ghcr.io/converged-computing/metric-fio:latest", 120],
                ["io-ior", "ghcr.io/converged-computing/metric-ior:latest", 120],
