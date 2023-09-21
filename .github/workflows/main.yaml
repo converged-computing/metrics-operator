@@ -16,7 +16,7 @@ jobs:
     - name: Check Spelling
       uses: crate-ci/typos@7ad296c72fa8265059cc03d1eda562fbdfcd6df2 # v1.9.0
       with:
-        files: ./README.md ./config/samples ./docs/*.md ./docs/*/*.md
+        files: ./README.md ./docs/*.md ./docs/*/*.md
 
     - name: Lint and format Python code
       run: |
