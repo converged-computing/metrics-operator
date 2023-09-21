@@ -18,7 +18,7 @@ The yaml spec will normally have an API version, the kind `MetricSet` and then
 a name and (optionally, a namespace) to identify the custom resource definition followed by the spec for it. Here is a spec that will deploy to the `default` namespace:
 
 ```yaml
-apiVersion: flux-framework.org/v1alpha1
+apiVersion: flux-framework.org/v1alpha2
 kind: MetricSet
 metadata:
   labels:
