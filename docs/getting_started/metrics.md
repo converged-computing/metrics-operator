@@ -172,6 +172,8 @@ This is the "iostat" executable of the sysstat library.
 | human | Show tabular, human-readable output inside of json | string "true" or "false" | "false" |
 | completions | Number of times to run metric | int32 | unset (runs for lifetime of application or indefinitely) |
 | rate | Seconds to pause between measurements | int32 | 10 |
+| pre | One or more commands to run before iostat | string | unset |
+| post | One or more commands to run after iostat | string | unset |
 
 This is good for mounted storage that can be seen by the operating system, but may not work for something like NFS.
 
