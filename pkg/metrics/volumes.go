@@ -26,7 +26,6 @@ func getVolumeMounts(
 ) []corev1.VolumeMount {
 
 	// This is for the core entrypoints (that are generated as config maps here)
-	// TODO an addon that generates a volume needs to be added to this set...
 	mounts := []corev1.VolumeMount{
 		{
 			Name:      set.Name,
@@ -39,7 +38,6 @@ func getVolumeMounts(
 	for _, vs := range volumes {
 
 		// Is this volume indicated for mount?
-		// This might not be necessary...
 		if vs.Mount {
 			mount := corev1.VolumeMount{
 				Name:      vs.Volume.Name,
@@ -80,7 +78,10 @@ func getExtraConfigmaps(volumes []specs.VolumeSpec) []corev1.KeyToPath {
 
 	for _, addedVolume := range volumes {
 
-		// TODO need to type check here
+		// Check that the typs is config map
+		if addedVolume.Volume.ConfigMap == nil {
+			continue
+		}
 		// This will error if it's not a config map :)
 		if addedVolume.Volume.Name == "" {
 			for _, item := range addedVolume.Volume.ConfigMap.Items {

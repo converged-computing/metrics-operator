@@ -30,7 +30,7 @@ type ApplicationAddon struct {
 	command string
 
 	// Working Directory
-	workingDir string
+	workdir string
 
 	// Entrypoint of container, if different from command
 	entrypoint string
@@ -67,7 +67,7 @@ func (a ApplicationAddon) AssembleContainers() []specs.ContainerSpec {
 	return []specs.ContainerSpec{{
 		Image:      a.image,
 		Name:       a.name,
-		WorkingDir: a.workingDir,
+		WorkingDir: a.workdir,
 		Command:    strings.Split(a.command, " "),
 		// TODO these need to be mapped from m.resources
 		Resources: &api.ContainerResources{},
@@ -102,7 +102,7 @@ func (a *ApplicationAddon) SetDefaultOptions(metric *api.MetricAddon) {
 	}
 	workdir, ok := metric.Options["workdir"]
 	if ok {
-		a.workingDir = workdir.StrVal
+		a.workdir = workdir.StrVal
 	}
 	priv, ok := metric.Options["privileged"]
 	if ok {
@@ -143,7 +143,7 @@ func (a *ApplicationAddon) SetOptions(metric *api.MetricAddon) {
 func (a *ApplicationAddon) DefaultOptions() map[string]intstr.IntOrString {
 	values := map[string]intstr.IntOrString{
 		"image":      intstr.FromString(a.image),
-		"workdir":    intstr.FromString(a.workingDir),
+		"workdir":    intstr.FromString(a.workdir),
 		"entrypoint": intstr.FromString(a.entrypoint),
 		"command":    intstr.FromString(a.command),
 	}

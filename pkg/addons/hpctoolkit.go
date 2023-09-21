@@ -55,14 +55,10 @@ func (m HPCToolkit) AssembleVolumes() []specs.VolumeSpec {
 
 	// This is a config map volume with items
 	// It needs to be created in the same metrics operator namespace
-	// We need a better way to define this, I'm not happy with it.
-	// There should just be some variables under the volumespec
-	newVolume := corev1.Volume{
+	// Thus we only need the items!
+	configVolume := corev1.Volume{
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
-				LocalObjectReference: corev1.LocalObjectReference{
-					Name: m.volumeName,
-				},
 				Items: items,
 			},
 		},
@@ -77,9 +73,8 @@ func (m HPCToolkit) AssembleVolumes() []specs.VolumeSpec {
 		},
 
 		// Mount is set to false here because we mount via metrics_operator
-		// This is a bit messy (I'm not happy) but I'll make it better
 		{
-			Volume:   newVolume,
+			Volume:   configVolume,
 			ReadOnly: true,
 			Mount:    false,
 			Path:     filepath.Dir(m.entrypointPath),
@@ -112,7 +107,7 @@ func (a *HPCToolkit) SetOptions(metric *api.MetricAddon) {
 	}
 	workdir, ok := metric.Options["workdir"]
 	if ok {
-		a.workingDir = workdir.StrVal
+		a.workdir = workdir.StrVal
 	}
 	target, ok := metric.Options["target"]
 	if ok {
@@ -202,9 +197,6 @@ echo "%s"
 # hpcprof hpctoolkit-sleep-measurements
 # hpcstruct hpctoolkit-sleep-measurements
 # hpcviewer ./hpctoolkit-lmp-database
-workdir="%s"
-echo "Changing directory to ${workdir}"
-cd ${workdir}
 `
 	preBlock = fmt.Sprintf(
 		preBlock,
@@ -214,8 +206,16 @@ cd ${workdir}
 		a.events,
 		metadata.CollectionStart,
 		metadata.Separator,
-		a.workingDir,
 	)
+
+	// Add the working directory, if defined
+	if a.workdir != "" {
+		preBlock += fmt.Sprintf(`
+workdir="%s"
+echo "Changing directory to ${workdir}"
+cd ${workdir}			
+`, a.workdir)
+	}
 
 	// TODO we may want to target specific entrypoint scripts here
 	// Right now we target all scripts associated with the job

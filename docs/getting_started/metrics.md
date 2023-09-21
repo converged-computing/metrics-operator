@@ -3,12 +3,8 @@
 The following metrics are under development (or being planned).
 
  - [Examples](https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#examples)
- - [Storage Metrics](https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#storage)
- - [Application Metrics](https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#application)
- - [Standalone Metrics](https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#standalone)
 
-Each of the above is a metric design, which is primarily represented in the Metrics Operator code. However, within each design
-there are different families of metrics (e.g., storage, network, performance, simulation) shown in the table below as the "Family" column. 
+Each metric can be ascribed to a high level family, shown in the table below as the "Family" column. 
 We likely will tweak and improve upon these categories.
 
 <iframe src="../_static/data/table.html" style="width:100%; height:1100px;" frameBorder="0"></iframe>
@@ -16,63 +12,8 @@ We likely will tweak and improve upon these categories.
 
 ## Implemented Metrics
 
-Each metric has a link to the type, along with (optionally) examples. These sections will better be organized by
-family once we decide on a more final set.
+### perf-sysstat
 
-### Performance
-
-These metrics are intended to assess application performance, where they run alongside an application of interest.
-
-#### perf-hpctoolkit
-
- - [Application Metric Set](user-guide.md#application-metric-set)
- - *[perf-hpctoolkit](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-hpctoolkit)*
-
-This metric provides [HPCToolkit](https://gitlab.com/hpctoolkit/hpctoolkit) for your application to use. This is the first metric of its type
-to use a shared volume approach. Specifically, we:
-
-- add a new ability for an application metric to define an empty volume, and have the metrics container copy stuff to it
-- also add an ability for this kind of application metric to customize the application entrypoint (e.g., copy volume contents to destinations)
-- build a spack copy view into the [hpctoolkit metrics container](https://github.com/converged-computing/metrics-containers/blob/main/hpctoolkit-containerize/Dockerfile)
-- move the `/opt/software` and `/opt/views/view` roots into the application container, this is a modular install of HPCToolkit.
-- copy over `/opt/share/software` (provided via the shared empty volume) to `/opt/software`` where spack expects it. We also add `/opt/share/view/bin` to the path (where hpcrun is)
-
-After those steps are done, HPCToolkit is essentially installed, on the fly, in the application container. Since the `hpcrun` command is using `LD_AUDIT` we need
-all libraries to be in the same system (the shared process namespace would not work). We can then run it, and generate a database. Here is an example
-given `hpctoolkit-lmp-measurements` in the present working directory of the container.
-
-
-```bash
-hpcstruct hpctoolkit-lmp-measurements
-
-# Run "the professor!" 🤓️
-hpcprof hpctoolkit-lmp-measurements
-```
-
-The above generates a database, `hpctoolkit-lmp-database` that you can copy to your machine for further interaction with hpcviewer
-(or some future tool that doesn't use Java)!
-
-```bash
-kubectl cp -c app metricset-sample-m-0-npbc9:/opt/lammps/examples/reaxff/HNS/hpctoolkit-lmp-database hpctoolkit-lmp-database
-hpcviewer ./hpctoolkit-lmp-database
-```
-
-Here are the acceptable parameters.
-
-| Name | Description | Type | Default |
-|-----|-------------|------------|------|
-| mount | Path to mount hpctoolview view in application container | string | /opt/share |
-| events | Events for hpctoolkit | string |  `-e IO` |
-
-Note that you can see events available with `hpcrun -L`, and use the container for this metric.
-There is a brief listing on [this page](https://hpc.llnl.gov/software/development-environment-software/hpc-toolkit).
-We recommend that you do not pair hpctoolkit with another metric, primarily because it is customizing the application
-entrypoint. If you add a process-namespace based metric, you likely need to account for the hpcrun command being the
-wrapper to the actual executable.
-
-#### perf-sysstat
-
- - [Application Metric Set](user-guide.md#application-metric-set)
  - *[perf-hello-world](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-hello-world)*
  - *[perf-lammps](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-lammps)*
 
@@ -114,13 +55,9 @@ after the index at 0 gets a custom command. See [pidstat](https://man7.org/linux
 more information on this command, and [this file](https://github.com/converged-computing/metrics-operator/blob/main/pkg/metrics/perf/sysstat.go) 
 for how we use them.  If there is an option or command that is not exposed that you would like, please [open an issue](https://github.com/converged-computing/metrics-operator/issues).
 
-### Storage
 
-These metrics are intended to assess storage volumes.
+### io-fio
 
-#### io-fio
-
- - [Storage Metric Set](user-guide.md#application-metric-set)
  - *[io-host-volume](https://github.com/converged-computing/metrics-operator/tree/main/examples/storage/google/io-fusion)*
 
 This is a nice tool that you can simply point at a path, and it measures IO stats by way of writing a file there! 
@@ -140,9 +77,8 @@ Options you can set include:
 For the "directory" we use this location to write a temporary file, which will be cleaned up.
 This allows for testing storage mounted from multiple metric pods without worrying about a name conflict.
 
-#### io-ior
+### io-ior
 
- - [Storage Metric Set](user-guide.md#application-metric-set)
  - *[io-host-volume](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/io-ior)*
 
 ![img/ior.jpeg](img/ior.jpeg)
@@ -160,9 +96,8 @@ basic commands are done. Note that the container does have mpirun if you want to
 for this across nodes, but this could be added. [Let us know](https://github.com/converged-computing/metrics-operator/issues) 
 if this would be interesting to you.
 
-#### io-sysstat
+### io-sysstat
 
- - [Storage Metric Set](user-guide.md#application-metric-set)
  - *[io-host-volume](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/io-host-volume)*
 
 This is the "iostat" executable of the sysstat library.
@@ -177,14 +112,8 @@ This is the "iostat" executable of the sysstat library.
 
 This is good for mounted storage that can be seen by the operating system, but may not work for something like NFS.
 
-### Standalone
+### network-netmark
 
-Standalone metrics can take on many designs, from a launcher/worker design to test networking, to running
-a metric across nodes to assess the node performance.
-
-#### network-netmark
-
- - [Standalone Metric Set](user-guide.md#application-metric-set)
  - *[network-netmark](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-netmark)* (code still private)
 
 This is currently a private container/software, but we have support for it when it's ready to be made public (networking)
@@ -200,9 +129,8 @@ Variables to customize include:
 | storeEachTrial | Flag to indicate storing each trial data | options->storeEachTrial | string (true/false) | "true" |
 | soleTenancy | Turn off sole tenancy (one pod/node) | options->soleTenancy | string ("false" or "no") | "true" |
 
-#### network-osu-benchmark
+### network-osu-benchmark
 
- - [Standalone Metric Set](user-guide.md#application-metric-set)
  - *[network-osu-benchmark](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-osu-benchmark)*
 
 Point to point benchmarks for MPI (networking). If listOptions->commands not set, will use all one-point commands.
@@ -296,9 +224,8 @@ Here are some useful resources for the benchmarks:
  - [HPC Council](https://hpcadvisorycouncil.atlassian.net/wiki/spaces/HPCWORKS/pages/1284538459/OSU+Benchmark+Tuning+for+2nd+Gen+AMD+EPYC+using+HDR+InfiniBand+over+HPC-X+MPI)
  - [AWS Tutorials](https://www.hpcworkshops.com/08-efa/04-complie-run-osu.html)
 
-#### app-lammps
+### app-lammps
 
- - [Standalone Metric Set](user-guide.md#application-metric-set)
  - *[app-lammps](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-lammps)*
 
 Since we were using LAMMPS so often as a benchmark (and testing timing of a network) it made sense to add it here
@@ -321,9 +248,8 @@ In the working directory `/opt/lammps/examples/reaxff/HNS#`. You should be calli
 You should also provide the correct number of processes (np) and problem size for LAMMPS (lmp). We left this as open and flexible
 anticipating that you as a user would want total control.
 
-#### app-amg
+### app-amg
 
- - [Standalone Metric Set](user-guide.md#application-metric-set)
  - *[app-amg](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-amg)*
 
 AMG means "algebraic multi-grid" and it's easy to confuse with the company [AMD](https://www.amd.com/en/solutions/supercomputing-and-hpc) "Advanced Micro Devices" ! From [the guide](https://asc.llnl.gov/sites/asc/files/2020-09/AMG_Summary_v1_7.pdf):
@@ -376,9 +302,8 @@ More likely you want an actual problem size on a specific number of node and tas
 run a larger problem and the parser does not work as expected, please [send us the output](https://github.com/converged-computing/metrics-operator/issues) and we will provide an updated parser.
 See [this guide](https://asc.llnl.gov/sites/asc/files/2020-09/AMG_Summary_v1_7.pdf) for more detail.
 
-#### app-quicksilver
+### app-quicksilver
 
- - [Standalone Metric Set](user-guide.md#application-metric-set)
  - *[app-quicksilver](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-quicksilver)*
 
 Quicksilver is a proxy app for Monte Carlo simulation code. You can learn more about it on the [GitHub repository](https://github.com/LLNL/Quicksilver/).
@@ -436,9 +361,8 @@ qs /opt/quicksilver/Examples/CORAL2_Benchmark/Problem1/Coral2_P1.inp
 
 You can also look more closely in the [GitHub repository](https://github.com/LLNL/Quicksilver/tree/master/Examples).
 
-#### app-pennant
+### app-pennant
 
- - [Standalone Metric Set](user-guide.md#application-metric-set)
  - *[app-pennant](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-pennant)*
 
 Pennant is an unstructured mesh hydrodynamics for advanced architectures. The documentation is sparse, but you
@@ -538,9 +462,8 @@ There are many input files that come in the container, and here are the fullpath
 
 And likely you will need to adjust the mpirun parameters, etc.
 
-#### app-kripke
+### app-kripke
 
- - [Standalone Metric Set](user-guide.md#application-metric-set)
  - *[app-kripke](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-kripke)*
 
 [Kripke](https://github.com/LLNL/Kripke) is (from the README):
@@ -584,9 +507,8 @@ ex3_colored-indexset_solution  ex6_stencil-offset-layout_solution  ex9_matrix-tr
 (meaning on the PATH in `/opt/Kripke/build/bin` in the container).
 For apps / metrics to be added, please see [this issue](https://github.com/converged-computing/metrics-operator/issues/30).
 
-#### app-ldms
+### app-ldms
 
- - [Standalone Metric Set](user-guide.md#application-metric-set)
  - *[app-ldms](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-ldms)*
 
 
@@ -608,9 +530,8 @@ The following is the default command:
 ldms_ls -h localhost -x sock -p 10444 -l -v
 ```
 
-#### app-nekbone
+### app-nekbone
 
- - [Standalone Metric Set](user-guide.md#application-metric-set)
  - *[app-nekbone](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-nekbone)*
 
 Nekbone comes with a set of example that primarily depend on you choosing the correct workikng directory and command to run from.
@@ -634,9 +555,8 @@ And the following combinations are supported. Note that example1 did not build, 
 You can see the archived repository [here](https://github.com/Nek5000/Nekbone). If there are interesting metrics in this
 project it would be worth bringing it back to life I think.
 
-#### app-laghos
+### app-laghos
 
- - [Standalone Metric Set](user-guide.md#application-metric-set)
  - *[app-laghos](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-laghos)*
 
 From the [Laghos README](https://github.com/CEED/Laghos):
@@ -651,9 +571,8 @@ the path, so the default references it as `./laghos`.
 | command | The full mpirun and laghos command | options->command |string | (see below) |
 | workdir | The working directory for the command | options->workdir | string | /workdir/laghos |
 
-#### app-bdas
+### app-bdas
 
- - [Standalone Metric Set](user-guide.md#application-metric-set)
  - *[app-bdas](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-bdas)*
 
 BDAS standards for "Big Data Analysis Suite" and you can read more about it [here](https://asc.llnl.gov/sites/asc/files/2020-09/BDAS_Summary_b4bcf27_0.pdf).
