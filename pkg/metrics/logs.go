@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"log"
 
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"github.com/converged-computing/metrics-operator/pkg/metadata"
 	"github.com/converged-computing/metrics-operator/pkg/utils"
 	"go.uber.org/zap"

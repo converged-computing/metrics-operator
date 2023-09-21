@@ -27,7 +27,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	controllers "github.com/converged-computing/metrics-operator/controllers/metric"
 
 	// Metrics are registered here! Importing registers once

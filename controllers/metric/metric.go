@@ -10,7 +10,7 @@ package controllers
 import (
 	"context"
 
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	mctrl "github.com/converged-computing/metrics-operator/pkg/metrics"
 	"github.com/converged-computing/metrics-operator/pkg/specs"
 	"k8s.io/apimachinery/pkg/types"

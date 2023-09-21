@@ -10,7 +10,7 @@ package metrics
 import (
 	"fmt"
 
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"github.com/converged-computing/metrics-operator/pkg/metadata"
 	"github.com/converged-computing/metrics-operator/pkg/specs"
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"

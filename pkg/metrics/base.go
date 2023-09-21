@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
 package metrics
 
 import (
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"github.com/converged-computing/metrics-operator/pkg/addons"
 	"github.com/converged-computing/metrics-operator/pkg/specs"
 	"k8s.io/apimachinery/pkg/util/intstr"

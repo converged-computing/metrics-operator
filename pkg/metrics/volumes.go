@@ -10,7 +10,7 @@ package metrics
 import (
 	"path/filepath"
 
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"github.com/converged-computing/metrics-operator/pkg/specs"
 	corev1 "k8s.io/api/core/v1"
 )

@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	corev1 "k8s.io/api/core/v1"
 )
 

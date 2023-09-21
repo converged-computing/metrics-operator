@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"strconv"
 
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"github.com/converged-computing/metrics-operator/pkg/metadata"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 	"github.com/converged-computing/metrics-operator/pkg/specs"

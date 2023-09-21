@@ -10,7 +10,7 @@ package application
 import (
 	"fmt"
 
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
 	"github.com/converged-computing/metrics-operator/pkg/metadata"
