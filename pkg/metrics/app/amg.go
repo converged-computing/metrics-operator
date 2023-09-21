@@ -60,10 +60,13 @@ func (m AMG) Options() map[string]intstr.IntOrString {
 }
 
 func init() {
+	base := metrics.BaseMetric{
+		Identifier: "app-amg",
+		Summary:    "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
+		Container:  "ghcr.io/converged-computing/metric-amg:latest",
+	}
 	launcher := metrics.LauncherWorker{
-		Identifier:     "app-amg",
-		Summary:        "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
-		Container:      "ghcr.io/converged-computing/metric-amg:latest",
+		BaseMetric:     base,
 		WorkerScript:   "/metrics_operator/amg-worker.sh",
 		LauncherScript: "/metrics_operator/amg-launcher.sh",
 	}

@@ -100,7 +100,7 @@ func (a *ApplicationAddon) SetDefaultOptions(metric *api.MetricAddon) {
 	if ok {
 		a.pullSecret = pullSecret.StrVal
 	}
-	workdir, ok := metric.Options["workingDir"]
+	workdir, ok := metric.Options["workdir"]
 	if ok {
 		a.workingDir = workdir.StrVal
 	}
@@ -143,7 +143,7 @@ func (a *ApplicationAddon) SetOptions(metric *api.MetricAddon) {
 func (a *ApplicationAddon) DefaultOptions() map[string]intstr.IntOrString {
 	values := map[string]intstr.IntOrString{
 		"image":      intstr.FromString(a.image),
-		"workingDir": intstr.FromString(a.workingDir),
+		"workdir":    intstr.FromString(a.workingDir),
 		"entrypoint": intstr.FromString(a.entrypoint),
 		"command":    intstr.FromString(a.command),
 	}

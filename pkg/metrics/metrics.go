@@ -43,7 +43,7 @@ type Metric interface {
 	// Validation and append addons
 	Validate(*api.MetricSet) bool
 	RegisterAddon(*addons.Addon)
-	AddAddons(*api.MetricSet, []*jobset.ReplicatedJob, []*specs.ContainerSpec) error
+	AddAddons(*api.MetricSet, []*jobset.ReplicatedJob, []*specs.ContainerSpec) ([]*specs.ContainerSpec, error)
 	GetAddons() []*addons.Addon
 
 	// Attributes for JobSet, etc.

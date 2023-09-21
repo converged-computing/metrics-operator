@@ -71,6 +71,26 @@ func generateOperatorItems(containerSpecs []*specs.ContainerSpec) []corev1.KeyTo
 	return runnerScripts
 }
 
+// Add extra config maps to the metrics_operator set from addons
+// These are distinct because the operator needs to create them too
+func getExtraConfigmaps(volumes []specs.VolumeSpec) []corev1.KeyToPath {
+
+	// Each metric has an entrypoint script
+	runnerScripts := []corev1.KeyToPath{}
+
+	for _, addedVolume := range volumes {
+
+		// TODO need to type check here
+		// This will error if it's not a config map :)
+		if addedVolume.Volume.Name == "" {
+			for _, item := range addedVolume.Volume.ConfigMap.Items {
+				runnerScripts = append(runnerScripts, item)
+			}
+		}
+	}
+	return runnerScripts
+}
+
 // getVolumes adds expected entrypoints along with added volumes (storage or applications)
 // This function is intended for a set with a listing of metrics
 func getReplicatedJobVolumes(
@@ -81,6 +101,11 @@ func getReplicatedJobVolumes(
 
 	// These are for the main entrypoints in /metrics_operator
 	runnerScripts := generateOperatorItems(cs)
+
+	// Any volumes that don't have a Name in added we need to generate under the operator
+	extraCMs := getExtraConfigmaps(addedVolumes)
+	runnerScripts = append(runnerScripts, extraCMs...)
+
 	volumes := []corev1.Volume{
 		{
 			Name: set.Name,
@@ -105,6 +130,10 @@ func getReplicatedJobVolumes(
 func getAddonVolumes(vs []specs.VolumeSpec) []corev1.Volume {
 	volumes := []corev1.Volume{}
 	for _, volume := range vs {
+		// If the volume doesn't have a name, it was added to the metrics_operator namespace
+		if volume.Volume.Name == "" {
+			continue
+		}
 		logger.Infof("Adding volume %s\n", &volume.Volume)
 		volumes = append(volumes, volume.Volume)
 	}

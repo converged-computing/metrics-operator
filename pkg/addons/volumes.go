@@ -133,7 +133,7 @@ func (v *ConfigMapVolume) MapOptions() map[string]map[string]intstr.IntOrString 
 }
 
 // AssembleVolumes for a config map
-func (v *ConfigMapVolume) AssembleVolumes() specs.VolumeSpec {
+func (v *ConfigMapVolume) AssembleVolumes() []specs.VolumeSpec {
 
 	// Prepare items as key to path
 	items := []corev1.KeyToPath{}
@@ -159,12 +159,12 @@ func (v *ConfigMapVolume) AssembleVolumes() specs.VolumeSpec {
 	}
 
 	// ConfigMaps have to be read only!
-	return specs.VolumeSpec{
+	return []specs.VolumeSpec{{
 		Volume:   newVolume,
 		Path:     filepath.Dir(v.path),
 		ReadOnly: true,
 		Mount:    true,
-	}
+	}}
 }
 
 // An existing peristent volume claim
@@ -194,7 +194,7 @@ func (v *PersistentVolumeClaim) SetOptions(metric *api.MetricAddon) {
 }
 
 // AssembleVolumes for a pvc
-func (v *PersistentVolumeClaim) AssembleVolumes() specs.VolumeSpec {
+func (v *PersistentVolumeClaim) AssembleVolumes() []specs.VolumeSpec {
 	volume := corev1.Volume{
 		Name: v.name,
 		VolumeSource: corev1.VolumeSource{
@@ -205,12 +205,12 @@ func (v *PersistentVolumeClaim) AssembleVolumes() specs.VolumeSpec {
 	}
 
 	// ConfigMaps have to be read only!
-	return specs.VolumeSpec{
+	return []specs.VolumeSpec{{
 		Volume:   volume,
 		Path:     filepath.Dir(v.path),
 		ReadOnly: v.readOnly,
 		Mount:    true,
-	}
+	}}
 }
 
 // An existing secret
@@ -240,7 +240,7 @@ func (v *SecretVolume) SetOptions(metric *api.MetricAddon) {
 }
 
 // AssembleVolumes for a Secret
-func (v *SecretVolume) AssembleVolumes() specs.VolumeSpec {
+func (v *SecretVolume) AssembleVolumes() []specs.VolumeSpec {
 	volume := corev1.Volume{
 		Name: v.name,
 		VolumeSource: corev1.VolumeSource{
@@ -249,12 +249,12 @@ func (v *SecretVolume) AssembleVolumes() specs.VolumeSpec {
 			},
 		},
 	}
-	return specs.VolumeSpec{
+	return []specs.VolumeSpec{{
 		Volume:   volume,
 		ReadOnly: v.readOnly,
 		Path:     v.path,
 		Mount:    true,
-	}
+	}}
 }
 
 // A hostPath volume
@@ -286,7 +286,7 @@ func (v *HostPathVolume) SetOptions(metric *api.MetricAddon) {
 }
 
 // AssembleVolumes for a host volume
-func (v *HostPathVolume) AssembleVolumes() specs.VolumeSpec {
+func (v *HostPathVolume) AssembleVolumes() []specs.VolumeSpec {
 	volume := corev1.Volume{
 		Name: v.name,
 		VolumeSource: corev1.VolumeSource{
@@ -295,12 +295,12 @@ func (v *HostPathVolume) AssembleVolumes() specs.VolumeSpec {
 			},
 		},
 	}
-	return specs.VolumeSpec{
+	return []specs.VolumeSpec{{
 		Volume:   volume,
 		Mount:    true,
 		Path:     v.path,
 		ReadOnly: v.readOnly,
-	}
+	}}
 }
 
 // An empty volume requires nothing! Nice!
@@ -322,19 +322,19 @@ func (v *EmptyVolume) SetOptions(metric *api.MetricAddon) {
 }
 
 // AssembleVolumes for an empty volume
-func (v *EmptyVolume) AssembleVolumes() specs.VolumeSpec {
+func (v *EmptyVolume) AssembleVolumes() []specs.VolumeSpec {
 	volume := corev1.Volume{
 		Name: v.name,
 		VolumeSource: corev1.VolumeSource{
 			EmptyDir: &corev1.EmptyDirVolumeSource{},
 		},
 	}
-	return specs.VolumeSpec{
+	return []specs.VolumeSpec{{
 		Volume:   volume,
 		Mount:    true,
 		Path:     v.path,
 		ReadOnly: v.readOnly,
-	}
+	}}
 }
 
 // TODO likely we need to carry around entrypoints to customize?

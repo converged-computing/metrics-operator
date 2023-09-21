@@ -67,15 +67,16 @@ func GetJobSet(
 		// Prepare container and volume specs (that are changeable) e.g.,
 		// 1. Create VolumeSpec across metrics and addons that can predefine volumes
 		// 2. Create ContainerSpec across metrics that can predefine containers, entrypoints, volumes
-		err = m.AddAddons(spec, jobs, cs)
+		// 3. Container specs (cms) returned are expected to be config maps that need to be written
+		cms, err := m.AddAddons(spec, jobs, cs)
 		if err != nil {
 			return js, containerSpecs, err
 		}
 
 		// Add the finalized container specs for the entire set of replicated jobs
 		// We need this at the end to hand back to generate config maps
-		// TODO if containers are specific to jobs, maybe need to have based on key...
 		containerSpecs = append(containerSpecs, cs...)
+		containerSpecs = append(containerSpecs, cms...)
 
 		// Add the final set of jobs (bad decision for the pointer here, oops)
 		for _, job := range jobs {

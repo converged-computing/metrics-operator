@@ -38,7 +38,7 @@ type Addon interface {
 	MapOptions() map[string]map[string]intstr.IntOrString
 
 	// What addons can control:
-	AssembleVolumes() specs.VolumeSpec
+	AssembleVolumes() []specs.VolumeSpec
 	AssembleContainers() []specs.ContainerSpec
 	CustomizeEntrypoints([]*specs.ContainerSpec, []*jobset.ReplicatedJob)
 
@@ -70,8 +70,8 @@ func (b AddonBase) AssembleContainers() []specs.ContainerSpec {
 }
 
 // Assemble Volumes (for now) just generates one
-func (b AddonBase) AssembleVolumes() specs.VolumeSpec {
-	return specs.VolumeSpec{}
+func (b AddonBase) AssembleVolumes() []specs.VolumeSpec {
+	return []specs.VolumeSpec{}
 }
 
 func (b AddonBase) Description() string {

@@ -25,24 +25,65 @@ type HPCToolkit struct {
 	ApplicationAddon
 
 	// Target is the name of the replicated job to customize entrypoint logic for
-	target         string
-	events         string
-	mount          string
-	entrypointPath string
+	target string
+
+	// ContainerTarget is the name of the container to add the entrypoint logic to
+	containerTarget string
+	events          string
+	mount           string
+	entrypointPath  string
+	volumeName      string
 }
 
 // AssembleVolumes to provide an empty volume for the application to share
-func (m HPCToolkit) AssembleVolumes() specs.VolumeSpec {
+// We also need to provide a config map volume for our container spec
+func (m HPCToolkit) AssembleVolumes() []specs.VolumeSpec {
 	volume := corev1.Volume{
-		Name: "hpctoolkit",
+		Name: m.volumeName,
 		VolumeSource: corev1.VolumeSource{
 			EmptyDir: &corev1.EmptyDirVolumeSource{},
 		},
 	}
+
+	// Prepare items as key to path
+	items := []corev1.KeyToPath{
+		{
+			Key:  m.volumeName,
+			Path: filepath.Base(m.entrypointPath),
+		},
+	}
+
+	// This is a config map volume with items
+	// It needs to be created in the same metrics operator namespace
+	// We need a better way to define this, I'm not happy with it.
+	// There should just be some variables under the volumespec
+	newVolume := corev1.Volume{
+		VolumeSource: corev1.VolumeSource{
+			ConfigMap: &corev1.ConfigMapVolumeSource{
+				LocalObjectReference: corev1.LocalObjectReference{
+					Name: m.volumeName,
+				},
+				Items: items,
+			},
+		},
+	}
+
 	// EmptyDir should be ReadOnly False, and we don't need a mount for it
-	return specs.VolumeSpec{
-		Volume: volume,
-		Mount:  false,
+	return []specs.VolumeSpec{
+		{
+			Volume: volume,
+			Mount:  true,
+			Path:   m.mount,
+		},
+
+		// Mount is set to false here because we mount via metrics_operator
+		// This is a bit messy (I'm not happy) but I'll make it better
+		{
+			Volume:   newVolume,
+			ReadOnly: true,
+			Mount:    false,
+			Path:     filepath.Dir(m.entrypointPath),
+		},
 	}
 }
 
@@ -50,14 +91,6 @@ func (m HPCToolkit) AssembleVolumes() specs.VolumeSpec {
 func (a *HPCToolkit) Validate() bool {
 	if a.events == "" {
 		logger.Error("The HPCtoolkit application addon requires one or more 'events' for hpcrun (e.g., -e IO).")
-		return false
-	}
-	if a.image == "" {
-		logger.Error("The application addon requires a container 'image'.")
-		return false
-	}
-	if a.command == "" {
-		logger.Error("The application addon requires a container 'command'.")
 		return false
 	}
 	return true
@@ -70,11 +103,24 @@ func (a *HPCToolkit) SetOptions(metric *api.MetricAddon) {
 	a.image = "ghcr.io/converged-computing/metric-hpctoolkit-view:latest"
 	a.SetDefaultOptions(metric)
 	a.mount = "/opt/share"
+	a.volumeName = "hpctoolkit"
 
 	// UseColor set to anything means to use it
 	mount, ok := metric.Options["mount"]
 	if ok {
 		a.mount = mount.StrVal
+	}
+	workdir, ok := metric.Options["workdir"]
+	if ok {
+		a.workingDir = workdir.StrVal
+	}
+	target, ok := metric.Options["target"]
+	if ok {
+		a.target = target.StrVal
+	}
+	ctarget, ok := metric.Options["containerTarget"]
+	if ok {
+		a.containerTarget = ctarget.StrVal
 	}
 	events, ok := metric.Options["events"]
 	if ok {
@@ -83,7 +129,7 @@ func (a *HPCToolkit) SetOptions(metric *api.MetricAddon) {
 }
 
 // Exported options and list options
-func (a HPCToolkit) Options() map[string]intstr.IntOrString {
+func (a *HPCToolkit) Options() map[string]intstr.IntOrString {
 	options := a.DefaultOptions()
 	options["events"] = intstr.FromString(a.events)
 	options["mount"] = intstr.FromString(a.mount)
@@ -127,7 +173,9 @@ mv ./wait-fs /usr/bin/goshare-wait-fs
 viewbase="%s"
 software="${viewbase}/software"
 viewbin="${viewbase}/view/bin"
-export PATH=${viewbin}:$PATH
+
+# Important to add AFTER in case software in container duplicated
+export PATH=$PATH:${viewbin}
 	
 # Wait for software directory, and give it time
 goshare-wait-fs -p ${software}
@@ -154,15 +202,19 @@ echo "%s"
 # hpcprof hpctoolkit-sleep-measurements
 # hpcstruct hpctoolkit-sleep-measurements
 # hpcviewer ./hpctoolkit-lmp-database
+workdir="%s"
+echo "Changing directory to ${workdir}"
+cd ${workdir}
 `
 	preBlock = fmt.Sprintf(
-		meta,
 		preBlock,
+		meta,
 		a.mount,
 		a.mount,
 		a.events,
 		metadata.CollectionStart,
 		metadata.Separator,
+		a.workingDir,
 	)
 
 	// TODO we may want to target specific entrypoint scripts here
@@ -173,7 +225,12 @@ echo "%s"
 		if containerSpec.JobName != rj.Name {
 			continue
 		}
-		containerSpec.EntrypointScript.Pre = "\n" + preBlock
+
+		// Next check if we have a target set (for the container)
+		if a.containerTarget != "" && containerSpec.Name != "" && a.containerTarget != containerSpec.Name {
+			continue
+		}
+		containerSpec.EntrypointScript.Pre += "\n" + preBlock
 		containerSpec.EntrypointScript.Command = fmt.Sprintf("hpcrun $events %s", containerSpec.EntrypointScript.Command)
 	}
 }
@@ -212,6 +269,7 @@ sleep infinity
 
 	// Leave the name empty to generate in the namespace of the metric set (e.g., set.Name)
 	entrypoint := specs.EntrypointScript{
+		Name:   a.volumeName,
 		Path:   a.entrypointPath,
 		Script: filepath.Base(a.entrypointPath),
 		Pre:    script,
@@ -232,6 +290,8 @@ sleep infinity
 					Privileged: a.privileged,
 				},
 			},
+			// We need to write this config map!
+			NeedsWrite: true,
 		},
 	}
 }

@@ -118,33 +118,43 @@ func (m BaseMetric) SetDefaultOptions(metric *api.Metric) {
 }
 
 // Add registered addons to replicated jobs
+// Container specs returned are assumed to be config maps that need to be written
 func (m BaseMetric) AddAddons(
 	spec *api.MetricSet,
 	rjs []*jobset.ReplicatedJob,
 
 	// These container specs include all replicated jobs
-	containerSpecs []*specs.ContainerSpec) error {
+	containerSpecs []*specs.ContainerSpec,
+) ([]*specs.ContainerSpec, error) {
 
 	// VolumeMounts can be generated from container specs
 	// For each addon, do custom logic depending on the type
 	// These are the main set of volumes, containers we are going to add
 	// Organize volumes by unique name
-	volumes := map[string]specs.VolumeSpec{}
+	volumes := []specs.VolumeSpec{}
 
 	// These are addon container specs
 	addonContainers := []specs.ContainerSpec{}
+
+	// These are container specs that need to be written to configmaps
+	cms := []*specs.ContainerSpec{}
 
 	logger.Infof("🟧️ Addons to include %s\n", m.Addons)
 	for _, addon := range m.Addons {
 		a := (*addon)
 
-		assembledVolume := a.AssembleVolumes()
-		if assembledVolume.Volume.Name != "" {
-			volumes[a.Name()] = assembledVolume
-		}
+		volumes = append(volumes, a.AssembleVolumes()...)
 
 		// Assemble containers that addons provide, also as specs
-		addonContainers = append(addonContainers, a.AssembleContainers()...)
+		assembleContainers := a.AssembleContainers()
+		for _, assembleContainer := range assembleContainers {
+
+			// Any container specs that need to be created later as config maps are kept in cms
+			if assembleContainer.NeedsWrite {
+				cms = append(cms, &assembleContainer)
+			}
+			addonContainers = append(addonContainers, assembleContainer)
+		}
 
 		// Allow the addons to customize the container entrypoints, specific to the job name
 		// It's important that this set does not include other addon container specs
@@ -153,10 +163,6 @@ func (m BaseMetric) AddAddons(
 
 	// There is a bug here showing lots of nil but I don't know why
 	logger.Infof("🟧️ Volumes that are going to be added %s\n", volumes)
-	listing := []specs.VolumeSpec{}
-	for _, volume := range volumes {
-		listing = append(listing, volume)
-	}
 
 	// Add containers to the replicated job (filtered based on matching names)
 	containers := addonContainers
@@ -168,18 +174,18 @@ func (m BaseMetric) AddAddons(
 	for _, rj := range rjs {
 
 		// We also include the addon volumes, which generally need mount points
-		rjContainers, err := getReplicatedJobContainers(spec, rj, containers, listing)
+		rjContainers, err := getReplicatedJobContainers(spec, rj, containers, volumes)
 		if err != nil {
-			return err
+			return cms, err
 		}
 		rj.Template.Spec.Template.Spec.Containers = rjContainers
 
 		// And volumes!
 		// containerSpecs are used to generate our metric entrypoint volumes
 		// volumes indicate existing volumes
-		rj.Template.Spec.Template.Spec.Volumes = getReplicatedJobVolumes(spec, containerSpecs, listing)
+		rj.Template.Spec.Template.Spec.Volumes = getReplicatedJobVolumes(spec, containerSpecs, volumes)
 	}
-	return nil
+	return cms, nil
 }
 
 // Addons returns a list of addons, removing them from the key value lookup

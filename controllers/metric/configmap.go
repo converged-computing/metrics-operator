@@ -51,6 +51,7 @@ func (r *MetricSetReconciler) ensureConfigMaps(
 
 		// Go through each container spec entrypoint
 		for _, cs := range containerSpecs {
+			r.Log.Info("⬜️ ConfigMaps", "Name", cs.EntrypointScript.Name, "Writing", cs)
 			data[cs.EntrypointScript.Name] = cs.EntrypointScript.WriteScript()
 		}
 

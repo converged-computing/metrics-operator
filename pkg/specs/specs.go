@@ -31,6 +31,9 @@ type ContainerSpec struct {
 	// If a command is provided, it's likely an addon (and EntrypointScript is ignored)
 	Command []string
 
+	// Does the Container spec need to be written to our set of config maps?
+	NeedsWrite bool
+
 	Resources  *api.ContainerResources
 	Attributes *api.ContainerSpec
 }

@@ -13,7 +13,7 @@ To learn more:
 ## Dinosaur TODO
 
 - Document and automate docs for addons (options, etc.)
-- Addons likely needs to be a list to support > 1 of one type! Then subsequent changes so it's not 1:1
+- Figure out issue with errors.IsNotFound not working...
 
 - We need a way for the entrypoint command to monitor (based on the container) to differ (potentially)
 - For larger metric collections, we should have a log streaming mode (and not wait for Completed/Successful)

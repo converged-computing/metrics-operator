@@ -8,10 +8,14 @@ SPDX-License-Identifier: MIT
 package application
 
 import (
+	"fmt"
+
 	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
+	"github.com/converged-computing/metrics-operator/pkg/metadata"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 )
 
 type Lammps struct {
@@ -63,6 +67,59 @@ func (m Lammps) Options() map[string]intstr.IntOrString {
 		"command": intstr.FromString(m.command),
 		"workdir": intstr.FromString(m.Workdir),
 	}
+}
+func (n Lammps) ListOptions() map[string][]intstr.IntOrString {
+	return map[string][]intstr.IntOrString{}
+}
+
+// Prepare containers with jobs and entrypoint scripts
+func (m Lammps) PrepareContainers(
+	spec *api.MetricSet,
+	metric *metrics.Metric,
+) []*specs.ContainerSpec {
+
+	// Metadata to add to beginning of run
+	meta := metrics.Metadata(spec, metric)
+	hosts := m.GetHostlist(spec)
+	prefix := m.GetCommonPrefix(meta, m.command, hosts)
+
+	// Template blocks for launcher script
+	preBlock := `
+echo "%s"
+`
+
+	postBlock := `
+echo "%s"
+%s
+`
+	interactive := metadata.Interactive(spec.Spec.Logging.Interactive)
+	preBlock = prefix + fmt.Sprintf(preBlock, metadata.Separator)
+	postBlock = fmt.Sprintf(postBlock, metadata.CollectionEnd, interactive)
+
+	// Entrypoint for the launcher
+	launcherEntrypoint := specs.EntrypointScript{
+		Name:    specs.DeriveScriptKey(m.LauncherScript),
+		Path:    m.LauncherScript,
+		Pre:     preBlock,
+		Command: m.command,
+		Post:    postBlock,
+	}
+
+	// Entrypoint for the worker
+	// Just has a sleep infinity added to the prefix
+	workerEntrypoint := specs.EntrypointScript{
+		Name:    specs.DeriveScriptKey(m.WorkerScript),
+		Path:    m.WorkerScript,
+		Pre:     prefix,
+		Command: "sleep infinity",
+	}
+
+	// These are associated with replicated jobs via JobName
+	launcherContainer := m.GetLauncherContainerSpec(launcherEntrypoint)
+	workerContainer := m.GetWorkerContainerSpec(workerEntrypoint)
+
+	// Return the script templates for each of launcher and worker
+	return []*specs.ContainerSpec{&launcherContainer, &workerContainer}
 }
 
 func init() {
