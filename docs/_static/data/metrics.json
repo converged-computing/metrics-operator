@@ -89,5 +89,12 @@
   "family": "storage",
   "image": "ghcr.io/converged-computing/metric-sysstat:latest",
   "url": "https://github.com/sysstat/sysstat"
+ },
+ {
+  "name": "network-osu-benchmark",
+  "description": "point to point MPI benchmarks",
+  "family": "network",
+  "image": "ghcr.io/converged-computing/metric-osu-benchmark:latest",
+  "url": "https://mvapich.cse.ohio-state.edu/benchmarks/"
  }
 ]

@@ -10,7 +10,7 @@ import (
 	"github.com/converged-computing/metrics-operator/pkg/metrics"
 	_ "github.com/converged-computing/metrics-operator/pkg/metrics/app"
 	_ "github.com/converged-computing/metrics-operator/pkg/metrics/io"
-	//	_ "github.com/converged-computing/metrics-operator/pkg/metrics/network"
+	_ "github.com/converged-computing/metrics-operator/pkg/metrics/network"
 	//	_ "github.com/converged-computing/metrics-operator/pkg/metrics/perf"
 	//
 	// +kubebuilder:scaffold:imports
