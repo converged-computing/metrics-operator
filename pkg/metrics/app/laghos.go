@@ -16,10 +16,6 @@ import (
 
 type Laghos struct {
 	metrics.LauncherWorker
-
-	// Custom Options
-	command string
-	prefix  string
 }
 
 // I think this is a simulation?
@@ -34,8 +30,8 @@ func (m Laghos) Url() string {
 // Set custom options / attributes for the metric
 func (m *Laghos) SetOptions(metric *api.Metric) {
 	// Set user defined values or fall back to defaults
-	m.prefix = "/bin/bash"
-	m.command = "mpirun -np 4 --hostfile ./hostlist.txt ./laghos"
+	m.Prefix = "/bin/bash"
+	m.Command = "mpirun -np 4 --hostfile ./hostlist.txt ./laghos"
 	m.Workdir = "/workflow/laghos"
 	m.SetDefaultOptions(metric)
 }
@@ -43,8 +39,8 @@ func (m *Laghos) SetOptions(metric *api.Metric) {
 // Exported options and list options
 func (m Laghos) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"command": intstr.FromString(m.command),
-		"prefix":  intstr.FromString(m.prefix),
+		"command": intstr.FromString(m.Command),
+		"prefix":  intstr.FromString(m.Prefix),
 		"workdir": intstr.FromString(m.Workdir),
 	}
 }

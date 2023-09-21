@@ -16,10 +16,6 @@ import (
 
 type Pennant struct {
 	metrics.LauncherWorker
-
-	// Custom Options
-	command string
-	prefix  string
 }
 
 // I think this is a simulation?
@@ -34,8 +30,8 @@ func (m Pennant) Url() string {
 // Set custom options / attributes for the metric
 func (m *Pennant) SetOptions(metric *api.Metric) {
 	// Set user defined values or fall back to defaults
-	m.prefix = "mpirun --hostfile ./hostlist.txt"
-	m.command = "pennant /opt/pennant/test/sedovsmall/sedovsmall.pnt"
+	m.Prefix = "mpirun --hostfile ./hostlist.txt"
+	m.Command = "pennant /opt/pennant/test/sedovsmall/sedovsmall.pnt"
 	m.Workdir = "/opt/pennant/test"
 	m.SetDefaultOptions(metric)
 }
@@ -43,8 +39,8 @@ func (m *Pennant) SetOptions(metric *api.Metric) {
 // Exported options and list options
 func (m Pennant) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"command": intstr.FromString(m.command),
-		"prefix":  intstr.FromString(m.prefix),
+		"command": intstr.FromString(m.Command),
+		"prefix":  intstr.FromString(m.Prefix),
 		"workdir": intstr.FromString(m.Workdir),
 	}
 }

@@ -20,10 +20,6 @@ import (
 
 type BDAS struct {
 	metrics.LauncherWorker
-
-	// Custom Options
-	command string
-	prefix  string
 }
 
 // I think this is a simulation?
@@ -39,8 +35,8 @@ func (m BDAS) Url() string {
 func (m *BDAS) SetOptions(metric *api.Metric) {
 
 	// Set user defined values or fall back to defaults
-	m.prefix = "/bin/bash"
-	m.command = "mpirun --allow-run-as-root -np 4 --hostfile ./hostlist.txt Rscript /opt/bdas/benchmarks/r/princomp.r 250 50"
+	m.Prefix = "/bin/bash"
+	m.Command = "mpirun --allow-run-as-root -np 4 --hostfile ./hostlist.txt Rscript /opt/bdas/benchmarks/r/princomp.r 250 50"
 	m.Workdir = "/opt/bdas/benchmarks/r"
 
 	// Examples from guide
@@ -52,8 +48,8 @@ func (m *BDAS) SetOptions(metric *api.Metric) {
 // Exported options and list options
 func (m BDAS) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"command": intstr.FromString(m.command),
-		"prefix":  intstr.FromString(m.prefix),
+		"command": intstr.FromString(m.Command),
+		"prefix":  intstr.FromString(m.Prefix),
 		"workdir": intstr.FromString(m.Workdir),
 	}
 }
@@ -66,7 +62,7 @@ func (m BDAS) PrepareContainers(
 	// Metadata to add to beginning of run
 	meta := metrics.Metadata(spec, metric)
 	hosts := m.GetHostlist(spec)
-	prefix := m.GetCommonPrefix(meta, m.command, hosts)
+	prefix := m.GetCommonPrefix(meta, m.Command, hosts)
 
 	preBlock := `
 echo "%s"
@@ -90,7 +86,7 @@ cat ./hostlist.txt
 echo "%s"
 %s
 `
-	command := fmt.Sprintf("%s ./problem.sh", m.prefix)
+	command := fmt.Sprintf("%s ./problem.sh", m.Prefix)
 	interactive := metadata.Interactive(spec.Spec.Logging.Interactive)
 	preBlock = prefix + fmt.Sprintf(preBlock, metadata.Separator)
 	postBlock = fmt.Sprintf(postBlock, metadata.CollectionEnd, interactive)

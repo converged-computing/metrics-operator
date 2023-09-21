@@ -41,8 +41,8 @@ type LauncherWorker struct {
 	Addons []*api.MetricAddon
 
 	// Most laucher workers have a command
-	command string
-	prefix  string
+	Command string
+	Prefix  string
 
 	// Scripts
 	WorkerScript      string
@@ -71,7 +71,7 @@ func (m *LauncherWorker) SetDefaultOptions(metric *api.Metric) {
 
 	command, ok := metric.Options["command"]
 	if ok {
-		m.command = command.StrVal
+		m.Command = command.StrVal
 	}
 	workdir, ok := metric.Options["workdir"]
 	if ok {
@@ -79,7 +79,7 @@ func (m *LauncherWorker) SetDefaultOptions(metric *api.Metric) {
 	}
 	prefix, ok := metric.Options["prefix"]
 	if ok {
-		m.prefix = prefix.StrVal
+		m.Prefix = prefix.StrVal
 	}
 }
 
@@ -106,7 +106,7 @@ func (m *LauncherWorker) ensureDefaultNames() {
 	}
 }
 
-func (m LauncherWorker) PrepareContainers(
+func (m *LauncherWorker) PrepareContainers(
 	spec *api.MetricSet,
 	metric *Metric,
 ) []*specs.ContainerSpec {
@@ -114,7 +114,8 @@ func (m LauncherWorker) PrepareContainers(
 	// Metadata to add to beginning of run
 	meta := Metadata(spec, metric)
 	hosts := m.GetHostlist(spec)
-	prefix := m.GetCommonPrefix(meta, m.command, hosts)
+	prefix := m.GetCommonPrefix(meta, m.Command, hosts)
+	logger.Infof("COMMAND %s", m.Command)
 
 	preBlock := `
 echo "%s"
@@ -124,7 +125,7 @@ echo "%s"
 echo "%s"
 %s
 `
-	command := fmt.Sprintf("%s ./problem.sh", m.prefix)
+	command := fmt.Sprintf("%s ./problem.sh", m.Prefix)
 	interactive := metadata.Interactive(spec.Spec.Logging.Interactive)
 	preBlock = prefix + fmt.Sprintf(preBlock, metadata.Separator)
 	postBlock = fmt.Sprintf(postBlock, metadata.CollectionEnd, interactive)
@@ -213,30 +214,36 @@ func (m *LauncherWorker) AddWorkers(spec *api.MetricSet) (*jobset.ReplicatedJob,
 func (m *LauncherWorker) GetLauncherContainerSpec(
 	entrypoint specs.EntrypointScript,
 ) specs.ContainerSpec {
-	return specs.ContainerSpec{
+	spec := specs.ContainerSpec{
 		JobName:          m.LauncherLetter,
 		Image:            m.Image(),
 		Name:             m.LauncherContainer,
-		WorkingDir:       m.Workdir,
 		EntrypointScript: entrypoint,
 		Resources:        m.ResourceSpec,
 		Attributes:       m.AttributeSpec,
 	}
+	if m.Workdir != "" {
+		spec.WorkingDir = m.Workdir
+	}
+	return spec
 }
 func (m *LauncherWorker) GetWorkerContainerSpec(
 	entrypoint specs.EntrypointScript,
 ) specs.ContainerSpec {
 
 	// Container spec for the launcher
-	return specs.ContainerSpec{
+	spec := specs.ContainerSpec{
 		JobName:          m.WorkerLetter,
 		Image:            m.Image(),
 		Name:             m.WorkerContainer,
-		WorkingDir:       m.Workdir,
 		EntrypointScript: entrypoint,
 		Resources:        m.ResourceSpec,
 		Attributes:       m.AttributeSpec,
 	}
+	if m.Workdir != "" {
+		spec.WorkingDir = m.Workdir
+	}
+	return spec
 }
 
 // Replicated Jobs are custom for a launcher worker

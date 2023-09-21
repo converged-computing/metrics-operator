@@ -20,9 +20,6 @@ import (
 
 type Lammps struct {
 	metrics.LauncherWorker
-
-	// Options
-	command string
 }
 
 func (m Lammps) Url() string {
@@ -42,18 +39,9 @@ func (m *Lammps) SetOptions(metric *api.Metric) {
 	// Set user defined values or fall back to defaults
 	// This is a more manual approach that puts the user in charge of determining the entire command
 	// This more closely matches what we might do on HPC :)
-	m.command = "mpirun --hostfile ./hostlist.txt -np 2 --map-by socket lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite"
+	m.Command = "mpirun --hostfile ./hostlist.txt -np 2 --map-by socket lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite"
 	m.Workdir = "/opt/lammps/examples/reaxff/HNS"
-
-	// This could be improved :)
-	command, ok := metric.Options["command"]
-	if ok {
-		m.command = command.StrVal
-	}
-	workdir, ok := metric.Options["workdir"]
-	if ok {
-		m.Workdir = workdir.StrVal
-	}
+	m.SetDefaultOptions(metric)
 }
 
 // Validate that we can run Lammps
@@ -64,7 +52,7 @@ func (n Lammps) Validate(spec *api.MetricSet) bool {
 // Exported options and list options
 func (m Lammps) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"command": intstr.FromString(m.command),
+		"command": intstr.FromString(m.Command),
 		"workdir": intstr.FromString(m.Workdir),
 	}
 }
@@ -81,7 +69,7 @@ func (m Lammps) PrepareContainers(
 	// Metadata to add to beginning of run
 	meta := metrics.Metadata(spec, metric)
 	hosts := m.GetHostlist(spec)
-	prefix := m.GetCommonPrefix(meta, m.command, hosts)
+	prefix := m.GetCommonPrefix(meta, m.Command, hosts)
 
 	// Template blocks for launcher script
 	preBlock := `
@@ -101,7 +89,7 @@ echo "%s"
 		Name:    specs.DeriveScriptKey(m.LauncherScript),
 		Path:    m.LauncherScript,
 		Pre:     preBlock,
-		Command: m.command,
+		Command: m.Command,
 		Post:    postBlock,
 	}
 

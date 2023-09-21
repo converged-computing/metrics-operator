@@ -16,10 +16,6 @@ import (
 
 type Kripke struct {
 	metrics.LauncherWorker
-
-	// Options
-	command string
-	prefix  string
 }
 
 func (m Kripke) Url() string {
@@ -35,8 +31,8 @@ func (m Kripke) Family() string {
 func (m *Kripke) SetOptions(metric *api.Metric) {
 
 	// Set user defined values or fall back to defaults
-	m.prefix = "mpirun --hostfile ./hostlist.txt"
-	m.command = "kripke"
+	m.Prefix = "mpirun --hostfile ./hostlist.txt"
+	m.Command = "kripke"
 	m.Workdir = "/opt/kripke"
 	m.SetDefaultOptions(metric)
 }
@@ -49,8 +45,8 @@ func (n Kripke) Validate(spec *api.MetricSet) bool {
 // Exported options and list options
 func (m Kripke) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"command": intstr.FromString(m.command),
-		"prefix":  intstr.FromString(m.prefix),
+		"command": intstr.FromString(m.Command),
+		"prefix":  intstr.FromString(m.Prefix),
 		"workdir": intstr.FromString(m.Workdir),
 	}
 }

@@ -16,10 +16,6 @@ import (
 
 type Nekbone struct {
 	metrics.LauncherWorker
-
-	// Custom Options
-	command string
-	prefix  string
 }
 
 // I think this is a simulation?
@@ -34,8 +30,8 @@ func (m Nekbone) Url() string {
 // Set custom options / attributes for the metric
 func (m *Nekbone) SetOptions(metric *api.Metric) {
 	// Set user defined values or fall back to defaults
-	m.prefix = "/bin/bash"
-	m.command = "mpiexec --hostfile ./hostlist.txt -np 2 ./nekbone"
+	m.Prefix = "/bin/bash"
+	m.Command = "mpiexec --hostfile ./hostlist.txt -np 2 ./nekbone"
 	m.Workdir = "/root/nekbone-3.0/test/example2"
 	m.SetDefaultOptions(metric)
 }
@@ -43,8 +39,8 @@ func (m *Nekbone) SetOptions(metric *api.Metric) {
 // Exported options and list options
 func (m Nekbone) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"command": intstr.FromString(m.command),
-		"prefix":  intstr.FromString(m.prefix),
+		"command": intstr.FromString(m.Command),
+		"prefix":  intstr.FromString(m.Prefix),
 		"workdir": intstr.FromString(m.Workdir),
 	}
 }

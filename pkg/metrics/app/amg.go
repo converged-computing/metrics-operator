@@ -17,11 +17,6 @@ import (
 // AMG is a launcher + workers metric application
 type AMG struct {
 	metrics.LauncherWorker
-
-	// Custom Options
-	workdir string
-	command string
-	prefix  string
 }
 
 func (m AMG) Url() string {
@@ -35,13 +30,10 @@ func (m AMG) Family() string {
 
 // Set custom options / attributes for the metric
 func (m *AMG) SetOptions(metric *api.Metric) {
-	m.ResourceSpec = &metric.Resources
-	m.AttributeSpec = &metric.Attributes
-
 	// Set user defined values or fall back to defaults
-	m.prefix = "mpirun --hostfile ./hostlist.txt"
-	m.command = "amg"
-	m.workdir = "/opt/AMG"
+	m.Prefix = "mpirun --hostfile ./hostlist.txt"
+	m.Command = "amg"
+	m.Workdir = "/opt/AMG"
 	m.SetDefaultOptions(metric)
 }
 
@@ -53,9 +45,9 @@ func (n AMG) Validate(spec *api.MetricSet) bool {
 // Exported options and list options
 func (m AMG) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"command": intstr.FromString(m.command),
-		"prefix":  intstr.FromString(m.prefix),
-		"workdir": intstr.FromString(m.workdir),
+		"command": intstr.FromString(m.Command),
+		"prefix":  intstr.FromString(m.Prefix),
+		"workdir": intstr.FromString(m.Workdir),
 	}
 }
 

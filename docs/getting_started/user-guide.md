@@ -96,7 +96,7 @@ TEST SUITE: None
 
 Let's first review how this works.
 
-1. We provide metrics here to assess performance, storage, networking, ot other custom cases (e.g run an HPC application).
+1. We provide metrics here to assess performance, storage, networking, or other custom cases (e.g run an HPC application).
 2. You can choose to supplement a metric with addons (e.g., add a volume to an IO metric)
 3. The metric output is printed in pod logs with a standard packaging (e.g., sections and headers) to distinguish output sections.
 4. We provide a Python module [metricsoperator](https://pypi.org/project/metricsoperator/) that can help you run an experiment, applying the metrics.yaml and then retrieving and parsing logs.

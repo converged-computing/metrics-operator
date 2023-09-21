@@ -184,6 +184,10 @@ func (m *HPL) SetOptions(metric *api.Metric) {
 	if ok {
 		m.blocksize = value.IntVal
 	}
+	value, ok = metric.Options["workdir"]
+	if ok {
+		m.Workdir = value.StrVal
+	}
 	value, ok = metric.Options["row_or_colmajor_pmapping"]
 	if ok {
 		m.row_or_colmajor_pmapping = value.IntVal
