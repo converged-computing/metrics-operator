@@ -1,6 +1,6 @@
 # Current Design
 
-For this second design,m we can more easily say:
+For this second design, we can more easily say:
 
 > A Metric Set is a collection of metrics to measure IO, performance, or networking that can be customized with addons.
 
