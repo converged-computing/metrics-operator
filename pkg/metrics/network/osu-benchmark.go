@@ -141,7 +141,6 @@ func (m *OSUBenchmark) SetOptions(metric *api.Metric) {
 	m.sleep = 60
 	m.ResourceSpec = &metric.Resources
 	m.AttributeSpec = &metric.Attributes
-	m.LauncherLetter = "n"
 
 	// One pod per hostname
 	m.SoleTenancy = true

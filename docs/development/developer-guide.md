@@ -121,32 +121,39 @@ This section will include instructions for how to write a metrics container.
 
 ### General Instructions
 
-We provide templates for different kinds of JobSet (e.g., SingleApplication vs. LauncherWorker pattern) in pkg/jobs,
-so the easiest thing to do is to find the template that is closest in design to what you want, and then
-copy a metric go file from `pkg/metrics/*` that is closest. You will need to:
+Metrics largely have functionality that comes from shared interfaces, such as a `LauncherWorker`
+design that has a main node launcher tasks, and some number of worker nodes, and basic interfaces
+for storage and applications. The best thing to do is explore the current metrics, find one that
+is similar to what you want to do, and use it as a template. As long as you put it in a known group
+directory, e.g., these:
 
- - Change the interface struct name
+```bash
+pkg/metrics/
+├── app
+├── io
+├── network
+└── perf
+```
+
+It will be discovered and registered and available for use.
+
+You will generally need to:
+
+ - Change the interface struct name depending on what you need
  - Update parameters /options for your needs
  - Change the URL, and the metadata at the bottom (container, description, identifier)
 
-The main logic for a metric will be in the function to `GenerateEntrypoints`. For development,
+The main logic for a metric will be in the function to `PrepareContainers`. For development,
 I find it easiest to build the container first (as an automated build), have a general sense how to
-run the metric, and then insert `sleep infinity` into the launcher (or primary) script in that function,
-and interactively develop. When you do this, you'll also want to:
+run the metric, create a `metrics.yaml` for it, and then insert `sleep infinity` 
+(or set logging->interactive to true)  to interactively develop. When you do this, you'll also want to:
 
 - Add a named example in `examples/tests`
 - Run `make pre-push` before pushing to update docs metadata
 - Run `make html` and cd into `_build/html` and `python -m http.server 9999` (and open to that port) to preview
 - The metrics.html page under getting started shows the metadata that is rendered from the code. You may need to make the frame taller.
 
-### Performance via PID
-
-For a perf metric, you can assume that your metric container will be run as a sidecar,
-and have access to the PID namespace of the application container.
-
-- They should contain wget if they need to download the wait script in the entrypoint
-
-WIP
+For addons, the same logic applies, but you will want to add content to `pkg/addons` instead.
 
 ## Documentation
 
