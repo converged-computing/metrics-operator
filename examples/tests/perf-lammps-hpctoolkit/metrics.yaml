@@ -27,7 +27,7 @@ spec:
 
            # hpcrun needs to have mpirun in front of hpcrun <command> e.g.,
            # mpirun <MPI args> hpcrun <hpcrun args> <app> <app args>
-           prefix: mpirun --hostfile /root/hostlist.txt -np 2 --map-by socket
+           prefix: mpirun --hostfile ./hostlist.txt -np 2 --map-by socket
 
            # Ensure the working directory is consistent
            workdir: /opt/lammps/examples/reaxff/HNS

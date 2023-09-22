@@ -115,7 +115,6 @@ func (m *LauncherWorker) PrepareContainers(
 	meta := Metadata(spec, metric)
 	hosts := m.GetHostlist(spec)
 	prefix := m.GetCommonPrefix(meta, m.Command, hosts)
-	logger.Infof("COMMAND %s", m.Command)
 
 	preBlock := `
 echo "%s"

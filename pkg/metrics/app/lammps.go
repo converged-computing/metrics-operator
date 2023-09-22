@@ -67,8 +67,6 @@ func (m Lammps) PrepareContainers(
 	meta := metrics.Metadata(spec, metric)
 	hosts := m.GetHostlist(spec)
 	prefix := m.GetCommonPrefix(meta, m.Command, hosts)
-	fmt.Printf("COMMAND %s", m.Command)
-	fmt.Printf("WORKING DIR %s", m.Workdir)
 
 	// Template blocks for launcher script
 	preBlock := `

@@ -195,9 +195,13 @@ sleep 10
 # Copy mount software to /opt/software
 cp -R %s/software /opt/software
 	
-# Wait for hpcrun
+# Wait for hpcrun and marker to indicate copy is done
 goshare-wait-fs -p ${viewbin}/hpcrun
-	
+goshare-wait-fs -p ${viewbase}/metrics-operator-done.txt
+
+# A small extra wait time to be conservative
+sleep 5
+
 # This will work with capability SYS_ADMIN added.
 # It will only work with privileged set to true AT YOUR OWN RISK!
 echo "-1" | tee /proc/sys/kernel/perf_event_paranoid
@@ -270,6 +274,9 @@ mkdir -p $viewroot/view
 # We have to move both of these paths, *sigh*
 cp -R ${view}/* $viewroot/view
 cp -R /opt/software $viewroot/
+
+# This is a marker to indicate the copy is done
+touch $viewroot/metrics-operator-done.txt
 
 # Sleep forever, the application needs to run and end
 echo "Sleeping forever so %s can be shared and use for hpctoolkit."
