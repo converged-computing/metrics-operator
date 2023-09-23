@@ -267,7 +267,7 @@ Here are the acceptable parameters.
 |-----|-------------|------------|------|
 | mount | Path to mount hpctoolview view in application container | string | /opt/share |
 | events | Events for hpctoolkit | string |  `-e IO` |
-| image | Customize the contianer image | string | `ghcr.io/converged-computing/metric-hpctoolkit-view:ubuntu` |
+| image | Customize the container image | string | `ghcr.io/converged-computing/metric-hpctoolkit-view:ubuntu` |
 | output | The output directory for hpcrun (database will generate to *-database) | string | hpctoolkit-result |
 
 Note that for image we also provide a rocky build base, `ghcr.io/converged-computing/metric-hpctoolkit-view:rocky`. 

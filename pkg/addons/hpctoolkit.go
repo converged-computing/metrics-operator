@@ -20,7 +20,11 @@ import (
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 )
 
-// HPCToolkit is an addon that provides a container that
+// HPCToolkit is an addon that provides a container to collect performance metrics
+// Commands to interact with output data
+// hpcstruct hpctoolkit-sleep-measurements
+// hpcprof hpctoolkit-sleep-measurements
+// hpcviewer ./hpctoolkit-lmp-database
 
 type HPCToolkit struct {
 	ApplicationAddon
@@ -238,12 +242,11 @@ output="%s"
 events="%s"
 
 # Write a script to run for the post block analysis
+here=$(pwd)
 cat <<EOF > ./post-run.sh
 #!/bin/bash
-# Ensure we are in the workdir
-if [[ "${workdir}" != "" ]]; then
-    cd ${workdir}
-fi
+# Input path should be consistent between nodes
+cd ${here}
 ${viewbin}/hpcstruct ${output}
 ${viewbin}/hpcprof -o ${output}-database ${output}
 EOF
@@ -251,11 +254,6 @@ chmod +x ./post-run.sh
 
 echo "%s"
 echo "%s"
-
-# Commands to interact with output data
-# hpcstruct hpctoolkit-sleep-measurements
-# hpcprof hpctoolkit-sleep-measurements
-# hpcviewer ./hpctoolkit-lmp-database
 `
 	preBlock = fmt.Sprintf(
 		preBlock,
@@ -272,13 +270,13 @@ echo "%s"
 	postBlock := ""
 	if a.postAnalysis {
 		postBlock = `
-# Run the command here for us
-bash ./post-run.sh
-
-# And for all the nodes
 for host in $(cat ./hostlist.txt); do
     echo "Running post analysis for host ${host}"
-    ssh ${host} ${workdir}/post-run.sh
+    if [[ "$host" == "$(hostname)" ]]; then
+    	bash ./post-run.sh
+    else
+        ssh ${host} ${workdir}/post-run.sh
+    fi
 done
 `
 	}
