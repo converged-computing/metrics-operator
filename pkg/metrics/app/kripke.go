@@ -68,7 +68,7 @@ func init() {
 	base := metrics.BaseMetric{
 		Identifier: kripkeIdentifier,
 		Summary:    kripkeSummary,
-		Container:  kripkeSummary,
+		Container:  kripkeContainer,
 	}
 	launcher := metrics.LauncherWorker{BaseMetric: base}
 	kripke := Kripke{LauncherWorker: launcher}

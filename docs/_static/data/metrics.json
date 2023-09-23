@@ -24,7 +24,7 @@
   "name": "app-kripke",
   "description": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
   "family": "solver",
-  "image": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
+  "image": "ghcr.io/converged-computing/metric-kripke:latest",
   "url": "https://github.com/LLNL/Kripke"
  },
  {

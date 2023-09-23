@@ -38,7 +38,7 @@ func (m *Laghos) SetOptions(metric *api.Metric) {
 
 	m.Identifier = laghosIdentifier
 	m.Summary = laghosSummary
-	m.Container = laghosSummary
+	m.Container = laghosContainer
 
 	// Set user defined values or fall back to defaults
 	m.Prefix = "/bin/bash"
