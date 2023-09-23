@@ -111,7 +111,7 @@ func (a *HPCToolkit) Validate() bool {
 func (a *HPCToolkit) SetOptions(metric *api.MetricAddon) {
 
 	a.entrypointPath = "/metrics_operator/hpctoolkit-entrypoint.sh"
-	a.image = "ghcr.io/converged-computing/metric-hpctoolkit-view:latest"
+	a.image = "ghcr.io/converged-computing/metric-hpctoolkit-view:ubuntu"
 	a.SetDefaultOptions(metric)
 	a.mount = "/opt/share"
 	a.volumeName = "hpctoolkit"
@@ -146,6 +146,10 @@ func (a *HPCToolkit) SetOptions(metric *api.MetricAddon) {
 	events, ok := metric.Options["events"]
 	if ok {
 		a.events = events.StrVal
+	}
+	image, ok := metric.Options["image"]
+	if ok {
+		a.image = image.StrVal
 	}
 	// This will work via a ssh command
 	postAnalysis, ok := metric.Options["postAnalysis"]
@@ -237,11 +241,11 @@ events="%s"
 cat <<EOF > ./post-run.sh
 #!/bin/bash
 # Ensure we are in the workdir
-cd ${workdir}
-hpcstructpath=${viewbin}/hpcstruct
-hpcprofpath=${viewbin}/hpcprof
-${hpcstructpath} ${workdir}/${output}
-${hpcprofpath} -o ${output}-database ${workdir}/${output}
+if [[ "${workdir}" != "" ]]; then
+    cd ${workdir}
+fi
+${viewbin}/hpcstruct ${output}
+${viewbin}/hpcprof -o ${output}-database ${output}
 EOF
 chmod +x ./post-run.sh
 

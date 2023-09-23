@@ -41,20 +41,17 @@ func (m *Lammps) SetOptions(metric *api.Metric) {
 	m.SetDefaultOptions(metric)
 }
 
-// Validate that we can run Lammps
-func (n Lammps) Validate(spec *api.MetricSet) bool {
-	return spec.Spec.Pods >= 2
-}
-
 // Exported options and list options
 func (m Lammps) Options() map[string]intstr.IntOrString {
-	return map[string]intstr.IntOrString{
-		"command": intstr.FromString(m.Command),
-		"workdir": intstr.FromString(m.Workdir),
+	values := map[string]intstr.IntOrString{
+		"command":    intstr.FromString(m.Command),
+		"workdir":    intstr.FromString(m.Workdir),
+		"soleTenacy": intstr.FromString("false"),
 	}
-}
-func (n Lammps) ListOptions() map[string][]intstr.IntOrString {
-	return map[string][]intstr.IntOrString{}
+	if m.SoleTenancy {
+		values["soleTenancy"] = intstr.FromString("true")
+	}
+	return values
 }
 
 // Prepare containers with jobs and entrypoint scripts

@@ -69,8 +69,8 @@ func GetMetric(metric *api.Metric, set *api.MetricSet) (Metric, error) {
 		m.SetOptions(metric)
 
 		// If the metric has a custom container, set here
-		if metric.Container != "" {
-			m.SetContainer(metric.Container)
+		if metric.Image != "" {
+			m.SetContainer(metric.Image)
 		}
 
 		// Register addons, meaning adding the spec but not instantiating yet (or should we?)

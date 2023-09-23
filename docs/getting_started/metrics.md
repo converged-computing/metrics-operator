@@ -236,6 +236,7 @@ to assess performance.
 |-----|-------------|------------|------|---------|
 | command | The full mpirun and lammps command | options->command |string | (see below) |
 | workdir | The working directory for the command | options->workdir | string | /opt/lammps/examples/reaxff/HNS# |
+| soleTenancy | require each pod to have sole tenancy | command->soleTenancy | string | "false" |
 
 For inspection, you can see all the examples provided [in the LAMMPS GitHub repository](https://github.com/lammps/lammps/tree/develop/examples).
 The default command (if you don't change it) intended as an example is:

@@ -240,7 +240,9 @@ to use a shared volume approach. Specifically, we:
 - copy over `/opt/share/software` (provided via the shared empty volume) to `/opt/software`` where spack expects it. We also add `/opt/share/view/bin` to the path (where hpcrun is)
 
 After those steps are done, HPCToolkit is essentially installed, on the fly, in the application container. Since the `hpcrun` command is using `LD_AUDIT` we need
-all libraries to be in the same system (the shared process namespace would not work). We can then run it, and generate a database. Here is an example
+all libraries to be in the same system (the shared process namespace would not work). We can then run it, and generate a database. Also note that by default,
+we run the post-analysis steps (shown below) and also provide them in each container as `post-run.sh`, which the addon will run for you, unless you
+set `postAnalysis` to "false." Finally, if you need to run it manually, here is an example
 given `hpctoolkit-lmp-measurements` in the present working directory of the container.
 
 
@@ -265,8 +267,11 @@ Here are the acceptable parameters.
 |-----|-------------|------------|------|
 | mount | Path to mount hpctoolview view in application container | string | /opt/share |
 | events | Events for hpctoolkit | string |  `-e IO` |
+| image | Customize the contianer image | string | `ghcr.io/converged-computing/metric-hpctoolkit-view:ubuntu` |
+| output | The output directory for hpcrun (database will generate to *-database) | string | hpctoolkit-result |
 
-Note that you can see events available with `hpcrun -L`, and use the container for this metric.
+Note that for image we also provide a rocky build base, `ghcr.io/converged-computing/metric-hpctoolkit-view:rocky`. 
+You can also see events available with `hpcrun -L`, and use the container for this metric.
 There is a brief listing on [this page](https://hpc.llnl.gov/software/development-environment-software/hpc-toolkit).
 We recommend that you do not pair hpctoolkit with another metric, primarily because it is customizing the application
 entrypoint. If you add a process-namespace based metric, you likely need to account for the hpcrun command being the

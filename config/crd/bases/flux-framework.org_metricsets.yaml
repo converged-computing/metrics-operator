@@ -118,8 +118,8 @@ spec:
                               type: boolean
                           type: object
                       type: object
-                    container:
-                      description: Use a custom container (advanced users only)
+                    image:
+                      description: Use a custom container image (advanced users only)
                       type: string
                     listOptions:
                       additionalProperties:

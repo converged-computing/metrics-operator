@@ -174,9 +174,9 @@ type Metric struct {
 	// +optional
 	Options map[string]intstr.IntOrString `json:"options"`
 
-	// Use a custom container (advanced users only)
+	// Use a custom container image (advanced users only)
 	// +optional
-	Container string `json:"container"`
+	Image string `json:"image"`
 
 	// A Metric addon can be storage (volume) or an application,
 	// It's an additional entity that can customize a replicated job,
