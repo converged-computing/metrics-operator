@@ -20,6 +20,11 @@ import (
 )
 
 // This library is currently private
+const (
+	netmarkIdentifier = "network-netmark"
+	netmarkSummary    = "point to point networking tool"
+	netmarkContainer  = "vanessa/netmark:latest"
+)
 
 type Netmark struct {
 	metrics.LauncherWorker
@@ -57,6 +62,10 @@ func (m *Netmark) SetOptions(metric *api.Metric) {
 	m.ResourceSpec = &metric.Resources
 	m.AttributeSpec = &metric.Attributes
 	m.LauncherLetter = "n"
+
+	m.Identifier = netmarkIdentifier
+	m.Summary = netmarkSummary
+	m.Container = netmarkContainer
 
 	// One pod per hostname
 	m.SoleTenancy = true
@@ -224,15 +233,11 @@ echo "%s"
 
 func init() {
 	base := metrics.BaseMetric{
-		Identifier: "network-netmark",
-		Summary:    "point to point networking tool",
-		Container:  "vanessa/netmark:latest",
+		Identifier: netmarkIdentifier,
+		Summary:    netmarkSummary,
+		Container:  netmarkContainer,
 	}
-	launcher := metrics.LauncherWorker{
-		BaseMetric:     base,
-		WorkerScript:   "/metrics_operator/netmark-worker.sh",
-		LauncherScript: "/metrics_operator/netmark-launcher.sh",
-	}
+	launcher := metrics.LauncherWorker{BaseMetric: base}
 	netmark := Netmark{LauncherWorker: launcher}
 	metrics.Register(&netmark)
 }

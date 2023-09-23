@@ -21,6 +21,12 @@ import (
 // https://www.netlib.org/benchmark/hpl/
 // https://ulhpc-tutorials.readthedocs.io/en/production/parallel/mpi/HPL/
 
+const (
+	hplIdentifier = "app-hpl"
+	hplSummary    = "High-Performance Linpack (HPL)"
+	hplContainer  = "ghcr.io/converged-computing/metric-hpl-spack:latest"
+)
+
 // Default input file hpl.dat
 // The output of this is Ns, memory is in GiB
 // -m 128 -NB 192 -r 0.3 -N 2: translates to --mem 128 -NB ${blocksize} -r 0.3 -N ${pods}
@@ -121,6 +127,10 @@ func (m HPL) Url() string {
 func (m *HPL) SetOptions(metric *api.Metric) {
 	m.ResourceSpec = &metric.Resources
 	m.AttributeSpec = &metric.Attributes
+
+	m.Identifier = hplIdentifier
+	m.Summary = hplSummary
+	m.Container = hplContainer
 
 	// Defaults for hpl.dat values.
 	// memory and pods (nodes) calculated on the fly, unless otherwise provided
@@ -394,9 +404,9 @@ echo "%s"
 
 func init() {
 	base := metrics.BaseMetric{
-		Identifier: "app-hpl",
-		Summary:    "High-Performance Linpack (HPL)",
-		Container:  "ghcr.io/converged-computing/metric-hpl-spack:latest",
+		Identifier: hplIdentifier,
+		Summary:    hplSummary,
+		Container:  hplContainer,
 	}
 	launcher := metrics.LauncherWorker{BaseMetric: base}
 	HPL := HPL{LauncherWorker: launcher}

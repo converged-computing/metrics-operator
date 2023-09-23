@@ -21,6 +21,11 @@ import (
 
 // ghcr.io/converged-computing/metric-osu-benchmark:latest
 // https://mvapich.cse.ohio-state.edu/benchmarks/
+const (
+	OSUIdentifier = "network-osu-benchmark"
+	OSUSummary    = "point to point MPI benchmarks"
+	OSUContainer  = "ghcr.io/converged-computing/metric-osu-benchmark:latest"
+)
 
 type BenchmarkConfig struct {
 	Workdir  string
@@ -136,6 +141,11 @@ func (m *OSUBenchmark) addCommand(command string) {
 
 // Set custom options / attributes for the metric
 func (m *OSUBenchmark) SetOptions(metric *api.Metric) {
+
+	m.Identifier = OSUIdentifier
+	m.Container = OSUContainer
+	m.Summary = OSUSummary
+
 	m.lookup = map[string]bool{}
 	m.commands = []string{}
 	m.sleep = 60
@@ -363,15 +373,11 @@ echo "%s"
 
 func init() {
 	base := metrics.BaseMetric{
-		Identifier: "network-osu-benchmark",
-		Summary:    "point to point MPI benchmarks",
-		Container:  "ghcr.io/converged-computing/metric-osu-benchmark:latest",
+		Identifier: OSUIdentifier,
+		Summary:    OSUSummary,
+		Container:  OSUContainer,
 	}
-	launcher := metrics.LauncherWorker{
-		BaseMetric:     base,
-		WorkerScript:   "/metrics_operator/osu-worker.sh",
-		LauncherScript: "/metrics_operator/osu-launcher.sh",
-	}
+	launcher := metrics.LauncherWorker{BaseMetric: base}
 	osu := OSUBenchmark{LauncherWorker: launcher}
 	metrics.Register(&osu)
 }

@@ -19,6 +19,12 @@ import (
 	"github.com/converged-computing/metrics-operator/pkg/specs"
 )
 
+const (
+	iostatIdentifier = "io-sysstat"
+	iostatSummary    = "statistics for Linux tasks (processes) : I/O, CPU, memory, etc."
+	iostatContainer  = "ghcr.io/converged-computing/metric-sysstat:latest"
+)
+
 // sysstat provides a tool "iostat" to assess a storage mount
 // https://github.com/sysstat/sysstat
 
@@ -39,6 +45,11 @@ func (m IOStat) Url() string {
 
 // Set custom options / attributes for the metric
 func (m *IOStat) SetOptions(metric *api.Metric) {
+
+	m.Identifier = iostatIdentifier
+	m.Summary = iostatSummary
+	m.Container = iostatContainer
+
 	m.rate = 10
 	m.completions = 0 // infinite
 	m.ResourceSpec = &metric.Resources
@@ -138,9 +149,9 @@ func (m IOStat) Options() map[string]intstr.IntOrString {
 
 func init() {
 	base := metrics.BaseMetric{
-		Identifier: "io-sysstat",
-		Summary:    "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
-		Container:  "ghcr.io/converged-computing/metric-sysstat:latest",
+		Identifier: iostatIdentifier,
+		Summary:    iostatSummary,
+		Container:  iostatContainer,
 	}
 	storage := metrics.StorageGeneric{BaseMetric: base}
 	iostat := IOStat{StorageGeneric: storage}

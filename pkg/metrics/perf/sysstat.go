@@ -18,6 +18,12 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
+const (
+	pidstatIdentifier = "perf-sysstat"
+	pidstatSummary    = "statistics for Linux tasks (processes) : I/O, CPU, memory, etc."
+	pidstatContainer  = "ghcr.io/converged-computing/metric-sysstat:latest"
+)
+
 // sysstat provides a tool "pidstat" that can monitor a PID (along with others)
 // https://github.com/sysstat/sysstat
 
@@ -40,6 +46,11 @@ func (m PidStat) Url() string {
 
 // Set custom options / attributes for the metric
 func (m *PidStat) SetOptions(metric *api.Metric) {
+
+	m.Identifier = pidstatIdentifier
+	m.Summary = pidstatSummary
+	m.Container = pidstatContainer
+
 	// Defaults for rate and completions
 	m.rate = 10
 	m.completions = 0 // infinite
@@ -257,9 +268,9 @@ done
 
 func init() {
 	base := metrics.BaseMetric{
-		Identifier: "perf-sysstat",
-		Summary:    "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
-		Container:  "ghcr.io/converged-computing/metric-sysstat:latest",
+		Identifier: pidstatIdentifier,
+		Summary:    pidstatSummary,
+		Container:  pidstatContainer,
 	}
 	app := metrics.SingleApplication{BaseMetric: base}
 	pidstat := PidStat{SingleApplication: app}

@@ -176,7 +176,7 @@ type Metric struct {
 
 	// Use a custom container image (advanced users only)
 	// +optional
-	Image string `json:"image"`
+	Image string `json:"image,omitempty"`
 
 	// A Metric addon can be storage (volume) or an application,
 	// It's an additional entity that can customize a replicated job,

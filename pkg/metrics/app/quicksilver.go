@@ -14,6 +14,12 @@ import (
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 
+const (
+	qsIdentifier = "app-quicksilver"
+	qsSummary    = "A proxy app for the Monte Carlo Transport Code"
+	qsContainer  = "ghcr.io/converged-computing/metric-quicksilver:latest"
+)
+
 type Quicksilver struct {
 	metrics.LauncherWorker
 }
@@ -29,6 +35,11 @@ func (m Quicksilver) Url() string {
 
 // Set custom options / attributes for the metric
 func (m *Quicksilver) SetOptions(metric *api.Metric) {
+
+	m.Identifier = qsIdentifier
+	m.Summary = qsSummary
+	m.Container = qsContainer
+
 	// Set user defined values or fall back to defaults
 	m.Prefix = "mpirun --hostfile ./hostlist.txt"
 	m.Command = "qs /opt/quicksilver/Examples/CORAL2_Benchmark/Problem1/Coral2_P1.inp"
@@ -47,15 +58,11 @@ func (m Quicksilver) Options() map[string]intstr.IntOrString {
 
 func init() {
 	base := metrics.BaseMetric{
-		Identifier: "app-quicksilver",
-		Summary:    "A proxy app for the Monte Carlo Transport Code",
-		Container:  "ghcr.io/converged-computing/metric-quicksilver:latest",
+		Identifier: qsIdentifier,
+		Summary:    qsSummary,
+		Container:  qsContainer,
 	}
-	launcher := metrics.LauncherWorker{
-		BaseMetric:     base,
-		WorkerScript:   "/metrics_operator/quicksilver-worker.sh",
-		LauncherScript: "/metrics_operator/quicksilver-launcher.sh",
-	}
+	launcher := metrics.LauncherWorker{BaseMetric: base}
 	Quicksilver := Quicksilver{LauncherWorker: launcher}
 	metrics.Register(&Quicksilver)
 }

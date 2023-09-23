@@ -10,6 +10,7 @@ package metrics
 import (
 	"fmt"
 	"log"
+	"reflect"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	addons "github.com/converged-computing/metrics-operator/pkg/addons"
@@ -63,7 +64,15 @@ type Metric interface {
 func GetMetric(metric *api.Metric, set *api.MetricSet) (Metric, error) {
 
 	if _, ok := Registry[metric.Name]; ok {
-		m := Registry[metric.Name]
+
+		// Start with the empty template, and create a copy
+		// This is important so we don't preserve state to the actaul interface
+		template := Registry[metric.Name]
+		templateType := reflect.ValueOf(template)
+		if templateType.Kind() == reflect.Ptr {
+			templateType = reflect.Indirect(templateType)
+		}
+		m := reflect.New(templateType.Type()).Interface().(Metric)
 
 		// Set global and custom options on the registry metric from the CRD
 		m.SetOptions(metric)

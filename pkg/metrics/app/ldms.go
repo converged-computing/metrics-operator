@@ -18,6 +18,12 @@ import (
 	"github.com/converged-computing/metrics-operator/pkg/specs"
 )
 
+const (
+	ldmsIdentifier = "app-ldms"
+	ldmsSummary    = "provides LDMS, a low-overhead, low-latency framework for collecting, transferring, and storing metric data on a large distributed computer system."
+	ldmsContainer  = "ghcr.io/converged-computing/metric-ovis-hpc:latest"
+)
+
 type LDMS struct {
 	metrics.SingleApplication
 
@@ -40,11 +46,15 @@ func (m LDMS) Url() string {
 func (m *LDMS) SetOptions(metric *api.Metric) {
 	m.ResourceSpec = &metric.Resources
 	m.AttributeSpec = &metric.Attributes
+
+	m.Identifier = ldmsIdentifier
+	m.Container = ldmsContainer
+	m.Summary = ldmsSummary
 	m.rate = 10
 
 	// Set user defined values or fall back to defaults
 	m.command = "ldms_ls -h localhost -x sock -p 10444 -l -v"
-	m.WorkingDir = "/opt"
+	m.Workdir = "/opt"
 
 	command, ok := metric.Options["command"]
 	if ok {
@@ -52,7 +62,7 @@ func (m *LDMS) SetOptions(metric *api.Metric) {
 	}
 	workdir, ok := metric.Options["workdir"]
 	if ok {
-		m.WorkingDir = workdir.StrVal
+		m.Workdir = workdir.StrVal
 	}
 	completions, ok := metric.Options["completions"]
 	if ok {
@@ -72,7 +82,7 @@ func (m LDMS) Options() map[string]intstr.IntOrString {
 		"rate":        intstr.FromInt(int(m.rate)),
 		"completions": intstr.FromInt(int(m.completions)),
 		"command":     intstr.FromString(m.command),
-		"workdir":     intstr.FromString(m.WorkingDir),
+		"workdir":     intstr.FromString(m.Workdir),
 	}
 }
 func (n LDMS) ListOptions() map[string][]intstr.IntOrString {
@@ -138,9 +148,9 @@ echo "%s"
 
 func init() {
 	base := metrics.BaseMetric{
-		Identifier: "app-ldms",
-		Summary:    "provides LDMS, a low-overhead, low-latency framework for collecting, transferring, and storing metric data on a large distributed computer system.",
-		Container:  "ghcr.io/converged-computing/metric-ovis-hpc:latest",
+		Identifier: ldmsIdentifier,
+		Summary:    ldmsSummary,
+		Container:  ldmsContainer,
 	}
 	single := metrics.SingleApplication{BaseMetric: base}
 	LDMS := LDMS{SingleApplication: single}

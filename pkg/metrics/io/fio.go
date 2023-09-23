@@ -21,6 +21,12 @@ import (
 // FIO means Flexible IO
 // https://docs.gitlab.com/ee/administration/operations/filesystem_benchmarking.html
 
+const (
+	fioIdentifier = "io-fio"
+	fioSummary    = "Flexible IO Tester (FIO)"
+	fioContainer  = "ghcr.io/converged-computing/metric-fio:latest"
+)
+
 type Fio struct {
 	metrics.StorageGeneric
 
@@ -48,6 +54,10 @@ func (m Fio) Url() string {
 func (m *Fio) SetOptions(metric *api.Metric) {
 	m.ResourceSpec = &metric.Resources
 	m.AttributeSpec = &metric.Attributes
+
+	m.Identifier = fioIdentifier
+	m.Summary = fioSummary
+	m.Container = fioContainer
 
 	// Set defaults for options
 	m.testname = "test"
@@ -174,9 +184,9 @@ func (m Fio) Options() map[string]intstr.IntOrString {
 
 func init() {
 	base := metrics.BaseMetric{
-		Identifier: "io-fio",
-		Summary:    "Flexible IO Tester (FIO)",
-		Container:  "ghcr.io/converged-computing/metric-fio:latest",
+		Identifier: fioIdentifier,
+		Summary:    fioSummary,
+		Container:  fioContainer,
 	}
 	storage := metrics.StorageGeneric{BaseMetric: base}
 	fio := Fio{StorageGeneric: storage}

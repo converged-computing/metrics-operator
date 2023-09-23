@@ -51,7 +51,7 @@ func (m *SingleApplication) ApplicationContainerSpec(
 		JobName:          ReplicatedJobName,
 		Image:            m.Image(),
 		Name:             "app",
-		WorkingDir:       m.WorkingDir,
+		WorkingDir:       m.Workdir,
 		EntrypointScript: entrypoint,
 		Resources:        m.ResourceSpec,
 		Attributes:       m.AttributeSpec,

@@ -20,7 +20,7 @@ type BaseMetric struct {
 	Identifier string
 	Summary    string
 	Container  string
-	WorkingDir string
+	Workdir    string
 
 	// A custom container can be used to replace the application
 	// (typically advanced users only)

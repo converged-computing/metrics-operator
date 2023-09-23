@@ -22,6 +22,12 @@ import (
 // ghcr.io/converged-computing/metric-osu-benchmark:latest
 // https://mvapich.cse.ohio-state.edu/benchmarks/
 
+const (
+	cbIdentifier = "network-chatterbug"
+	cbSummary    = "A suite of communication proxies for HPC applications"
+	cbContainer  = "ghcr.io/converged-computing/metric-chatterbug:latest"
+)
+
 var (
 
 	// Directory (app) name and executable in /root/chatterbug
@@ -63,6 +69,10 @@ func (m *Chatterbug) hasCommand(command string) bool {
 // Set custom options / attributes for the metric
 func (m *Chatterbug) SetOptions(metric *api.Metric) {
 	m.lookup = map[string]bool{}
+
+	m.Identifier = cbIdentifier
+	m.Container = cbContainer
+	m.Summary = cbSummary
 
 	// Default command and args (for a demo)
 	m.command = "stencil3d"
@@ -220,15 +230,11 @@ echo "%s"
 
 func init() {
 	base := metrics.BaseMetric{
-		Identifier: "network-chatterbug",
-		Summary:    "A suite of communication proxies for HPC applications",
-		Container:  "ghcr.io/converged-computing/metric-chatterbug:latest",
+		Identifier: cbIdentifier,
+		Summary:    cbSummary,
+		Container:  cbContainer,
 	}
-	launcher := metrics.LauncherWorker{
-		BaseMetric:     base,
-		WorkerScript:   "/metrics_operator/chatterbug-worker.sh",
-		LauncherScript: "/metrics_operator/chatterbug-launcher.sh",
-	}
+	launcher := metrics.LauncherWorker{BaseMetric: base}
 	bug := Chatterbug{LauncherWorker: launcher}
 	metrics.Register(&bug)
 }

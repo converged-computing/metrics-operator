@@ -18,6 +18,12 @@ import (
 	"github.com/converged-computing/metrics-operator/pkg/specs"
 )
 
+const (
+	lammpsIdentifier = "app-lammps"
+	lammpsSummary    = "LAMMPS molecular dynamic simulation"
+	lammpsContainer  = "ghcr.io/converged-computing/metric-lammps:latest"
+)
+
 type Lammps struct {
 	metrics.LauncherWorker
 }
@@ -33,6 +39,12 @@ func (m Lammps) Family() string {
 
 // Set custom options / attributes for the metric
 func (m *Lammps) SetOptions(metric *api.Metric) {
+
+	// Default metric options, these are overridden when we reflect
+	m.Identifier = lammpsIdentifier
+	m.Summary = lammpsSummary
+	m.Container = lammpsContainer
+
 	// Set user defined values or fall back to defaults
 	// This is a more manual approach that puts the user in charge of determining the entire command
 	// This more closely matches what we might do on HPC :)
@@ -109,17 +121,14 @@ echo "%s"
 	return []*specs.ContainerSpec{&launcherContainer, &workerContainer}
 }
 
+// TODO can we have a new function instead?
 func init() {
 	base := metrics.BaseMetric{
-		Identifier: "app-lammps",
-		Summary:    "LAMMPS molecular dynamic simulation",
-		Container:  "ghcr.io/converged-computing/metric-lammps:latest",
+		Identifier: lammpsIdentifier,
+		Summary:    lammpsSummary,
+		Container:  lammpsContainer,
 	}
-	launcher := metrics.LauncherWorker{
-		BaseMetric:     base,
-		WorkerScript:   "/metrics_operator/lammps-worker.sh",
-		LauncherScript: "/metrics_operator/lammps-launcher.sh",
-	}
+	launcher := metrics.LauncherWorker{BaseMetric: base}
 	lammps := Lammps{LauncherWorker: launcher}
 	metrics.Register(&lammps)
 }

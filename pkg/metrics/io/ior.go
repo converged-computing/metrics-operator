@@ -18,6 +18,12 @@ import (
 	"github.com/converged-computing/metrics-operator/pkg/specs"
 )
 
+const (
+	iorIdentifier = "io-ior"
+	iorSummary    = "HPC IO Benchmark"
+	iorContainer  = "ghcr.io/converged-computing/metric-ior:latest"
+)
+
 // Ior means Flexible IO
 // https://docs.gitlab.com/ee/administration/operations/filesystem_benchmarking.html
 
@@ -39,6 +45,10 @@ func (m Ior) Url() string {
 func (m *Ior) SetOptions(metric *api.Metric) {
 	m.ResourceSpec = &metric.Resources
 	m.AttributeSpec = &metric.Attributes
+
+	m.Identifier = iorIdentifier
+	m.Container = iorContainer
+	m.Summary = iorSummary
 
 	// Set defaults for options
 	m.command = "ior -w -r -o testfile"
@@ -115,9 +125,9 @@ func (m Ior) Options() map[string]intstr.IntOrString {
 
 func init() {
 	base := metrics.BaseMetric{
-		Identifier: "io-ior",
-		Summary:    "HPC IO Benchmark",
-		Container:  "ghcr.io/converged-computing/metric-ior:latest",
+		Identifier: iorIdentifier,
+		Summary:    iorSummary,
+		Container:  iorContainer,
 	}
 	storage := metrics.StorageGeneric{BaseMetric: base}
 	Ior := Ior{StorageGeneric: storage}

@@ -29,11 +29,6 @@ var (
 // be accessible by other packages (and not conflict with function names)
 type LauncherWorker struct {
 	BaseMetric
-
-	Identifier    string
-	Summary       string
-	Container     string
-	Workdir       string
 	ResourceSpec  *api.ContainerResources
 	AttributeSpec *api.ContainerSpec
 

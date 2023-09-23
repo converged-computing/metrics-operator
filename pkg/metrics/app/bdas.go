@@ -18,6 +18,12 @@ import (
 	"github.com/converged-computing/metrics-operator/pkg/specs"
 )
 
+const (
+	bdasIdentifier = "app-bdas"
+	bdasSummary    = "The big data analytic suite contains the K-Means observation label, PCA, and SVM benchmarks."
+	bdasContainer  = "ghcr.io/converged-computing/metric-bdas:latest"
+)
+
 type BDAS struct {
 	metrics.LauncherWorker
 }
@@ -33,6 +39,11 @@ func (m BDAS) Url() string {
 
 // Set custom options / attributes for the metric
 func (m *BDAS) SetOptions(metric *api.Metric) {
+
+	// Metadatqa
+	m.Identifier = bdasIdentifier
+	m.Summary = bdasSummary
+	m.Container = bdasContainer
 
 	// Set user defined values or fall back to defaults
 	m.Prefix = "/bin/bash"
@@ -118,9 +129,9 @@ echo "%s"
 
 func init() {
 	base := metrics.BaseMetric{
-		Identifier: "app-bdas",
-		Summary:    "The big data analytic suite contains the K-Means observation label, PCA, and SVM benchmarks.",
-		Container:  "ghcr.io/converged-computing/metric-bdas:latest",
+		Identifier: bdasIdentifier,
+		Summary:    bdasSummary,
+		Container:  bdasContainer,
 	}
 	launcher := metrics.LauncherWorker{BaseMetric: base}
 	BDAS := BDAS{LauncherWorker: launcher}

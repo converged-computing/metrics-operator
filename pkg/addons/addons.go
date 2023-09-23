@@ -10,6 +10,7 @@ package addons
 import (
 	"fmt"
 	"log"
+	"reflect"
 
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
@@ -97,10 +98,17 @@ func (b AddonBase) MapOptions() map[string]map[string]intstr.IntOrString {
 
 // GetAddon looks up and validates an addon
 func GetAddon(a *api.MetricAddon) (Addon, error) {
-	addon, ok := Registry[a.Name]
+
+	// We don't want to change the addon interface/struct itself
+	template, ok := Registry[a.Name]
 	if !ok {
 		return nil, fmt.Errorf("%s is not a known addon", a.Name)
 	}
+	templateType := reflect.ValueOf(template)
+	if templateType.Kind() == reflect.Ptr {
+		templateType = reflect.Indirect(templateType)
+	}
+	addon := reflect.New(templateType.Type()).Interface().(Addon)
 
 	// Set options before validation
 	addon.SetOptions(a)

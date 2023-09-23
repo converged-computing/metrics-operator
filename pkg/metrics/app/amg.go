@@ -14,6 +14,12 @@ import (
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 
+const (
+	amgIdentifier = "app-amg"
+	amgSummary    = "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids"
+	amgContainer  = "ghcr.io/converged-computing/metric-amg:latest"
+)
+
 // AMG is a launcher + workers metric application
 type AMG struct {
 	metrics.LauncherWorker
@@ -30,6 +36,12 @@ func (m AMG) Family() string {
 
 // Set custom options / attributes for the metric
 func (m *AMG) SetOptions(metric *api.Metric) {
+
+	// TODO change these to class varaibles? then set in two places...
+	m.Identifier = amgIdentifier
+	m.Summary = amgSummary
+	m.Container = amgContainer
+
 	// Set user defined values or fall back to defaults
 	m.Prefix = "mpirun --hostfile ./hostlist.txt"
 	m.Command = "amg"
@@ -53,15 +65,11 @@ func (m AMG) Options() map[string]intstr.IntOrString {
 
 func init() {
 	base := metrics.BaseMetric{
-		Identifier: "app-amg",
-		Summary:    "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
-		Container:  "ghcr.io/converged-computing/metric-amg:latest",
+		Identifier: amgIdentifier,
+		Summary:    amgSummary,
+		Container:  amgContainer,
 	}
-	launcher := metrics.LauncherWorker{
-		BaseMetric:     base,
-		WorkerScript:   "/metrics_operator/amg-worker.sh",
-		LauncherScript: "/metrics_operator/amg-launcher.sh",
-	}
+	launcher := metrics.LauncherWorker{BaseMetric: base}
 	amg := AMG{LauncherWorker: launcher}
 	metrics.Register(&amg)
 }

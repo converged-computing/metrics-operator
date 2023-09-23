@@ -14,6 +14,12 @@ import (
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 
+const (
+	pennantIdentifier = "app-pennant"
+	pennantSummary    = "Unstructured mesh hydrodynamics for advanced architectures "
+	pennantContainer  = "ghcr.io/converged-computing/metric-pennant:latest"
+)
+
 type Pennant struct {
 	metrics.LauncherWorker
 }
@@ -29,6 +35,11 @@ func (m Pennant) Url() string {
 
 // Set custom options / attributes for the metric
 func (m *Pennant) SetOptions(metric *api.Metric) {
+
+	m.Container = pennantContainer
+	m.Identifier = pennantIdentifier
+	m.Summary = pennantSummary
+
 	// Set user defined values or fall back to defaults
 	m.Prefix = "mpirun --hostfile ./hostlist.txt"
 	m.Command = "pennant /opt/pennant/test/sedovsmall/sedovsmall.pnt"
@@ -47,15 +58,11 @@ func (m Pennant) Options() map[string]intstr.IntOrString {
 
 func init() {
 	base := metrics.BaseMetric{
-		Identifier: "app-pennant",
-		Summary:    "Unstructured mesh hydrodynamics for advanced architectures ",
-		Container:  "ghcr.io/converged-computing/metric-pennant:latest",
+		Identifier: pennantIdentifier,
+		Summary:    pennantSummary,
+		Container:  pennantContainer,
 	}
-	launcher := metrics.LauncherWorker{
-		BaseMetric:     base,
-		WorkerScript:   "/metrics_operator/pennant-worker.sh",
-		LauncherScript: "/metrics_operator/pennant-launcher.sh",
-	}
+	launcher := metrics.LauncherWorker{BaseMetric: base}
 	Pennant := Pennant{LauncherWorker: launcher}
 	metrics.Register(&Pennant)
 }

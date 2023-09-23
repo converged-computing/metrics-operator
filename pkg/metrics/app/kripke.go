@@ -14,6 +14,12 @@ import (
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 
+const (
+	kripkeIdentifier = "app-kripke"
+	kripkeSummary    = "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids"
+	kripkeContainer  = "ghcr.io/converged-computing/metric-kripke:latest"
+)
+
 type Kripke struct {
 	metrics.LauncherWorker
 }
@@ -29,6 +35,10 @@ func (m Kripke) Family() string {
 
 // Set custom options / attributes for the metric
 func (m *Kripke) SetOptions(metric *api.Metric) {
+
+	m.Identifier = kripkeIdentifier
+	m.Summary = kripkeSummary
+	m.Container = kripkeContainer
 
 	// Set user defined values or fall back to defaults
 	m.Prefix = "mpirun --hostfile ./hostlist.txt"
@@ -56,15 +66,11 @@ func (n Kripke) ListOptions() map[string][]intstr.IntOrString {
 
 func init() {
 	base := metrics.BaseMetric{
-		Identifier: "app-kripke",
-		Summary:    "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
-		Container:  "ghcr.io/converged-computing/metric-kripke:latest",
+		Identifier: kripkeIdentifier,
+		Summary:    kripkeSummary,
+		Container:  kripkeSummary,
 	}
-	launcher := metrics.LauncherWorker{
-		BaseMetric:     base,
-		WorkerScript:   "/metrics_operator/kripke-worker.sh",
-		LauncherScript: "/metrics_operator/kripke-launcher.sh",
-	}
+	launcher := metrics.LauncherWorker{BaseMetric: base}
 	kripke := Kripke{LauncherWorker: launcher}
 	metrics.Register(&kripke)
 }

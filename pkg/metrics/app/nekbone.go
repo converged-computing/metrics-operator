@@ -14,6 +14,12 @@ import (
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 
+const (
+	nekboneIdentifier = "app-nekbone"
+	nekboneSummary    = "A mini-app derived from the Nek5000 CFD code which is a high order, incompressible Navier-Stokes CFD solver based on the spectral element method. The conjugate gradiant solve is compute intense, contains small messages and frequent allreduces."
+	nekboneContainer  = "ghcr.io/converged-computing/metric-nekbone:latest"
+)
+
 type Nekbone struct {
 	metrics.LauncherWorker
 }
@@ -30,6 +36,9 @@ func (m Nekbone) Url() string {
 // Set custom options / attributes for the metric
 func (m *Nekbone) SetOptions(metric *api.Metric) {
 	// Set user defined values or fall back to defaults
+	m.Identifier = nekboneIdentifier
+	m.Summary = nekboneSummary
+	m.Container = nekboneContainer
 	m.Prefix = "/bin/bash"
 	m.Command = "mpiexec --hostfile ./hostlist.txt -np 2 ./nekbone"
 	m.Workdir = "/root/nekbone-3.0/test/example2"
@@ -47,9 +56,9 @@ func (m Nekbone) Options() map[string]intstr.IntOrString {
 
 func init() {
 	base := metrics.BaseMetric{
-		Identifier: "app-nekbone",
-		Summary:    "A mini-app derived from the Nek5000 CFD code which is a high order, incompressible Navier-Stokes CFD solver based on the spectral element method. The conjugate gradiant solve is compute intense, contains small messages and frequent allreduces.",
-		Container:  "ghcr.io/converged-computing/metric-nekbone:latest",
+		Identifier: nekboneIdentifier,
+		Summary:    nekboneSummary,
+		Container:  nekboneContainer,
 	}
 	launcher := metrics.LauncherWorker{BaseMetric: base}
 	Nekbone := Nekbone{LauncherWorker: launcher}
