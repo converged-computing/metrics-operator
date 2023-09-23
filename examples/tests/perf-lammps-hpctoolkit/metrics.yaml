@@ -17,7 +17,8 @@ spec:
    - name: app-lammps
 
      # How to define a custom lammps container (advanced users)
-     image: ghcr.io/converged-computing/metric-lammps-intel-mpi:rocky
+     # This is for if you use rocky, not the default
+     # image: ghcr.io/converged-computing/metric-lammps-intel-mpi:rocky
 
      options:
        command: lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite
@@ -32,14 +33,17 @@ spec:
            events:  "-e REALTIME@100"
 
            # Use a custom container here too (we have for rocky and ubuntu)
-           image: ghcr.io/converged-computing/metric-hpctoolkit-view:rocky 
+           # image: ghcr.io/converged-computing/metric-hpctoolkit-view:rocky 
 
            # Don't run post analysis - script will still be generated
            # postAnalysis: "false"
            
            # hpcrun needs to have mpirun in front of hpcrun <command> e.g.,
            # mpirun <MPI args> hpcrun <hpcrun args> <app> <app args>
-           prefix: /opt/intel/mpi/2021.8.0/bin/mpirun --hostfile ./hostlist.txt -np 4 --map-by socket
+           prefix: mpirun --hostfile ./hostlist.txt -np 4 --map-by socket
+
+           # This is for rocky
+           #prefix: /opt/intel/mpi/2021.8.0/bin/mpirun --hostfile ./hostlist.txt -np 4 --map-by socket
 
            # Ensure the working directory is consistent
            workdir: /opt/lammps/examples/reaxff/HNS
