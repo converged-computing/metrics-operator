@@ -41,6 +41,11 @@ func (m *Lammps) SetOptions(metric *api.Metric) {
 	m.SetDefaultOptions(metric)
 }
 
+// LAMMPS can be run on one node
+func (m Lammps) Validate(spec *api.MetricSet) bool {
+	return true
+}
+
 // Exported options and list options
 func (m Lammps) Options() map[string]intstr.IntOrString {
 	values := map[string]intstr.IntOrString{

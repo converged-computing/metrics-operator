@@ -278,6 +278,7 @@ for host in $(cat ./hostlist.txt); do
         ssh ${host} ${workdir}/post-run.sh
     fi
 done
+echo "METRICS-OPERATOR HPCTOOLKIT Post analysis done."
 `
 	}
 
