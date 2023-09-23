@@ -22,8 +22,11 @@ type BaseMetric struct {
 	Container  string
 	WorkingDir string
 
-	ResourceSpec  *api.ContainerResources
-	AttributeSpec *api.ContainerSpec
+	// A custom container can be used to replace the application
+	// (typically advanced users only)
+	CustomContainer string
+	ResourceSpec    *api.ContainerResources
+	AttributeSpec   *api.ContainerSpec
 
 	// If we ask for sole tenancy, we assign 1 pod / hostname
 	SoleTenancy bool
@@ -47,13 +50,18 @@ func (m BaseMetric) Name() string {
 	return m.Identifier
 }
 
+// Set a custom container
+func (m *BaseMetric) SetContainer(container string) {
+	m.Container = container
+}
+
 // Description returns the metric description
 func (m BaseMetric) Description() string {
 	return m.Summary
 }
 
 // Container
-func (m BaseMetric) Image() string {
+func (m *BaseMetric) Image() string {
 	return m.Container
 }
 

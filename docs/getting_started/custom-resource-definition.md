@@ -73,6 +73,15 @@ spec:
     - name: perf-sysstat
 ```
 
+For any metric, advanced users might want to set a custom container. This is done at your own expertise (and risk):
+
+```yaml
+spec:
+  metrics:
+    - name: perf-sysstat
+      container: ghcr.io/my-github/my-sysstat-container:latest
+```
+
 To see all the metrics available, see [metrics](metrics.md). We will be adding many more as the operator is developed.
 
 #### options

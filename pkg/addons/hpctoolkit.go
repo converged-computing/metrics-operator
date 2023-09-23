@@ -10,6 +10,7 @@ package addons
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"github.com/converged-computing/metrics-operator/pkg/metadata"
@@ -26,6 +27,13 @@ type HPCToolkit struct {
 
 	// Target is the name of the replicated job to customize entrypoint logic for
 	target string
+
+	// Output files
+	// This is the main output file, and then the database is this + -database
+	output string
+
+	// Run a post analysis with hpcstruct and hpcprof to generate a database
+	postAnalysis bool
 
 	// ContainerTarget is the name of the container to add the entrypoint logic to
 	containerTarget string
@@ -107,8 +115,14 @@ func (a *HPCToolkit) SetOptions(metric *api.MetricAddon) {
 	a.SetDefaultOptions(metric)
 	a.mount = "/opt/share"
 	a.volumeName = "hpctoolkit"
+	a.output = "hpctoolkit-result"
+	a.postAnalysis = true
 
 	// UseColor set to anything means to use it
+	output, ok := metric.Options["output"]
+	if ok {
+		a.output = output.StrVal
+	}
 	mount, ok := metric.Options["mount"]
 	if ok {
 		a.mount = mount.StrVal
@@ -132,6 +146,13 @@ func (a *HPCToolkit) SetOptions(metric *api.MetricAddon) {
 	events, ok := metric.Options["events"]
 	if ok {
 		a.events = events.StrVal
+	}
+	// This will work via a ssh command
+	postAnalysis, ok := metric.Options["postAnalysis"]
+	if ok {
+		if postAnalysis.StrVal == "no" || postAnalysis.StrVal == "false" {
+			a.postAnalysis = false
+		}
 	}
 }
 
@@ -205,15 +226,31 @@ sleep 5
 # This will work with capability SYS_ADMIN added.
 # It will only work with privileged set to true AT YOUR OWN RISK!
 echo "-1" | tee /proc/sys/kernel/perf_event_paranoid
-	
+
+# The output path for the analysis
+output="%s"
+
 # Run hpcrun. See options with hpcrun -L
 events="%s"
+
+# Write a script to run for the post block analysis
+cat <<EOF > ./post-run.sh
+#!/bin/bash
+# Ensure we are in the workdir
+cd ${workdir}
+hpcstructpath=${viewbin}/hpcstruct
+hpcprofpath=${viewbin}/hpcprof
+${hpcstructpath} ${workdir}/${output}
+${hpcprofpath} -o ${output}-database ${workdir}/${output}
+EOF
+chmod +x ./post-run.sh
+
 echo "%s"
 echo "%s"
-	
+
 # Commands to interact with output data
-# hpcprof hpctoolkit-sleep-measurements
 # hpcstruct hpctoolkit-sleep-measurements
+# hpcprof hpctoolkit-sleep-measurements
 # hpcviewer ./hpctoolkit-lmp-database
 `
 	preBlock = fmt.Sprintf(
@@ -221,10 +258,26 @@ echo "%s"
 		meta,
 		a.mount,
 		a.mount,
+		a.output,
 		a.events,
 		metadata.CollectionStart,
 		metadata.Separator,
 	)
+
+	// postBlock to possibly run the hpcstruct command should come right after
+	postBlock := ""
+	if a.postAnalysis {
+		postBlock = `
+# Run the command here for us
+bash ./post-run.sh
+
+# And for all the nodes
+for host in $(cat ./hostlist.txt); do
+    echo "Running post analysis for host ${host}"
+    ssh ${host} ${workdir}/post-run.sh
+done
+`
+	}
 
 	// Add the working directory, if defined
 	if a.workdir != "" {
@@ -250,8 +303,31 @@ cd ${workdir}
 		if a.containerTarget != "" && containerSpec.Name != "" && a.containerTarget != containerSpec.Name {
 			continue
 		}
-		containerSpec.EntrypointScript.Command = fmt.Sprintf("%s $hpcrunpath $events %s", a.prefix, containerSpec.EntrypointScript.Command)
+
+		// If the post command ends with sleep infinity, tweak it
+		isInteractive, updatedPost := deriveUpdatedPost(containerSpec.EntrypointScript.Post)
+		containerSpec.EntrypointScript.Post = updatedPost
+
+		// The post to run the command across nodes (when the application finishes)
+		containerSpec.EntrypointScript.Post = containerSpec.EntrypointScript.Post + "\n" + postBlock
+		containerSpec.EntrypointScript.Command = fmt.Sprintf("%s $hpcrunpath -o $output $events %s", a.prefix, containerSpec.EntrypointScript.Command)
+
+		// If is interactive, add back sleep infinity
+		if isInteractive {
+			containerSpec.EntrypointScript.Post += "\nsleep infinity\n"
+		}
 	}
+}
+
+// update a post command to not end in sleep
+func deriveUpdatedPost(post string) (bool, string) {
+	if strings.HasSuffix(post, "sleep infinity\n") {
+		updated := strings.Split(post, "\n")
+		// This is actually two lines
+		updated = updated[:len(updated)-2]
+		return true, strings.Join(updated, "\n")
+	}
+	return false, post
 }
 
 // Generate a container spec that will map to a listing of containers for the replicated job

@@ -31,6 +31,9 @@ type Fio struct {
 	size      string
 	directory string
 
+	// Or just define the entire command
+	command string
+
 	// extra commands for pre, post, etc.
 	pre    string
 	post   string
@@ -56,6 +59,10 @@ func (m *Fio) SetOptions(metric *api.Metric) {
 	v, ok := metric.Options["testname"]
 	if ok {
 		m.testname = v.StrVal
+	}
+	v, ok = metric.Options["command"]
+	if ok {
+		m.command = v.StrVal
 	}
 	v, ok = metric.Options["blocksize"]
 	if ok {
@@ -95,13 +102,28 @@ func (m Fio) PrepareContainers(
 	// Metadata to add to beginning of run
 	meta := metrics.Metadata(spec, metric)
 
+	// Assemble the command first. This way, the user can define the entire thing OR we can control it
+	command := "%s fio --randrepeat=1 --ioengine=libaio --direct=1 --gtod_reduce=1 --name=%s --bs=%s --iodepth=%d --readwrite=randrw --rwmixread=75 --size=%s --filename=$filename --output-format=json"
+	command = fmt.Sprintf(
+		command,
+		m.prefix,
+		m.testname,
+		m.blocksize,
+		m.iodepth,
+		m.size,
+	)
+	// Overwrite with user command
+	if m.command != "" {
+		command = m.command
+	}
+
 	preBlock := `#!/bin/bash
 echo "%s"
 # Directory (and filename) for test assuming other storage mounts
 filename=%s/test-$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 32)
 # Run the pre-command here so it has access to the filename.
 %s
-command="%s fio --randrepeat=1 --ioengine=libaio --direct=1 --gtod_reduce=1 --name=%s --bs=%s --iodepth=%d --readwrite=randrw --rwmixread=75 --size=%s --filename=$filename --output-format=json"
+command="%s"
 echo "FIO COMMAND START"
 echo $command
 echo "FIO COMMAND END"
@@ -114,11 +136,7 @@ echo "%s"
 		meta,
 		m.directory,
 		m.pre,
-		m.prefix,
-		m.testname,
-		m.blocksize,
-		m.iodepth,
-		m.size,
+		command,
 		metadata.CollectionStart,
 		metadata.Separator,
 	)
@@ -150,6 +168,7 @@ func (m Fio) Options() map[string]intstr.IntOrString {
 		"iodepth":   intstr.FromInt(m.iodepth),
 		"size":      intstr.FromString(m.size),
 		"directory": intstr.FromString(m.directory),
+		"command":   intstr.FromString(m.command),
 	}
 }
 

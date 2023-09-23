@@ -12,6 +12,7 @@ spec:
     interactive: true
 
   metrics:
+
    # Running more scaled lammps is our main goal
    - name: app-lammps
      options:
@@ -23,11 +24,12 @@ spec:
        - name: perf-hpctoolkit
          options:
            mount: /opt/mnt
-           events: "-e IO"
+           # Where is the event blocked / taking more time
+           events:  "-e REALTIME@100"
 
            # hpcrun needs to have mpirun in front of hpcrun <command> e.g.,
            # mpirun <MPI args> hpcrun <hpcrun args> <app> <app args>
-           prefix: mpirun --hostfile ./hostlist.txt -np 2 --map-by socket
+           prefix: mpirun --hostfile ./hostlist.txt -np 4 --map-by socket
 
            # Ensure the working directory is consistent
            workdir: /opt/lammps/examples/reaxff/HNS

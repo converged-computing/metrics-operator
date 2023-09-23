@@ -33,6 +33,7 @@ type Metric interface {
 
 	// Container attributes
 	Image() string
+	SetContainer(string)
 
 	// Options and exportable attributes
 	SetOptions(*api.Metric)
@@ -66,6 +67,11 @@ func GetMetric(metric *api.Metric, set *api.MetricSet) (Metric, error) {
 
 		// Set global and custom options on the registry metric from the CRD
 		m.SetOptions(metric)
+
+		// If the metric has a custom container, set here
+		if metric.Container != "" {
+			m.SetContainer(metric.Container)
+		}
 
 		// Register addons, meaning adding the spec but not instantiating yet (or should we?)
 		for _, a := range metric.Addons {
