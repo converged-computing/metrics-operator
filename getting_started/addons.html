@@ -437,6 +437,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#command-addons" class="md-nav__link">
+    <span title="/getting_started/addons.md#command-addons (reference label)" class="md-ellipsis">Command Addons</span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Command Addons">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands" class="md-nav__link">
+    <span title="/getting_started/addons.md#commands (reference label)" class="md-ellipsis">Commands</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#perf" class="md-nav__link">
+    <span title="/getting_started/addons.md#perf (reference label)" class="md-ellipsis">Perf</span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#existing-volumes" class="md-nav__link">
     <span title="/getting_started/addons.md#existing-volumes (reference label)" class="md-ellipsis">Existing Volumes</span>
   </a>
@@ -469,60 +496,6 @@
   <a href="#hostpath-volume-addon-example" class="md-nav__link">
     <span title="/getting_started/addons.md#hostpath-volume-addon-example (reference label)" class="md-ellipsis">hostpath volume addon example</span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#application" class="md-nav__link">
-    <span title="/getting_started/addons.md#application (reference label)" class="md-ellipsis">application</span>
-  </a>
-  
-    <nav class="md-nav" aria-label="application">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#workingdir" class="md-nav__link">
-    <span title="/getting_started/addons.md#workingdir (reference label)" class="md-ellipsis">working<wbr>Dir</span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#volumes" class="md-nav__link">
-    <span title="/getting_started/addons.md#volumes (reference label)" class="md-ellipsis">volumes</span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#resources" class="md-nav__link">
-    <span title="/getting_started/addons.md#resources (reference label)" class="md-ellipsis">resources</span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#storage" class="md-nav__link">
-    <span title="/getting_started/addons.md#storage (reference label)" class="md-ellipsis">storage</span>
-  </a>
-  
-    <nav class="md-nav" aria-label="storage">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#commands" class="md-nav__link">
-    <span title="/getting_started/addons.md#commands (reference label)" class="md-ellipsis">commands</span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -684,6 +657,34 @@
 solutions by way of using a volume added. The different groups available are discussed below, and if you
 have a request for an addon please <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues">let us know</a>.</p>
 <iframe src="../_static/data/addons.html" style="width:100%; height:500px;" frameBorder="0"></iframe>
+<h2 id="command-addons">Command Addons<a class="headerlink" href="#command-addons" title="Link to this heading">¶</a></h2>
+<p>The Commands group of addons are some of my favorites, because they allow you to customize entrypoints for existing metrics!</p>
+<h3 id="commands">Commands<a class="headerlink" href="#commands" title="Link to this heading">¶</a></h3>
+<blockquote>
+<div><p>Use addon with name “commands”</p>
+</div></blockquote>
+<p>The basic “commands” addon allows you to customize:</p>
+<ul class="simple">
+<li><p><strong>preBlock</strong>: A custom block of commands to run before the primary entrypoint command.</p></li>
+<li><p><strong>prefix</strong>: a wrapping prefix to the entrypoint</p></li>
+<li><p><strong>suffix</strong>: a wrapping suffix to the entrypoint</p></li>
+<li><p><strong>postBlock</strong>: a block of commands to run after the primary entrypoint command.</p></li>
+</ul>
+<p>For example, you might want to time something by adding “time” as the prefix. You may want to
+install something special to the container (or otherwise customize files or content) before running
+the entrypoint. You might also want to run some kind of cleanup or save in the postBlock. The
+reason “commands” is so cool is because it’s flexible to so many ideas! Here is an example:</p>
+<ul class="simple">
+<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/addons/commands/metrics-time.yaml">metrics-time.yaml</a></em></p></li>
+</ul>
+<h3 id="perf">Perf<a class="headerlink" href="#perf" title="Link to this heading">¶</a></h3>
+<blockquote>
+<div><p>Use addon with name “perf-commands”</p>
+</div></blockquote>
+<p>Per commands has the same arguments as <a class="reference internal" href="#commands"><span class="std std-ref">commands</span></a> above, but will additionally add CAP_PTRACE and CAP_SYSADMIN
+to your container, which are typically needed for performance benchmarking tools. As an example here, you might
+install a performance tool in the preBlock, run it using the “prefix” and then use “suffix” optionally to pipe to
+a file, and postBlock to upload somewhere.</p>
 <h2 id="existing-volumes">Existing Volumes<a class="headerlink" href="#existing-volumes" title="Link to this heading">¶</a></h2>
 <p>An existing volume addon can be provided to a metric. As an example, it would make sense to run an IO benchmarks with
 different kinds of volume addons. The addons for volumes currently include:</p>
@@ -777,79 +778,7 @@ to the metric container(s):</p>
 <span class="w">            </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/in/container</span>
 </code></pre></div>
 </div>
-<p>TODO convert to addon logic</p>
-<h3 id="application">application<a class="headerlink" href="#application" title="Link to this heading">¶</a></h3>
-<p>When you want to measure application performance, you’ll need to add an “application” section to your MetricSet. This is the container that houses some application that you want to measure performance for. This means that minimally, you are required to define the application container image and command:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">application</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/rse-ops/vanilla-lammps:tag-latest</span>
-<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun lmp -v x 1 -v y 1 -v z 1 -in in.reaxc.hns -nocite</span>
-</code></pre></div>
-</div>
-<p>In the above example, we target a container with LAMMPS and mpi, and we are going to run MPIrun.
-The command will be used by the metrics sidecar containers to find the PID of interest to measure.</p>
-<h4 id="workingdir">workingDir<a class="headerlink" href="#workingdir" title="Link to this heading">¶</a></h4>
-<p>To add a working directory for your application:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">application</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/rse-ops/vanilla-lammps:tag-latest</span>
-<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun lmp -v x 1 -v y 1 -v z 1 -in in.reaxc.hns -nocite</span>
-<span class="w">    </span><span class="nt">workingDir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/lammps/examples/reaxff/HNS</span>
-</code></pre></div>
-</div>
-<h4 id="volumes">volumes<a class="headerlink" href="#volumes" title="Link to this heading">¶</a></h4>
-<p>An application is allowed to have one or more existing volumes. An existing volume can be any of the types described in <a class="reference internal" href="#existing-volumes"><span class="std std-ref">existing volumes</span></a></p>
-<h4 id="resources">resources<a class="headerlink" href="#resources" title="Link to this heading">¶</a></h4>
-<p>You can define resources for an application or a metric container. Known keys include “memory” and “cpu” (should be provided in some string format that can be parsed) and all others are considered some kind of quantity request.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">application</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">resources</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">500M</span>
-<span class="w">    </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
-</code></pre></div>
-</div>
-<p>Metrics can also take resource requests.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">metrics</span><span class="p">:</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">io-fio</span>
-<span class="w">    </span><span class="nt">resources</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">500M</span>
-<span class="w">      </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
-</code></pre></div>
-</div>
-<p>If you wanted to, for example, request a GPU, that might look like:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">resources</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">limits</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">gpu-vendor.example/example-gpu</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
-</code></pre></div>
-</div>
-<p>Or for a particular type of networking fabric:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">resources</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">limits</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">vpc.amazonaws.com/efa</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
-</code></pre></div>
-</div>
-<p>Both limits and resources are flexible to accept a string or an integer value, and you’ll get an error if you
-provide something else. If you need something else, <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues">let us know</a>.
-If you are requesting GPU, <a class="reference external" href="https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/">this documentation</a> is helpful.</p>
-<h3 id="storage">storage<a class="headerlink" href="#storage" title="Link to this heading">¶</a></h3>
-<p>When you want to measure some storage performance, you’ll want to add a “storage” section to your MetricSet. This will typically just be a reference to some existing storage (see <a class="reference internal" href="#existing-volumes"><span class="std std-ref">existing volumes</span></a>) that we want to measure, and can also be done for some number of completions and metrics for storage.</p>
-<h4 id="commands">commands<a class="headerlink" href="#commands" title="Link to this heading">¶</a></h4>
-<p>If you need to add some special logic to create or cleanup for a storage volume, you are free to define them for storage in each of pre and post sections, which will happen before and after the metric runs, respectively.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">storage</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">volume</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">claimName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data</span><span class="w"> </span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/data</span>
-<span class="w">  </span><span class="nt">commands</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">pre</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<span class="w">      </span><span class="no">apt-get update &amp;&amp; apt-get install -y mymounter-tool</span>
-<span class="w">      </span><span class="no">mymounter-tool mount /data</span>
-<span class="w">    </span><span class="nt">post</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mymounter-tool unmount /data</span>
-<span class="w">    </span><span class="c1"># Wrap the storage metric in this prefix</span>
-<span class="w">    </span><span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">myprefix</span>
-</code></pre></div>
-</div>
-<p>All of the above are strings. The pipe allows for multiple lines, if appropriate.
-Note that while a “volume” is typical, you might have a storage setup that is done via a set of custom commands, in which case
-you don’t need to define the volume too.</p>
+<p><strong>Note that we have support for a custom application container, but haven’t written any good examples yet!</strong></p>
 <h2 id="performance">Performance<a class="headerlink" href="#performance" title="Link to this heading">¶</a></h2>
 <h3 id="perf-hpctoolkit">perf-hpctoolkit<a class="headerlink" href="#perf-hpctoolkit" title="Link to this heading">¶</a></h3>
 <ul class="simple">

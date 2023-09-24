@@ -5,6 +5,16 @@
   "family": "application"
  },
  {
+  "name": "commands",
+  "description": "customize a metric's entrypoints",
+  "family": "application"
+ },
+ {
+  "name": "perf-commands",
+  "description": "customize a metric's entrypoints expecting performance tracing (adding ptrace and admin caps)",
+  "family": "application"
+ },
+ {
   "name": "perf-hpctoolkit",
   "description": "performance tools for measurement and analysis",
   "family": "performance"
