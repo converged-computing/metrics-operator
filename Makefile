@@ -323,7 +323,8 @@ helm: manifests kustomize helmify
 
 .PHONY: docs-data
 docs-data:
-	go run hack/docs-gen/main.go docs/_static/data/metrics.json
+	go run hack/metrics-gen/main.go docs/_static/data/metrics.json
+	go run hack/addons-gen/main.go docs/_static/data/addons.json
 
 .PHONY: pre-push
 pre-push: generate build-config-arm build-config docs-data

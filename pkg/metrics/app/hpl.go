@@ -10,15 +10,22 @@ package application
 import (
 	"fmt"
 
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/converged-computing/metrics-operator/pkg/jobs"
+	"github.com/converged-computing/metrics-operator/pkg/metadata"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 )
 
 // https://www.netlib.org/benchmark/hpl/
 // https://ulhpc-tutorials.readthedocs.io/en/production/parallel/mpi/HPL/
+
+const (
+	hplIdentifier = "app-hpl"
+	hplSummary    = "High-Performance Linpack (HPL)"
+	hplContainer  = "ghcr.io/converged-computing/metric-hpl-spack:latest"
+)
 
 // Default input file hpl.dat
 // The output of this is Ns, memory is in GiB
@@ -59,7 +66,7 @@ ${mem_alignment}            memory alignment in double (> 0) (4,8,16)
 )
 
 type HPL struct {
-	jobs.LauncherWorker
+	metrics.LauncherWorker
 
 	// Custom Options
 	mpiargs string
@@ -120,6 +127,10 @@ func (m HPL) Url() string {
 func (m *HPL) SetOptions(metric *api.Metric) {
 	m.ResourceSpec = &metric.Resources
 	m.AttributeSpec = &metric.Attributes
+
+	m.Identifier = hplIdentifier
+	m.Summary = hplSummary
+	m.Container = hplContainer
 
 	// Defaults for hpl.dat values.
 	// memory and pods (nodes) calculated on the fly, unless otherwise provided
@@ -182,6 +193,10 @@ func (m *HPL) SetOptions(metric *api.Metric) {
 	value, ok = metric.Options["blocksize"]
 	if ok {
 		m.blocksize = value.IntVal
+	}
+	value, ok = metric.Options["workdir"]
+	if ok {
+		m.Workdir = value.StrVal
 	}
 	value, ok = metric.Options["row_or_colmajor_pmapping"]
 	if ok {
@@ -256,34 +271,31 @@ func (m HPL) Options() map[string]intstr.IntOrString {
 	}
 }
 
-// Return lookup of entrypoint scripts
-func (m HPL) EntrypointScripts(
+func (m HPL) PrepareContainers(
 	spec *api.MetricSet,
 	metric *metrics.Metric,
-) []metrics.EntrypointScript {
+) []*specs.ContainerSpec {
 
 	// Metadata to add to beginning of run
-	metadata := metrics.Metadata(spec, metric)
+	meta := metrics.Metadata(spec, metric)
 	hosts := m.GetHostlist(spec)
-	prefix := m.GetCommonPrefix(metadata, "", hosts)
+	prefix := m.GetCommonPrefix(meta, "", hosts)
 
 	// Memory command since could mess up templating
 	memoryCmd := `awk '/MemFree/ { printf "%.3f \n", $2/1024/1024 }' /proc/meminfo`
 
-	// Template for the launcher
-	// TODO need to finish adding here when HPL rebuild done
-	template := `
+	preBlock := `
 # Source spack environment
 . /opt/spack-environment/activate.sh
-
+		
 # Calculate memory, if not defined
 memory=%d
 if [[ $memory -eq 0 ]]; then
 	memory=$(%s)
 fi
-
+		
 echo "Memory is ${memory}"
-
+		
 np=%d
 pods=%d
 # Tasks per node, not total
@@ -291,20 +303,20 @@ tasks=$(nproc)
 if [[ $np -eq 0 ]]; then
 	np=$(( $pods*$tasks ))
 fi
-
+		
 echo "Number of tasks (nproc on one node) is $tasks"
 echo "Number of tasks total (across $pods nodes) is $np"
-
+		
 blocksize=%d
 ratio=%s
-
+		
 # This calculates the compute value - retrieved from tutorials in /opt/view/bin
 compute_script="compute_N -m ${memory} -NB ${blocksize} -r ${ratio} -N ${pods}"
 echo $compute_script
 # This is the size, variable "N" in the hpl.dat (not confusing or anything)
 size=$(${compute_script})
 echo "Compute size is ${size}"
-
+		
 # Define rest of envars we need for template
 row_or_colmajor_pmapping=%d
 pfact=%d
@@ -318,24 +330,28 @@ swapping_threshold=%d
 L1_transposed=%d
 U_transposed=%d
 mem_alignment=%d
-
+		
 # Write the input file (this parses environment variables too)
 cat <<EOF > ./hpl.dat
 %s
 EOF
-
+		
 cp ./hostlist.txt ./hostnames.txt
 rm ./hostlist.txt
 %s
-
+		
 echo "%s"
 # This is in /root/hpl/bin/linux/xhpl
-mpirun --allow-run-as-root --hostfile ./hostlist.txt -np $np %s xhpl
+`
+
+	postBlock := `
 echo "%s"
 %s
 `
-	launcherTemplate := prefix + fmt.Sprintf(
-		template,
+	command := fmt.Sprintf("mpirun --allow-run-as-root --hostfile ./hostlist.txt -np $np %s xhpl", m.mpiargs)
+	interactive := metadata.Interactive(spec.Spec.Logging.Interactive)
+	preBlock = prefix + fmt.Sprintf(
+		preBlock,
 		m.memory,
 		memoryCmd,
 		m.tasks,
@@ -356,24 +372,43 @@ echo "%s"
 		m.memAlignment,
 		inputData,
 		metrics.TemplateConvertHostnames,
-		metrics.Separator,
-		m.mpiargs,
-		metrics.CollectionEnd,
-		metrics.Interactive(spec.Spec.Logging.Interactive),
+		metadata.Separator,
 	)
+	postBlock = fmt.Sprintf(postBlock, metadata.CollectionEnd, interactive)
 
-	// The worker just has sleep infinity added
-	workerTemplate := prefix + "\nsleep infinity"
-	return m.FinalizeEntrypoints(launcherTemplate, workerTemplate)
+	// Entrypoint for the launcher
+	launcherEntrypoint := specs.EntrypointScript{
+		Name:    specs.DeriveScriptKey(m.LauncherScript),
+		Path:    m.LauncherScript,
+		Pre:     preBlock,
+		Command: command,
+		Post:    postBlock,
+	}
+
+	// Entrypoint for the worker
+	workerEntrypoint := specs.EntrypointScript{
+		Name:    specs.DeriveScriptKey(m.WorkerScript),
+		Path:    m.WorkerScript,
+		Pre:     prefix,
+		Command: "sleep infinity",
+	}
+
+	// Container spec for the launcher
+	launcherContainer := m.GetLauncherContainerSpec(launcherEntrypoint)
+	workerContainer := m.GetWorkerContainerSpec(workerEntrypoint)
+
+	// Return the script templates for each of launcher and worker
+	return []*specs.ContainerSpec{&launcherContainer, &workerContainer}
+
 }
 
 func init() {
-	launcher := jobs.LauncherWorker{
-		Identifier: "app-hpl",
-		Summary:    "High-Performance Linpack (HPL)",
-		Container:  "ghcr.io/converged-computing/metric-hpl-spack:latest",
+	base := metrics.BaseMetric{
+		Identifier: hplIdentifier,
+		Summary:    hplSummary,
+		Container:  hplContainer,
 	}
-
+	launcher := metrics.LauncherWorker{BaseMetric: base}
 	HPL := HPL{LauncherWorker: launcher}
 	metrics.Register(&HPL)
 }

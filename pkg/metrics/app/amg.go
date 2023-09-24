@@ -8,23 +8,21 @@ SPDX-License-Identifier: MIT
 package application
 
 import (
-	"fmt"
-
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/converged-computing/metrics-operator/pkg/jobs"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
+)
+
+const (
+	amgIdentifier = "app-amg"
+	amgSummary    = "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids"
+	amgContainer  = "ghcr.io/converged-computing/metric-amg:latest"
 )
 
 // AMG is a launcher + workers metric application
 type AMG struct {
-	jobs.LauncherWorker
-
-	// Custom Options
-	workdir string
-	command string
-	prefix  string
+	metrics.LauncherWorker
 }
 
 func (m AMG) Url() string {
@@ -38,27 +36,17 @@ func (m AMG) Family() string {
 
 // Set custom options / attributes for the metric
 func (m *AMG) SetOptions(metric *api.Metric) {
-	m.ResourceSpec = &metric.Resources
-	m.AttributeSpec = &metric.Attributes
+
+	// TODO change these to class varaibles? then set in two places...
+	m.Identifier = amgIdentifier
+	m.Summary = amgSummary
+	m.Container = amgContainer
 
 	// Set user defined values or fall back to defaults
-	m.prefix = "mpirun --hostfile ./hostlist.txt"
-	m.command = "amg"
-	m.workdir = "/opt/AMG"
-
-	// This could be improved :)
-	command, ok := metric.Options["command"]
-	if ok {
-		m.command = command.StrVal
-	}
-	workdir, ok := metric.Options["workdir"]
-	if ok {
-		m.workdir = workdir.StrVal
-	}
-	mpirun, ok := metric.Options["mpirun"]
-	if ok {
-		m.prefix = mpirun.StrVal
-	}
+	m.Prefix = "mpirun --hostfile ./hostlist.txt"
+	m.Command = "amg"
+	m.Workdir = "/opt/AMG"
+	m.SetDefaultOptions(metric)
 }
 
 // Validate that we can run AMG
@@ -69,53 +57,19 @@ func (n AMG) Validate(spec *api.MetricSet) bool {
 // Exported options and list options
 func (m AMG) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"command": intstr.FromString(m.command),
-		"mpirun":  intstr.FromString(m.prefix),
-		"workdir": intstr.FromString(m.workdir),
+		"command": intstr.FromString(m.Command),
+		"prefix":  intstr.FromString(m.Prefix),
+		"workdir": intstr.FromString(m.Workdir),
 	}
-}
-
-// Return lookup of entrypoint scripts
-func (m AMG) EntrypointScripts(
-	spec *api.MetricSet,
-	metric *metrics.Metric,
-) []metrics.EntrypointScript {
-
-	// Metadata to add to beginning of run
-	metadata := metrics.Metadata(spec, metric)
-	hosts := m.GetHostlist(spec)
-	prefix := m.GetCommonPrefix(metadata, m.command, hosts)
-
-	// Template for the launcher
-	template := `
-echo "%s"
-%s ./problem.sh
-echo "%s"
-%s
-`
-	launcherTemplate := prefix + fmt.Sprintf(
-		template,
-		metrics.Separator,
-		m.prefix,
-		metrics.CollectionEnd,
-		metrics.Interactive(spec.Spec.Logging.Interactive),
-	)
-
-	// The worker just has sleep infinity added
-	workerTemplate := prefix + "\nsleep infinity"
-
-	// Return the script templates for each of launcher and worker
-	return m.FinalizeEntrypoints(launcherTemplate, workerTemplate)
 }
 
 func init() {
-	launcher := jobs.LauncherWorker{
-		Identifier:     "app-amg",
-		Summary:        "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
-		Container:      "ghcr.io/converged-computing/metric-amg:latest",
-		WorkerScript:   "/metrics_operator/amg-worker.sh",
-		LauncherScript: "/metrics_operator/amg-launcher.sh",
+	base := metrics.BaseMetric{
+		Identifier: amgIdentifier,
+		Summary:    amgSummary,
+		Container:  amgContainer,
 	}
+	launcher := metrics.LauncherWorker{BaseMetric: base}
 	amg := AMG{LauncherWorker: launcher}
 	metrics.Register(&amg)
 }

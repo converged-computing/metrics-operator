@@ -415,7 +415,6 @@ table {
     <thead>
         <tr>
             <th>Name</th>
-            <th>Type</th>
             <th>Family</th>
             <th>Description</th>
             <th>Container</th>
@@ -440,7 +439,6 @@ $.getJSON("metrics.json", function(data) {
           }
           return "<a href='" + row['url'] + "' target='_blank'>" + data +"</a>";},
       },
-      { data: "type"},
       { data: "family"},
       { data: "description"},
       { data: "image",
@@ -457,22 +455,22 @@ $.getJSON("metrics.json", function(data) {
     'rowCallback': function(row, data, index){
       // Distinguish family
       if(data.family == 'storage'){
-        $(row).find('td:eq(2)').css('background-color', 'lavender');
+        $(row).find('td:eq(1)').css('background-color', 'lavender');
       }
       if(data.family == 'solver'){
-        $(row).find('td:eq(2)').css('background-color', 'lightgreen');
+        $(row).find('td:eq(1)').css('background-color', 'lightgreen');
       }
       if(data.family == 'performance'){
-        $(row).find('td:eq(2)').css('background-color', '#f79fb7');
+        $(row).find('td:eq(1)').css('background-color', '#f79fb7');
       }
       if(data.family == 'machine-learning'){
-        $(row).find('td:eq(2)').css('background-color', 'palegoldenrod');
+        $(row).find('td:eq(1)').css('background-color', 'palegoldenrod');
       }
       if(data.family == 'network'){
-        $(row).find('td:eq(2)').css('background-color', 'orange');
+        $(row).find('td:eq(1)').css('background-color', 'orange');
       }
       if(data.family == 'simulation'){
-        $(row).find('td:eq(2)').css('background-color', 'skyblue');
+        $(row).find('td:eq(1)').css('background-color', 'skyblue');
       }
     }
   });

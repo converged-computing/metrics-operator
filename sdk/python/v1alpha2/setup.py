@@ -30,14 +30,14 @@ except Exception:
 if __name__ == "__main__":
     setup(
         name="metricsoperator",
-        version="0.0.21",
+        version="0.1.0",
         author="Vanessasaurus",
         author_email="vsoch@users.noreply.github.com",
         maintainer="Vanessasaurus",
         packages=find_packages(),
         include_package_data=True,
         zip_safe=False,
-        url="https://github.com/converged-computing/metrics-operator/tree/main/python-sdk/v1alpha1",
+        url="https://github.com/converged-computing/metrics-operator/tree/main/python-sdk/v1alpha2",
         license="MIT",
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,

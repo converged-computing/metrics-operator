@@ -8,11 +8,11 @@ SPDX-License-Identifier: MIT
 package metrics
 
 import (
-	"fmt"
-
 	corev1 "k8s.io/api/core/v1"
+	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 )
 
 // Security context defaults
@@ -21,66 +21,20 @@ var (
 	capPtrace = corev1.Capability("SYS_PTRACE")
 )
 
-// A ContainerSpec is used by a metric to define a container
-type ContainerSpec struct {
-	Command    []string
-	Image      string
-	Name       string
-	WorkingDir string
-	Resources  *api.ContainerResources
-	Attributes *api.ContainerSpec
-}
-
-// Named entrypoint script for a container
-type EntrypointScript struct {
-	Name   string
-	Path   string
-	Script string
-}
-
-// getContainers gets containers for a set of metrics
-func getContainers(
+// getReplicatedJobContainers gets containers for the replicated job
+// also generating needed mounts, etc.
+func getReplicatedJobContainers(
 	set *api.MetricSet,
-	metrics []*Metric,
-	volumes map[string]api.Volume,
+	rj *jobset.ReplicatedJob,
+	containerSpecs []specs.ContainerSpec,
+	volumes []specs.VolumeSpec,
 ) ([]corev1.Container, error) {
 
-	containers := []ContainerSpec{}
-
-	// Create one container per metric!
-	// Each needs to have the sys trace capability to see the application pids
-	for i, m := range metrics {
-
-		metric := (*m)
-		script := fmt.Sprintf("/metrics_operator/entrypoint-%d.sh", i)
-		command := []string{"/bin/bash", script}
-
-		newContainer := ContainerSpec{
-			Command:    command,
-			Image:      metric.Image(),
-			WorkingDir: metric.WorkingDir(),
-			Name:       metric.Name(),
-			Resources:  metric.Resources(),
-			Attributes: metric.Attributes(),
-		}
-		containers = append(containers, newContainer)
-	}
-	return GetContainers(set, containers, volumes, false, false)
-}
-
-// GetContainers based on one or more container specs
-func GetContainers(
-	set *api.MetricSet,
-	specs []ContainerSpec,
-	volumes map[string]api.Volume,
-	allowPtrace bool,
-	allowAdmin bool,
-) ([]corev1.Container, error) {
-
-	// Assume we can pull once for now, this could be changed to allow
-	// corev2.PullAlways
-	pullPolicy := corev1.PullIfNotPresent
+	// We only generate containers from specs that match the replicated job name
 	containers := []corev1.Container{}
+
+	// Assume we can pull once for now, this could be changed to allow pull always
+	pullPolicy := corev1.PullIfNotPresent
 
 	// Currently we share the same mounts across containers, makes life easier!
 	mounts := getVolumeMounts(set, volumes)
@@ -89,29 +43,34 @@ func GetContainers(
 	hasPrivileged := false
 
 	// Each needs to have the sys trace capability to see the application pids
-	for _, s := range specs {
+	for _, cs := range containerSpecs {
 
-		hasPrivileged = hasPrivileged || s.Attributes.SecurityContext.Privileged
-
-		// Get resources for container
-		resources, err := getContainerResources(s.Resources)
-		logger.Info("🌀 Metric", "Container.Resources", resources)
+		// Skip containers not intended for the replicated job
+		if cs.JobName != "" && cs.JobName != rj.Name {
+			continue
+		}
+		hasPrivileged = hasPrivileged || cs.Attributes.SecurityContext.Privileged
+		resources, err := getContainerResources(cs.Resources)
 		if err != nil {
 			return containers, err
 		}
 
-		// Create one container per metric!
-		// Name the container by the metric for now
+		// If a command is provided, use it first
+		command := []string{"/bin/bash", cs.EntrypointScript.Path}
+		if len(cs.Command) > 0 {
+			command = cs.Command
+		}
+		// Create the actual container from the spec
 		newContainer := corev1.Container{
-			Name:            s.Name,
-			Image:           s.Image,
+			Name:            cs.Name,
+			Image:           cs.Image,
 			ImagePullPolicy: pullPolicy,
 			VolumeMounts:    mounts,
 			Stdin:           true,
 			TTY:             true,
-			Command:         s.Command,
+			Command:         command,
 			SecurityContext: &corev1.SecurityContext{
-				Privileged: &s.Attributes.SecurityContext.Privileged,
+				Privileged: &cs.Attributes.SecurityContext.Privileged,
 			},
 		}
 
@@ -119,66 +78,26 @@ func GetContainers(
 		caps := []corev1.Capability{}
 
 		// Should we allow sharing the process namespace?
-		if allowPtrace {
+		if cs.Attributes.SecurityContext.AllowPtrace {
 			caps = append(caps, capPtrace)
 		}
-		if allowAdmin {
+		if cs.Attributes.SecurityContext.AllowAdmin {
 			caps = append(caps, capAdmin)
 		}
 		newContainer.SecurityContext.Capabilities = &corev1.Capabilities{Add: caps}
 
 		// Only add the working directory if it's defined
-		if s.WorkingDir != "" {
-			newContainer.WorkingDir = s.WorkingDir
+		if cs.WorkingDir != "" {
+			newContainer.WorkingDir = cs.WorkingDir
 		}
 
-		// Ports and environment
-		// TODO this should be added when needed
+		// Ports and environment (add when needed)
 		ports := []corev1.ContainerPort{}
 		envars := []corev1.EnvVar{}
 		newContainer.Ports = ports
 		newContainer.Env = envars
 		newContainer.Resources = resources
 		containers = append(containers, newContainer)
-	}
-
-	// If our metric set has an application, add it last
-	// We currently accept resources for an application (but not metrics yet)
-	if set.HasApplication() {
-
-		// Prepare container resources
-		resources, err := getContainerResources(&set.Spec.Application.Resources)
-		logger.Info("🌀 Application", "Container.Resources", resources)
-		if err != nil {
-			return containers, err
-		}
-
-		// The application security context can have admin (but should not have the same process sharing)
-		securityContext := &corev1.SecurityContext{}
-		if allowAdmin {
-			securityContext.Capabilities = &corev1.Capabilities{
-				Add: []corev1.Capability{capAdmin},
-			}
-			securityContext.Privileged = &hasPrivileged
-		}
-
-		// Minimally this is set.Spec.Application.Entrypoint executed in a bash script
-		// But for an application metric with a volume, there can be custom logic
-		command := []string{"/bin/bash", DefaultApplicationEntrypoint}
-		appContainer := corev1.Container{
-			Name:            "app",
-			Image:           set.Spec.Application.Image,
-			ImagePullPolicy: pullPolicy,
-			VolumeMounts:    mounts,
-			Stdin:           true,
-			TTY:             true,
-			Command:         command,
-			SecurityContext: securityContext,
-		}
-		if set.Spec.Application.WorkingDir != "" {
-			appContainer.WorkingDir = set.Spec.Application.WorkingDir
-		}
-		containers = append(containers, appContainer)
 	}
 	logger.Infof("🟪️ Adding %d containers\n", len(containers))
 	return containers, nil

@@ -8,46 +8,49 @@ SPDX-License-Identifier: MIT
 package metrics
 
 import (
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
-	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 )
 
-// Get ReplicatedJobs intended to run storage
-// For this setup, we expect to create a container for each storage metric
-// And then add the volume bind to it
-func (m *StorageMetricSet) ReplicatedJobs(spec *api.MetricSet) ([]jobset.ReplicatedJob, error) {
+// These are common templates for storage apps.
+// They define the interface of a Metric.
 
-	// Prepare replicated jobs list to return
-	rjs := []jobset.ReplicatedJob{}
+type StorageGeneric struct {
+	BaseMetric
+}
 
-	// Storage metrics do not need to share the process namespace
-	// The jobname empty string will use the default, no custom replicated job name, and sole tenancy false
-	job, err := GetReplicatedJob(spec, false, spec.Spec.Pods, spec.Spec.Completions, "", m.HasSoleTenancy())
-	if err != nil {
-		return rjs, err
+// Family returns the storage family
+func (m StorageGeneric) Family() string {
+	return StorageFamily
+}
+
+// By default assume storage does not have sole tenancy
+func (m StorageGeneric) HasSoleTenancy() bool {
+	return false
+}
+
+// StorageContainerSpec gets the storage container spec
+// This is identical to the application spec and could be combined
+func (m *StorageGeneric) StorageContainerSpec(
+	preBlock string,
+	command string,
+	postBlock string,
+) []*specs.ContainerSpec {
+
+	entrypoint := specs.EntrypointScript{
+		Name:    specs.DeriveScriptKey(DefaultEntrypointScript),
+		Path:    DefaultEntrypointScript,
+		Pre:     preBlock,
+		Command: command,
+		Post:    postBlock,
 	}
 
-	// Only add storage volume if we have it! Not all storage interfaces require
-	// A Kubernetes abstraction, some are created via a command.
-	volumes := map[string]api.Volume{}
-	if spec.HasStorageVolume() {
-		// Add volumes expecting an application.
-		// A storage app is required to have a volume
-		volumes = map[string]api.Volume{"storage": spec.Spec.Storage.Volume}
-	}
-
-	// Derive running scripts from the metric
-	runnerScripts := GetMetricsKeyToPath(m.Metrics())
-	job.Template.Spec.Template.Spec.Volumes = GetVolumes(spec, runnerScripts, volumes)
-
-	// Derive the containers, one per metric
-	// This will also include mounts for volumes
-	containers, err := getContainers(spec, m.Metrics(), volumes)
-	if err != nil {
-		return rjs, err
-	}
-	job.Template.Spec.Template.Spec.Containers = containers
-	rjs = append(rjs, *job)
-	return rjs, nil
-
+	return []*specs.ContainerSpec{{
+		JobName:          ReplicatedJobName,
+		Image:            m.Image(),
+		Name:             "storage",
+		WorkingDir:       m.Workdir,
+		EntrypointScript: entrypoint,
+		Resources:        m.ResourceSpec,
+		Attributes:       m.AttributeSpec,
+	}}
 }

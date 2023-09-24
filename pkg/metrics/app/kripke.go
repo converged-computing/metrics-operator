@@ -8,21 +8,20 @@ SPDX-License-Identifier: MIT
 package application
 
 import (
-	"fmt"
-
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/converged-computing/metrics-operator/pkg/jobs"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 
-type Kripke struct {
-	jobs.LauncherWorker
+const (
+	kripkeIdentifier = "app-kripke"
+	kripkeSummary    = "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids"
+	kripkeContainer  = "ghcr.io/converged-computing/metric-kripke:latest"
+)
 
-	// Options
-	command string
-	prefix  string
+type Kripke struct {
+	metrics.LauncherWorker
 }
 
 func (m Kripke) Url() string {
@@ -36,27 +35,16 @@ func (m Kripke) Family() string {
 
 // Set custom options / attributes for the metric
 func (m *Kripke) SetOptions(metric *api.Metric) {
-	m.ResourceSpec = &metric.Resources
-	m.AttributeSpec = &metric.Attributes
+
+	m.Identifier = kripkeIdentifier
+	m.Summary = kripkeSummary
+	m.Container = kripkeContainer
 
 	// Set user defined values or fall back to defaults
-	m.prefix = "mpirun --hostfile ./hostlist.txt"
-	m.command = "kripke"
+	m.Prefix = "mpirun --hostfile ./hostlist.txt"
+	m.Command = "kripke"
 	m.Workdir = "/opt/kripke"
-
-	// This could be improved :)
-	command, ok := metric.Options["command"]
-	if ok {
-		m.command = command.StrVal
-	}
-	workdir, ok := metric.Options["workdir"]
-	if ok {
-		m.Workdir = workdir.StrVal
-	}
-	mpirun, ok := metric.Options["mpirun"]
-	if ok {
-		m.prefix = mpirun.StrVal
-	}
+	m.SetDefaultOptions(metric)
 }
 
 // Validate that we can run Kripke
@@ -67,8 +55,8 @@ func (n Kripke) Validate(spec *api.MetricSet) bool {
 // Exported options and list options
 func (m Kripke) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"command": intstr.FromString(m.command),
-		"mpirun":  intstr.FromString(m.prefix),
+		"command": intstr.FromString(m.Command),
+		"prefix":  intstr.FromString(m.Prefix),
 		"workdir": intstr.FromString(m.Workdir),
 	}
 }
@@ -76,45 +64,13 @@ func (n Kripke) ListOptions() map[string][]intstr.IntOrString {
 	return map[string][]intstr.IntOrString{}
 }
 
-// Return lookup of entrypoint scripts
-func (m Kripke) EntrypointScripts(
-	spec *api.MetricSet,
-	metric *metrics.Metric,
-) []metrics.EntrypointScript {
-
-	// Metadata to add to beginning of run
-	metadata := metrics.Metadata(spec, metric)
-	hosts := m.GetHostlist(spec)
-	prefix := m.GetCommonPrefix(metadata, m.command, hosts)
-
-	// Template for the launcher
-	template := `
-echo "%s"
-%s ./problem.sh
-echo "%s"
-%s
-`
-	launcherTemplate := prefix + fmt.Sprintf(
-		template,
-		metrics.Separator,
-		m.prefix,
-		metrics.CollectionEnd,
-		metrics.Interactive(spec.Spec.Logging.Interactive),
-	)
-
-	// The worker just has sleep infinity added
-	workerTemplate := prefix + "\nsleep infinity"
-	return m.FinalizeEntrypoints(launcherTemplate, workerTemplate)
-}
-
 func init() {
-	launcher := jobs.LauncherWorker{
-		Identifier:     "app-kripke",
-		Summary:        "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
-		Container:      "ghcr.io/converged-computing/metric-kripke:latest",
-		WorkerScript:   "/metrics_operator/kripke-worker.sh",
-		LauncherScript: "/metrics_operator/kripke-launcher.sh",
+	base := metrics.BaseMetric{
+		Identifier: kripkeIdentifier,
+		Summary:    kripkeSummary,
+		Container:  kripkeContainer,
 	}
+	launcher := metrics.LauncherWorker{BaseMetric: base}
 	kripke := Kripke{LauncherWorker: launcher}
 	metrics.Register(&kripke)
 }

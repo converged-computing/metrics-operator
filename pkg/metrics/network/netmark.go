@@ -11,17 +11,23 @@ import (
 	"fmt"
 	"strconv"
 
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	jobs "github.com/converged-computing/metrics-operator/pkg/jobs"
+	"github.com/converged-computing/metrics-operator/pkg/metadata"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 )
 
 // This library is currently private
+const (
+	netmarkIdentifier = "network-netmark"
+	netmarkSummary    = "point to point networking tool"
+	netmarkContainer  = "vanessa/netmark:latest"
+)
 
 type Netmark struct {
-	jobs.LauncherWorker
+	metrics.LauncherWorker
 
 	// Options
 	tasks int32
@@ -57,6 +63,10 @@ func (m *Netmark) SetOptions(metric *api.Metric) {
 	m.AttributeSpec = &metric.Attributes
 	m.LauncherLetter = "n"
 
+	m.Identifier = netmarkIdentifier
+	m.Summary = netmarkSummary
+	m.Container = netmarkContainer
+
 	// One pod per hostname
 	m.SoleTenancy = true
 
@@ -73,6 +83,12 @@ func (m *Netmark) SetOptions(metric *api.Metric) {
 	tasks, ok := metric.Options["tasks"]
 	if ok {
 		m.tasks = tasks.IntVal
+	}
+	st, ok := metric.Options["soleTenancy"]
+	if ok {
+		if st.StrVal == "false" || st.StrVal == "no" {
+			m.SoleTenancy = false
+		}
 	}
 	warmups, ok := metric.Options["warmups"]
 	if ok {
@@ -113,14 +129,15 @@ func (n Netmark) Options() map[string]intstr.IntOrString {
 	}
 }
 
-// Return lookup of entrypoint scripts
-func (m Netmark) EntrypointScripts(
+func (m Netmark) PrepareContainers(
 	spec *api.MetricSet,
 	metric *metrics.Metric,
-) []metrics.EntrypointScript {
+) []*specs.ContainerSpec {
 
 	// Metadata to add to beginning of run
-	metadata := metrics.Metadata(spec, metric)
+	meta := metrics.Metadata(spec, metric)
+
+	// The launcher has a different hostname, n for netmark
 	hosts := m.GetHostlist(spec)
 
 	// Add boolean flag to store the trial?
@@ -154,16 +171,27 @@ echo "%s"
 `
 	prefix := fmt.Sprintf(
 		prefixTemplate,
-		metadata,
+		meta,
 		m.tasks,
 		spec.Spec.Pods,
 		hosts,
-		metrics.CollectionStart,
+		metadata.CollectionStart,
 	)
 
-	// Template for the launcher
-	template := `
-mpirun -f ./hostlist.txt -np $np /usr/local/bin/netmark.x -w %d -t %d -c %d -b %d %s
+	// Netmark main command
+	command := "mpirun -f ./hostlist.txt -np $np /usr/local/bin/netmark.x -w %d -t %d -c %d -b %d %s"
+	command = fmt.Sprintf(
+		command,
+		m.warmups,
+		m.trials,
+		m.sendReceiveCycles,
+		m.messageSize,
+		storeTrial,
+	)
+	// The preBlock is also the prefix
+	preBlock := prefix
+
+	postBlock := `
 ls
 echo "NETMARK RTT.CSV START"
 cat RTT.csv
@@ -171,30 +199,45 @@ echo "NETMARK RTT.CSV END"
 echo "%s"
 %s
 `
-	launcherTemplate := prefix + fmt.Sprintf(
-		template,
-		m.warmups,
-		m.trials,
-		m.sendReceiveCycles,
-		m.messageSize,
-		storeTrial,
-		metrics.CollectionEnd,
-		metrics.Interactive(spec.Spec.Logging.Interactive),
+	interactive := metadata.Interactive(spec.Spec.Logging.Interactive)
+	postBlock = fmt.Sprintf(
+		postBlock,
+		metadata.CollectionEnd,
+		interactive,
 	)
 
-	// The worker just has sleep infinity added
-	workerTemplate := prefix + "\nsleep infinity"
-	return m.FinalizeEntrypoints(launcherTemplate, workerTemplate)
+	// The worker just has a preBlock with the prefix and the command is to sleep
+	launcherEntrypoint := specs.EntrypointScript{
+		Name:    specs.DeriveScriptKey(m.LauncherScript),
+		Path:    m.LauncherScript,
+		Pre:     preBlock,
+		Command: command,
+		Post:    postBlock,
+	}
+
+	// Entrypoint for the worker
+	workerEntrypoint := specs.EntrypointScript{
+		Name:    specs.DeriveScriptKey(m.WorkerScript),
+		Path:    m.WorkerScript,
+		Pre:     prefix,
+		Command: "sleep infinity",
+	}
+
+	// Container spec for the launcher
+	launcherContainer := m.GetLauncherContainerSpec(launcherEntrypoint)
+	workerContainer := m.GetWorkerContainerSpec(workerEntrypoint)
+
+	// Return the script templates for each of launcher and worker
+	return []*specs.ContainerSpec{&launcherContainer, &workerContainer}
 }
 
 func init() {
-	launcher := jobs.LauncherWorker{
-		Identifier:     "network-netmark",
-		Summary:        "point to point networking tool",
-		Container:      "vanessa/netmark:latest",
-		WorkerScript:   "/metrics_operator/netmark-worker.sh",
-		LauncherScript: "/metrics_operator/netmark-launcher.sh",
+	base := metrics.BaseMetric{
+		Identifier: netmarkIdentifier,
+		Summary:    netmarkSummary,
+		Container:  netmarkContainer,
 	}
+	launcher := metrics.LauncherWorker{BaseMetric: base}
 	netmark := Netmark{LauncherWorker: launcher}
 	metrics.Register(&netmark)
 }

@@ -8,21 +8,20 @@ SPDX-License-Identifier: MIT
 package application
 
 import (
-	"fmt"
-
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/converged-computing/metrics-operator/pkg/jobs"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
 )
 
-type Quicksilver struct {
-	jobs.LauncherWorker
+const (
+	qsIdentifier = "app-quicksilver"
+	qsSummary    = "A proxy app for the Monte Carlo Transport Code"
+	qsContainer  = "ghcr.io/converged-computing/metric-quicksilver:latest"
+)
 
-	// Custom Options
-	command string
-	mpirun  string
+type Quicksilver struct {
+	metrics.LauncherWorker
 }
 
 // I think this is a simulation?
@@ -36,80 +35,34 @@ func (m Quicksilver) Url() string {
 
 // Set custom options / attributes for the metric
 func (m *Quicksilver) SetOptions(metric *api.Metric) {
-	m.ResourceSpec = &metric.Resources
-	m.AttributeSpec = &metric.Attributes
+
+	m.Identifier = qsIdentifier
+	m.Summary = qsSummary
+	m.Container = qsContainer
 
 	// Set user defined values or fall back to defaults
-	m.mpirun = "mpirun --hostfile ./hostlist.txt"
-	m.command = "qs /opt/quicksilver/Examples/CORAL2_Benchmark/Problem1/Coral2_P1.inp"
+	m.Prefix = "mpirun --hostfile ./hostlist.txt"
+	m.Command = "qs /opt/quicksilver/Examples/CORAL2_Benchmark/Problem1/Coral2_P1.inp"
 	m.Workdir = "/opt/quicksilver/Examples"
-
-	// This could be improved :)
-	command, ok := metric.Options["command"]
-	if ok {
-		m.command = command.StrVal
-	}
-	workdir, ok := metric.Options["workdir"]
-	if ok {
-		m.Workdir = workdir.StrVal
-	}
-	mpirun, ok := metric.Options["mpirun"]
-	if ok {
-		m.mpirun = mpirun.StrVal
-	}
+	m.SetDefaultOptions(metric)
 }
 
 // Exported options and list options
 func (m Quicksilver) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"command": intstr.FromString(m.command),
-		"mpirun":  intstr.FromString(m.mpirun),
+		"command": intstr.FromString(m.Command),
+		"prefix":  intstr.FromString(m.Prefix),
 		"workdir": intstr.FromString(m.Workdir),
 	}
 }
-func (n Quicksilver) ListOptions() map[string][]intstr.IntOrString {
-	return map[string][]intstr.IntOrString{}
-}
-
-// Return lookup of entrypoint scripts
-func (m Quicksilver) EntrypointScripts(
-	spec *api.MetricSet,
-	metric *metrics.Metric,
-) []metrics.EntrypointScript {
-
-	// Metadata to add to beginning of run
-	metadata := metrics.Metadata(spec, metric)
-	hosts := m.GetHostlist(spec)
-	prefix := m.GetCommonPrefix(metadata, m.command, hosts)
-
-	// Template for the launcher
-	template := `
-echo "%s"
-%s ./problem.sh
-echo "%s"
-%s
-`
-	launcherTemplate := prefix + fmt.Sprintf(
-		template,
-		metrics.Separator,
-		m.mpirun,
-		metrics.CollectionEnd,
-		metrics.Interactive(spec.Spec.Logging.Interactive),
-	)
-
-	// The worker just has sleep infinity added
-	workerTemplate := prefix + "\nsleep infinity"
-	return m.FinalizeEntrypoints(launcherTemplate, workerTemplate)
-}
 
 func init() {
-	launcher := jobs.LauncherWorker{
-		Identifier:     "app-quicksilver",
-		Summary:        "A proxy app for the Monte Carlo Transport Code",
-		Container:      "ghcr.io/converged-computing/metric-quicksilver:latest",
-		WorkerScript:   "/metrics_operator/quicksilver-worker.sh",
-		LauncherScript: "/metrics_operator/quicksilver-launcher.sh",
+	base := metrics.BaseMetric{
+		Identifier: qsIdentifier,
+		Summary:    qsSummary,
+		Container:  qsContainer,
 	}
+	launcher := metrics.LauncherWorker{BaseMetric: base}
 	Quicksilver := Quicksilver{LauncherWorker: launcher}
 	metrics.Register(&Quicksilver)
 }

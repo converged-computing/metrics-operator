@@ -3,7 +3,6 @@
   "name": "app-amg",
   "description": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
   "family": "solver",
-  "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-amg:latest",
   "url": "https://github.com/LLNL/AMG"
  },
@@ -11,7 +10,6 @@
   "name": "app-bdas",
   "description": "The big data analytic suite contains the K-Means observation label, PCA, and SVM benchmarks.",
   "family": "machine-learning",
-  "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-bdas:latest",
   "url": "https://asc.llnl.gov/sites/asc/files/2020-09/BDAS_Summary_b4bcf27_0.pdf"
  },
@@ -19,7 +17,6 @@
   "name": "app-hpl",
   "description": "High-Performance Linpack (HPL)",
   "family": "solver",
-  "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-hpl-spack:latest",
   "url": "https://www.netlib.org/benchmark/hpl/"
  },
@@ -27,7 +24,6 @@
   "name": "app-kripke",
   "description": "parallel algebraic multigrid solver for linear systems arising from problems on unstructured grids",
   "family": "solver",
-  "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-kripke:latest",
   "url": "https://github.com/LLNL/Kripke"
  },
@@ -35,7 +31,6 @@
   "name": "app-laghos",
   "description": "LAGrangian High-Order Solver",
   "family": "solver",
-  "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-laghos:latest",
   "url": "https://github.com/CEED/Laghos"
  },
@@ -43,7 +38,6 @@
   "name": "app-lammps",
   "description": "LAMMPS molecular dynamic simulation",
   "family": "simulation",
-  "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-lammps:latest",
   "url": "https://www.lammps.org/"
  },
@@ -51,7 +45,6 @@
   "name": "app-ldms",
   "description": "provides LDMS, a low-overhead, low-latency framework for collecting, transferring, and storing metric data on a large distributed computer system.",
   "family": "performance",
-  "type": "application",
   "image": "ghcr.io/converged-computing/metric-ovis-hpc:latest",
   "url": "https://github.com/ovis-hpc/ovis"
  },
@@ -59,7 +52,6 @@
   "name": "app-nekbone",
   "description": "A mini-app derived from the Nek5000 CFD code which is a high order, incompressible Navier-Stokes CFD solver based on the spectral element method. The conjugate gradiant solve is compute intense, contains small messages and frequent allreduces.",
   "family": "solver",
-  "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-nekbone:latest",
   "url": "https://github.com/Nek5000/Nekbone"
  },
@@ -67,7 +59,6 @@
   "name": "app-pennant",
   "description": "Unstructured mesh hydrodynamics for advanced architectures ",
   "family": "simulation",
-  "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-pennant:latest",
   "url": "https://github.com/LLNL/pennant"
  },
@@ -75,7 +66,6 @@
   "name": "app-quicksilver",
   "description": "A proxy app for the Monte Carlo Transport Code",
   "family": "simulation",
-  "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-quicksilver:latest",
   "url": "https://github.com/LLNL/Quicksilver"
  },
@@ -83,7 +73,6 @@
   "name": "io-fio",
   "description": "Flexible IO Tester (FIO)",
   "family": "storage",
-  "type": "storage",
   "image": "ghcr.io/converged-computing/metric-fio:latest",
   "url": "https://fio.readthedocs.io/en/latest/fio_doc.html"
  },
@@ -91,7 +80,6 @@
   "name": "io-ior",
   "description": "HPC IO Benchmark",
   "family": "storage",
-  "type": "storage",
   "image": "ghcr.io/converged-computing/metric-ior:latest",
   "url": "https://github.com/hpc/ior"
  },
@@ -99,7 +87,6 @@
   "name": "io-sysstat",
   "description": "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
   "family": "storage",
-  "type": "storage",
   "image": "ghcr.io/converged-computing/metric-sysstat:latest",
   "url": "https://github.com/sysstat/sysstat"
  },
@@ -107,7 +94,6 @@
   "name": "network-chatterbug",
   "description": "A suite of communication proxies for HPC applications",
   "family": "network",
-  "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-chatterbug:latest",
   "url": "https://github.com/hpcgroup/chatterbug"
  },
@@ -115,7 +101,6 @@
   "name": "network-netmark",
   "description": "point to point networking tool",
   "family": "network",
-  "type": "standalone",
   "image": "vanessa/netmark:latest",
   "url": ""
  },
@@ -123,23 +108,13 @@
   "name": "network-osu-benchmark",
   "description": "point to point MPI benchmarks",
   "family": "network",
-  "type": "standalone",
   "image": "ghcr.io/converged-computing/metric-osu-benchmark:latest",
   "url": "https://mvapich.cse.ohio-state.edu/benchmarks/"
- },
- {
-  "name": "perf-hpctoolkit",
-  "description": "performance tools for measurement and analysis",
-  "family": "performance",
-  "type": "application",
-  "image": "ghcr.io/converged-computing/metric-hpctoolkit-view:latest",
-  "url": "https://gitlab.com/hpctoolkit/hpctoolkit"
  },
  {
   "name": "perf-sysstat",
   "description": "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
   "family": "performance",
-  "type": "application",
   "image": "ghcr.io/converged-computing/metric-sysstat:latest",
   "url": "https://github.com/sysstat/sysstat"
  }

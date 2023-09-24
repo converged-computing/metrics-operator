@@ -1,4 +1,4 @@
-apiVersion: flux-framework.org/v1alpha1
+apiVersion: flux-framework.org/v1alpha2
 kind: MetricSet
 metadata:
   labels:
@@ -9,6 +9,7 @@ spec:
   # Number of indexed jobs to run netmark on
   pods: 2
   metrics:
+
    # This uses the default commands
    - name: app-amg
 

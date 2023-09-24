@@ -11,15 +11,21 @@ import (
 	"fmt"
 	"path"
 
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	jobs "github.com/converged-computing/metrics-operator/pkg/jobs"
+	"github.com/converged-computing/metrics-operator/pkg/metadata"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 )
 
 // ghcr.io/converged-computing/metric-osu-benchmark:latest
 // https://mvapich.cse.ohio-state.edu/benchmarks/
+const (
+	OSUIdentifier = "network-osu-benchmark"
+	OSUSummary    = "point to point MPI benchmarks"
+	OSUContainer  = "ghcr.io/converged-computing/metric-osu-benchmark:latest"
+)
 
 type BenchmarkConfig struct {
 	Workdir  string
@@ -105,7 +111,7 @@ var (
 )
 
 type OSUBenchmark struct {
-	jobs.LauncherWorker
+	metrics.LauncherWorker
 
 	// Custom options
 	commands []string
@@ -114,6 +120,7 @@ type OSUBenchmark struct {
 	runAll   bool
 	flags    string
 	timed    bool
+	sleep    int32
 }
 
 func (m OSUBenchmark) Url() string {
@@ -134,8 +141,14 @@ func (m *OSUBenchmark) addCommand(command string) {
 
 // Set custom options / attributes for the metric
 func (m *OSUBenchmark) SetOptions(metric *api.Metric) {
+
+	m.Identifier = OSUIdentifier
+	m.Container = OSUContainer
+	m.Summary = OSUSummary
+
 	m.lookup = map[string]bool{}
 	m.commands = []string{}
+	m.sleep = 60
 	m.ResourceSpec = &metric.Resources
 	m.AttributeSpec = &metric.Attributes
 
@@ -159,7 +172,11 @@ func (m *OSUBenchmark) SetOptions(metric *api.Metric) {
 	if ok {
 		m.tasks = tasks.IntVal
 	}
-	st, ok := metric.Options["sole-tenancy"]
+	sleep, ok := metric.Options["sleep"]
+	if ok {
+		m.sleep = sleep.IntVal
+	}
+	st, ok := metric.Options["soleTenancy"]
 	if ok && st.StrVal == "false" || st.StrVal == "no" {
 		m.SoleTenancy = false
 	}
@@ -229,18 +246,16 @@ func (n OSUBenchmark) Family() string {
 	return metrics.NetworkFamily
 }
 
-// Return lookup of entrypoint scripts
-func (m OSUBenchmark) EntrypointScripts(
+func (m OSUBenchmark) PrepareContainers(
 	spec *api.MetricSet,
 	metric *metrics.Metric,
-) []metrics.EntrypointScript {
+) []*specs.ContainerSpec {
 
 	// Metadata to add to beginning of run
-	metadata := metrics.Metadata(spec, metric)
+	meta := metrics.Metadata(spec, metric)
 
 	// The launcher has a different hostname, n for netmark
 	hosts := m.GetHostlist(spec)
-
 	prefixTemplate := `#!/bin/bash
 # Start ssh daemon
 /usr/sbin/sshd -D &
@@ -259,8 +274,9 @@ echo "Number of tasks (nproc on one node) is $tasks"
 echo "Number of tasks total (across $pods nodes) is $np"
 
 # Allow network to ready (we need the hostnames / ip addresses to be there)
-echo "Sleeping for 60 seconds waiting for network..."
-sleep 60
+sleeptime=%d
+echo "Sleeping for ${sleeptime} seconds waiting for network..."
+sleep ${sleeptime}
 
 # Write the hosts file.
 cat <<EOF > ./hostnames.txt
@@ -285,9 +301,10 @@ echo "%s"
 		prefixTemplate,
 		m.tasks,
 		spec.Spec.Pods,
+		m.sleep,
 		hosts,
 		metrics.TemplateConvertHostnames,
-		metadata,
+		meta,
 	)
 
 	// Do we want timed?
@@ -295,11 +312,12 @@ echo "%s"
 	if m.timed {
 		mpirun = "time mpirun"
 	}
+
 	// Prepare list of commands, e.g.,
 	// mpirun -f ./hostlist.txt -np 2 ./osu_acc_latency (mpich)
 	// mpirun --hostfile ./hostfile.txt --allow-run-as-root -N 2 -np 2 ./osu_fop_latency (openmpi)
 	// Sleep a little more to allow worker to write launcher hostname
-	commands := fmt.Sprintf("\nsleep 5\necho %s\n", metrics.CollectionStart)
+	commands := fmt.Sprintf("\nsleep 5\necho %s\n", metadata.CollectionStart)
 	for _, executable := range m.commands {
 
 		workDir := osuBenchmarkCommands[executable].Workdir
@@ -319,28 +337,47 @@ echo "%s"
 		} else {
 			line = fmt.Sprintf("%s --hostfile %s --allow-run-as-root %s %s", mpirun, hostfile, flags, command)
 		}
-		commands += fmt.Sprintf("echo %s\necho \"%s\"\n%s\n", metrics.Separator, line, line)
+		commands += fmt.Sprintf("echo %s\necho \"%s\"\n%s\n", metadata.Separator, line, line)
 	}
 
-	// Close the commands block
-	commands += fmt.Sprintf("echo %s\n", metrics.CollectionEnd)
+	// The pre block has the prefix and commands
+	preBlock := fmt.Sprintf("%s\n%s", prefix, commands)
 
-	// Template for the launcher with interactive mode, if desired
-	launcherTemplate := fmt.Sprintf("%s\n%s\n%s", prefix, commands, metrics.Interactive(spec.Spec.Logging.Interactive))
+	// The post block is just closing the colletion, and optionally interactive mode
+	interactive := metadata.Interactive(spec.Spec.Logging.Interactive)
+	postBlock := fmt.Sprintf("echo %s\n%s\n", metadata.CollectionEnd, interactive)
 
-	// The worker just has sleep infinity added, and getting the ip address of the launcher
-	workerTemplate := prefix + "\nsleep infinity"
-	return m.FinalizeEntrypoints(launcherTemplate, workerTemplate)
+	// The worker just has a preBlock with the prefix and the command is to sleep
+	launcherEntrypoint := specs.EntrypointScript{
+		Name: specs.DeriveScriptKey(m.LauncherScript),
+		Path: m.LauncherScript,
+		Pre:  preBlock,
+		Post: postBlock,
+	}
+
+	// Entrypoint for the worker
+	workerEntrypoint := specs.EntrypointScript{
+		Name:    specs.DeriveScriptKey(m.WorkerScript),
+		Path:    m.WorkerScript,
+		Pre:     prefix,
+		Command: "sleep infinity",
+	}
+
+	// Container spec for the launcher
+	launcherContainer := m.GetLauncherContainerSpec(launcherEntrypoint)
+	workerContainer := m.GetWorkerContainerSpec(workerEntrypoint)
+
+	// Return the script templates for each of launcher and worker
+	return []*specs.ContainerSpec{&launcherContainer, &workerContainer}
 }
 
 func init() {
-	launcher := jobs.LauncherWorker{
-		Identifier:     "network-osu-benchmark",
-		Summary:        "point to point MPI benchmarks",
-		Container:      "ghcr.io/converged-computing/metric-osu-benchmark:latest",
-		WorkerScript:   "/metrics_operator/osu-worker.sh",
-		LauncherScript: "/metrics_operator/osu-launcher.sh",
+	base := metrics.BaseMetric{
+		Identifier: OSUIdentifier,
+		Summary:    OSUSummary,
+		Container:  OSUContainer,
 	}
+	launcher := metrics.LauncherWorker{BaseMetric: base}
 	osu := OSUBenchmark{LauncherWorker: launcher}
 	metrics.Register(&osu)
 }

@@ -11,8 +11,9 @@ import (
 	"context"
 	"fmt"
 
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	mctrl "github.com/converged-computing/metrics-operator/pkg/metrics"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -20,11 +21,13 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
+// TODO this should take the final entrypoint scripts
 // ensureConfigMap ensures we've generated the read only entrypoints
 func (r *MetricSetReconciler) ensureConfigMaps(
 	ctx context.Context,
-	set *api.MetricSet,
-	sets *map[string]mctrl.MetricSet,
+	spec *api.MetricSet,
+	set *mctrl.MetricSet,
+	containerSpecs []*specs.ContainerSpec,
 ) (*corev1.ConfigMap, ctrl.Result, error) {
 
 	// Look for the config map by name
@@ -32,8 +35,8 @@ func (r *MetricSetReconciler) ensureConfigMaps(
 	err := r.Get(
 		ctx,
 		types.NamespacedName{
-			Name:      set.Name,
-			Namespace: set.Namespace,
+			Name:      spec.Name,
+			Namespace: spec.Namespace,
 		},
 		existing,
 	)
@@ -45,18 +48,14 @@ func (r *MetricSetReconciler) ensureConfigMaps(
 		// Prepare lookup of entrypoints, one per application/storage,
 		// or possible multiple for a standalone metric
 		data := map[string]string{}
-		count := 0
-		for _, s := range *sets {
-			for _, es := range s.EntrypointScripts(set) {
-				key := es.Name
-				if key == "" {
-					key = fmt.Sprintf("entrypoint-%d", count)
-				}
-				data[key] = es.Script
-			}
-			count += 1
+
+		// Go through each container spec entrypoint
+		for _, cs := range containerSpecs {
+			r.Log.Info("⬜️ ConfigMaps", "Name", cs.EntrypointScript.Name, "Writing", cs)
+			data[cs.EntrypointScript.Name] = cs.EntrypointScript.WriteScript()
 		}
-		cm, result, err := r.getConfigMap(ctx, set, data)
+
+		cm, result, err := r.getConfigMap(ctx, spec, data)
 		if err != nil {
 			r.Log.Error(
 				err, "🟥️ Failed to get config map",

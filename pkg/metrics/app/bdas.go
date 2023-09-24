@@ -10,19 +10,22 @@ package application
 import (
 	"fmt"
 
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/converged-computing/metrics-operator/pkg/jobs"
+	"github.com/converged-computing/metrics-operator/pkg/metadata"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
+)
+
+const (
+	bdasIdentifier = "app-bdas"
+	bdasSummary    = "The big data analytic suite contains the K-Means observation label, PCA, and SVM benchmarks."
+	bdasContainer  = "ghcr.io/converged-computing/metric-bdas:latest"
 )
 
 type BDAS struct {
-	jobs.LauncherWorker
-
-	// Custom Options
-	command string
-	prefix  string
+	metrics.LauncherWorker
 }
 
 // I think this is a simulation?
@@ -36,99 +39,101 @@ func (m BDAS) Url() string {
 
 // Set custom options / attributes for the metric
 func (m *BDAS) SetOptions(metric *api.Metric) {
-	m.ResourceSpec = &metric.Resources
-	m.AttributeSpec = &metric.Attributes
+
+	// Metadatqa
+	m.Identifier = bdasIdentifier
+	m.Summary = bdasSummary
+	m.Container = bdasContainer
 
 	// Set user defined values or fall back to defaults
-	m.prefix = "/bin/bash"
-	m.command = "mpirun --allow-run-as-root -np 4 --hostfile ./hostlist.txt Rscript /opt/bdas/benchmarks/r/princomp.r 250 50"
+	m.Prefix = "/bin/bash"
+	m.Command = "mpirun --allow-run-as-root -np 4 --hostfile ./hostlist.txt Rscript /opt/bdas/benchmarks/r/princomp.r 250 50"
 	m.Workdir = "/opt/bdas/benchmarks/r"
 
 	// Examples from guide
 	// mpirun -np num_ranks Rscript princomp.r num_local_rows num_global_cols
 	// mpirun -np 16 Rscript princomp.r 1000 250
-
-	// This could be improved :)
-	command, ok := metric.Options["command"]
-	if ok {
-		m.command = command.StrVal
-	}
-	workdir, ok := metric.Options["workdir"]
-	if ok {
-		m.Workdir = workdir.StrVal
-	}
-	prefix, ok := metric.Options["prefix"]
-	if ok {
-		m.prefix = prefix.StrVal
-	}
+	m.SetDefaultOptions(metric)
 }
 
 // Exported options and list options
 func (m BDAS) Options() map[string]intstr.IntOrString {
 	return map[string]intstr.IntOrString{
-		"command": intstr.FromString(m.command),
-		"prefix":  intstr.FromString(m.prefix),
+		"command": intstr.FromString(m.Command),
+		"prefix":  intstr.FromString(m.Prefix),
 		"workdir": intstr.FromString(m.Workdir),
 	}
 }
 
-// Return lookup of entrypoint scripts
-func (m BDAS) EntrypointScripts(
+func (m BDAS) PrepareContainers(
 	spec *api.MetricSet,
 	metric *metrics.Metric,
-) []metrics.EntrypointScript {
+) []*specs.ContainerSpec {
 
 	// Metadata to add to beginning of run
-	metadata := metrics.Metadata(spec, metric)
+	meta := metrics.Metadata(spec, metric)
 	hosts := m.GetHostlist(spec)
-	prefix := m.GetCommonPrefix(metadata, m.command, hosts)
+	prefix := m.GetCommonPrefix(meta, m.Command, hosts)
 
-	// Template for the launcher
-	// TODO need to finish adding here when BDAS rebuild done
-	template := `
+	preBlock := `
 echo "%s"
 
 # We need ip addresses for openmpi
 mv ./hostlist.txt ./hostnames.txt
 for h in $(cat ./hostnames.txt); do
   if [[ "${h}" != "" ]]; then
-    if [[ "${h}" == "$(hostname)" ]]; then
-        hostname -I | awk '{print $1}' >> hostlist.txt
-    else
-        host $h | cut -d ' ' -f 4 >> hostlist.txt
-    fi
+	if [[ "${h}" == "$(hostname)" ]]; then
+		hostname -I | awk '{print $1}' >> hostlist.txt
+	else
+		host $h | cut -d ' ' -f 4 >> hostlist.txt
+	fi
   fi  
 done
 echo "Hostlist"
 cat ./hostlist.txt
-echo "%s"
-echo "%s"
-%s ./problem.sh
+`
+
+	postBlock := `
 echo "%s"
 %s
 `
-	launcherTemplate := prefix + fmt.Sprintf(
-		template,
-		metadata,
-		metrics.CollectionStart,
-		metrics.Separator,
-		m.prefix,
-		metrics.CollectionEnd,
-		metrics.Interactive(spec.Spec.Logging.Interactive),
-	)
+	command := fmt.Sprintf("%s ./problem.sh", m.Prefix)
+	interactive := metadata.Interactive(spec.Spec.Logging.Interactive)
+	preBlock = prefix + fmt.Sprintf(preBlock, metadata.Separator)
+	postBlock = fmt.Sprintf(postBlock, metadata.CollectionEnd, interactive)
 
-	// The worker just has sleep infinity added
-	workerTemplate := prefix + "\nsleep infinity"
-	return m.FinalizeEntrypoints(launcherTemplate, workerTemplate)
+	// Entrypoint for the launcher
+	launcherEntrypoint := specs.EntrypointScript{
+		Name:    specs.DeriveScriptKey(m.LauncherScript),
+		Path:    m.LauncherScript,
+		Pre:     preBlock,
+		Command: command,
+		Post:    postBlock,
+	}
+
+	// Entrypoint for the worker
+	workerEntrypoint := specs.EntrypointScript{
+		Name:    specs.DeriveScriptKey(m.WorkerScript),
+		Path:    m.WorkerScript,
+		Pre:     prefix,
+		Command: "sleep infinity",
+	}
+
+	// Container spec for the launcher
+	launcherContainer := m.GetLauncherContainerSpec(launcherEntrypoint)
+	workerContainer := m.GetWorkerContainerSpec(workerEntrypoint)
+
+	// Return the script templates for each of launcher and worker
+	return []*specs.ContainerSpec{&launcherContainer, &workerContainer}
 }
 
 func init() {
-	launcher := jobs.LauncherWorker{
-		Identifier: "app-bdas",
-		Summary:    "The big data analytic suite contains the K-Means observation label, PCA, and SVM benchmarks.",
-		Container:  "ghcr.io/converged-computing/metric-bdas:latest",
+	base := metrics.BaseMetric{
+		Identifier: bdasIdentifier,
+		Summary:    bdasSummary,
+		Container:  bdasContainer,
 	}
-
+	launcher := metrics.LauncherWorker{BaseMetric: base}
 	BDAS := BDAS{LauncherWorker: launcher}
 	metrics.Register(&BDAS)
 }

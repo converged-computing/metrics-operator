@@ -1,4 +1,4 @@
-apiVersion: flux-framework.org/v1alpha1
+apiVersion: flux-framework.org/v1alpha2
 kind: MetricSet
 metadata:
   labels:
@@ -11,8 +11,3 @@ spec:
   metrics:
    # This uses the default commands
    - name: app-lammps
-
-     # This should the default - you are responsible for asking for the right number of processes,
-     # lammps arguments, and calling mpirun to point at an expected hostfile in the workdir.
-     # options:
-     #  command: mpirun --hostfile ./hostlist.txt -np 2 --map-by socket lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite

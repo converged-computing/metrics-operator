@@ -10,8 +10,9 @@ package controllers
 import (
 	"context"
 
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	mctrl "github.com/converged-computing/metrics-operator/pkg/metrics"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
@@ -21,17 +22,30 @@ import (
 func (r *MetricSetReconciler) ensureMetricSet(
 	ctx context.Context,
 	spec *api.MetricSet,
-	sets *map[string]mctrl.MetricSet,
+	set *mctrl.MetricSet,
 ) (ctrl.Result, error) {
 
-	// First ensure config maps, typically entrypoints for custom metrics containers.
-	// They are all bound to the same config map (read only volume)
-	// and named by metric index or custom metric script key name
-	// We could theoretically allow creating more than one JobSet here
-	// and change the name to include the group type.
-	_, result, err := r.ensureConfigMaps(ctx, spec, sets)
+	// Ensure we create the JobSet for the MetricSet
+	// We get back container specs to use for generating configmaps
+	// This doesn't actually create the jobset
+	js, cs, result, exists, err := r.getJobSet(ctx, spec, set)
 	if err != nil {
 		return result, err
+	}
+
+	// Now create config maps...
+	// The config maps need to exist before the jobsets, etc.
+	_, result, err = r.ensureConfigMaps(ctx, spec, set, cs)
+	if err != nil {
+		return result, err
+	}
+
+	// And finally, the jobset
+	if !exists {
+		err = r.createJobSet(ctx, spec, js)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
 	}
 
 	// Create headless service for the metrics set (which is a JobSet)
@@ -42,13 +56,6 @@ func (r *MetricSetReconciler) ensureMetricSet(
 		return result, err
 	}
 
-	// Ensure we create the JobSet for the MetricSet
-	// either application, storage, or standalone based
-	// This could be updated to support > 1
-	_, result, err = r.ensureJobSet(ctx, spec, sets)
-	if err != nil {
-		return result, err
-	}
 	return ctrl.Result{}, nil
 }
 
@@ -70,49 +77,40 @@ func (r *MetricSetReconciler) getExistingJob(
 	return existing, err
 }
 
-// getCluster does an actual check if we have a jobset in the namespace
-func (r *MetricSetReconciler) ensureJobSet(
+// getJobset retrieves the existing jobset (or generates the spec for a new one)
+func (r *MetricSetReconciler) getJobSet(
 	ctx context.Context,
 	spec *api.MetricSet,
-	sets *map[string]mctrl.MetricSet,
-) ([]*jobset.JobSet, ctrl.Result, error) {
+	set *mctrl.MetricSet,
+) (*jobset.JobSet, []*specs.ContainerSpec, ctrl.Result, bool, error) {
 
 	// Look for an existing job
-	// We only care about the set Name/Namespace matched to one
-	// This can eventually update to support > 1 if needed
-	existing, err := r.getExistingJob(ctx, spec)
-	jobsets := []*jobset.JobSet{existing}
+	js, err := r.getExistingJob(ctx, spec)
+	cs := []*specs.ContainerSpec{}
 
 	// Create a new job if it does not exist
 	if err != nil {
 
+		// TODO test checking for is not found error
 		r.Log.Info(
 			"✨ Creating a new Metrics JobSet ✨",
 			"Namespace:", spec.Namespace,
 			"Name:", spec.Name,
 		)
 
-		// Get one JobSet to create (can eventually support > 1)
-		jobsets, err := mctrl.GetJobSet(spec, sets)
-		if err != nil {
-			return jobsets, ctrl.Result{}, err
-		}
-		for _, js := range jobsets {
-			err = r.createJobSet(ctx, spec, js)
-			if err != nil {
-				return jobsets, ctrl.Result{}, err
-			}
-		}
-		return jobsets, ctrl.Result{}, err
+		// Get one JobSet and container specs to create config maps
+		js, cs, err := mctrl.GetJobSet(spec, set)
 
-	} else {
-		r.Log.Info(
-			"🎉 Found existing Metrics JobSet 🎉",
-			"Namespace:", existing.Namespace,
-			"Name:", existing.Name,
-		)
+		// We don't create it here, we need configmaps first
+		return js, cs, ctrl.Result{}, false, err
+
 	}
-	return jobsets, ctrl.Result{}, err
+	r.Log.Info(
+		"🎉 Found existing Metrics JobSet 🎉",
+		"Namespace:", js.Namespace,
+		"Name:", js.Name,
+	)
+	return js, cs, ctrl.Result{}, true, err
 }
 
 // createJobSet handles the creation operator

@@ -11,21 +11,32 @@ import (
 	"fmt"
 	"strconv"
 
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/converged-computing/metrics-operator/pkg/jobs"
+	"github.com/converged-computing/metrics-operator/pkg/metadata"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
+)
+
+const (
+	iostatIdentifier = "io-sysstat"
+	iostatSummary    = "statistics for Linux tasks (processes) : I/O, CPU, memory, etc."
+	iostatContainer  = "ghcr.io/converged-computing/metric-sysstat:latest"
 )
 
 // sysstat provides a tool "iostat" to assess a storage mount
 // https://github.com/sysstat/sysstat
 
 type IOStat struct {
-	jobs.StorageGeneric
+	metrics.StorageGeneric
 	humanReadable bool
 	rate          int32
 	completions   int32
+
+	// pre and post commands
+	pre  string
+	post string
 }
 
 func (m IOStat) Url() string {
@@ -34,6 +45,11 @@ func (m IOStat) Url() string {
 
 // Set custom options / attributes for the metric
 func (m *IOStat) SetOptions(metric *api.Metric) {
+
+	m.Identifier = iostatIdentifier
+	m.Summary = iostatSummary
+	m.Container = iostatContainer
+
 	m.rate = 10
 	m.completions = 0 // infinite
 	m.ResourceSpec = &metric.Resources
@@ -46,6 +62,15 @@ func (m *IOStat) SetOptions(metric *api.Metric) {
 			m.humanReadable = true
 		}
 	}
+	v, ok := metric.Options["pre"]
+	if ok {
+		m.pre = v.StrVal
+	}
+	v, ok = metric.Options["post"]
+	if ok {
+		m.post = v.StrVal
+	}
+
 	rate, ok := metric.Options["rate"]
 	if ok {
 		m.rate = rate.IntVal
@@ -57,20 +82,20 @@ func (m *IOStat) SetOptions(metric *api.Metric) {
 
 }
 
-// Generate the entrypoint for measuring the storage
-func (m IOStat) EntrypointScripts(
+func (m IOStat) PrepareContainers(
 	spec *api.MetricSet,
 	metric *metrics.Metric,
-) []metrics.EntrypointScript {
+) []*specs.ContainerSpec {
 
-	// Prepare metadata for set and separator
-	metadata := metrics.Metadata(spec, metric)
+	// Metadata to add to beginning of run
+	meta := metrics.Metadata(spec, metric)
 	command := "iostat -dxm -o JSON"
 	if m.humanReadable {
 		command = "iostat -dxm"
 	}
-	template := `#!/bin/bash
-# Custom pre command
+
+	preBlock := `#!/bin/bash
+# Custom pre comamand logic
 %s
 i=0
 echo "%s"
@@ -89,32 +114,28 @@ while true
 	sleep %d
 	let i=i+1
 done
-# Custom post command after done, if we get here
+`
+
+	postBlock := `
 %s
 %s
 `
-	script := fmt.Sprintf(
-		template,
-		spec.Spec.Storage.Commands.Pre,
-		metadata,
+	interactive := metadata.Interactive(spec.Spec.Logging.Interactive)
+	preBlock = fmt.Sprintf(
+		preBlock,
+		m.pre,
+		meta,
 		m.completions,
-		metrics.CollectionStart,
-		metrics.Separator,
+		metadata.CollectionStart,
+		metadata.Separator,
 		command,
-		metrics.CollectionEnd,
-		spec.Spec.Storage.Commands.Post,
+		metadata.CollectionEnd,
+		metadata.CollectionEnd,
 		m.rate,
-		spec.Spec.Storage.Commands.Post,
-		metrics.Interactive(spec.Spec.Logging.Interactive),
 	)
-	// The entrypoint is the entrypoint for the container, while
-	// the command is expected to be what we are monitoring. Often
-	// they are the same thing. We return an empty Name so it's automatically
-	// assigned
-	return []metrics.EntrypointScript{
-		{Script: script},
-	}
 
+	postBlock = fmt.Sprintf(postBlock, m.post, interactive)
+	return m.StorageContainerSpec(preBlock, "", postBlock)
 }
 
 // Exported options and list options
@@ -127,11 +148,12 @@ func (m IOStat) Options() map[string]intstr.IntOrString {
 }
 
 func init() {
-	storage := jobs.StorageGeneric{
-		Identifier: "io-sysstat",
-		Summary:    "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
-		Container:  "ghcr.io/converged-computing/metric-sysstat:latest",
+	base := metrics.BaseMetric{
+		Identifier: iostatIdentifier,
+		Summary:    iostatSummary,
+		Container:  iostatContainer,
 	}
+	storage := metrics.StorageGeneric{BaseMetric: base}
 	iostat := IOStat{StorageGeneric: storage}
 	metrics.Register(&iostat)
 }

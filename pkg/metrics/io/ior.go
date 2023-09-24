@@ -10,22 +10,31 @@ package io
 import (
 	"fmt"
 
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/converged-computing/metrics-operator/pkg/jobs"
+	"github.com/converged-computing/metrics-operator/pkg/metadata"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
+)
+
+const (
+	iorIdentifier = "io-ior"
+	iorSummary    = "HPC IO Benchmark"
+	iorContainer  = "ghcr.io/converged-computing/metric-ior:latest"
 )
 
 // Ior means Flexible IO
 // https://docs.gitlab.com/ee/administration/operations/filesystem_benchmarking.html
 
 type Ior struct {
-	jobs.StorageGeneric
+	metrics.StorageGeneric
 
 	// Options
 	workdir string
 	command string
+	pre     string
+	post    string
 }
 
 func (m Ior) Url() string {
@@ -36,6 +45,10 @@ func (m Ior) Url() string {
 func (m *Ior) SetOptions(metric *api.Metric) {
 	m.ResourceSpec = &metric.Resources
 	m.AttributeSpec = &metric.Attributes
+
+	m.Identifier = iorIdentifier
+	m.Container = iorContainer
+	m.Summary = iorSummary
 
 	// Set defaults for options
 	m.command = "ior -w -r -o testfile"
@@ -53,44 +66,53 @@ func (m *Ior) SetOptions(metric *api.Metric) {
 	if ok {
 		m.workdir = workdir.StrVal
 	}
+	v, ok := metric.Options["pre"]
+	if ok {
+		m.pre = v.StrVal
+	}
+	v, ok = metric.Options["post"]
+	if ok {
+		m.post = v.StrVal
+	}
 }
 
-// Generate the entrypoint for measuring the storage
-func (m Ior) EntrypointScripts(
+func (m Ior) PrepareContainers(
 	spec *api.MetricSet,
 	metric *metrics.Metric,
-) []metrics.EntrypointScript {
+) []*specs.ContainerSpec {
 
-	// Prepare metadata for set and separator
-	metadata := metrics.Metadata(spec, metric)
-	template := `#!/bin/bash
+	// Metadata to add to beginning of run
+	meta := metrics.Metadata(spec, metric)
+
+	preBlock := `#!/bin/bash
 echo "%s"
 # Directory (and filename) for test assuming other storage mounts
 cd %s
 echo "%s"
 echo "%s"
-%s
+`
+
+	postBlock := `
 echo "%s"
 %s
 %s
-%s
 `
-	script := fmt.Sprintf(
-		template,
-		metadata,
+	interactive := metadata.Interactive(spec.Spec.Logging.Interactive)
+	preBlock = fmt.Sprintf(
+		preBlock,
+		meta,
 		m.workdir,
-		metrics.CollectionStart,
-		metrics.Separator,
-		m.command,
-		metrics.CollectionEnd,
-		spec.Spec.Storage.Commands.Post,
-		spec.Spec.Storage.Commands.Prefix,
-		metrics.Interactive(spec.Spec.Logging.Interactive),
+		metadata.CollectionStart,
+		metadata.Separator,
 	)
-	return []metrics.EntrypointScript{
-		{Script: script},
-	}
 
+	postBlock = fmt.Sprintf(
+		postBlock,
+		metadata.CollectionEnd,
+		m.post,
+		interactive,
+	)
+	return m.StorageContainerSpec(preBlock, m.command, postBlock)
 }
 
 // Exported options and list options
@@ -102,11 +124,12 @@ func (m Ior) Options() map[string]intstr.IntOrString {
 }
 
 func init() {
-	storage := jobs.StorageGeneric{
-		Identifier: "io-ior",
-		Summary:    "HPC IO Benchmark",
-		Container:  "ghcr.io/converged-computing/metric-ior:latest",
+	base := metrics.BaseMetric{
+		Identifier: iorIdentifier,
+		Summary:    iorSummary,
+		Container:  iorContainer,
 	}
+	storage := metrics.StorageGeneric{BaseMetric: base}
 	Ior := Ior{StorageGeneric: storage}
 	metrics.Register(&Ior)
 }

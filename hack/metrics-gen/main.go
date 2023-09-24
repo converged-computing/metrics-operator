@@ -12,7 +12,8 @@ import (
 	_ "github.com/converged-computing/metrics-operator/pkg/metrics/io"
 	_ "github.com/converged-computing/metrics-operator/pkg/metrics/network"
 	_ "github.com/converged-computing/metrics-operator/pkg/metrics/perf"
-	//+kubebuilder:scaffold:imports
+	//
+	// +kubebuilder:scaffold:imports
 )
 
 var (
@@ -23,7 +24,6 @@ type MetricOutput struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Family      string `json:"family"`
-	Type        string `json:"type"`
 	Image       string `json:"image"`
 	Url         string `json:"url"`
 }
@@ -39,7 +39,6 @@ func main() {
 			Name:        metric.Name(),
 			Description: metric.Description(),
 			Family:      metric.Family(),
-			Type:        metric.Type(),
 			Image:       metric.Image(),
 			Url:         metric.Url(),
 		}

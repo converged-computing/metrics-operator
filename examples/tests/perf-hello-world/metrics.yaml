@@ -1,4 +1,4 @@
-apiVersion: flux-framework.org/v1alpha1
+apiVersion: flux-framework.org/v1alpha2
 kind: MetricSet
 metadata:
   labels:
@@ -6,12 +6,17 @@ metadata:
     app.kubernetes.io/instance: metricset-sample
   name: metricset-sample
 spec:
-  # We don't have support currently for bash commands with -c quotes - hence the simple commands
-  application:
-    image: ubuntu
-    command: sleep 10
   metrics:
     - name: perf-sysstat
       options:
         color: "true"
+        # The command we are watching for
+        command: sleep 10
+      
+      # The addon that runs the container with the shared process namespace
+      addons:
+        - name: application
+          options:
+            image: ubuntu
+            command: sleep 10
        

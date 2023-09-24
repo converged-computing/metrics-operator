@@ -11,15 +11,22 @@ import (
 	"fmt"
 	"path"
 
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	jobs "github.com/converged-computing/metrics-operator/pkg/jobs"
+	"github.com/converged-computing/metrics-operator/pkg/metadata"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 )
 
 // ghcr.io/converged-computing/metric-osu-benchmark:latest
 // https://mvapich.cse.ohio-state.edu/benchmarks/
+
+const (
+	cbIdentifier = "network-chatterbug"
+	cbSummary    = "A suite of communication proxies for HPC applications"
+	cbContainer  = "ghcr.io/converged-computing/metric-chatterbug:latest"
+)
 
 var (
 
@@ -37,7 +44,7 @@ var (
 )
 
 type Chatterbug struct {
-	jobs.LauncherWorker
+	metrics.LauncherWorker
 
 	// Custom options
 	command string
@@ -62,6 +69,10 @@ func (m *Chatterbug) hasCommand(command string) bool {
 // Set custom options / attributes for the metric
 func (m *Chatterbug) SetOptions(metric *api.Metric) {
 	m.lookup = map[string]bool{}
+
+	m.Identifier = cbIdentifier
+	m.Container = cbContainer
+	m.Summary = cbSummary
 
 	// Default command and args (for a demo)
 	m.command = "stencil3d"
@@ -118,16 +129,16 @@ func (n Chatterbug) Family() string {
 	return metrics.NetworkFamily
 }
 
-// Return lookup of entrypoint scripts
-func (m Chatterbug) EntrypointScripts(
+func (m Chatterbug) PrepareContainers(
 	spec *api.MetricSet,
 	metric *metrics.Metric,
-) []metrics.EntrypointScript {
+) []*specs.ContainerSpec {
 
 	// Metadata to add to beginning of run
-	metadata := metrics.Metadata(spec, metric)
-	hosts := m.GetHostlist(spec)
+	meta := metrics.Metadata(spec, metric)
 
+	// The launcher has a different hostname, n for netmark
+	hosts := m.GetHostlist(spec)
 	prefixTemplate := `#!/bin/bash
 # Start ssh daemon
 /usr/sbin/sshd -D &
@@ -167,43 +178,63 @@ done
 cat ./hostlist.txt
 # Show metadata for run
 echo "%s"
-sleep infinity
 `
 	prefix := fmt.Sprintf(
 		prefixTemplate,
 		m.tasks,
 		spec.Spec.Pods,
 		hosts,
-		metadata,
+		meta,
 	)
 
 	// Prepare command for chatterbug
-	commands := fmt.Sprintf("\nsleep 5\necho %s\n", metrics.CollectionStart)
+	commands := fmt.Sprintf("\nsleep 5\necho %s\n", metadata.CollectionStart)
 
 	// Full path to, e.g., /root/chatterbug/stencil3d/stencil3d.x
 	command := path.Join("/root/chatterbug", m.command, ChatterbugApps[m.command])
 	line := fmt.Sprintf("mpirun --hostfile ./hostlist.txt --allow-run-as-root %s %s %s", m.mpirun, command, m.args)
-	commands += fmt.Sprintf("echo %s\necho \"%s\"\n%s\n", metrics.Separator, line, line)
 
-	// Close the commands block
-	commands += fmt.Sprintf("echo %s\n", metrics.CollectionEnd)
+	commands += fmt.Sprintf("echo %s\necho \"%s\"\n", metadata.Separator, line)
 
-	// Template for the launcher with interactive mode, if desired
-	launcherTemplate := fmt.Sprintf("%s\n%s\n%s", prefix, commands, metrics.Interactive(spec.Spec.Logging.Interactive))
+	// The pre block has the prefix and commands, up to the echo of the command (line)
+	preBlock := fmt.Sprintf("%s\n%s", prefix, commands)
 
-	// The worker just has sleep infinity added, and getting the ip address of the launcher
-	workerTemplate := prefix + "\nsleep infinity"
-	return m.FinalizeEntrypoints(launcherTemplate, workerTemplate)
+	// The post block has the collection end and interactive option
+	interactive := metadata.Interactive(spec.Spec.Logging.Interactive)
+	postBlock := fmt.Sprintf("echo %s\n%s\n", metadata.CollectionEnd, interactive)
+
+	// The worker just has a preBlock with the prefix and the command is to sleep
+	launcherEntrypoint := specs.EntrypointScript{
+		Name:    specs.DeriveScriptKey(m.LauncherScript),
+		Path:    m.LauncherScript,
+		Pre:     preBlock,
+		Command: line,
+		Post:    postBlock,
+	}
+
+	// Entrypoint for the worker
+	workerEntrypoint := specs.EntrypointScript{
+		Name:    specs.DeriveScriptKey(m.WorkerScript),
+		Path:    m.WorkerScript,
+		Pre:     prefix,
+		Command: "sleep infinity",
+	}
+
+	// Container spec for the launcher
+	launcherContainer := m.GetLauncherContainerSpec(launcherEntrypoint)
+	workerContainer := m.GetWorkerContainerSpec(workerEntrypoint)
+
+	// Return the script templates for each of launcher and worker
+	return []*specs.ContainerSpec{&launcherContainer, &workerContainer}
 }
 
 func init() {
-	launcher := jobs.LauncherWorker{
-		Identifier:     "network-chatterbug",
-		Summary:        "A suite of communication proxies for HPC applications",
-		Container:      "ghcr.io/converged-computing/metric-chatterbug:latest",
-		WorkerScript:   "/metrics_operator/chatterbug-worker.sh",
-		LauncherScript: "/metrics_operator/chatterbug-launcher.sh",
+	base := metrics.BaseMetric{
+		Identifier: cbIdentifier,
+		Summary:    cbSummary,
+		Container:  cbContainer,
 	}
+	launcher := metrics.LauncherWorker{BaseMetric: base}
 	bug := Chatterbug{LauncherWorker: launcher}
 	metrics.Register(&bug)
 }

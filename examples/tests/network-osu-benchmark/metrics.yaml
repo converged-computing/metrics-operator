@@ -1,4 +1,4 @@
-apiVersion: flux-framework.org/v1alpha1
+apiVersion: flux-framework.org/v1alpha2
 kind: MetricSet
 metadata:
   labels:
@@ -12,7 +12,8 @@ spec:
     interactive: true
   metrics:
    - name: network-osu-benchmark
-
+     options:
+       soleTenancy: "false"
      # Example of resource requests / limits
      # You should set these to ensure 1 pod : 1 node
      # resources:

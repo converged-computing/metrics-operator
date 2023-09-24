@@ -22,7 +22,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	mctrl "github.com/converged-computing/metrics-operator/pkg/metrics"
 	"github.com/go-logr/logr"
 )
@@ -104,65 +104,33 @@ func (r *MetricSetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, nil
 	}
 
-	// Verify that all metrics are valid.
-	// If the metric requires an application, the MetricSet CRD must have one!
-	// If the metric requires storage, the MetricSet CRD must defined storage
-	// Only one of application, storage, and standalone is required until
-	// we see a use case that warrants this be done differently.
-	metrics := []mctrl.Metric{}
-
-	// We are allowed to create more that one MetricSet (JobSet)
-	sets := map[string]mctrl.MetricSet{}
+	// A MetricSet creates one or more JobSets (right now we just do 1)
+	set := mctrl.MetricSet{}
 	for _, metric := range spec.Spec.Metrics {
 
-		// Get the individual metric, the type will determine the set we add it to
+		// Get the individual metric
+		r.Log.Info(fmt.Sprintf("🟦️ Looking for metric %s\n", metric.Name))
 		m, err := mctrl.GetMetric(&metric, &spec)
 		if err != nil {
 			r.Log.Error(err, fmt.Sprintf("🟥️ We had an issue loading that metric %s!", metric.Name))
 			return ctrl.Result{}, nil
 		}
-		metricType := m.Type()
-
-		// Determine if we've seen the MetricSet type yet, and add either way.
-		_, ok := sets[metricType]
-		if !ok {
-			ms, err := mctrl.GetMetricSet(metricType)
-			if err != nil {
-				r.Log.Info(fmt.Sprintf("🟥️ We cannot find a metricset type called %s!", metricType))
-				return ctrl.Result{}, nil
-			}
-			sets[metricType] = ms
-		}
-		sets[metricType].Add(&m)
+		// Add the metric to the set
+		set.Add(&m)
 	}
 
-	// Ensure sets all have one or more metrics
-	for setName, set := range sets {
-		count := len(set.Metrics())
-		if count == 0 {
-			r.Log.Info(fmt.Sprintf("🟥️ Metric set %s does not have any validated metrics.", setName))
-			return ctrl.Result{}, nil
-		}
-		r.Log.Info(fmt.Sprintf("🟦️ Metric set %s has %d metrics.", setName, count))
-	}
-	// Currently just support one JobSet per MetricSet
-	if len(sets) != 1 {
-		r.Log.Info(fmt.Sprintf("🟥️ Found %d metric sets, but exactly one is allowed to correspond to a final JobSet.", len(sets)))
+	// Ensure we have one or more metrics
+	count := len(set.Metrics())
+	if count == 0 {
+		r.Log.Info(fmt.Sprintf("🟥️ Metric set %s in namespace %s does not have any validated metrics.", spec.Name, spec.Namespace))
 		return ctrl.Result{}, nil
 	}
-
-	// Currently just support one jobset for standalone
-	_, ok := sets[mctrl.StandaloneMetric]
-	if ok && len(metrics) > 1 {
-		r.Log.Info("🟥️ The standalone type metric, by definition, must be measured on its own and not with other metrics.")
-		return ctrl.Result{}, nil
-	}
+	r.Log.Info(fmt.Sprintf("🟦️ Metric set %s in namespace %s has %d metrics.", spec.Name, spec.Namespace, count))
 
 	// Ensure the metricset is mapped to a JobSet. For design:
 	// 1. If an application is provided, we pair the application at some scale with each metric as a contaienr
 	// 2. If storage is provided, we create the volumes for the metric containers
-	// 3. If standalone is required, we create a JobSet with custom logic
-	result, err := r.ensureMetricSet(ctx, &spec, &sets)
+	result, err := r.ensureMetricSet(ctx, &spec, &set)
 	if err != nil {
 		r.Log.Error(err, "🟥️ Issue ensuring metric set")
 		return result, err

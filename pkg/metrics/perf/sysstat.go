@@ -11,17 +11,24 @@ import (
 	"fmt"
 	"strconv"
 
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
-	"github.com/converged-computing/metrics-operator/pkg/jobs"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
+	"github.com/converged-computing/metrics-operator/pkg/metadata"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
 	"k8s.io/apimachinery/pkg/util/intstr"
+)
+
+const (
+	pidstatIdentifier = "perf-sysstat"
+	pidstatSummary    = "statistics for Linux tasks (processes) : I/O, CPU, memory, etc."
+	pidstatContainer  = "ghcr.io/converged-computing/metric-sysstat:latest"
 )
 
 // sysstat provides a tool "pidstat" that can monitor a PID (along with others)
 // https://github.com/sysstat/sysstat
 
 type PidStat struct {
-	jobs.SingleApplication
+	metrics.SingleApplication
 
 	// Custom Options
 	useColor    bool
@@ -29,6 +36,7 @@ type PidStat struct {
 	useThreads  bool
 	rate        int32
 	completions int32
+	command     string
 	commands    map[string]intstr.IntOrString
 }
 
@@ -38,6 +46,11 @@ func (m PidStat) Url() string {
 
 // Set custom options / attributes for the metric
 func (m *PidStat) SetOptions(metric *api.Metric) {
+
+	m.Identifier = pidstatIdentifier
+	m.Summary = pidstatSummary
+	m.Container = pidstatContainer
+
 	// Defaults for rate and completions
 	m.rate = 10
 	m.completions = 0 // infinite
@@ -74,6 +87,10 @@ func (m *PidStat) SetOptions(metric *api.Metric) {
 	if ok {
 		m.commands = commands
 	}
+	command, ok := metric.Options["command"]
+	if ok {
+		m.command = command.StrVal
+	}
 
 }
 
@@ -104,7 +121,7 @@ func (m PidStat) prepareIndexedCommand(spec *api.MetricSet) string {
 	if len(m.commands) == 0 {
 
 		// This is a global command for the entire application
-		command = fmt.Sprintf("command=\"%s\"\n", spec.Spec.Application.Command)
+		command = fmt.Sprintf("command=\"%s\"\n", m.command)
 
 	} else {
 
@@ -136,15 +153,13 @@ func (m PidStat) prepareIndexedCommand(spec *api.MetricSet) string {
 	return command
 }
 
-// Generate the replicated job for measuring the application
-// TODO if the app is too fast we might miss it?
-func (m PidStat) EntrypointScripts(
+func (m PidStat) PrepareContainers(
 	spec *api.MetricSet,
 	metric *metrics.Metric,
-) []metrics.EntrypointScript {
+) []*specs.ContainerSpec {
 
 	// Metadata to add to beginning of run
-	metadata := metrics.Metadata(spec, metric)
+	meta := metrics.Metadata(spec, metric)
 
 	useColor := ""
 	if !m.useColor {
@@ -160,19 +175,19 @@ func (m PidStat) EntrypointScripts(
 	if m.useThreads {
 		useThreads = " -t "
 	}
-	// Prepare custom logic to determine command
+
 	command := m.prepareIndexedCommand(spec)
-	template := `#!/bin/bash
+	preBlock := `#!/bin/bash
 
 echo "%s"
 # Download the wait binary
 wget https://github.com/converged-computing/goshare/releases/download/2023-07-27/wait > /dev/null
 chmod +x ./wait
 mv ./wait /usr/bin/goshare-wait
-
+	
 # Do we want to use threads?
 threads="%s"
-
+	
 # This is logic to determine the command, it will set $command
 # We do this because command to watch can vary between worker pods
 %s
@@ -181,10 +196,10 @@ echo "$command"
 echo "PIDSTAT COMMAND END"
 echo "Waiting for application PID..."
 pid=$(goshare-wait -c "$command" -q)
-
+	
 # Set color or not
 %s
-
+	
 # See https://kellyjonbrazil.github.io/jc/docs/parsers/pidstat
 # for how we get lovely json
 i=0
@@ -192,16 +207,16 @@ completions=%d
 echo "%s"
 while true
   do
-    echo "%s"
+	echo "%s"
 	%s
-    echo "CPU STATISTICS TASK"
-    pidstat -p ${pid} -u -h $threads -T TASK | jc --pidstat
-    echo "CPU STATISTICS CHILD"
-    pidstat -p ${pid} -u -h $threads -T CHILD | jc --pidstat
+	echo "CPU STATISTICS TASK"
+	pidstat -p ${pid} -u -h $threads -T TASK | jc --pidstat
+	echo "CPU STATISTICS CHILD"
+	pidstat -p ${pid} -u -h $threads -T CHILD | jc --pidstat
 	echo "IO STATISTICS"
-    pidstat -p ${pid} -d -h $threads -T ALL | jc --pidstat
+	pidstat -p ${pid} -d -h $threads -T ALL | jc --pidstat
 	echo "POLICY"
-    pidstat -p ${pid} -R -h $threads -T ALL | jc --pidstat
+	pidstat -p ${pid} -R -h $threads -T ALL | jc --pidstat
 	echo "PAGEFAULTS TASK"
 	pidstat -p ${pid} -r -h $threads -T TASK | jc --pidstat
 	echo "PAGEFAULTS CHILD"
@@ -218,51 +233,46 @@ while true
 	pidstat -p ${pid} -w -h $threads -T ALL | jc --pidstat
 	# Check if still running
 	ps -p ${pid} > /dev/null
-    retval=$?
-    if [[ $retval -ne 0 ]]; then
-        echo "%s"
-        exit 0
-    fi
-    if [[ $completions -ne 0 ]] && [[ $i -eq $completions ]]; then
-        echo "%s"
-    	exit 0
-    fi
-    sleep %d
-    let i=i+1
+	retval=$?
+	if [[ $retval -ne 0 ]]; then
+		echo "%s"
+		exit 0
+	fi
+	if [[ $completions -ne 0 ]] && [[ $i -eq $completions ]]; then
+		echo "%s"
+		exit 0
+	fi
+	sleep %d
+	let i=i+1
 done
-%s
 `
 
-	script := fmt.Sprintf(
-		template,
-		metadata,
+	interactive := metadata.Interactive(spec.Spec.Logging.Interactive)
+	preBlock = fmt.Sprintf(
+		preBlock,
+		meta,
 		useThreads,
 		command,
 		useColor,
 		m.completions,
-		metrics.CollectionStart,
-		metrics.Separator,
+		metadata.CollectionStart,
+		metadata.Separator,
 		showPIDS,
-		metrics.CollectionEnd,
-		metrics.CollectionEnd,
+		metadata.CollectionEnd,
+		metadata.CollectionEnd,
 		m.rate,
-		metrics.Interactive(spec.Spec.Logging.Interactive),
 	)
-
-	// NOTE: the entrypoint is the entrypoint for the container, while
-	// the command is expected to be what we are monitoring. Often
-	// they are the same thing.
-	return []metrics.EntrypointScript{
-		{Script: script},
-	}
+	postBlock := fmt.Sprintf("\n%s\n", interactive)
+	return m.ApplicationContainerSpec(preBlock, command, postBlock)
 }
 
 func init() {
-	app := jobs.SingleApplication{
-		Identifier: "perf-sysstat",
-		Summary:    "statistics for Linux tasks (processes) : I/O, CPU, memory, etc.",
-		Container:  "ghcr.io/converged-computing/metric-sysstat:latest",
+	base := metrics.BaseMetric{
+		Identifier: pidstatIdentifier,
+		Summary:    pidstatSummary,
+		Container:  pidstatContainer,
 	}
+	app := metrics.SingleApplication{BaseMetric: base}
 	pidstat := PidStat{SingleApplication: app}
 	metrics.Register(&pidstat)
 }

@@ -10,15 +10,22 @@ package application
 import (
 	"fmt"
 
-	api "github.com/converged-computing/metrics-operator/api/v1alpha1"
+	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/converged-computing/metrics-operator/pkg/jobs"
+	"github.com/converged-computing/metrics-operator/pkg/metadata"
 	metrics "github.com/converged-computing/metrics-operator/pkg/metrics"
+	"github.com/converged-computing/metrics-operator/pkg/specs"
+)
+
+const (
+	ldmsIdentifier = "app-ldms"
+	ldmsSummary    = "provides LDMS, a low-overhead, low-latency framework for collecting, transferring, and storing metric data on a large distributed computer system."
+	ldmsContainer  = "ghcr.io/converged-computing/metric-ovis-hpc:latest"
 )
 
 type LDMS struct {
-	jobs.SingleApplication
+	metrics.SingleApplication
 
 	// Custom Options
 	completions int32
@@ -39,6 +46,10 @@ func (m LDMS) Url() string {
 func (m *LDMS) SetOptions(metric *api.Metric) {
 	m.ResourceSpec = &metric.Resources
 	m.AttributeSpec = &metric.Attributes
+
+	m.Identifier = ldmsIdentifier
+	m.Container = ldmsContainer
+	m.Summary = ldmsSummary
 	m.rate = 10
 
 	// Set user defined values or fall back to defaults
@@ -61,6 +72,8 @@ func (m *LDMS) SetOptions(metric *api.Metric) {
 	if ok {
 		m.rate = rate.IntVal
 	}
+	// Primarily sole tenancy
+	m.SetDefaultOptions(metric)
 }
 
 // Exported options and list options
@@ -76,17 +89,15 @@ func (n LDMS) ListOptions() map[string][]intstr.IntOrString {
 	return map[string][]intstr.IntOrString{}
 }
 
-// Return lookup of entrypoint scripts
-func (m LDMS) EntrypointScripts(
+func (m LDMS) PrepareContainers(
 	spec *api.MetricSet,
 	metric *metrics.Metric,
-) []metrics.EntrypointScript {
+) []*specs.ContainerSpec {
 
 	// Metadata to add to beginning of run
-	metadata := metrics.Metadata(spec, metric)
+	meta := metrics.Metadata(spec, metric)
 
-	// Template for the launcher
-	template := `
+	preBlock := `
 # Setup munge
 mkdir -p /run/munge
 chown -R 0 /var/log/munge /var/lib/munge /etc/munge /run/munge
@@ -94,52 +105,54 @@ chown -R 0 /var/log/munge /var/lib/munge /etc/munge /run/munge
 # ldmsd -x sock:10444 -c /opt/sampler.conf -l /tmp/demo_ldmsd_log -v DEBUG -a munge  -r $(pwd)/ldmsd.pid
 ldmsd -x sock:10444 -c /opt/sampler.conf -l /tmp/demo_ldmsd_log -v DEBUG -r $(pwd)/ldmsd.pid
 echo "%s"
-
+	
 i=0
 completions=%d
 echo "%s"
 while true
   do
-    echo "%s"
-    %s
-    if [[ $retval -ne 0 ]]; then
-        echo "%s"
-        exit 0
-    fi
-    if [[ $completions -ne 0 ]] && [[ $i -eq $completions ]]; then
-        echo "%s"
-    	exit 0
-    fi
-    sleep %d
-    let i=i+1
+	echo "%s"
+	%s
+	if [[ $retval -ne 0 ]]; then
+		echo "%s"
+		exit 0
+	fi
+	if [[ $completions -ne 0 ]] && [[ $i -eq $completions ]]; then
+		echo "%s"
+		exit 0
+	fi
+	sleep %d
+	let i=i+1
 done
+`
+
+	postBlock := `
 echo "%s"
 %s
 `
-	script := fmt.Sprintf(
-		template,
-		metadata,
+	interactive := metadata.Interactive(spec.Spec.Logging.Interactive)
+	preBlock = fmt.Sprintf(
+		preBlock,
+		meta,
 		m.completions,
-		metrics.CollectionStart,
-		metrics.Separator,
+		metadata.CollectionStart,
+		metadata.Separator,
 		m.command,
-		metrics.CollectionEnd,
-		metrics.CollectionEnd,
+		metadata.CollectionEnd,
+		metadata.CollectionEnd,
 		m.rate,
-		metrics.CollectionEnd,
-		metrics.Interactive(spec.Spec.Logging.Interactive),
 	)
-	return []metrics.EntrypointScript{
-		{Script: script},
-	}
+	postBlock = fmt.Sprintf(postBlock, metadata.CollectionEnd, interactive)
+	return m.ApplicationContainerSpec(preBlock, "", postBlock)
 }
 
 func init() {
-	app := jobs.SingleApplication{
-		Identifier: "app-ldms",
-		Summary:    "provides LDMS, a low-overhead, low-latency framework for collecting, transferring, and storing metric data on a large distributed computer system.",
-		Container:  "ghcr.io/converged-computing/metric-ovis-hpc:latest",
+	base := metrics.BaseMetric{
+		Identifier: ldmsIdentifier,
+		Summary:    ldmsSummary,
+		Container:  ldmsContainer,
 	}
-	LDMS := LDMS{SingleApplication: app}
+	single := metrics.SingleApplication{BaseMetric: base}
+	LDMS := LDMS{SingleApplication: single}
 	metrics.Register(&LDMS)
 }
