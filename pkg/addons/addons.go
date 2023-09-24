@@ -120,8 +120,6 @@ func GetAddon(a *api.MetricAddon) (Addon, error) {
 	return addon, nil
 }
 
-// TODO likely we need to carry around entrypoints to customize?
-
 // Register a new addon!
 func Register(a Addon) {
 	name := a.Name()

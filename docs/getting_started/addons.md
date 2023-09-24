@@ -12,6 +12,38 @@ have a request for an addon please [let us know](https://github.com/converged-co
 
 <iframe src="../_static/data/addons.html" style="width:100%; height:500px;" frameBorder="0"></iframe>
 
+## Command Addons
+
+The Commands group of addons are some of my favorites, because they allow you to customize entrypoints for existing metrics! 
+
+### Commands
+
+> Use addon with name "commands"
+
+The basic "commands" addon allows you to customize:
+
+ - **preBlock**: A custom block of commands to run before the primary entrypoint command.
+ - **prefix**: a wrapping prefix to the entrypoint
+ - **suffix**: a wrapping suffix to the entrypoint
+ - **postBlock**: a block of commands to run after the primary entrypoint command.
+
+For example, you might want to time something by adding "time" as the prefix. You may want to
+install something special to the container (or otherwise customize files or content) before running
+the entrypoint. You might also want to run some kind of cleanup or save in the postBlock. The
+reason "commands" is so cool is because it's flexible to so many ideas! Here is an example:
+
+ - *[metrics-time.yaml](https://github.com/converged-computing/metrics-operator/tree/main/examples/addons/commands/metrics-time.yaml)*
+
+### Perf
+
+> Use addon with name "perf-commands"
+
+Per commands has the same arguments as [commands](#commands) above, but will additionally add CAP_PTRACE and CAP_SYSADMIN
+to your container, which are typically needed for performance benchmarking tools. As an example here, you might
+install a performance tool in the preBlock, run it using the "prefix" and then use "suffix" optionally to pipe to
+a file, and postBlock to upload somewhere.
+
+
 ## Existing Volumes
 
 An existing volume addon can be provided to a metric. As an example, it would make sense to run an IO benchmarks with
@@ -25,7 +57,7 @@ different kinds of volume addons. The addons for volumes currently include:
 
 and for all of the above, you want to create it and provide metadata for the addon to the operator, which will ensure the volume is available for your metric. We will provide examples here to do that.
 
-#### persistent volume claim addon
+### persistent volume claim addon
 
 As an example, here is how to provide the name of an existing claim (you created separately) to a metric container:
 TODO add support to specify a specific metric container or replicated job container, if applicable.
@@ -45,7 +77,7 @@ spec:
 
 The above would add a claim named "data" to the metric container(s).
 
-#### config map addon example
+### config map addon example
 
 Here is an example of providing a config map to an application container In layman's terms, we are deploying vanilla nginx, but adding a configuration file
 to `/etc/nginx/conf.d`
@@ -86,7 +118,7 @@ data:
     }
 ```
 
-#### secret addon example
+### secret addon example
 
 Here is an example of providing an existing secret (in the metrics-operator namespace)
 to the metric container(s):
@@ -106,7 +138,7 @@ spec:
 
 The above shows an existing secret named "certs" that we will mount into `/etc/certs`.
 
-#### hostpath volume addon example
+### hostpath volume addon example
 
 Here is how to use a host path:
 
@@ -123,106 +155,7 @@ spec:
             path: /path/in/container
 ```
 
-
-TODO convert to addon logic
-
-### application
-
-When you want to measure application performance, you'll need to add an "application" section to your MetricSet. This is the container that houses some application that you want to measure performance for. This means that minimally, you are required to define the application container image and command:
-
-
-```yaml
-spec:
-  application:
-    image: ghcr.io/rse-ops/vanilla-lammps:tag-latest
-    command: mpirun lmp -v x 1 -v y 1 -v z 1 -in in.reaxc.hns -nocite
-```
-
-In the above example, we target a container with LAMMPS and mpi, and we are going to run MPIrun.
-The command will be used by the metrics sidecar containers to find the PID of interest to measure.
-
-#### workingDir
-
-To add a working directory for your application:
-
-```yaml
-spec:
-  application:
-    image: ghcr.io/rse-ops/vanilla-lammps:tag-latest
-    command: mpirun lmp -v x 1 -v y 1 -v z 1 -in in.reaxc.hns -nocite
-    workingDir: /opt/lammps/examples/reaxff/HNS
-```
-
-#### volumes
-
-An application is allowed to have one or more existing volumes. An existing volume can be any of the types described in [existing volumes](#existing-volumes)
-
-#### resources
-
-You can define resources for an application or a metric container. Known keys include "memory" and "cpu" (should be provided in some string format that can be parsed) and all others are considered some kind of quantity request.
-
-```yaml
-application:
-  resources:
-    memory: 500M
-    cpu: 4
-```
-
-Metrics can also take resource requests.
-
-```yaml
-metrics:
-  - name: io-fio
-    resources:
-      memory: 500M
-      cpu: 4
-```
-
-If you wanted to, for example, request a GPU, that might look like:
-
-```yaml
-resources:
-  limits:
-    gpu-vendor.example/example-gpu: 1
-```
-
-Or for a particular type of networking fabric:
-
-```yaml
-resources:
-  limits:
-    vpc.amazonaws.com/efa: 1
-```
-
-Both limits and resources are flexible to accept a string or an integer value, and you'll get an error if you
-provide something else. If you need something else, [let us know](https://github.com/converged-computing/metrics-operator/issues).
-If you are requesting GPU, [this documentation](https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/) is helpful.
-
-### storage
-
-When you want to measure some storage performance, you'll want to add a "storage" section to your MetricSet. This will typically just be a reference to some existing storage (see [existing volumes](#existing-volumes)) that we want to measure, and can also be done for some number of completions and metrics for storage.
-
-#### commands
-
-If you need to add some special logic to create or cleanup for a storage volume, you are free to define them for storage in each of pre and post sections, which will happen before and after the metric runs, respectively.
-
-```yaml
-storage:
-  volume:
-    claimName: data 
-    path: /data
-  commands:
-    pre: |
-      apt-get update && apt-get install -y mymounter-tool
-      mymounter-tool mount /data
-    post: mymounter-tool unmount /data
-    # Wrap the storage metric in this prefix
-    prefix: myprefix
-```
-
-All of the above are strings. The pipe allows for multiple lines, if appropriate.
-Note that while a "volume" is typical, you might have a storage setup that is done via a set of custom commands, in which case
-you don't need to define the volume too.
+**Note that we have support for a custom application container, but haven't written any good examples yet!**
 
 ## Performance
 
