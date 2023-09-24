@@ -417,7 +417,6 @@ table {
             <th>Name</th>
             <th>Family</th>
             <th>Description</th>
-            <th>Container</th>
         </tr>
   </thead>
 </table>
@@ -427,7 +426,7 @@ table {
 <script>
 $(document).ready(function () {
 
-$.getJSON("metrics.json", function(data) {
+$.getJSON("addons.json", function(data) {
   $('#metrics').DataTable({
     data: data,
     pageLength: 10,
@@ -441,37 +440,27 @@ $.getJSON("metrics.json", function(data) {
       },
       { data: "family"},
       { data: "description"},
-      { data: "image",
-        render: function ( data, type, row ) {
-          if (data.startsWith("ghcr.io/converged-computing/metric-")) {
-          var containerNameTagged = data.split("/")[2];
-          var containerName = containerNameTagged.split(":")[0]
-          console.log(containerName)
-          return "<a href='https://github.com/converged-computing/metrics-operator/pkgs/container/" + containerName + "' target='_blank'>" + data +"</a>";
-        }
-        return data
-      }}
     ],
     'rowCallback': function(row, data, index){
       // Distinguish family
-      if(data.family == 'storage'){
+      if(data.family == 'volume'){
         $(row).find('td:eq(1)').css('background-color', 'lavender');
       }
-      if(data.family == 'solver'){
+      if(data.family == 'application'){
         $(row).find('td:eq(1)').css('background-color', 'lightgreen');
       }
       if(data.family == 'performance'){
         $(row).find('td:eq(1)').css('background-color', '#f79fb7');
       }
-      if(data.family == 'machine-learning'){
-        $(row).find('td:eq(1)').css('background-color', 'palegoldenrod');
+      /*if(data.family == 'machine-learning'){
+        $(row).find('td:eq(2)').css('background-color', 'palegoldenrod');
       }
       if(data.family == 'network'){
-        $(row).find('td:eq(1)').css('background-color', 'orange');
+        $(row).find('td:eq(2)').css('background-color', 'orange');
       }
       if(data.family == 'simulation'){
-        $(row).find('td:eq(1)').css('background-color', 'skyblue');
-      }
+        $(row).find('td:eq(2)').css('background-color', 'skyblue');
+      }*/
     }
   });
 });
@@ -480,8 +469,6 @@ $.getJSON("metrics.json", function(data) {
 $('#software_filter').parent().attr("class", "col-md-12")})
 
 </script>
-
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.1/js/bootstrap.min.js"></script>
   <script src='https://code.jquery.com/jquery-3.7.0.js'></script>
   <script src='https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js'></script>

@@ -7,7 +7,7 @@ any questions, please [let us know](https://github.com/converged-computing/metri
 ```{toctree}
 :maxdepth: 3
 developer-guide
-designs
+designs/index.md
 metrics
 debugging
 creation

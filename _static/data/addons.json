@@ -1,0 +1,37 @@
+[
+ {
+  "name": "application",
+  "description": "basic application (container) type",
+  "family": "application"
+ },
+ {
+  "name": "perf-hpctoolkit",
+  "description": "performance tools for measurement and analysis",
+  "family": "performance"
+ },
+ {
+  "name": "volume-cm",
+  "description": "config map volume type",
+  "family": "volume"
+ },
+ {
+  "name": "volume-empty",
+  "description": "empty volume type",
+  "family": "volume"
+ },
+ {
+  "name": "volume-hostpath",
+  "description": "host path volume type",
+  "family": "volume"
+ },
+ {
+  "name": "volume-pvc",
+  "description": "persistent volume claim volume type",
+  "family": "volume"
+ },
+ {
+  "name": "volume-secret",
+  "description": "secret volume type",
+  "family": "volume"
+ }
+]

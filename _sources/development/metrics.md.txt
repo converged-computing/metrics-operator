@@ -6,7 +6,6 @@ These are metrics that are consistered under development (and likely need more e
 
 ### network-chatterbug
 
- - [Standalone Metric Set](user-guide.md#application-metric-set)
  - *[network-chatterbug](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-chatterbug)*
 
 Chatterbug provides a [suite of communication proxy applications](https://github.com/hpcgroup/chatterbug) for HPC.
@@ -50,7 +49,6 @@ See the example linked in the header for a metrics.yaml example.
 
 ### app-hpl
 
- - [Standalone Metric Set](user-guide.md#application-metric-set)
  - *[app-hpl](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-hpl)*
 
 The [Linpack](https://ulhpc-tutorials.readthedocs.io/en/production/parallel/mpi/HPL/) benchmark is used for the [Top500](https://www.top500.org/project/linpack/),
@@ -88,7 +86,7 @@ script help below:
 
 <details>
 
-<summary>`compute_N --help`</summary>
+<summary>compute_N --help</summary>
 
 ```console
 # compute_N -h

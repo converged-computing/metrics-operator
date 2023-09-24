@@ -497,13 +497,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#performance-via-pid" class="md-nav__link">
-    <span title="/development/developer-guide.md#performance-via-pid (reference label)" class="md-ellipsis">Performance via PID</span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -552,8 +545,8 @@
   
   
     <li class="md-nav__item">
-      <a href="designs.html" class="md-nav__link">
-        <span title="/development/designs.md (reference label)" class="md-ellipsis">Design Thinking</span>
+      <a href="designs/index.html" class="md-nav__link">
+        <span title="/development/designs/index.md (reference label)" class="md-ellipsis">Designs</span>
       </a>
     </li>
   
@@ -775,31 +768,36 @@ pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
 <h2 id="writing-metric-containers">Writing Metric Containers<a class="headerlink" href="#writing-metric-containers" title="Link to this heading">¶</a></h2>
 <p>This section will include instructions for how to write a metrics container.</p>
 <h3 id="general-instructions">General Instructions<a class="headerlink" href="#general-instructions" title="Link to this heading">¶</a></h3>
-<p>We provide templates for different kinds of JobSet (e.g., SingleApplication vs. LauncherWorker pattern) in pkg/jobs,
-so the easiest thing to do is to find the template that is closest in design to what you want, and then
-copy a metric go file from <code class="docutils literal notranslate"><span class="pre">pkg/metrics/*</span></code> that is closest. You will need to:</p>
+<p>Metrics largely have functionality that comes from shared interfaces, such as a <code class="docutils literal notranslate"><span class="pre">LauncherWorker</span></code>
+design that has a main node launcher tasks, and some number of worker nodes, and basic interfaces
+for storage and applications. The best thing to do is explore the current metrics, find one that
+is similar to what you want to do, and use it as a template. As long as you put it in a known group
+directory, e.g., these:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>pkg/metrics/
+├──<span class="w"> </span>app
+├──<span class="w"> </span>io
+├──<span class="w"> </span>network
+└──<span class="w"> </span>perf
+</code></pre></div>
+</div>
+<p>It will be discovered and registered and available for use.</p>
+<p>You will generally need to:</p>
 <ul class="simple">
-<li><p>Change the interface struct name</p></li>
+<li><p>Change the interface struct name depending on what you need</p></li>
 <li><p>Update parameters /options for your needs</p></li>
 <li><p>Change the URL, and the metadata at the bottom (container, description, identifier)</p></li>
 </ul>
-<p>The main logic for a metric will be in the function to <code class="docutils literal notranslate"><span class="pre">GenerateEntrypoints</span></code>. For development,
+<p>The main logic for a metric will be in the function to <code class="docutils literal notranslate"><span class="pre">PrepareContainers</span></code>. For development,
 I find it easiest to build the container first (as an automated build), have a general sense how to
-run the metric, and then insert <code class="docutils literal notranslate"><span class="pre">sleep</span> <span class="pre">infinity</span></code> into the launcher (or primary) script in that function,
-and interactively develop. When you do this, you’ll also want to:</p>
+run the metric, create a <code class="docutils literal notranslate"><span class="pre">metrics.yaml</span></code> for it, and then insert <code class="docutils literal notranslate"><span class="pre">sleep</span> <span class="pre">infinity</span></code>
+(or set logging-&gt;interactive to true)  to interactively develop. When you do this, you’ll also want to:</p>
 <ul class="simple">
 <li><p>Add a named example in <code class="docutils literal notranslate"><span class="pre">examples/tests</span></code></p></li>
 <li><p>Run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">pre-push</span></code> before pushing to update docs metadata</p></li>
 <li><p>Run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code> and cd into <code class="docutils literal notranslate"><span class="pre">_build/html</span></code> and <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">http.server</span> <span class="pre">9999</span></code> (and open to that port) to preview</p></li>
 <li><p>The metrics.html page under getting started shows the metadata that is rendered from the code. You may need to make the frame taller.</p></li>
 </ul>
-<h3 id="performance-via-pid">Performance via PID<a class="headerlink" href="#performance-via-pid" title="Link to this heading">¶</a></h3>
-<p>For a perf metric, you can assume that your metric container will be run as a sidecar,
-and have access to the PID namespace of the application container.</p>
-<ul class="simple">
-<li><p>They should contain wget if they need to download the wait script in the entrypoint</p></li>
-</ul>
-<p>WIP</p>
+<p>For addons, the same logic applies, but you will want to add content to <code class="docutils literal notranslate"><span class="pre">pkg/addons</span></code> instead.</p>
 <h2 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Link to this heading">¶</a></h2>
 <p>The documentation is provided in the <code class="docutils literal notranslate"><span class="pre">docs</span></code> folder of the repository, and generally most content that you might want to add is under <code class="docutils literal notranslate"><span class="pre">getting_started</span></code>. For ease of contribution, files that are likely to be updated by contributors (e.g., mostly everything but the module generated files)
 are written in markdown. If you need to use <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#table-of-contents">toctree</a> you should not use extra newlines or spaces (see index.md files for examples). The documentation is also provided in Markdown (instead of rst or restructured syntax) to make contribution easier for the community.</p>
@@ -832,7 +830,7 @@ server to preview:</p>
   <small>
     
       Last update:
-      Sep 17, 2023
+      Sep 24, 2023
     
   </small>
 </div>
@@ -879,13 +877,13 @@ server to preview:</p>
       
       
         
-        <a href="designs.html" class="md-footer__link md-footer__link--next" aria-label="Next: Design Thinking" rel="next">
+        <a href="designs/index.html" class="md-footer__link md-footer__link--next" aria-label="Next: Designs" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Design Thinking
+              Designs
             </div>
           </div>
           <div class="md-footer__button md-icon">

@@ -429,27 +429,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#storage" class="md-nav__link">
-    <span class="md-ellipsis">Storage Metrics</span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#application" class="md-nav__link">
-    <span class="md-ellipsis">Application Metrics</span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#standalone" class="md-nav__link">
-    <span class="md-ellipsis">Standalone Metrics</span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#implemented-metrics" class="md-nav__link">
     <span title="/getting_started/metrics.md#implemented-metrics (reference label)" class="md-ellipsis">Implemented Metrics</span>
   </a>
@@ -458,39 +437,11 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#performance" class="md-nav__link">
-    <span title="/getting_started/metrics.md#performance (reference label)" class="md-ellipsis">Performance</span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Performance">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#perf-hpctoolkit" class="md-nav__link">
-    <span title="/getting_started/metrics.md#perf-hpctoolkit (reference label)" class="md-ellipsis">perf-<wbr>hpctoolkit</span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#perf-sysstat" class="md-nav__link">
     <span title="/getting_started/metrics.md#perf-sysstat (reference label)" class="md-ellipsis">perf-<wbr>sysstat</span>
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#storage" class="md-nav__link">
-    <span title="/getting_started/metrics.md#storage (reference label)" class="md-ellipsis">Storage</span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Storage">
-      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#io-fio" class="md-nav__link">
@@ -512,19 +463,6 @@
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#standalone" class="md-nav__link">
-    <span title="/getting_started/metrics.md#standalone (reference label)" class="md-ellipsis">Standalone</span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Standalone">
-      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#network-netmark" class="md-nav__link">
@@ -627,11 +565,6 @@
     </nav>
   
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
       
         <li class="md-nav__item">
   <a href="#containers" class="md-nav__link">
@@ -644,6 +577,21 @@
   
 </nav>
       
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="addons.html" class="md-nav__link">
+        <span title="/getting_started/addons.md (reference label)" class="md-ellipsis">Addons</span>
+      </a>
     </li>
   
 
@@ -767,82 +715,14 @@
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#examples">Examples</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#storage">Storage Metrics</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#application">Application Metrics</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://converged-computing.github.io/metrics-operator/getting_started/metrics.html#standalone">Standalone Metrics</a></li>
 </ul>
 </div>
-<p>Each of the above is a metric design, which is primarily represented in the Metrics Operator code. However, within each design
-there are different families of metrics (e.g., storage, network, performance, simulation) shown in the table below as the “Family” column.
+<p>Each metric can be ascribed to a high level family, shown in the table below as the “Family” column.
 We likely will tweak and improve upon these categories.</p>
-<iframe src="../_static/data/table.html" style="width:100%; height:1100px;" frameBorder="0"></iframe>
+<iframe src="../_static/data/table.html" style="width:100%; height:900px;" frameBorder="0"></iframe>
 <h2 id="implemented-metrics">Implemented Metrics<a class="headerlink" href="#implemented-metrics" title="Link to this heading">¶</a></h2>
-<p>Each metric has a link to the type, along with (optionally) examples. These sections will better be organized by
-family once we decide on a more final set.</p>
-<h3 id="performance">Performance<a class="headerlink" href="#performance" title="Link to this heading">¶</a></h3>
-<p>These metrics are intended to assess application performance, where they run alongside an application of interest.</p>
-<h4 id="perf-hpctoolkit">perf-hpctoolkit<a class="headerlink" href="#perf-hpctoolkit" title="Link to this heading">¶</a></h4>
+<h3 id="perf-sysstat">perf-sysstat<a class="headerlink" href="#perf-sysstat" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Application Metric Set</span></a></p></li>
-<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-hpctoolkit">perf-hpctoolkit</a></em></p></li>
-</ul>
-<p>This metric provides <a class="reference external" href="https://gitlab.com/hpctoolkit/hpctoolkit">HPCToolkit</a> for your application to use. This is the first metric of its type
-to use a shared volume approach. Specifically, we:</p>
-<ul class="simple">
-<li><p>add a new ability for an application metric to define an empty volume, and have the metrics container copy stuff to it</p></li>
-<li><p>also add an ability for this kind of application metric to customize the application entrypoint (e.g., copy volume contents to destinations)</p></li>
-<li><p>build a spack copy view into the <a class="reference external" href="https://github.com/converged-computing/metrics-containers/blob/main/hpctoolkit-containerize/Dockerfile">hpctoolkit metrics container</a></p></li>
-<li><p>move the <code class="docutils literal notranslate"><span class="pre">/opt/software</span></code> and <code class="docutils literal notranslate"><span class="pre">/opt/views/view</span></code> roots into the application container, this is a modular install of HPCToolkit.</p></li>
-<li><p>copy over <code class="docutils literal notranslate"><span class="pre">/opt/share/software</span></code> (provided via the shared empty volume) to <code class="docutils literal notranslate"><span class="pre">/opt/software``</span> <span class="pre">where</span> <span class="pre">spack</span> <span class="pre">expects</span> <span class="pre">it.</span> <span class="pre">We</span> <span class="pre">also</span> <span class="pre">add</span> </code>/opt/share/view/bin` to the path (where hpcrun is)</p></li>
-</ul>
-<p>After those steps are done, HPCToolkit is essentially installed, on the fly, in the application container. Since the <code class="docutils literal notranslate"><span class="pre">hpcrun</span></code> command is using <code class="docutils literal notranslate"><span class="pre">LD_AUDIT</span></code> we need
-all libraries to be in the same system (the shared process namespace would not work). We can then run it, and generate a database. Here is an example
-given <code class="docutils literal notranslate"><span class="pre">hpctoolkit-lmp-measurements</span></code> in the present working directory of the container.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>hpcstruct<span class="w"> </span>hpctoolkit-lmp-measurements
-
-<span class="c1"># Run &quot;the professor!&quot; 🤓️</span>
-hpcprof<span class="w"> </span>hpctoolkit-lmp-measurements
-</code></pre></div>
-</div>
-<p>The above generates a database, <code class="docutils literal notranslate"><span class="pre">hpctoolkit-lmp-database</span></code> that you can copy to your machine for further interaction with hpcviewer
-(or some future tool that doesn’t use Java)!</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>cp<span class="w"> </span>-c<span class="w"> </span>app<span class="w"> </span>metricset-sample-m-0-npbc9:/opt/lammps/examples/reaxff/HNS/hpctoolkit-lmp-database<span class="w"> </span>hpctoolkit-lmp-database
-hpcviewer<span class="w"> </span>./hpctoolkit-lmp-database
-</code></pre></div>
-</div>
-<p>Here are the acceptable parameters.</p>
-<table border="1" class="docutils">
-<thead>
-<tr>
-<th>Name</th>
-<th>Description</th>
-<th>Type</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>mount</td>
-<td>Path to mount hpctoolview view in application container</td>
-<td>string</td>
-<td>/opt/share</td>
-</tr>
-<tr>
-<td>events</td>
-<td>Events for hpctoolkit</td>
-<td>string</td>
-<td><code>-e IO</code></td>
-</tr>
-</tbody>
-</table>
-<p>Note that you can see events available with <code class="docutils literal notranslate"><span class="pre">hpcrun</span> <span class="pre">-L</span></code>, and use the container for this metric.
-There is a brief listing on <a class="reference external" href="https://hpc.llnl.gov/software/development-environment-software/hpc-toolkit">this page</a>.
-We recommend that you do not pair hpctoolkit with another metric, primarily because it is customizing the application
-entrypoint. If you add a process-namespace based metric, you likely need to account for the hpcrun command being the
-wrapper to the actual executable.</p>
-<h4 id="perf-sysstat">perf-sysstat<a class="headerlink" href="#perf-sysstat" title="Link to this heading">¶</a></h4>
-<ul class="simple">
-<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Application Metric Set</span></a></p></li>
 <li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-hello-world">perf-hello-world</a></em></p></li>
 <li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-lammps">perf-lammps</a></em></p></li>
 </ul>
@@ -913,11 +793,8 @@ and the rest (workers).</p>
 after the index at 0 gets a custom command. See <a class="reference external" href="https://man7.org/linux/man-pages/man1/pidstat.1.html">pidstat</a> for
 more information on this command, and <a class="reference external" href="https://github.com/converged-computing/metrics-operator/blob/main/pkg/metrics/perf/sysstat.go">this file</a>
 for how we use them.  If there is an option or command that is not exposed that you would like, please <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues">open an issue</a>.</p>
-<h3 id="storage">Storage<a class="headerlink" href="#storage" title="Link to this heading">¶</a></h3>
-<p>These metrics are intended to assess storage volumes.</p>
-<h4 id="io-fio">io-fio<a class="headerlink" href="#io-fio" title="Link to this heading">¶</a></h4>
+<h3 id="io-fio">io-fio<a class="headerlink" href="#io-fio" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Storage Metric Set</span></a></p></li>
 <li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/storage/google/io-fusion">io-host-volume</a></em></p></li>
 </ul>
 <p>This is a nice tool that you can simply point at a path, and it measures IO stats by way of writing a file there!
@@ -962,13 +839,30 @@ Options you can set include:</p>
 <td>string</td>
 <td>/tmp</td>
 </tr>
+<tr>
+<td>pre</td>
+<td>Custom logic / command to run before Fio</td>
+<td>string</td>
+<td>unset</td>
+</tr>
+<tr>
+<td>post</td>
+<td>Custom logic / command to run after Fio (e.g., cleanup)</td>
+<td>string</td>
+<td>unset</td>
+</tr>
+<tr>
+<td>prefix</td>
+<td>Prefix to add to running fio commands (like a wrapper)</td>
+<td>string</td>
+<td>unset</td>
+</tr>
 </tbody>
 </table>
-<p>For the last “directory” we use this location to write a temporary file, which will be cleaned up.
+<p>For the “directory” we use this location to write a temporary file, which will be cleaned up.
 This allows for testing storage mounted from multiple metric pods without worrying about a name conflict.</p>
-<h4 id="io-ior">io-ior<a class="headerlink" href="#io-ior" title="Link to this heading">¶</a></h4>
+<h3 id="io-ior">io-ior<a class="headerlink" href="#io-ior" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Storage Metric Set</span></a></p></li>
 <li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/io-ior">io-host-volume</a></em></p></li>
 </ul>
 <p><img alt="img/ior.jpeg" src="../_images/ior.jpeg" /></p>
@@ -1002,9 +896,8 @@ tool. We expose a simple set of the working directory and command that you want 
 basic commands are done. Note that the container does have mpirun if you want to use it. We don’t have support
 for this across nodes, but this could be added. <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues">Let us know</a>
 if this would be interesting to you.</p>
-<h4 id="io-sysstat">io-sysstat<a class="headerlink" href="#io-sysstat" title="Link to this heading">¶</a></h4>
+<h3 id="io-sysstat">io-sysstat<a class="headerlink" href="#io-sysstat" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Storage Metric Set</span></a></p></li>
 <li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/io-host-volume">io-host-volume</a></em></p></li>
 </ul>
 <p>This is the “iostat” executable of the sysstat library.</p>
@@ -1036,15 +929,23 @@ if this would be interesting to you.</p>
 <td>int32</td>
 <td>10</td>
 </tr>
+<tr>
+<td>pre</td>
+<td>One or more commands to run before iostat</td>
+<td>string</td>
+<td>unset</td>
+</tr>
+<tr>
+<td>post</td>
+<td>One or more commands to run after iostat</td>
+<td>string</td>
+<td>unset</td>
+</tr>
 </tbody>
 </table>
 <p>This is good for mounted storage that can be seen by the operating system, but may not work for something like NFS.</p>
-<h3 id="standalone">Standalone<a class="headerlink" href="#standalone" title="Link to this heading">¶</a></h3>
-<p>Standalone metrics can take on many designs, from a launcher/worker design to test networking, to running
-a metric across nodes to assess the node performance.</p>
-<h4 id="network-netmark">network-netmark<a class="headerlink" href="#network-netmark" title="Link to this heading">¶</a></h4>
+<h3 id="network-netmark">network-netmark<a class="headerlink" href="#network-netmark" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
 <li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-netmark">network-netmark</a></em> (code still private)</p></li>
 </ul>
 <p>This is currently a private container/software, but we have support for it when it’s ready to be made public (networking)
@@ -1102,11 +1003,17 @@ Variables to customize include:</p>
 <td>string (true/false)</td>
 <td>"true"</td>
 </tr>
+<tr>
+<td>soleTenancy</td>
+<td>Turn off sole tenancy (one pod/node)</td>
+<td>options-&gt;soleTenancy</td>
+<td>string ("false" or "no")</td>
+<td>"true"</td>
+</tr>
 </tbody>
 </table>
-<h4 id="network-osu-benchmark">network-osu-benchmark<a class="headerlink" href="#network-osu-benchmark" title="Link to this heading">¶</a></h4>
+<h3 id="network-osu-benchmark">network-osu-benchmark<a class="headerlink" href="#network-osu-benchmark" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
 <li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-osu-benchmark">network-osu-benchmark</a></em></p></li>
 </ul>
 <p>Point to point benchmarks for MPI (networking). If listOptions-&gt;commands not set, will use all one-point commands.
@@ -1130,7 +1037,7 @@ Variables to customize include:</p>
 <td>unset uses default set</td>
 </tr>
 <tr>
-<td>sole-tenancy</td>
+<td>soleTenancy</td>
 <td>Turn off sole tenancy (one pod/node)</td>
 <td>string ("false" or "no")</td>
 <td>"true"</td>
@@ -1155,6 +1062,13 @@ Variables to customize include:</p>
 <td>String "true" or "yes" to add time prefix to mpirun (for debugging, etc)</td>
 <td>string</td>
 <td>"false"</td>
+<td></td>
+</tr>
+<tr>
+<td>sleep</td>
+<td>Number of seconds to sleep to wait for network to be ready</td>
+<td>int32</td>
+<td>60</td>
 <td></td>
 </tr>
 </tbody>
@@ -1235,9 +1149,8 @@ Here are some useful resources for the benchmarks:</p>
 <li class="toctree-l1"><a class="reference external" href="https://www.hpcworkshops.com/08-efa/04-complie-run-osu.html">AWS Tutorials</a></li>
 </ul>
 </div>
-<h4 id="app-lammps">app-lammps<a class="headerlink" href="#app-lammps" title="Link to this heading">¶</a></h4>
+<h3 id="app-lammps">app-lammps<a class="headerlink" href="#app-lammps" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
 <li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-lammps">app-lammps</a></em></p></li>
 </ul>
 <p>Since we were using LAMMPS so often as a benchmark (and testing timing of a network) it made sense to add it here
@@ -1268,6 +1181,13 @@ to assess performance.</p>
 <td>string</td>
 <td>/opt/lammps/examples/reaxff/HNS#</td>
 </tr>
+<tr>
+<td>soleTenancy</td>
+<td>require each pod to have sole tenancy</td>
+<td>command-&gt;soleTenancy</td>
+<td>string</td>
+<td>"false"</td>
+</tr>
 </tbody>
 </table>
 <p>For inspection, you can see all the examples provided <a class="reference external" href="https://github.com/lammps/lammps/tree/develop/examples">in the LAMMPS GitHub repository</a>.
@@ -1278,9 +1198,8 @@ The default command (if you don’t change it) intended as an example is:</p>
 <p>In the working directory <code class="docutils literal notranslate"><span class="pre">/opt/lammps/examples/reaxff/HNS#</span></code>. You should be calling <code class="docutils literal notranslate"><span class="pre">mpirun</span></code> and expecting a ./hostlist.txt in the present working directory (the “workdir” you chose above).
 You should also provide the correct number of processes (np) and problem size for LAMMPS (lmp). We left this as open and flexible
 anticipating that you as a user would want total control.</p>
-<h4 id="app-amg">app-amg<a class="headerlink" href="#app-amg" title="Link to this heading">¶</a></h4>
+<h3 id="app-amg">app-amg<a class="headerlink" href="#app-amg" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
 <li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-amg">app-amg</a></em></p></li>
 </ul>
 <p>AMG means “algebraic multi-grid” and it’s easy to confuse with the company <a class="reference external" href="https://www.amd.com/en/solutions/supercomputing-and-hpc">AMD</a> “Advanced Micro Devices” ! From <a class="reference external" href="https://asc.llnl.gov/sites/asc/files/2020-09/AMG_Summary_v1_7.pdf">the guide</a>:</p>
@@ -1321,8 +1240,8 @@ anticipating that you as a user would want total control.</p>
 <td>(see below)</td>
 </tr>
 <tr>
-<td>mpirun</td>
-<td>The mpirun command (and arguments)</td>
+<td>prefix</td>
+<td>The prefix (mpirun command and arguments)</td>
 <td>options-&gt;mpirun</td>
 <td>string</td>
 <td>(see below)</td>
@@ -1355,9 +1274,8 @@ mpirun<span class="w"> </span>--hostfile<span class="w"> </span>./hostlist.txt<s
 <p><strong>NOTE</strong> that the Python parser was written for the test case, and likely we need to extend it to problem 2 or larger sized problems. If you
 run a larger problem and the parser does not work as expected, please <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues">send us the output</a> and we will provide an updated parser.
 See <a class="reference external" href="https://asc.llnl.gov/sites/asc/files/2020-09/AMG_Summary_v1_7.pdf">this guide</a> for more detail.</p>
-<h4 id="app-quicksilver">app-quicksilver<a class="headerlink" href="#app-quicksilver" title="Link to this heading">¶</a></h4>
+<h3 id="app-quicksilver">app-quicksilver<a class="headerlink" href="#app-quicksilver" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
 <li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-quicksilver">app-quicksilver</a></em></p></li>
 </ul>
 <p>Quicksilver is a proxy app for Monte Carlo simulation code. You can learn more about it on the <a class="reference external" href="https://github.com/LLNL/Quicksilver/">GitHub repository</a>.
@@ -1381,8 +1299,8 @@ By default, akin to other apps we expose the entire mpirun command along with th
 <td>(see below)</td>
 </tr>
 <tr>
-<td>mpirun</td>
-<td>The mpirun command (and arguments)</td>
+<td>prefix</td>
+<td>The prefix (mpirun command and arguments)</td>
 <td>options-&gt;mpirun</td>
 <td>string</td>
 <td>(see below)</td>
@@ -1437,9 +1355,8 @@ mpirun<span class="w"> </span>--hostfile<span class="w"> </span>./hostlist.txt<s
 </code></pre></div>
 </div>
 <p>You can also look more closely in the <a class="reference external" href="https://github.com/LLNL/Quicksilver/tree/master/Examples">GitHub repository</a>.</p>
-<h4 id="app-pennant">app-pennant<a class="headerlink" href="#app-pennant" title="Link to this heading">¶</a></h4>
+<h3 id="app-pennant">app-pennant<a class="headerlink" href="#app-pennant" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
 <li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-pennant">app-pennant</a></em></p></li>
 </ul>
 <p>Pennant is an unstructured mesh hydrodynamics for advanced architectures. The documentation is sparse, but you
@@ -1464,8 +1381,8 @@ By default, akin to other apps we expose the entire mpirun prefix and command al
 <td>(see below)</td>
 </tr>
 <tr>
-<td>mpirun</td>
-<td>The mpirun command (and arguments)</td>
+<td>prefix</td>
+<td>The prefix (mpirun command and arguments)</td>
 <td>options-&gt;mpirun</td>
 <td>string</td>
 <td>(see below)</td>
@@ -1558,9 +1475,8 @@ mpirun<span class="w"> </span>--hostfile<span class="w"> </span>./hostlist.txt<s
 </div>
 </details>
 <p>And likely you will need to adjust the mpirun parameters, etc.</p>
-<h4 id="app-kripke">app-kripke<a class="headerlink" href="#app-kripke" title="Link to this heading">¶</a></h4>
+<h3 id="app-kripke">app-kripke<a class="headerlink" href="#app-kripke" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
 <li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-kripke">app-kripke</a></em></p></li>
 </ul>
 <p><a class="reference external" href="https://github.com/LLNL/Kripke">Kripke</a> is (from the README):</p>
@@ -1587,8 +1503,8 @@ mpirun<span class="w"> </span>--hostfile<span class="w"> </span>./hostlist.txt<s
 <td>(see below)</td>
 </tr>
 <tr>
-<td>mpirun</td>
-<td>The mpirun command (and arguments)</td>
+<td>prefix</td>
+<td>The prefix (mpirun command and arguments)</td>
 <td>options-&gt;mpirun</td>
 <td>string</td>
 <td>(see below)</td>
@@ -1627,9 +1543,8 @@ on your specific command or problem size. Also note that we expose the following
 </div>
 <p>(meaning on the PATH in <code class="docutils literal notranslate"><span class="pre">/opt/Kripke/build/bin</span></code> in the container).
 For apps / metrics to be added, please see <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues/30">this issue</a>.</p>
-<h4 id="app-ldms">app-ldms<a class="headerlink" href="#app-ldms" title="Link to this heading">¶</a></h4>
+<h3 id="app-ldms">app-ldms<a class="headerlink" href="#app-ldms" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
 <li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-ldms">app-ldms</a></em></p></li>
 </ul>
 <p>LDMS is “a low-overhead, low-latency framework for collecting, transferring, and storing metric data on a large distributed computer system”
@@ -1675,9 +1590,8 @@ for this simple metric we simply run (on each separate pod/node). The following 
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>ldms_ls<span class="w"> </span>-h<span class="w"> </span>localhost<span class="w"> </span>-x<span class="w"> </span>sock<span class="w"> </span>-p<span class="w"> </span><span class="m">10444</span><span class="w"> </span>-l<span class="w"> </span>-v
 </code></pre></div>
 </div>
-<h4 id="app-nekbone">app-nekbone<a class="headerlink" href="#app-nekbone" title="Link to this heading">¶</a></h4>
+<h3 id="app-nekbone">app-nekbone<a class="headerlink" href="#app-nekbone" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
 <li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-nekbone">app-nekbone</a></em></p></li>
 </ul>
 <p>Nekbone comes with a set of example that primarily depend on you choosing the correct workikng directory and command to run from.
@@ -1742,9 +1656,8 @@ You can do this via these primary two commands:</p>
 </table>
 <p>You can see the archived repository <a class="reference external" href="https://github.com/Nek5000/Nekbone">here</a>. If there are interesting metrics in this
 project it would be worth bringing it back to life I think.</p>
-<h4 id="app-laghos">app-laghos<a class="headerlink" href="#app-laghos" title="Link to this heading">¶</a></h4>
+<h3 id="app-laghos">app-laghos<a class="headerlink" href="#app-laghos" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
 <li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-laghos">app-laghos</a></em></p></li>
 </ul>
 <p>From the <a class="reference external" href="https://github.com/CEED/Laghos">Laghos README</a>:</p>
@@ -1780,9 +1693,8 @@ the path, so the default references it as <code class="docutils literal notransl
 </tr>
 </tbody>
 </table>
-<h4 id="app-bdas">app-bdas<a class="headerlink" href="#app-bdas" title="Link to this heading">¶</a></h4>
+<h3 id="app-bdas">app-bdas<a class="headerlink" href="#app-bdas" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="user-guide.html#application-metric-set"><span class="std std-ref">Standalone Metric Set</span></a></p></li>
 <li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-bdas">app-bdas</a></em></p></li>
 </ul>
 <p>BDAS standards for “Big Data Analysis Suite” and you can read more about it <a class="reference external" href="https://asc.llnl.gov/sites/asc/files/2020-09/BDAS_Summary_b4bcf27_0.pdf">here</a>.
@@ -1837,7 +1749,7 @@ repository (with <code class="docutils literal notranslate"><span class="pre">Do
   <small>
     
       Last update:
-      Sep 17, 2023
+      Sep 24, 2023
     
   </small>
 </div>
@@ -1884,13 +1796,13 @@ repository (with <code class="docutils literal notranslate"><span class="pre">Do
       
       
         
-        <a href="custom-resource-definition.html" class="md-footer__link md-footer__link--next" aria-label="Next: MetricSet" rel="next">
+        <a href="addons.html" class="md-footer__link md-footer__link--next" aria-label="Next: Addons" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              MetricSet
+              Addons
             </div>
           </div>
           <div class="md-footer__button md-icon">
