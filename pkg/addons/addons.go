@@ -65,34 +65,34 @@ type AddonBase struct {
 	mapOptions  map[string]map[string]intstr.IntOrString
 }
 
-func (b AddonBase) SetOptions(metric *api.MetricAddon)                                   {}
-func (b AddonBase) CustomizeEntrypoints([]*specs.ContainerSpec, []*jobset.ReplicatedJob) {}
+func (b *AddonBase) SetOptions(metric *api.MetricAddon)                                   {}
+func (b *AddonBase) CustomizeEntrypoints([]*specs.ContainerSpec, []*jobset.ReplicatedJob) {}
 
-func (b AddonBase) Validate() bool {
+func (b *AddonBase) Validate() bool {
 	return true
 }
-func (b AddonBase) AssembleContainers() []specs.ContainerSpec {
+func (b *AddonBase) AssembleContainers() []specs.ContainerSpec {
 	return []specs.ContainerSpec{}
 }
 
 // Assemble Volumes (for now) just generates one
-func (b AddonBase) AssembleVolumes() []specs.VolumeSpec {
+func (b *AddonBase) AssembleVolumes() []specs.VolumeSpec {
 	return []specs.VolumeSpec{}
 }
 
-func (b AddonBase) Description() string {
+func (b *AddonBase) Description() string {
 	return b.Summary
 }
-func (b AddonBase) Name() string {
+func (b *AddonBase) Name() string {
 	return b.Identifier
 }
-func (b AddonBase) Options() map[string]intstr.IntOrString {
+func (b *AddonBase) Options() map[string]intstr.IntOrString {
 	return b.options
 }
-func (b AddonBase) ListOptions() map[string][]intstr.IntOrString {
+func (b *AddonBase) ListOptions() map[string][]intstr.IntOrString {
 	return b.listOptions
 }
-func (b AddonBase) MapOptions() map[string]map[string]intstr.IntOrString {
+func (b *AddonBase) MapOptions() map[string]map[string]intstr.IntOrString {
 	return b.mapOptions
 }
 

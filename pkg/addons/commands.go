@@ -16,6 +16,11 @@ import (
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 )
 
+const (
+	commandsName     = "commands"
+	perfCommandsName = "perf-commands"
+)
+
 // Perf addon expects the same command structure, but adds sys caps for trace and admin
 type PerfAddon struct {
 	CommandAddon
@@ -35,6 +40,11 @@ func (a *PerfAddon) CustomizeEntrypoints(
 		a.customizeEntrypoint(cs, rj)
 		a.addContainerCaps(cs, rj)
 	}
+}
+
+func (a *PerfAddon) SetOptions(metric *api.MetricAddon) {
+	a.Identifier = perfCommandsName
+	a.SetSharedCommandOptions(metric)
 }
 
 // addContainerCaps adds capabilities to a container spec
@@ -92,8 +102,13 @@ func (m CommandAddon) Family() string {
 	return AddonFamilyApplication
 }
 
-// Set custom options / attributes for the metric
 func (a *CommandAddon) SetOptions(metric *api.MetricAddon) {
+	a.Identifier = commandsName
+	a.SetSharedCommandOptions(metric)
+}
+
+// Set custom options / attributes for the metric
+func (a *CommandAddon) SetSharedCommandOptions(metric *api.MetricAddon) {
 	target, ok := metric.Options["target"]
 	if ok {
 		a.target = target.StrVal
@@ -213,14 +228,14 @@ func init() {
 
 	// Config map volume type
 	base := AddonBase{
-		Identifier: "commands",
+		Identifier: commandsName,
 		Summary:    "customize a metric's entrypoints",
 	}
 	app := CommandAddon{AddonBase: base}
 	Register(&app)
 
 	base = AddonBase{
-		Identifier: "perf-commands",
+		Identifier: perfCommandsName,
 		Summary:    "customize a metric's entrypoints expecting performance tracing (adding ptrace and admin caps)",
 	}
 	cmd := CommandAddon{AddonBase: base}

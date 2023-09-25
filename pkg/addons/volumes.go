@@ -19,6 +19,14 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
+const (
+	hostPathName = "volume-hostpath"
+	pvcName      = "volume-pvc"
+	emptyName    = "volume-empty"
+	secretName   = "volume-secret"
+	cmName       = "volume-cm"
+)
+
 type VolumeBase struct {
 	AddonBase
 	readOnly bool
@@ -97,6 +105,8 @@ func (v *ConfigMapVolume) Validate() bool {
 
 // Set custom options / attributes for the metric
 func (v *ConfigMapVolume) SetOptions(metric *api.MetricAddon) {
+
+	v.Identifier = cmName
 
 	// Set an empty list of items
 	v.items = map[string]string{}
@@ -190,6 +200,9 @@ func (v *PersistentVolumeClaim) Validate() bool {
 
 // Set custom options / attributes
 func (v *PersistentVolumeClaim) SetOptions(metric *api.MetricAddon) {
+
+	v.Identifier = pvcName
+
 	claimName, ok := metric.Options["claimName"]
 	if ok {
 		v.claimName = claimName.StrVal
@@ -199,6 +212,7 @@ func (v *PersistentVolumeClaim) SetOptions(metric *api.MetricAddon) {
 
 // AssembleVolumes for a pvc
 func (v *PersistentVolumeClaim) AssembleVolumes() []specs.VolumeSpec {
+	fmt.Println("ADDING PVC HERE")
 	volume := corev1.Volume{
 		Name: v.name,
 		VolumeSource: corev1.VolumeSource{
@@ -207,8 +221,6 @@ func (v *PersistentVolumeClaim) AssembleVolumes() []specs.VolumeSpec {
 			},
 		},
 	}
-
-	// ConfigMaps have to be read only!
 	return []specs.VolumeSpec{{
 		Volume:   volume,
 		Path:     filepath.Dir(v.path),
@@ -236,6 +248,8 @@ func (v *SecretVolume) Validate() bool {
 
 // Set custom options / attributes
 func (v *SecretVolume) SetOptions(metric *api.MetricAddon) {
+
+	v.Identifier = secretName
 	secretName, ok := metric.Options["secretName"]
 	if ok {
 		v.secretName = secretName.StrVal
@@ -281,6 +295,8 @@ func (v *HostPathVolume) Validate() bool {
 // Set custom options / attributes
 func (v *HostPathVolume) SetOptions(metric *api.MetricAddon) {
 
+	v.Identifier = hostPathName
+
 	// Name is required!
 	path, ok := metric.Options["hostPath"]
 	if ok {
@@ -319,6 +335,7 @@ func (v *EmptyVolume) Validate() bool {
 
 // Set custom options / attributes
 func (v *EmptyVolume) SetOptions(metric *api.MetricAddon) {
+	v.Identifier = emptyName
 	name, ok := metric.Options["name"]
 	if ok {
 		v.name = name.StrVal
@@ -347,7 +364,7 @@ func init() {
 
 	// Config map volume type
 	base := AddonBase{
-		Identifier: "volume-cm",
+		Identifier: cmName,
 		Summary:    "config map volume type",
 	}
 	volBase := VolumeBase{AddonBase: base}
@@ -356,7 +373,7 @@ func init() {
 
 	// Secret volume type
 	base = AddonBase{
-		Identifier: "volume-secret",
+		Identifier: secretName,
 		Summary:    "secret volume type",
 	}
 	volBase = VolumeBase{AddonBase: base}
@@ -365,7 +382,7 @@ func init() {
 
 	// Hostpath volume type
 	base = AddonBase{
-		Identifier: "volume-hostpath",
+		Identifier: hostPathName,
 		Summary:    "host path volume type",
 	}
 	volBase = VolumeBase{AddonBase: base}
@@ -374,7 +391,7 @@ func init() {
 
 	// persistent volume claim volume type
 	base = AddonBase{
-		Identifier: "volume-pvc",
+		Identifier: pvcName,
 		Summary:    "persistent volume claim volume type",
 	}
 	volBase = VolumeBase{AddonBase: base}
@@ -383,7 +400,7 @@ func init() {
 
 	// EmptyVolume
 	base = AddonBase{
-		Identifier: "volume-empty",
+		Identifier: emptyName,
 		Summary:    "empty volume type",
 	}
 	volBase = VolumeBase{AddonBase: base}

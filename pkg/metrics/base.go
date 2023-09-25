@@ -39,9 +39,10 @@ type BaseMetric struct {
 func (m *BaseMetric) RegisterAddon(addon *addons.Addon) {
 	a := (*addon)
 	if m.Addons == nil {
+		logger.Infof("🟧️ Resetting addons - they are unset.")
 		m.Addons = map[string]*addons.Addon{}
 	}
-	logger.Infof("🟧️ Registering addon %s", a)
+	logger.Infof("🟧️ Registering addon %s", a.Name())
 	m.Addons[a.Name()] = addon
 }
 
@@ -142,10 +143,10 @@ func (m BaseMetric) AddAddons(
 	// These are container specs that need to be written to configmaps
 	cms := []*specs.ContainerSpec{}
 
-	logger.Infof("🟧️ Addons to include %s\n", m.Addons)
 	for _, addon := range m.Addons {
 		a := (*addon)
 
+		logger.Infof("🟧️ Including Addon", a.Name())
 		volumes = append(volumes, a.AssembleVolumes()...)
 
 		// Assemble containers that addons provide, also as specs
