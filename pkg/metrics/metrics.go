@@ -85,12 +85,12 @@ func GetMetric(metric *api.Metric, set *api.MetricSet) (Metric, error) {
 		// Register addons, meaning adding the spec but not instantiating yet (or should we?)
 		for _, a := range metric.Addons {
 
-			fmt.Printf("Attempting to add addon %s", a.Name)
+			logger.Infof("Attempting to add addon %s", a.Name)
 			addon, err := addons.GetAddon(&a)
 			if err != nil {
 				return nil, fmt.Errorf("Addon %s for metric %s did not validate", a.Name, metric.Name)
 			}
-			fmt.Printf("Registering addon %s", a.Name)
+			logger.Infof("Registering addon %s", a.Name)
 			m.RegisterAddon(&addon)
 		}
 

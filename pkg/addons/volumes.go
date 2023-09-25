@@ -212,7 +212,6 @@ func (v *PersistentVolumeClaim) SetOptions(metric *api.MetricAddon) {
 
 // AssembleVolumes for a pvc
 func (v *PersistentVolumeClaim) AssembleVolumes() []specs.VolumeSpec {
-	fmt.Println("ADDING PVC HERE")
 	volume := corev1.Volume{
 		Name: v.name,
 		VolumeSource: corev1.VolumeSource{
