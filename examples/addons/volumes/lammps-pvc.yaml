@@ -1,0 +1,56 @@
+apiVersion: flux-framework.org/v1alpha2
+kind: MetricSet
+metadata:
+  labels:
+    app.kubernetes.io/name: metricset
+    app.kubernetes.io/instance: metricset-sample
+  name: metricset-sample
+spec:
+  # Number of pods for lammps (one launcher, the rest workers)
+  pods: 4
+
+  # Keep interactive so we can decide when to quit
+  logging:
+    interactive: true
+
+  metrics:
+
+   # Running more scaled lammps is our main goal
+   - name: app-lammps
+
+     # This has intel mpi on rocky linux, per suggested by Google
+     image: ghcr.io/converged-computing/metric-lammps-intel-mpi:rocky
+
+     options:
+       command: lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite
+       workdir: /opt/lammps/examples/reaxff/HNS
+       soleTenancy: "true"
+
+     # Add on hpctoolkit, will mount a volume and wrap lammps
+     addons:
+
+       - name: volume-pvc
+         options:
+           name: data
+           claimName: data
+           path: /storage
+           readOnly: "false"
+
+       - name: perf-hpctoolkit
+         options:           
+           mount: /opt/mnt
+           # This allows us to ask where is the event blocked / taking more time
+           events:  "-e REALTIME@10000"
+
+           # Use a custom container here too (we have for rocky and ubuntu)
+           image: ghcr.io/converged-computing/metric-hpctoolkit-view:rocky 
+           
+           # hpcrun needs to have mpirun in front of hpcrun <command> e.g.,
+           # mpirun <MPI args> hpcrun <hpcrun args> <app> <app args>
+           prefix: /opt/intel/mpi/2021.8.0/bin/mpirun --hostfile ./hostlist.txt -np 4 -map-by ppr:1:node
+
+           # Ensure the working directory is consistent
+           workdir: /opt/lammps/examples/reaxff/HNS
+
+           # Target container for entrypoint addition is the launcher, not workers
+           containerTarget: launcher

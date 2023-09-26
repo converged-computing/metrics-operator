@@ -25,6 +25,9 @@ import (
 // hpcstruct hpctoolkit-sleep-measurements
 // hpcprof hpctoolkit-sleep-measurements
 // hpcviewer ./hpctoolkit-lmp-database
+const (
+	hpctoolkitIdentifier = "perf-hpctoolkit"
+)
 
 type HPCToolkit struct {
 	ApplicationAddon
@@ -121,6 +124,7 @@ func (a *HPCToolkit) SetOptions(metric *api.MetricAddon) {
 	a.volumeName = "hpctoolkit"
 	a.output = "hpctoolkit-result"
 	a.postAnalysis = true
+	a.Identifier = hpctoolkitIdentifier
 
 	// UseColor set to anything means to use it
 	output, ok := metric.Options["output"]
@@ -399,7 +403,7 @@ sleep infinity
 
 func init() {
 	base := AddonBase{
-		Identifier: "perf-hpctoolkit",
+		Identifier: hpctoolkitIdentifier,
 		Summary:    "performance tools for measurement and analysis",
 	}
 	app := ApplicationAddon{AddonBase: base}
