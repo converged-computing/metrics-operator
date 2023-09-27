@@ -163,7 +163,7 @@ spec:
 
 If you need to "throw in" Flux Framework into your container to use as a scheduler, you can do that with an addon!
 
-> Yes, it's astounding.
+> Yes, it's astounding. 🦩️
 
 This works by way of the same trick that we use for other addons that have a complex (and/or large) install setup. We:
 
