@@ -42,9 +42,9 @@ func (a *PerfAddon) CustomizeEntrypoints(
 	}
 }
 
-func (a *PerfAddon) SetOptions(metric *api.MetricAddon) {
+func (a *PerfAddon) SetOptions(addon *api.MetricAddon, metric *api.MetricSet) {
 	a.Identifier = perfCommandsName
-	a.SetSharedCommandOptions(metric)
+	a.SetSharedCommandOptions(addon)
 }
 
 // addContainerCaps adds capabilities to a container spec
@@ -102,9 +102,9 @@ func (m CommandAddon) Family() string {
 	return AddonFamilyApplication
 }
 
-func (a *CommandAddon) SetOptions(metric *api.MetricAddon) {
+func (a *CommandAddon) SetOptions(addon *api.MetricAddon, metric *api.MetricSet) {
 	a.Identifier = commandsName
-	a.SetSharedCommandOptions(metric)
+	a.SetSharedCommandOptions(addon)
 }
 
 // Set custom options / attributes for the metric

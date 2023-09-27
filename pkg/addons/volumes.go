@@ -104,7 +104,7 @@ func (v *ConfigMapVolume) Validate() bool {
 }
 
 // Set custom options / attributes for the metric
-func (v *ConfigMapVolume) SetOptions(metric *api.MetricAddon) {
+func (v *ConfigMapVolume) SetOptions(metric *api.MetricAddon, m *api.MetricSet) {
 
 	v.Identifier = cmName
 
@@ -199,7 +199,7 @@ func (v *PersistentVolumeClaim) Validate() bool {
 }
 
 // Set custom options / attributes
-func (v *PersistentVolumeClaim) SetOptions(metric *api.MetricAddon) {
+func (v *PersistentVolumeClaim) SetOptions(metric *api.MetricAddon, m *api.MetricSet) {
 
 	v.Identifier = pvcName
 
@@ -246,7 +246,7 @@ func (v *SecretVolume) Validate() bool {
 }
 
 // Set custom options / attributes
-func (v *SecretVolume) SetOptions(metric *api.MetricAddon) {
+func (v *SecretVolume) SetOptions(metric *api.MetricAddon, m *api.MetricSet) {
 
 	v.Identifier = secretName
 	secretName, ok := metric.Options["secretName"]
@@ -292,7 +292,7 @@ func (v *HostPathVolume) Validate() bool {
 }
 
 // Set custom options / attributes
-func (v *HostPathVolume) SetOptions(metric *api.MetricAddon) {
+func (v *HostPathVolume) SetOptions(metric *api.MetricAddon, m *api.MetricSet) {
 
 	v.Identifier = hostPathName
 
@@ -333,7 +333,7 @@ func (v *EmptyVolume) Validate() bool {
 }
 
 // Set custom options / attributes
-func (v *EmptyVolume) SetOptions(metric *api.MetricAddon) {
+func (v *EmptyVolume) SetOptions(metric *api.MetricAddon, m *api.MetricSet) {
 	v.Identifier = emptyName
 	name, ok := metric.Options["name"]
 	if ok {

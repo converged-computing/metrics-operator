@@ -26,6 +26,7 @@ var (
 	AddonFamilyPerformance = "performance"
 	AddonFamilyVolume      = "volume"
 	AddonFamilyApplication = "application"
+	AddonFamilyWorkload    = "workload"
 )
 
 // A general metric is a container added to a JobSet
@@ -37,7 +38,7 @@ type Addon interface {
 	Description() string
 
 	// Options and exportable attributes
-	SetOptions(*api.MetricAddon)
+	SetOptions(*api.MetricAddon, *api.MetricSet)
 	Options() map[string]intstr.IntOrString
 	ListOptions() map[string][]intstr.IntOrString
 	MapOptions() map[string]map[string]intstr.IntOrString
@@ -65,7 +66,7 @@ type AddonBase struct {
 	mapOptions  map[string]map[string]intstr.IntOrString
 }
 
-func (b *AddonBase) SetOptions(metric *api.MetricAddon)                                   {}
+func (b *AddonBase) SetOptions(addon *api.MetricAddon, metric *api.MetricSet)             {}
 func (b *AddonBase) CustomizeEntrypoints([]*specs.ContainerSpec, []*jobset.ReplicatedJob) {}
 
 func (b *AddonBase) Validate() bool {
@@ -97,7 +98,7 @@ func (b *AddonBase) MapOptions() map[string]map[string]intstr.IntOrString {
 }
 
 // GetAddon looks up and validates an addon
-func GetAddon(a *api.MetricAddon) (Addon, error) {
+func GetAddon(a *api.MetricAddon, set *api.MetricSet) (Addon, error) {
 
 	// We don't want to change the addon interface/struct itself
 	template, ok := Registry[a.Name]
@@ -111,7 +112,7 @@ func GetAddon(a *api.MetricAddon) (Addon, error) {
 	addon := reflect.New(templateType.Type()).Interface().(Addon)
 
 	// Set options before validation
-	addon.SetOptions(a)
+	addon.SetOptions(a, set)
 
 	// Validate the addon
 	if !addon.Validate() {
