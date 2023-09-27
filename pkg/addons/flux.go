@@ -439,7 +439,7 @@ echo "%s"
 systemctl enable munge || service munge start || echo "Issue starting munge, might already be started."
 
 # Ensure the flux volume addition is complete.
-wget https://github.com/converged-computing/goshare/releases/download/2023-09-06/wait-fs
+wget -q https://github.com/converged-computing/goshare/releases/download/2023-09-06/wait-fs
 chmod +x ./wait-fs
 mv ./wait-fs /usr/bin/goshare-wait-fs
 	

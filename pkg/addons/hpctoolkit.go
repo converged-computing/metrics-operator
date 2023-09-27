@@ -161,7 +161,7 @@ func (a *HPCToolkit) customizeEntrypoint(
 	preBlock := `
 echo "%s"
 # Ensure hpcrun and software exists. This is rough, but should be OK with enough wait time
-wget https://github.com/converged-computing/goshare/releases/download/2023-09-06/wait-fs
+wget -q https://github.com/converged-computing/goshare/releases/download/2023-09-06/wait-fs
 chmod +x ./wait-fs
 mv ./wait-fs /usr/bin/goshare-wait-fs
 	

@@ -181,7 +181,7 @@ func (m PidStat) PrepareContainers(
 
 echo "%s"
 # Download the wait binary
-wget https://github.com/converged-computing/goshare/releases/download/2023-07-27/wait > /dev/null
+wget -q https://github.com/converged-computing/goshare/releases/download/2023-07-27/wait > /dev/null
 chmod +x ./wait
 mv ./wait /usr/bin/goshare-wait
 	
