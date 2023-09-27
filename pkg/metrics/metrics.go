@@ -86,7 +86,7 @@ func GetMetric(metric *api.Metric, set *api.MetricSet) (Metric, error) {
 		for _, a := range metric.Addons {
 
 			logger.Infof("Attempting to add addon %s", a.Name)
-			addon, err := addons.GetAddon(&a)
+			addon, err := addons.GetAddon(&a, set)
 			if err != nil {
 				return nil, fmt.Errorf("Addon %s for metric %s did not validate", a.Name, metric.Name)
 			}

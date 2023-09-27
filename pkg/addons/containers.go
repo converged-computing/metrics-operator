@@ -139,8 +139,8 @@ func (a *ApplicationAddon) setDefaultEntrypoint() {
 }
 
 // Calling the default allows a custom application that uses this to do the same
-func (a *ApplicationAddon) SetOptions(metric *api.MetricAddon) {
-	a.SetDefaultOptions(metric)
+func (a *ApplicationAddon) SetOptions(addon *api.MetricAddon, metric *api.MetricSet) {
+	a.SetDefaultOptions(addon)
 }
 
 // Underlying function that can be shared

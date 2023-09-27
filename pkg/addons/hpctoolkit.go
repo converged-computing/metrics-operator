@@ -9,13 +9,11 @@ package addons
 
 import (
 	"fmt"
-	"path/filepath"
 	"strings"
 
 	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"github.com/converged-computing/metrics-operator/pkg/metadata"
 	"github.com/converged-computing/metrics-operator/pkg/specs"
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 )
@@ -30,7 +28,7 @@ const (
 )
 
 type HPCToolkit struct {
-	ApplicationAddon
+	SpackView
 
 	// Target is the name of the replicated job to customize entrypoint logic for
 	target string
@@ -45,9 +43,6 @@ type HPCToolkit struct {
 	// ContainerTarget is the name of the container to add the entrypoint logic to
 	containerTarget string
 	events          string
-	mount           string
-	entrypointPath  string
-	volumeName      string
 
 	// For mpirun and similar, mpirun needs to wrap hpcrun and the command, e.g.,
 	// mpirun <MPI args> hpcrun <hpcrun args> <app> <app args>
@@ -61,48 +56,7 @@ func (m HPCToolkit) Family() string {
 // AssembleVolumes to provide an empty volume for the application to share
 // We also need to provide a config map volume for our container spec
 func (m HPCToolkit) AssembleVolumes() []specs.VolumeSpec {
-	volume := corev1.Volume{
-		Name: m.volumeName,
-		VolumeSource: corev1.VolumeSource{
-			EmptyDir: &corev1.EmptyDirVolumeSource{},
-		},
-	}
-
-	// Prepare items as key to path
-	items := []corev1.KeyToPath{
-		{
-			Key:  m.volumeName,
-			Path: filepath.Base(m.entrypointPath),
-		},
-	}
-
-	// This is a config map volume with items
-	// It needs to be created in the same metrics operator namespace
-	// Thus we only need the items!
-	configVolume := corev1.Volume{
-		VolumeSource: corev1.VolumeSource{
-			ConfigMap: &corev1.ConfigMapVolumeSource{
-				Items: items,
-			},
-		},
-	}
-
-	// EmptyDir should be ReadOnly False, and we don't need a mount for it
-	return []specs.VolumeSpec{
-		{
-			Volume: volume,
-			Mount:  true,
-			Path:   m.mount,
-		},
-
-		// Mount is set to false here because we mount via metrics_operator
-		{
-			Volume:   configVolume,
-			ReadOnly: true,
-			Mount:    false,
-			Path:     filepath.Dir(m.entrypointPath),
-		},
-	}
+	return m.GetSpackViewVolumes()
 }
 
 // Validate we have an executable provided, and args and optional
@@ -115,16 +69,17 @@ func (a *HPCToolkit) Validate() bool {
 }
 
 // Set custom options / attributes for the metric
-func (a *HPCToolkit) SetOptions(metric *api.MetricAddon) {
+func (a *HPCToolkit) SetOptions(metric *api.MetricAddon, m *api.MetricSet) {
 
-	a.entrypointPath = "/metrics_operator/hpctoolkit-entrypoint.sh"
+	a.EntrypointPath = "/metrics_operator/hpctoolkit-entrypoint.sh"
 	a.image = "ghcr.io/converged-computing/metric-hpctoolkit-view:ubuntu"
 	a.SetDefaultOptions(metric)
-	a.mount = "/opt/share"
-	a.volumeName = "hpctoolkit"
+	a.Mount = "/opt/share"
+	a.VolumeName = "hpctoolkit"
 	a.output = "hpctoolkit-result"
 	a.postAnalysis = true
 	a.Identifier = hpctoolkitIdentifier
+	a.SpackViewContainer = "hpctoolkit"
 
 	// UseColor set to anything means to use it
 	output, ok := metric.Options["output"]
@@ -133,7 +88,7 @@ func (a *HPCToolkit) SetOptions(metric *api.MetricAddon) {
 	}
 	mount, ok := metric.Options["mount"]
 	if ok {
-		a.mount = mount.StrVal
+		a.Mount = mount.StrVal
 	}
 	prefix, ok := metric.Options["prefix"]
 	if ok {
@@ -172,7 +127,7 @@ func (a *HPCToolkit) SetOptions(metric *api.MetricAddon) {
 func (a *HPCToolkit) Options() map[string]intstr.IntOrString {
 	options := a.DefaultOptions()
 	options["events"] = intstr.FromString(a.events)
-	options["mount"] = intstr.FromString(a.mount)
+	options["mount"] = intstr.FromString(a.Mount)
 	options["prefix"] = intstr.FromString(a.prefix)
 	return options
 }
@@ -206,7 +161,7 @@ func (a *HPCToolkit) customizeEntrypoint(
 	preBlock := `
 echo "%s"
 # Ensure hpcrun and software exists. This is rough, but should be OK with enough wait time
-wget https://github.com/converged-computing/goshare/releases/download/2023-09-06/wait-fs
+wget -q https://github.com/converged-computing/goshare/releases/download/2023-09-06/wait-fs
 chmod +x ./wait-fs
 mv ./wait-fs /usr/bin/goshare-wait-fs
 	
@@ -262,8 +217,8 @@ echo "%s"
 	preBlock = fmt.Sprintf(
 		preBlock,
 		meta,
-		a.mount,
-		a.mount,
+		a.Mount,
+		a.Mount,
 		a.output,
 		a.events,
 		metadata.CollectionStart,
@@ -337,76 +292,13 @@ func deriveUpdatedPost(post string) (bool, string) {
 	return false, post
 }
 
-// Generate a container spec that will map to a listing of containers for the replicated job
-func (a *HPCToolkit) AssembleContainers() []specs.ContainerSpec {
-
-	// The entrypoint script
-	// This is the addon container entrypoint, we don't care about metadata here
-	// The sole purpose is just to provide the volume, meaning copying content there
-	template := `#!/bin/bash
-
-echo "Moving content from /opt/view to be in shared volume at %s"
-view=$(ls /opt/views/._view/)
-view="/opt/views/._view/${view}"
-
-# Give a little extra wait time
-sleep 10
-
-viewroot="%s"
-mkdir -p $viewroot/view
-# We have to move both of these paths, *sigh*
-cp -R ${view}/* $viewroot/view
-cp -R /opt/software $viewroot/
-
-# This is a marker to indicate the copy is done
-touch $viewroot/metrics-operator-done.txt
-
-# Sleep forever, the application needs to run and end
-echo "Sleeping forever so %s can be shared and use for hpctoolkit."
-sleep infinity
-`
-	script := fmt.Sprintf(
-		template,
-		a.mount,
-		a.mount,
-		a.mount,
-	)
-
-	// Leave the name empty to generate in the namespace of the metric set (e.g., set.Name)
-	entrypoint := specs.EntrypointScript{
-		Name:   a.volumeName,
-		Path:   a.entrypointPath,
-		Script: filepath.Base(a.entrypointPath),
-		Pre:    script,
-	}
-
-	// The resource spec and attributes for now are empty (might redo this design)
-	// We assume they inherit the resources / attributes of the pod for now
-	// We don't use JobName here because we don't associate addon containers
-	// with other addon entrypoints
-	return []specs.ContainerSpec{
-		{
-			Image:            a.image,
-			Name:             "hpctoolkit",
-			EntrypointScript: entrypoint,
-			Resources:        &api.ContainerResources{},
-			Attributes: &api.ContainerSpec{
-				SecurityContext: api.SecurityContext{
-					Privileged: a.privileged,
-				},
-			},
-			// We need to write this config map!
-			NeedsWrite: true,
-		},
-	}
-}
-
 func init() {
 	base := AddonBase{
 		Identifier: hpctoolkitIdentifier,
 		Summary:    "performance tools for measurement and analysis",
 	}
 	app := ApplicationAddon{AddonBase: base}
-	HPCToolkit := HPCToolkit{ApplicationAddon: app}
-	Register(&HPCToolkit)
+	spack := SpackView{ApplicationAddon: app}
+	toolkit := HPCToolkit{SpackView: spack}
+	Register(&toolkit)
 }
