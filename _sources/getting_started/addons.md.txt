@@ -157,6 +157,63 @@ spec:
 
 **Note that we have support for a custom application container, but haven't written any good examples yet!**
 
+## Workload
+
+### workload-flux
+
+If you need to "throw in" Flux Framework into your container to use as a scheduler, you can do that with an addon!
+
+> Yes, it's astounding. 🦩️
+
+This works by way of the same trick that we use for other addons that have a complex (and/or large) install setup. We:
+
+- Build the software into an isolated spack "copy" view
+- The software is then (generally) at some `/opt/view` and `/opt/software`
+- The flux container is added as a sidecar container to your pod for your replicated job
+  - Additional setup / configuration is done here
+- We can then create an empty volume that is shared by your metric or scaled application
+- The entire tree is copied over into the empty volume
+- When the copy is done, indicated by the final touch of a file, the updated container entrypoint is run
+- This typically means we have taken your metric command, and wrapped it in a Flux submit.
+
+It's really cool because it means you can run a metric / application with Flux without needing
+to install it into your container to begin with. The one important detail is a matching of
+general operating system. The current view uses rocky, however the image is customizable
+(and we can provide other bases if/when requested). Here are the arguments you can customize
+under the metric -> options.
+
+| Name | Description | Type | Default |
+|-----|-------------|------------|------|
+| mount | Path to mount flux view in application container | string | /opt/share |
+| tasks | Number of tasks `-n` to give to flux (not provided if not set) | string | unset |
+| image | Customize the container image | string | `ghcr.io/rse-ops/spack-flux-rocky-view:tag-8` |
+| fluxUser  | The flux user (currently not used, but TBA)  | string | flux |
+| fluxUid  | The flux user ID (currently not used, but TBA)  | string | 1004 |
+| interactive  | Run flux in interactive mode  | string | "false" |
+| connectTimeout | How long zeroMQ should wait to retry | string | "5s" |
+| quorum | The number of brokers to require before starting the cluster | string | (total brokers or pods) |
+| debugZeroMQ | Turn on zeroMQ debugging | string | "false" |
+| logLevel | Customize the flux log level | string | "6" |
+| queuePolicy | Queue policy for flux to use | string | fcfs |
+| workerLetter | The letter that the worker job is expected to have | string | w |
+| launcherLetter | The letter that the launcher job is expected to have | string | w |
+| workerIndex | The index of the replicated job for the worker | string | 0 |
+| launcherIndex | The index of the replicated job for the launcher | string | 0 |
+| preCommand | Pre-command logic to run in launcher/workers before flux is started (after setup in flux container) | string | unset |
+
+Note that the number of pods for flux defaults to the number in your MetricSet, along 
+with the namespace and service name.
+
+**Important** the flux addon is currently supported for metric types that:
+
+1. have the launcher / worker design (so the hostlist.txt is present in the PWD)
+2. Have scp installed, as the shared certificate needs to be copied from the lead broker to all followers
+3. Ideally have munge installed - we do try to install it (but better to already be there)
+
+We also currently run flux as root. This is considered bad practice, but probably OK
+for this early development work. We don't see a need to have shared namespace / operator
+environments at this point, which is why I didn't add it.
+
 ## Performance
 
 ### perf-hpctoolkit

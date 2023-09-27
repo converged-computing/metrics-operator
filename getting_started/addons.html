@@ -505,6 +505,26 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#workload" class="md-nav__link">
+    <span title="/getting_started/addons.md#workload (reference label)" class="md-ellipsis">Workload</span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workload">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workload-flux" class="md-nav__link">
+    <span title="/getting_started/addons.md#workload-flux (reference label)" class="md-ellipsis">workload-<wbr>flux</span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#performance" class="md-nav__link">
     <span title="/getting_started/addons.md#performance (reference label)" class="md-ellipsis">Performance</span>
   </a>
@@ -779,6 +799,150 @@ to the metric container(s):</p>
 </code></pre></div>
 </div>
 <p><strong>Note that we have support for a custom application container, but haven’t written any good examples yet!</strong></p>
+<h2 id="workload">Workload<a class="headerlink" href="#workload" title="Link to this heading">¶</a></h2>
+<h3 id="workload-flux">workload-flux<a class="headerlink" href="#workload-flux" title="Link to this heading">¶</a></h3>
+<p>If you need to “throw in” Flux Framework into your container to use as a scheduler, you can do that with an addon!</p>
+<blockquote>
+<div><p>Yes, it’s astounding. 🦩️</p>
+</div></blockquote>
+<p>This works by way of the same trick that we use for other addons that have a complex (and/or large) install setup. We:</p>
+<ul class="simple">
+<li><p>Build the software into an isolated spack “copy” view</p></li>
+<li><p>The software is then (generally) at some <code class="docutils literal notranslate"><span class="pre">/opt/view</span></code> and <code class="docutils literal notranslate"><span class="pre">/opt/software</span></code></p></li>
+<li><p>The flux container is added as a sidecar container to your pod for your replicated job</p>
+<ul>
+<li><p>Additional setup / configuration is done here</p></li>
+</ul>
+</li>
+<li><p>We can then create an empty volume that is shared by your metric or scaled application</p></li>
+<li><p>The entire tree is copied over into the empty volume</p></li>
+<li><p>When the copy is done, indicated by the final touch of a file, the updated container entrypoint is run</p></li>
+<li><p>This typically means we have taken your metric command, and wrapped it in a Flux submit.</p></li>
+</ul>
+<p>It’s really cool because it means you can run a metric / application with Flux without needing
+to install it into your container to begin with. The one important detail is a matching of
+general operating system. The current view uses rocky, however the image is customizable
+(and we can provide other bases if/when requested). Here are the arguments you can customize
+under the metric -&gt; options.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>mount</td>
+<td>Path to mount flux view in application container</td>
+<td>string</td>
+<td>/opt/share</td>
+</tr>
+<tr>
+<td>tasks</td>
+<td>Number of tasks <code>-n</code> to give to flux (not provided if not set)</td>
+<td>string</td>
+<td>unset</td>
+</tr>
+<tr>
+<td>image</td>
+<td>Customize the container image</td>
+<td>string</td>
+<td><code>ghcr.io/rse-ops/spack-flux-rocky-view:tag-8</code></td>
+</tr>
+<tr>
+<td>fluxUser</td>
+<td>The flux user (currently not used, but TBA)</td>
+<td>string</td>
+<td>flux</td>
+</tr>
+<tr>
+<td>fluxUid</td>
+<td>The flux user ID (currently not used, but TBA)</td>
+<td>string</td>
+<td>1004</td>
+</tr>
+<tr>
+<td>interactive</td>
+<td>Run flux in interactive mode</td>
+<td>string</td>
+<td>"false"</td>
+</tr>
+<tr>
+<td>connectTimeout</td>
+<td>How long zeroMQ should wait to retry</td>
+<td>string</td>
+<td>"5s"</td>
+</tr>
+<tr>
+<td>quorum</td>
+<td>The number of brokers to require before starting the cluster</td>
+<td>string</td>
+<td>(total brokers or pods)</td>
+</tr>
+<tr>
+<td>debugZeroMQ</td>
+<td>Turn on zeroMQ debugging</td>
+<td>string</td>
+<td>"false"</td>
+</tr>
+<tr>
+<td>logLevel</td>
+<td>Customize the flux log level</td>
+<td>string</td>
+<td>"6"</td>
+</tr>
+<tr>
+<td>queuePolicy</td>
+<td>Queue policy for flux to use</td>
+<td>string</td>
+<td>fcfs</td>
+</tr>
+<tr>
+<td>workerLetter</td>
+<td>The letter that the worker job is expected to have</td>
+<td>string</td>
+<td>w</td>
+</tr>
+<tr>
+<td>launcherLetter</td>
+<td>The letter that the launcher job is expected to have</td>
+<td>string</td>
+<td>w</td>
+</tr>
+<tr>
+<td>workerIndex</td>
+<td>The index of the replicated job for the worker</td>
+<td>string</td>
+<td>0</td>
+</tr>
+<tr>
+<td>launcherIndex</td>
+<td>The index of the replicated job for the launcher</td>
+<td>string</td>
+<td>0</td>
+</tr>
+<tr>
+<td>preCommand</td>
+<td>Pre-command logic to run in launcher/workers before flux is started (after setup in flux container)</td>
+<td>string</td>
+<td>unset</td>
+</tr>
+</tbody>
+</table>
+<p>Note that the number of pods for flux defaults to the number in your MetricSet, along
+with the namespace and service name.</p>
+<p><strong>Important</strong> the flux addon is currently supported for metric types that:</p>
+<ol class="arabic simple">
+<li><p>have the launcher / worker design (so the hostlist.txt is present in the PWD)</p></li>
+<li><p>Have scp installed, as the shared certificate needs to be copied from the lead broker to all followers</p></li>
+<li><p>Ideally have munge installed - we do try to install it (but better to already be there)</p></li>
+</ol>
+<p>We also currently run flux as root. This is considered bad practice, but probably OK
+for this early development work. We don’t see a need to have shared namespace / operator
+environments at this point, which is why I didn’t add it.</p>
 <h2 id="performance">Performance<a class="headerlink" href="#performance" title="Link to this heading">¶</a></h2>
 <h3 id="perf-hpctoolkit">perf-hpctoolkit<a class="headerlink" href="#perf-hpctoolkit" title="Link to this heading">¶</a></h3>
 <ul class="simple">
@@ -860,7 +1024,7 @@ wrapper to the actual executable.</p>
   <small>
     
       Last update:
-      Sep 26, 2023
+      Sep 27, 2023
     
   </small>
 </div>

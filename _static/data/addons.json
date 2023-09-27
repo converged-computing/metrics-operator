@@ -43,5 +43,10 @@
   "name": "volume-secret",
   "description": "secret volume type",
   "family": "volume"
+ },
+ {
+  "name": "workload-flux",
+  "description": "hierarchical graph-based scheduler and resource manager",
+  "family": "workload"
  }
 ]
