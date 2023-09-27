@@ -46,6 +46,10 @@ type FluxFramework struct {
 	tasks         int32
 	optionFlags   string
 	submitCommand string
+	preCommand    string
+
+	// Extra to add to LD_LIBRARY_PATH first
+	libraryPath string
 
 	// volumeName to provide for the empty volume
 	volumeName     string
@@ -55,9 +59,10 @@ type FluxFramework struct {
 	logLevel       string
 	queuePolicy    string
 	serviceName    string
-	jobLetter      string
+	launcherLetter string
 	workerLetter   string
-	jobIndex       string
+	workerIndex    string
+	launcherIndex  string
 }
 
 func (m FluxFramework) Family() string {
@@ -101,15 +106,30 @@ func (a *FluxFramework) SetOptions(metric *api.MetricAddon, set *api.MetricSet) 
 	a.serviceName = set.Spec.ServiceName
 	a.queuePolicy = "fcfs"
 	a.SpackViewContainer = "flux-framework"
-	a.jobIndex = "0"
-	a.jobLetter = "l"
+	a.launcherIndex = "0"
+	a.workerIndex = "0"
+	a.launcherLetter = "l"
 	a.workerLetter = "w"
 	a.quorum = fmt.Sprintf("%d", a.pods)
 
 	// e.g., can be changed to mini submit or run
 	a.submitCommand = "submit"
-
-	// UseColor set to anything means to use it
+	lp, ok := metric.Options["libraryPath"]
+	if ok {
+		a.libraryPath = lp.StrVal
+	}
+	pc, ok := metric.Options["preCommand"]
+	if ok {
+		a.preCommand = pc.StrVal
+	}
+	wi, ok := metric.Options["workerIndex"]
+	if ok {
+		a.workerIndex = wi.StrVal
+	}
+	li, ok := metric.Options["launcherIndex"]
+	if ok {
+		a.launcherIndex = li.StrVal
+	}
 	mount, ok := metric.Options["mount"]
 	if ok {
 		a.mount = mount.StrVal
@@ -199,8 +219,8 @@ func (a *FluxFramework) setSetup() {
 	fluxRoot := "/opt/view"
 
 	// Generate hostlists, this is the lead broker
-	leadBroker := fmt.Sprintf("%s-%s-%s-0", a.jobname, a.jobLetter, a.jobIndex)
-	workers := fmt.Sprintf("%s-%s-%s-[%s]", a.jobname, a.workerLetter, a.jobIndex, generateRange(a.pods-1, 0))
+	leadBroker := fmt.Sprintf("%s-%s-%s-0", a.jobname, a.launcherLetter, a.launcherIndex)
+	workers := fmt.Sprintf("%s-%s-%s-[%s]", a.jobname, a.workerLetter, a.workerIndex, generateRange(a.pods-1, 0))
 	hosts := fmt.Sprintf("%s,%s", leadBroker, workers)
 	fqdn := fmt.Sprintf("%s.%s.svc.cluster.local", a.serviceName, a.namespace)
 
@@ -215,6 +235,10 @@ fluxroot=%s
 
 # The mount for the view will be at the user defined mount / view
 mount="%s/view"
+
+echo "Hello I am hostname $(hostname) running setup."
+# We only want one host to generate a certificate
+mainHost="%s"
 
 # Always use verbose, no reason to not here
 echo "Flux username: ${fluxuser}"
@@ -294,22 +318,26 @@ chmod 0644 ${fluxroot}/etc/flux/imp/conf.d/imp.toml
 # Along with the state directory and curve certificate
 mkdir -p ${fluxroot}/run/flux ${fluxroot}/etc/curve
 
-# Generate the certificate
+# Generate the certificate (ONLY if the lead broker)
 mkdir -p ${fluxroot}/etc/curve
-$fluxroot/bin/flux keygen ${fluxroot}/etc/curve/curve.cert
 
-# Remove group and other read
-chmod o-r ${fluxroot}/etc/curve/curve.cert
-chmod g-r ${fluxroot}/etc/curve/curve.cert
+if [[ "$(hostname)" == "$mainHost" ]]; then
+    echo "I am the main host, generating shared certificate"
+    $fluxroot/bin/flux keygen ${fluxroot}/etc/curve/curve.cert
 
-# Either the flux user owns the instance, or root
-# We must get the correct flux user id - this user needs to own
-# the run directory and these others
-chown -R ${fluxuid} ${fluxroot}/etc/curve/curve.cert
-
-echo
-echo "✨ Curve certificate"
-cat ${fluxroot}/etc/curve/curve.cert
+	# Remove group and other read
+	chmod o-r ${fluxroot}/etc/curve/curve.cert
+	chmod g-r ${fluxroot}/etc/curve/curve.cert
+	
+	# Either the flux user owns the instance, or root
+	# We must get the correct flux user id - this user needs to own
+	# the run directory and these others
+	chown -R ${fluxuid} ${fluxroot}/etc/curve/curve.cert
+	
+	echo
+	echo "✨ Curve certificate"
+	cat ${fluxroot}/etc/curve/curve.cert	
+fi
 `
 
 	setup = fmt.Sprintf(
@@ -318,6 +346,7 @@ cat ${fluxroot}/etc/curve/curve.cert
 		a.fluxUid,
 		fluxRoot,
 		a.Mount,
+		leadBroker,
 		hosts,
 		defaultBind,
 		defaultConnect,
@@ -330,6 +359,23 @@ cat ${fluxroot}/etc/curve/curve.cert
 func (a *FluxFramework) Options() map[string]intstr.IntOrString {
 	options := a.DefaultOptions()
 	options["mount"] = intstr.FromString(a.mount)
+	options["quorum"] = intstr.FromString(a.quorum)
+	options["fluxUser"] = intstr.FromString(a.fluxUser)
+	options["fluxUid"] = intstr.FromString(a.fluxUid)
+	options["fluxUid"] = intstr.FromString(a.fluxUid)
+	options["pods"] = intstr.FromInt(int(a.pods))
+	options["connectTimeout"] = intstr.FromString(a.connectTimeout)
+	options["logLevel"] = intstr.FromString(a.logLevel)
+	options["jobname"] = intstr.FromString(a.jobname)
+	options["namespace"] = intstr.FromString(a.namespace)
+	options["serviceName"] = intstr.FromString(a.serviceName)
+	options["queuePolicy"] = intstr.FromString(a.queuePolicy)
+	options["launcherIndex"] = intstr.FromString(a.launcherIndex)
+	options["launcherLetter"] = intstr.FromString(a.launcherLetter)
+	options["workerIndex"] = intstr.FromString(a.workerIndex)
+	options["workerLetter"] = intstr.FromString(a.workerLetter)
+	options["submitCommand"] = intstr.FromString(a.submitCommand)
+	options["libraryPath"] = intstr.FromString(a.libraryPath)
 	return options
 }
 
@@ -370,7 +416,7 @@ func (a *FluxFramework) customizeEntrypoint(
 
 	// This assumes a certain launcher letter for now
 	// TODO allow to customize letter
-	leadBroker := fmt.Sprintf("%s-%s-%s-0", a.jobname, a.jobLetter, a.jobIndex)
+	leadBroker := fmt.Sprintf("%s-%s-%s-0", a.jobname, a.launcherLetter, a.launcherIndex)
 
 	// Watch only works with submit
 	watch := ""
@@ -397,13 +443,16 @@ echo "%s"
 # Try to support debian / rocky flavor
 # This is the weakest point - it takes a long time to install with dnf
 /usr/bin/yum install munge -y || apt-get install -y munge || echo "Issue installing munge, might already be installed."
-systemctl enable munge && systemctl start munge || service munge start || echo "Issue starting munge, might already be started."
+systemctl enable munge || service munge start || echo "Issue starting munge, might already be started."
 
 # Ensure the flux volume addition is complete.
 wget https://github.com/converged-computing/goshare/releases/download/2023-09-06/wait-fs
 chmod +x ./wait-fs
 mv ./wait-fs /usr/bin/goshare-wait-fs
-	
+
+# Pre-commands
+%s
+
 # Ensure spack view is on the path, wherever it is mounted
 viewbase="%s"
 viewroot=${viewbase}/view
@@ -436,13 +485,20 @@ fluxuid="%s"
 
 # Add a flux user (required) that should exist before pre-command
 # This might vary between OS
-adduser --disabled-password --uid ${fluxuid} --gecos "" ${fluxuser} > /dev/null 2>&1 || echo "Issue adding ${fluxuser}"
+# adduser --disabled-password --uid ${fluxuid} --gecos "" ${fluxuser} > /dev/null 2>&1 || echo "Issue adding ${fluxuser}"
 
 # Add view to default LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=${viewroot}/lib:${viewroot}/lib64
+if [ -z ${LD_LIBRARY_PATH+x} ]; then
+    export LD_LIBRARY_PATH=%s:${viewroot}/lib:${viewroot}/lib64
+else
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:%s:${viewroot}/lib:${viewroot}/lib64
+fi
+echo "LD_LIBRARY_PATH is ${LD_LIBRARY_PATH}"
 
 # Ensure we use flux's python (TODO update this to use variable)
 export PYTHONPATH=${viewroot}/lib/python3.11:${viewroot}/lib/python3.11/site-packages
+echo "PYTHONPATH is ${PYTHONPATH}"
+echo "PATH is $PATH"
 
 # We could install pip...
 # /opt/share/view/bin/python3.11 -m ensurepip
@@ -495,9 +551,23 @@ flags="%s"
 watch="%s"
 submit="%s"
 
+# We will copy the curve certificate if the lead, otherwise wait for it
+curvepath=${viewroot}/etc/curve/curve.cert
+
 # Start flux with the original entrypoint
 if [ $(hostname) == "${mainHost}" ]; then
 
+  # The main host needs to scp the curve.cert over to the others
+  for host in $(cat ./hostlist.txt); do
+      if [[ "$host" == "" ]]; then
+	      continue
+	  fi
+	  if [[ "$host" == "${mainHost}" ]]; then
+          continue
+	  fi
+      echo "Copying curve.cert to $host"
+	  scp ${curvepath} $host:${curvepath}
+  done
   echo "Command provided is: ${command}"
   if [ "${command}" == "" ]; then
 
@@ -516,16 +586,20 @@ else
 # We basically sleep/wait until the lead broker is ready
 echo "🌀 flux start -o --config ${viewroot}/etc/flux/config ${brokerOptions}"
 
+until [ -f ${curvepath} ]
+do
+    echo "Waiting for curve certificate to exist."
+    sleep 5
+done
+
+# We can keep trying forever, don't care if worker is successful or not
+# TODO likely need to tweak success policy here?
 while true
   do
     flux start -o --config ${viewroot}/etc/flux/config ${brokerOptions}
     retval=$?
     echo "Return value for follower worker is ${retval}"
-    if [[ "${retval}" -eq 0 ]]; then
-        echo "The follower worker exited cleanly. Goodbye."
-        break
-    fi
-    echo "😪 Sleeping 15s until broker is ready..."
+    echo "😪 Sleeping 15s to try again..."
     sleep 15
 done
 fi
@@ -536,9 +610,11 @@ echo "%s"
 	preBlock = fmt.Sprintf(
 		preBlock,
 		meta,
+		a.preCommand,
 		a.Mount,
 		a.fluxUser,
 		a.fluxUid,
+		a.libraryPath,
 		leadBroker,
 		interactive,
 		a.connectTimeout,

@@ -195,9 +195,21 @@ under the metric -> options.
 | debugZeroMQ | Turn on zeroMQ debugging | string | "false" |
 | logLevel | Customize the flux log level | string | "6" |
 | queuePolicy | Queue policy for flux to use | string | fcfs |
+| workerLetter | The letter that the worker job is expected to have | string | w |
+| launcherLetter | The letter that the launcher job is expected to have | string | w |
+| workerIndex | The index of the replicated job for the worker | string | 0 |
+| launcherIndex | The index of the replicated job for the launcher | string | 0 |
+| libraryPath | Extra to add to the start of the `LD_LIBRARY_PATH` | string | unset |
+| preCommand | Pre-command logic to run in launcher/workers before flux is started (after setup in flux container) | string | unset |
 
 Note that the number of pods for flux defaults to the number in your MetricSet, along 
 with the namespace and service name.
+
+**Important** the flux addon is currently supported for metric types that:
+
+1. have the launcher / worker design (so the hostlist.txt is present in the PWD)
+2. Have scp installed, as the shared certificate needs to be copied from the lead broker to all followers
+3. Ideally have munge installed - we do try to install it (but better to already be there)
 
 ## Performance
 

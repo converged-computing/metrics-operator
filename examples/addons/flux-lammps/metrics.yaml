@@ -27,6 +27,14 @@ spec:
      addons:
        - name: workload-flux
          options:
+           # Needed for intel MPI I think?
+           preCommand: |
+             export PMI_TRACE=0xff
+             # export I_MPI_PMI_LIBRARY=/opt/intel/mpi/latest/lib/libmpicxx.so
+             export I_MPI_PMI_LIBRARY=${fluxroot}/lib/flux/libpmi.so
 
+           # optionFlags: -ompi=pmix
+           # Ensure library path (with MPI) is used first
+           libraryPath: /opt/intel/mpi/latest/lib
            # Ensure the working directory is consistent
            workdir: /opt/lammps/examples/reaxff/HNS
