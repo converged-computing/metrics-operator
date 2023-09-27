@@ -5,4 +5,4 @@ kind: Kustomization
 images:
 - name: controller
   newName: ghcr.io/converged-computing/metrics-operator
-  newTag: test
+  newTag: latest

@@ -80,7 +80,7 @@ func (m FluxFramework) AssembleVolumes() []specs.VolumeSpec {
 	return m.GetSpackViewVolumes()
 }
 
-// Set custom options / attributes for the metric
+// Set custom options / attributes for the addon metric
 func (a *FluxFramework) SetOptions(metric *api.MetricAddon, set *api.MetricSet) {
 
 	a.EntrypointPath = "/metrics_operator/flux-entrypoint.sh"
@@ -565,7 +565,7 @@ echo "%s"
 		rj.Template.Spec.Template.Spec.SetHostnameAsFQDN = &setFQDN
 
 		// Always copy over the pre block - we need the logic to copy software
-		// Then we need to add the command,a nd finish with the full preBlock
+		// Then we need to add the command, and finish with the full preBlock
 		// The command is given to flux!
 		command := containerSpec.EntrypointScript.Command
 		containerSpec.EntrypointScript.Pre += "\n" + fmt.Sprintf("command='%s'", command) + "\n" + preBlock
