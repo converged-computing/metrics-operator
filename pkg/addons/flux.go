@@ -233,6 +233,8 @@ fluxuser=%s
 fluxuid=%s
 fluxroot=%s
 
+%s
+
 # The mount for the view will be at the user defined mount / view
 mount="%s/view"
 
@@ -440,6 +442,8 @@ func (a *FluxFramework) customizeEntrypoint(
 	preBlock := `
 echo "%s"
 
+%s
+
 # Try to support debian / rocky flavor
 # This is the weakest point - it takes a long time to install with dnf
 /usr/bin/yum install munge -y || apt-get install -y munge || echo "Issue installing munge, might already be installed."
@@ -449,10 +453,7 @@ systemctl enable munge || service munge start || echo "Issue starting munge, mig
 wget https://github.com/converged-computing/goshare/releases/download/2023-09-06/wait-fs
 chmod +x ./wait-fs
 mv ./wait-fs /usr/bin/goshare-wait-fs
-
-# Pre-commands
-%s
-
+	
 # Ensure spack view is on the path, wherever it is mounted
 viewbase="%s"
 viewroot=${viewbase}/view
@@ -488,10 +489,11 @@ fluxuid="%s"
 # adduser --disabled-password --uid ${fluxuid} --gecos "" ${fluxuser} > /dev/null 2>&1 || echo "Issue adding ${fluxuser}"
 
 # Add view to default LD_LIBRARY_PATH
+extra_ld_path=%s
 if [ -z ${LD_LIBRARY_PATH+x} ]; then
-    export LD_LIBRARY_PATH=%s:${viewroot}/lib:${viewroot}/lib64
+    export LD_LIBRARY_PATH=${extra_ld_path}:${viewroot}/lib:${viewroot}/lib64
 else
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:%s:${viewroot}/lib:${viewroot}/lib64
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${extra_ld_path}:${viewroot}/lib:${viewroot}/lib64
 fi
 echo "LD_LIBRARY_PATH is ${LD_LIBRARY_PATH}"
 
@@ -585,12 +587,7 @@ else
 
 # We basically sleep/wait until the lead broker is ready
 echo "🌀 flux start -o --config ${viewroot}/etc/flux/config ${brokerOptions}"
-
-until [ -f ${curvepath} ]
-do
-    echo "Waiting for curve certificate to exist."
-    sleep 5
-done
+goshare-wait-fs -p ${curvepath}
 
 # We can keep trying forever, don't care if worker is successful or not
 # TODO likely need to tweak success policy here?
