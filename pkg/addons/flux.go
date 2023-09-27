@@ -378,11 +378,12 @@ func (a *FluxFramework) customizeEntrypoint(
 		watch = "--watch"
 	}
 
-	// Prepare flags for flux
+	// Prepare flags for flux. First, add big N if it's > pods, OR not set
 	flags := ""
 	if (a.tasks != 0 && a.tasks > a.pods) || a.tasks == 0 {
 		flags = fmt.Sprintf(" -N %d", a.pods)
 	}
+	// Little n only gets added if it is set
 	if a.tasks != 0 {
 		flags += fmt.Sprintf(" -n %d %s -vvv", a.tasks, a.optionFlags)
 	} else {
@@ -392,6 +393,12 @@ func (a *FluxFramework) customizeEntrypoint(
 	// This should be run after the pre block of the script
 	preBlock := `
 echo "%s"
+
+# Try to support debian / rocky flavor
+# This is the weakest point - it takes a long time to install with dnf
+/usr/bin/yum install munge -y || apt-get install -y munge || echo "Issue installing munge, might already be installed."
+systemctl enable munge && systemctl start munge || service munge start || echo "Issue starting munge, might already be started."
+
 # Ensure the flux volume addition is complete.
 wget https://github.com/converged-computing/goshare/releases/download/2023-09-06/wait-fs
 chmod +x ./wait-fs
@@ -463,11 +470,6 @@ echo "The main host is ${mainHost}"
 workdir=$(pwd)
 echo "The working directory is ${workdir}, contents include:"
 ls -R ${workdir}
-
-# Try to support debian / rocky flavor
-# This is the weakest point - it takes a long time to install with dnf
-/usr/bin/yum install munge -y || apt-get install -y munge
-systemctl enable munge && systemctl start munge || service munge start
 
 # Use root for now, easier :)
 # fluxuid=$(id -u ${fluxuser})
