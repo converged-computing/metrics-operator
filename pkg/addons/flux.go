@@ -233,8 +233,6 @@ fluxuser=%s
 fluxuid=%s
 fluxroot=%s
 
-%s
-
 # The mount for the view will be at the user defined mount / view
 mount="%s/view"
 
