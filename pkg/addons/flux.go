@@ -48,9 +48,6 @@ type FluxFramework struct {
 	submitCommand string
 	preCommand    string
 
-	// Extra to add to LD_LIBRARY_PATH first
-	libraryPath string
-
 	// volumeName to provide for the empty volume
 	volumeName     string
 	interactive    bool
@@ -111,13 +108,8 @@ func (a *FluxFramework) SetOptions(metric *api.MetricAddon, set *api.MetricSet) 
 	a.launcherLetter = "l"
 	a.workerLetter = "w"
 	a.quorum = fmt.Sprintf("%d", a.pods)
-
-	// e.g., can be changed to mini submit or run
 	a.submitCommand = "submit"
-	lp, ok := metric.Options["libraryPath"]
-	if ok {
-		a.libraryPath = lp.StrVal
-	}
+
 	pc, ok := metric.Options["preCommand"]
 	if ok {
 		a.preCommand = pc.StrVal
@@ -375,7 +367,6 @@ func (a *FluxFramework) Options() map[string]intstr.IntOrString {
 	options["workerIndex"] = intstr.FromString(a.workerIndex)
 	options["workerLetter"] = intstr.FromString(a.workerLetter)
 	options["submitCommand"] = intstr.FromString(a.submitCommand)
-	options["libraryPath"] = intstr.FromString(a.libraryPath)
 	return options
 }
 
@@ -486,29 +477,10 @@ fluxuid="%s"
 # This might vary between OS
 # adduser --disabled-password --uid ${fluxuid} --gecos "" ${fluxuser} > /dev/null 2>&1 || echo "Issue adding ${fluxuser}"
 
-# Add view to default LD_LIBRARY_PATH
-extra_ld_path=%s
-if [ -z ${LD_LIBRARY_PATH+x} ]; then
-    export LD_LIBRARY_PATH=${extra_ld_path}:${viewroot}/lib:${viewroot}/lib64
-else
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${extra_ld_path}:${viewroot}/lib:${viewroot}/lib64
-fi
-echo "LD_LIBRARY_PATH is ${LD_LIBRARY_PATH}"
-
 # Ensure we use flux's python (TODO update this to use variable)
-export PYTHONPATH=${viewroot}/lib/python3.11:${viewroot}/lib/python3.11/site-packages
+export PYTHONPATH=${viewroot}/lib/python3.11/site-packages
 echo "PYTHONPATH is ${PYTHONPATH}"
 echo "PATH is $PATH"
-
-# We could install pip...
-# /opt/share/view/bin/python3.11 -m ensurepip
-
-asSudo="sudo -E PYTHONPATH=$PYTHONPATH -E PATH=$PATH -E LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
-asFlux="${asSudo}"
-
-# If we aren't running as root, TODO
-# asFlux="${asSudo} -E HOME=/home/${fluxuser}"
-# asFlux="sudo -u ${fluxuser} -E PYTHONPATH=$PYTHONPATH -E PATH=$PATH -E LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -E HOME=/home/${fluxuser}"
 
 # Add fluxuser to sudoers
 echo "${fluxuser} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
@@ -526,10 +498,6 @@ echo "The main host is ${mainHost}"
 workdir=$(pwd)
 echo "The working directory is ${workdir}, contents include:"
 ls -R ${workdir}
-
-# Use root for now, easier :)
-# fluxuid=$(id -u ${fluxuser})
-# chown -R ${fluxuid} /run/flux ${STATE_DIR} ${viewbin}/etc/curve/curve.cert ${workdir}
 
 brokerOptions="-Scron.directory=/etc/flux/system/cron.d \
   -Stbon.fanout=256 \
@@ -588,7 +556,6 @@ echo "🌀 flux start -o --config ${viewroot}/etc/flux/config ${brokerOptions}"
 goshare-wait-fs -p ${curvepath}
 
 # We can keep trying forever, don't care if worker is successful or not
-# TODO likely need to tweak success policy here?
 while true
   do
     flux start -o --config ${viewroot}/etc/flux/config ${brokerOptions}
@@ -609,7 +576,6 @@ echo "%s"
 		a.Mount,
 		a.fluxUser,
 		a.fluxUid,
-		a.libraryPath,
 		leadBroker,
 		interactive,
 		a.connectTimeout,
