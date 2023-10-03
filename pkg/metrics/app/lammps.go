@@ -48,7 +48,7 @@ func (m *Lammps) SetOptions(metric *api.Metric) {
 	// Ensure we set sole tenancy if desired
 	st, ok := metric.Options["soleTenancy"]
 	if ok && st.StrVal == "true" || st.StrVal == "yes" {
-		m.SoleTenancy = false
+		m.SoleTenancy = true
 	}
 
 	// Set user defined values or fall back to defaults
