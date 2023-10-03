@@ -45,6 +45,12 @@ func (m *Lammps) SetOptions(metric *api.Metric) {
 	m.Summary = lammpsSummary
 	m.Container = lammpsContainer
 
+	// Ensure we set sole tenancy if desired
+	st, ok := metric.Options["soleTenancy"]
+	if ok && st.StrVal == "true" || st.StrVal == "yes" {
+		m.SoleTenancy = false
+	}
+
 	// Set user defined values or fall back to defaults
 	// This is a more manual approach that puts the user in charge of determining the entire command
 	// This more closely matches what we might do on HPC :)
@@ -63,7 +69,7 @@ func (m Lammps) Options() map[string]intstr.IntOrString {
 	values := map[string]intstr.IntOrString{
 		"command":    intstr.FromString(m.Command),
 		"workdir":    intstr.FromString(m.Workdir),
-		"soleTenacy": intstr.FromString("false"),
+		"soleTenancy": intstr.FromString("false"),
 	}
 	if m.SoleTenancy {
 		values["soleTenancy"] = intstr.FromString("true")
