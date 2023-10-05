@@ -14,6 +14,7 @@ and **Merged pull requests**. Critical items to know are:
 The versions coincide with releases on pip. Only major versions will be released as tags on Github.
 
 ## [0.0.x](https://github.com/converged-computing/metrics-operator/tree/main) (0.0.x)
+ - LAMMPS parsing should include row names for component names (0.1.1)
  - More specific parsing / control for OSU benchmarks (0.0.21)
  - Support for OSU benchmark parsing with timed wrappers (0.0.2)
  - Allow getting raw logs for any metric (without parser) (0.0.19)
