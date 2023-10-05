@@ -213,9 +213,10 @@ def parse_lammps(lines):
             line = lines.pop(0)
             while line and line.strip():
                 parts = [x.strip() for x in line.split("|")]
-                _, rest = parts[0], parts[1:]
+                rowtitle, rest = parts[0], parts[1:]
+                rest = [float(x) for x in rest if x]
                 if rest:
-                    matrix.append(rest)
+                    matrix.append([rowtitle] + rest)
                 if not lines:
                     break
                 line = lines.pop(0)
