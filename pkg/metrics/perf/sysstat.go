@@ -236,12 +236,12 @@ while true
 	retval=$?
 	if [[ $retval -ne 0 ]]; then
 		echo "%s"
-        %s
+		%s
 		exit 0
 	fi
 	if [[ $completions -ne 0 ]] && [[ $i -eq $completions ]]; then
 		echo "%s"
-        %s
+		%s
 		exit 0
 	fi
 	sleep %d
