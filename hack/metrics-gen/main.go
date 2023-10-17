@@ -12,6 +12,7 @@ import (
 	_ "github.com/converged-computing/metrics-operator/pkg/metrics/io"
 	_ "github.com/converged-computing/metrics-operator/pkg/metrics/network"
 	_ "github.com/converged-computing/metrics-operator/pkg/metrics/perf"
+	_ "github.com/converged-computing/metrics-operator/pkg/metrics/sys"
 	//
 	// +kubebuilder:scaffold:imports
 )
