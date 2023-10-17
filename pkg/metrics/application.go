@@ -10,6 +10,7 @@ package metrics
 import (
 	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"github.com/converged-computing/metrics-operator/pkg/specs"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	jobset "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 )
 
@@ -26,6 +27,10 @@ type SingleApplication struct {
 
 func (m SingleApplication) HasSoleTenancy() bool {
 	return false
+}
+
+func (m SingleApplication) Options() map[string]intstr.IntOrString {
+	return map[string]intstr.IntOrString{}
 }
 
 // Default SingleApplication is generic performance family

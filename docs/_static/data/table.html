@@ -460,6 +460,9 @@ $.getJSON("metrics.json", function(data) {
       if(data.family == 'solver'){
         $(row).find('td:eq(1)').css('background-color', 'lightgreen');
       }
+      if(data.family == 'system'){
+        $(row).find('td:eq(1)').css('background-color', 'gray');
+      }
       if(data.family == 'performance'){
         $(row).find('td:eq(1)').css('background-color', '#f79fb7');
       }

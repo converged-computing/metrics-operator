@@ -45,6 +45,8 @@ func getReplicatedJobContainers(
 	// Each needs to have the sys trace capability to see the application pids
 	for _, cs := range containerSpecs {
 
+		logger.Infof("Checking container spec %s", cs)
+
 		// Skip containers not intended for the replicated job
 		if cs.JobName != "" && cs.JobName != rj.Name {
 			continue

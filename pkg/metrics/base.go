@@ -38,12 +38,17 @@ type BaseMetric struct {
 // RegisterAddon adds an addon to the set, assuming it's already validated
 func (m *BaseMetric) RegisterAddon(addon *addons.Addon) {
 	a := (*addon)
+	m.InitAddons()
+	logger.Infof("🟧️ Registering addon %s", a.Name())
+	m.Addons[a.Name()] = addon
+}
+
+// InitAddons ensures we don't have an empty map
+func (m *BaseMetric) InitAddons() {
 	if m.Addons == nil {
 		logger.Infof("🟧️ Resetting addons - they are unset.")
 		m.Addons = map[string]*addons.Addon{}
 	}
-	logger.Infof("🟧️ Registering addon %s", a.Name())
-	m.Addons[a.Name()] = addon
 }
 
 // Name returns the metric name
@@ -130,6 +135,9 @@ func (m BaseMetric) AddAddons(
 	// These container specs include all replicated jobs
 	containerSpecs []*specs.ContainerSpec,
 ) ([]*specs.ContainerSpec, error) {
+
+	// Ensure we have created the map!
+	m.InitAddons()
 
 	// VolumeMounts can be generated from container specs
 	// For each addon, do custom logic depending on the type

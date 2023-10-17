@@ -12,6 +12,21 @@ We likely will tweak and improve upon these categories.
 
 ## Implemented Metrics
 
+### sys-hwloc
+
+ - *[sys-hwloc](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/sys-hwloc)*
+
+[Hwloc](https://www.open-mpi.org/projects/hwloc/) or "portable hardware locality" can be used to look at the hardware of your system.
+There is a [nice tutorial here](https://www.open-mpi.org/projects/hwloc/tutorials/20120702-POA-hwloc-tutorial.html) for the default command that is run,
+"lstopo" that does exactly that - listing your hardware topology! Specifically we output a png image and machine spec for the default command, and this can be updated.
+[This man page](https://manpages.ubuntu.com/manpages/impish/man1/lstopo.1.html) is recommended to see the different commands and options.
+
+| Name | Description | Type | Default |
+|-----|-------------|------------|------|
+| command | Change the default command to something else. | string | lstopo architecture.png && hwloc-ls machine.xml |
+
+The above saves a png image, and the machine data to xml.
+
 ### perf-sysstat
 
  - *[perf-hello-world](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-hello-world)*
