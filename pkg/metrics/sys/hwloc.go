@@ -34,6 +34,10 @@ func (m Hwloc) Url() string {
 	return "https://www.open-mpi.org/projects/hwloc/tutorials/20120702-POA-hwloc-tutorial.html"
 }
 
+func (m *Hwloc) Famliy() string {
+	return metrics.SystemFamily
+}
+
 // Set custom options / attributes for the metric
 func (m *Hwloc) SetOptions(metric *api.Metric) {
 

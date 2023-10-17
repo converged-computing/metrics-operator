@@ -22,6 +22,7 @@ var (
 const (
 
 	// Metric Family Types (these likely can be changed)
+	SystemFamily          = "system"
 	StorageFamily         = "storage"
 	MachineLearningFamily = "machine-learning"
 	NetworkFamily         = "network"
