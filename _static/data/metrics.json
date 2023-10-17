@@ -117,5 +117,12 @@
   "family": "performance",
   "image": "ghcr.io/converged-computing/metric-sysstat:latest",
   "url": "https://github.com/sysstat/sysstat"
+ },
+ {
+  "name": "sys-hwloc",
+  "description": "install hwloc for inspecting hardware locality",
+  "family": "performance",
+  "image": "ghcr.io/converged-computing/metric-hwloc:latest",
+  "url": "https://www.open-mpi.org/projects/hwloc/tutorials/20120702-POA-hwloc-tutorial.html"
  }
 ]
