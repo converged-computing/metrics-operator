@@ -6,6 +6,17 @@ import os
 import re
 
 import yaml
+from kubernetes import client, config
+
+
+def make_k8s_client(kubeconfig_yaml):
+    """
+    Load the yaml config for use in Python
+    """
+    with open(kubeconfig_yaml) as f:
+        kubeconfig = yaml.safe_load(f)
+    api_client = config.new_client_from_config_dict(kubeconfig)
+    return client.CoreV1Api(api_client)
 
 
 def read_file(filename):

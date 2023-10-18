@@ -12,7 +12,7 @@ import metricsoperator.utils as utils
 
 
 class MetricsOperator:
-    def __init__(self, yaml_file):
+    def __init__(self, yaml_file, kubeconfig=None):
         """
         Given a YAML file with one or more metrics, apply
         to create it and stream logs for each metric of interest.
@@ -20,7 +20,20 @@ class MetricsOperator:
         self._core_v1 = None
         self.yaml_file = os.path.abspath(yaml_file)
         self.spec = utils.read_yaml(self.yaml_file)
-        config.load_kube_config()
+        self.kubeconfig = kubeconfig
+        self.load_kube_config()
+
+    def load_kube_config(self, kubeconfig=None):
+        """
+        Allow providing a custom kubeconfig to control a cluster and metric
+        """
+        kubeconfig = kubeconfig or self.kubeconfig
+        if not kubeconfig:
+            config.load_kube_config()
+            return
+
+        self._core_v1 = utils.make_k8s_client(kubeconfig)
+        config.load_kube_config(config_file=kubeconfig)
 
     def watch(self, raw_logs=False, pod_prefix=None, container_name=None):
         """
@@ -31,10 +44,12 @@ class MetricsOperator:
 
         for metric in self.spec["spec"]["metrics"]:
             if raw_logs:
-                parser = mutils.get_metric()(self.spec, container_name=container_name)
+                parser = mutils.get_metric()(
+                    self.spec, container_name=container_name, kubeconfig=self.kubeconfig
+                )
             else:
                 parser = mutils.get_metric(metric["name"])(
-                    self.spec, container_name=container_name
+                    self.spec, container_name=container_name, kubeconfig=self.kubeconfig
                 )
             print("Watching %s" % metric["name"])
             for pod, container in parser.logging_containers(pod_prefix=pod_prefix):
