@@ -6,6 +6,8 @@ from kubernetes.client.api import core_v1_api
 from kubernetes.client.exceptions import ApiException
 from kubernetes.client.models.v1_pod_list import V1PodList
 
+import metricsoperator.utils as utils
+
 
 class MetricBase:
     separator = "METRICS OPERATOR TIMEPOINT"
@@ -23,6 +25,7 @@ class MetricBase:
         """
         self.spec = spec
         self._core_v1 = kwargs.get("core_v1_api")
+        self.kubeconfig = kwargs.get("kubeconfig")
 
         # If we don't have a default container name...
         if not self.container_name:
@@ -30,7 +33,19 @@ class MetricBase:
 
         # Load kubeconfig on Metricbase init only
         if self.spec is not None:
+            self.load_kube_config()
+
+    def load_kube_config(self):
+        """
+        Allow providing a custom kubeconfig to control a cluster and metric
+        """
+        if not self.kubeconfig:
             config.load_kube_config()
+            return
+
+        # Assume the core v1 handler is replaced with this kubeconfig
+        self._core_v1 = utils.make_k8s_client(self.kubeconfig)
+        config.load_kube_config(config_file=self.kubeconfig)
 
     @property
     def namespace(self):
