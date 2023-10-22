@@ -20,6 +20,11 @@
   "family": "performance"
  },
  {
+  "name": "perf-mpitrace",
+  "description": "library for measuring communication in distributed-memory parallel applications that use MPI",
+  "family": "performance"
+ },
+ {
   "name": "volume-cm",
   "description": "config map volume type",
   "family": "volume"
