@@ -218,7 +218,7 @@ environments at this point, which is why I didn't add it.
 
 ### perf-hpctoolkit
 
- - *[perf-hpctoolkit](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-lammps-hpctoolkit)*
+ - *[perf-hpctoolkit](https://github.com/converged-computing/metrics-operator/tree/main/examples/addons/hpctoolkit-lammps)*
 
 This metric provides [HPCToolkit](https://gitlab.com/hpctoolkit/hpctoolkit) for your application to use. This is the first metric of its type
 to use a shared volume approach. Specifically, we:
@@ -266,3 +266,19 @@ There is a brief listing on [this page](https://hpc.llnl.gov/software/developmen
 We recommend that you do not pair hpctoolkit with another metric, primarily because it is customizing the application
 entrypoint. If you add a process-namespace based metric, you likely need to account for the hpcrun command being the
 wrapper to the actual executable.
+
+
+### perf-mpitrace
+
+ - *[perf-mpitrace](https://github.com/converged-computing/metrics-operator/tree/main/examples/addons/perf-mpitrace)*
+
+This metric provides [mpitrace](https://github.com/IBM/mpitrace) to wrap an MPI application. The setup is the same as hpctoolkit, and we
+currently only provide a rocky base (please let us know if you need another). It works by way of wrapping the mpirun command with `LD_PRELOAD`.
+See the link above for an example that uses LAMMPS.
+
+Here are the acceptable parameters.
+
+| Name | Description | Type | Default |
+|-----|-------------|------------|------|
+| mount | Path to mount hpctoolview view in application container | string | /opt/share |
+| image | Customize the container image | string | `ghcr.io/converged-computing/metric-mpitrace:rocky` |

@@ -539,6 +539,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#perf-mpitrace" class="md-nav__link">
+    <span title="/getting_started/addons.md#perf-mpitrace (reference label)" class="md-ellipsis">perf-<wbr>mpitrace</span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -946,7 +953,7 @@ environments at this point, which is why I didn’t add it.</p>
 <h2 id="performance">Performance<a class="headerlink" href="#performance" title="Link to this heading">¶</a></h2>
 <h3 id="perf-hpctoolkit">perf-hpctoolkit<a class="headerlink" href="#perf-hpctoolkit" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-lammps-hpctoolkit">perf-hpctoolkit</a></em></p></li>
+<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/addons/hpctoolkit-lammps">perf-hpctoolkit</a></em></p></li>
 </ul>
 <p>This metric provides <a class="reference external" href="https://gitlab.com/hpctoolkit/hpctoolkit">HPCToolkit</a> for your application to use. This is the first metric of its type
 to use a shared volume approach. Specifically, we:</p>
@@ -1017,14 +1024,45 @@ There is a brief listing on <a class="reference external" href="https://hpc.llnl
 We recommend that you do not pair hpctoolkit with another metric, primarily because it is customizing the application
 entrypoint. If you add a process-namespace based metric, you likely need to account for the hpcrun command being the
 wrapper to the actual executable.</p>
-
+<h3 id="perf-mpitrace">perf-mpitrace<a class="headerlink" href="#perf-mpitrace" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/addons/perf-mpitrace">perf-mpitrace</a></em></p></li>
+</ul>
+<p>This metric provides <a class="reference external" href="https://github.com/IBM/mpitrace">mpitrace</a> to wrap an MPI application. The setup is the same as hpctoolkit, and we
+currently only provide a rocky base (please let us know if you need another). It works by way of wrapping the mpirun command with <code class="docutils literal notranslate"><span class="pre">LD_PRELOAD</span></code>.
+See the link above for an example that uses LAMMPS.</p>
+<p>Here are the acceptable parameters.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>mount</td>
+<td>Path to mount hpctoolview view in application container</td>
+<td>string</td>
+<td>/opt/share</td>
+</tr>
+<tr>
+<td>image</td>
+<td>Customize the container image</td>
+<td>string</td>
+<td><code>ghcr.io/converged-computing/metric-mpitrace:rocky</code></td>
+</tr>
+</tbody>
+</table>
 
   <hr>
 <div class="md-source-file">
   <small>
     
       Last update:
-      Oct 18, 2023
+      Oct 23, 2023
     
   </small>
 </div>
