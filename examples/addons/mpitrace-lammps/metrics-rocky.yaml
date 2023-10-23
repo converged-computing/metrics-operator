@@ -1,0 +1,32 @@
+apiVersion: flux-framework.org/v1alpha2
+kind: MetricSet
+metadata:
+  labels:
+    app.kubernetes.io/name: metricset
+    app.kubernetes.io/instance: metricset-sample
+  name: metricset-sample
+spec:
+  # Number of pods for lammps (one launcher, the rest workers)
+  pods: 4
+  logging:
+    interactive: true
+
+  metrics:
+
+   # Running more scaled lammps is our main goal
+   - name: app-lammps
+
+     # This is for if you use rocky, not the default
+     image: ghcr.io/converged-computing/metric-lammps-intel-mpi:rocky
+     options:
+       command: /opt/intel/mpi/2021.8.0/bin/mpirun --hostfile ./hostlist.txt -np 4 --map-by socket lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite
+       workdir: /opt/lammps/examples/reaxff/HNS
+
+     # Add on hpctoolkit, will mount a volume and wrap lammps
+     addons:
+       - name: perf-mpitrace
+         options:
+           mount: /opt/mnt
+           image: ghcr.io/converged-computing/metric-mpitrace:rocky           
+           workdir: /opt/lammps/examples/reaxff/HNS
+           containerTarget: launcher
