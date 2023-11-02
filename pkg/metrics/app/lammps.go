@@ -67,8 +67,8 @@ func (m Lammps) Validate(spec *api.MetricSet) bool {
 // Exported options and list options
 func (m Lammps) Options() map[string]intstr.IntOrString {
 	values := map[string]intstr.IntOrString{
-		"command":    intstr.FromString(m.Command),
-		"workdir":    intstr.FromString(m.Workdir),
+		"command":     intstr.FromString(m.Command),
+		"workdir":     intstr.FromString(m.Workdir),
 		"soleTenancy": intstr.FromString("false"),
 	}
 	if m.SoleTenancy {

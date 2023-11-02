@@ -1,0 +1,33 @@
+apiVersion: flux-framework.org/v1alpha2
+kind: MetricSet
+metadata:
+  labels:
+    app.kubernetes.io/name: metricset
+    app.kubernetes.io/instance: metricset-sample
+  name: metricset-sample
+spec:
+  # Number of pods for lammps (one launcher, the rest workers)
+  pods: 4
+  logging:
+    interactive: true
+
+  metrics:
+
+   # Running more scaled lammps is our main goal
+   - name: app-lammps
+     options:
+       # This will be wrapped with LD_PRELOAD to use darshan
+       command: mpirun --hostfile ./hostlist.txt -np 4 --map-by socket lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite
+       workdir: /opt/lammps/examples/reaxff/HNS
+
+     # Add on hpctoolkit, will mount a volume and wrap lammps
+     addons:
+       - name: perf-darshan
+         options:
+           mount: /opt/mnt
+
+           # Ensure the working directory is consistent
+           workdir: /opt/lammps/examples/reaxff/HNS
+
+           # Target container for entrypoint addition is the launcher, not workers
+           containerTarget: launcher

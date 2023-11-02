@@ -282,3 +282,5 @@ Here are the acceptable parameters.
 |-----|-------------|------------|------|
 | mount | Path to mount hpctoolview view in application container | string | /opt/share |
 | image | Customize the container image | string | `ghcr.io/converged-computing/metric-mpitrace:rocky` |
+
+
