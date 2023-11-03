@@ -178,6 +178,16 @@ spec:
                 description: Pod spec for the application, standalone, or storage
                   metrics
                 properties:
+                  annotations:
+                    additionalProperties:
+                      type: string
+                    description: Annotations to add to the pod
+                    type: object
+                  labels:
+                    additionalProperties:
+                      type: string
+                    description: Labels to add to the pod
+                    type: object
                   nodeSelector:
                     additionalProperties:
                       type: string

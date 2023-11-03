@@ -81,6 +81,14 @@ type Logging struct {
 // Pod attributes that can be given to an application or metric
 type Pod struct {
 
+	// Annotations to add to the pod
+	//+optional
+	Annotations map[string]string `json:"annotations"`
+
+	// Labels to add to the pod
+	//+optional
+	Labels map[string]string `json:"labels"`
+
 	// name of service account to associate with pod
 	//+optional
 	ServiceAccountName string `json:"serviceAccountName"`
@@ -205,7 +213,9 @@ type Metric struct {
 // Get pod labels for a metric set
 func (m *MetricSet) GetPodLabels() map[string]string {
 
-	podLabels := map[string]string{}
+	// Start with those provided by the user
+	podLabels := m.Spec.Pod.Labels
+
 	// This is for autoscaling, although haven't used yet
 	podLabels["cluster-name"] = m.Name
 	// This is for the headless service
@@ -233,6 +243,12 @@ type MetricSet struct {
 // Validate a requested metricset
 func (m *MetricSet) Validate() bool {
 
+	if m.Spec.Pod.Labels == nil {
+		m.Spec.Pod.Labels = map[string]string{}
+	}
+	if m.Spec.Pod.Annotations == nil {
+		m.Spec.Pod.Annotations = map[string]string{}
+	}
 	if len(m.Spec.Metrics) == 0 {
 		fmt.Printf("😥️ One or more metrics are required.\n")
 		return false
