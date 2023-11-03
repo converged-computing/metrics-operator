@@ -27,6 +27,17 @@ There is a [nice tutorial here](https://www.open-mpi.org/projects/hwloc/tutorial
 
 The above saves a png image, and the machine data to xml.
 
+### perf-dlio
+
+While this is a simple performance tool not coded into the Metrics Operator (it is installed on the fly to your container with pip and you minimally require hwloc)
+it generates pretty cool data that can be visualized with perfetto!
+
+ - *[perf-dlio](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-dlio)*
+
+You can see the full example above. It is just installing a library with pip, and then ensuring the tool `LD_PRELOAD`
+is set as the prefix. I added sleep infinity to the end to copy over output data at the end.
+
+
 ### perf-sysstat
 
  - *[perf-hello-world](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/perf-hello-world)*

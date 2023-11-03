@@ -1,0 +1,37 @@
+apiVersion: flux-framework.org/v1alpha2
+kind: MetricSet
+metadata:
+  labels:
+    app.kubernetes.io/name: metricset
+    app.kubernetes.io/instance: metricset-sample
+  name: metricset-sample
+spec:
+  # kubectl apply -f metrics.yaml
+  # kubectl logs <launcher-pod> -f
+  pods: 2
+
+  metrics:
+   - name: io-ior
+     options:
+      command: LD_PRELOAD=$PRELOAD_PATH ior -k -w -r -o testfile > out.txt
+     addons:
+       - name: commands
+         options:
+           preBlock: |
+             apt-get install -y python3-pip hwloc libhwloc-dev
+             DLP_VERSION=dev
+             python3 -m pip install git+https://github.com/hariharan-devarajan/dlio-profiler.git@${DLP_VERSION}      
+             mkdir -p /opt/logs
+             export DLIO_PROFILER_LOG_LEVEL=ERROR
+             export DLIO_PROFILER_LOG_LEVEL=DEBUG
+             export DLIO_PROFILER_ENABLE=1
+             export DLIO_PROFILER_INC_METADATA=1
+             export DLIO_PROFILER_INIT=PRELOAD
+             export DLIO_PROFILER_DATA_DIR=/opt/ior
+             export DLIO_PROFILER_LOG_FILE=/opt/logs/ior-profile.pfw
+             sleep 10
+             export PRELOAD_PATH=$(find /usr -name libdlio_profiler_preload.so)  
+             echo "preload path is $PRELOAD_PATH"
+           postBlock: |
+             ls /opt/logs
+             sleep infinity
