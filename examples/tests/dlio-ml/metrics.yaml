@@ -13,7 +13,7 @@ spec:
   metrics:
    - name: io-ior
      options:
-      command: mpirun --allow-run-as-root -np 10 python3 /dlio/source/dlio_benchmark/main.py workload=resnet50 ++workload.workflow.generate_data=True ++workload.output.folder=/dlio/output
+      command: mpirun --allow-run-as-root -np 10 python3 /dlio/source/dlio_benchmark/main.py workload=resnet50 ++workload.workflow.generate_data=True ++workload.dataset.data_folder=/dlio/data ++workload.output.folder=/dlio/output 
       workdir: /dlio/data
      addons:
        - name: commands
@@ -24,7 +24,7 @@ spec:
              python3 -m pip install git+https://github.com/argonne-lcf/dlio_benchmark.git
              mkdir -p /dlio/data /dlio/output /dlio/logs
              git clone https://github.com/argonne-lcf/dlio_benchmark.git /dlio/source
-             export DLIO_PROFILER_LOG_LEVEL=ERROR
+             export DLIO_PROFILER_LOG_LEVEL=INFO
              export DLIO_PROFILER_ENABLE=1
              export DLIO_PROFILER_INC_METADATA=1
              export PYTHONPATH=$PYTHONPATH:/dlio/source
