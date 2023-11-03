@@ -472,6 +472,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#dlio" class="md-nav__link">
+    <span title="/getting_started/metrics.md#dlio (reference label)" class="md-ellipsis">dlio</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#network-netmark" class="md-nav__link">
     <span title="/getting_started/metrics.md#network-netmark (reference label)" class="md-ellipsis">network-<wbr>netmark</span>
   </a>
@@ -978,6 +985,14 @@ if this would be interesting to you.</p>
 </tbody>
 </table>
 <p>This is good for mounted storage that can be seen by the operating system, but may not work for something like NFS.</p>
+<h3 id="dlio">dlio<a class="headerlink" href="#dlio" title="Link to this heading">¶</a></h3>
+<p>While this is a simple performance tool not coded into the Metrics Operator (it is installed on the fly to your container with pip and you minimally require hwloc)
+it generates pretty cool data that can be visualized with perfetto!</p>
+<ul class="simple">
+<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/dlio">dlio</a></em></p></li>
+</ul>
+<p>You can see the full example above. It is just installing a library with pip, and then ensuring the tool <code class="docutils literal notranslate"><span class="pre">LD_PRELOAD</span></code>
+is set as the prefix. I added sleep infinity to the end to copy over output data at the end.</p>
 <h3 id="network-netmark">network-netmark<a class="headerlink" href="#network-netmark" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/network-netmark">network-netmark</a></em> (code still private)</p></li>
@@ -1783,7 +1798,7 @@ repository (with <code class="docutils literal notranslate"><span class="pre">Do
   <small>
     
       Last update:
-      Oct 23, 2023
+      Nov 03, 2023
     
   </small>
 </div>
