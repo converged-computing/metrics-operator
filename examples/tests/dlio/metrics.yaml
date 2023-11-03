@@ -1,0 +1,40 @@
+apiVersion: flux-framework.org/v1alpha2
+kind: MetricSet
+metadata:
+  labels:
+    app.kubernetes.io/name: metricset
+    app.kubernetes.io/instance: metricset-sample
+  name: metricset-sample
+spec:
+  # kubectl apply -f metrics.yaml
+  # kubectl logs <launcher-pod> -f
+  pods: 2
+
+  metrics:
+   - name: io-ior
+     options:
+      command: LD_PRELOAD=$PRELOAD_PATH mpirun --allow-run-as-root -np 10 ior -k -b=1g -w -r -o testfile
+      workdir: /ior/data
+     addons:
+       - name: commands
+         options:
+           preBlock: |
+             apt-get install -y python3 python3-pip openmpi-bin openmpi-common libopenmpi-dev hwloc libhwloc-dev
+             python3 -m pip install git+https://github.com/hariharan-devarajan/dlio-profiler.git
+             mkdir -p /ior/logs /ior/data
+             export DLIO_PROFILER_LOG_LEVEL=INFO
+             export DLIO_PROFILER_ENABLE=1
+             export DLIO_PROFILER_DATA_DIR=testfile
+             export DLIO_PROFILER_INIT=PRELOAD
+             export DLIO_PROFILER_LOG_FILE=/ior/logs/trace
+             export DLIO_PROFILER_TRACE_COMPRESSION=1
+             export DLIO_PROFILER_INC_METADATA=1
+             sleep 10
+             export PRELOAD_PATH=$(find /usr -name libdlio_profiler_preload.so)  
+             echo "preload path is $PRELOAD_PATH"
+             cd /ior/data
+           postBlock: |
+             ls /ior/logs
+             gzip -d /ior/logs/*.pfw.gz
+             cat /ior/logs/*.pfw
+             sleep infinity
