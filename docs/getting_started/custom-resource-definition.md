@@ -135,3 +135,21 @@ metrics:
 
 Each addon has its own custom options. You can look at examples and at our [addons documentation](addons.md) for more detail on how to add existing volumes
 or other custom functionality.
+
+
+### pod
+
+You can customize variables for the pod, which currently includes labels, annotations, selectors, and a service account name,
+
+```yaml
+spec:
+  pod:
+    annotations:
+      key.subkey: value
+    labels:
+      dinner: lasagna
+    serviceAccountName: mySVCAccount
+    nodeSelector:
+      key: value
+```
+

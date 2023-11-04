@@ -118,9 +118,10 @@ func AssembleReplicatedJob(
 		// Note there is parameter to limit runtime
 		Template: corev1.PodTemplateSpec{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      set.Name,
-				Namespace: set.Namespace,
-				Labels:    podLabels,
+				Name:        set.Name,
+				Namespace:   set.Namespace,
+				Labels:      podLabels,
+				Annotations: set.Spec.Pod.Annotations,
 			},
 			Spec: corev1.PodSpec{
 				// matches the service
