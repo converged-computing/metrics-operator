@@ -521,6 +521,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#pod" class="md-nav__link">
+    <span title="/getting_started/custom-resource-definition.md#pod (reference label)" class="md-ellipsis">pod</span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -740,6 +747,19 @@ Akin to <a class="reference internal" href="#options"><span class="std std-ref">
 </div>
 <p>Each addon has its own custom options. You can look at examples and at our <a class="reference internal" href="addons.html"><span class="std std-doc">addons documentation</span></a> for more detail on how to add existing volumes
 or other custom functionality.</p>
+<h3 id="pod">pod<a class="headerlink" href="#pod" title="Link to this heading">¶</a></h3>
+<p>You can customize variables for the pod, which currently includes labels, annotations, selectors, and a service account name,</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">pod</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">annotations</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">key.subkey</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">value</span>
+<span class="w">    </span><span class="nt">labels</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">dinner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lasagna</span>
+<span class="w">    </span><span class="nt">serviceAccountName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mySVCAccount</span>
+<span class="w">    </span><span class="nt">nodeSelector</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">value</span>
+</code></pre></div>
+</div>
 
 
   <hr>
@@ -747,7 +767,7 @@ or other custom functionality.</p>
   <small>
     
       Last update:
-      Nov 03, 2023
+      Nov 04, 2023
     
   </small>
 </div>
