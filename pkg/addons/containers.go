@@ -62,10 +62,6 @@ func (a *ApplicationAddon) Validate() bool {
 	return true
 }
 
-func (a ApplicationAddon) AssembleInitContainers() []specs.ContainerSpec {
-	return []specs.ContainerSpec{}
-}
-
 // AssembleContainers adds the addon application container
 func (a ApplicationAddon) AssembleContainers() []specs.ContainerSpec {
 	return []specs.ContainerSpec{{
