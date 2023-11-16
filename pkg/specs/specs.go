@@ -26,6 +26,7 @@ type ContainerSpec struct {
 	Image            string
 	Name             string
 	WorkingDir       string
+	InitContainer    bool
 	EntrypointScript EntrypointScript
 
 	// If a command is provided, it's likely an addon (and EntrypointScript is ignored)

@@ -159,6 +159,8 @@ func (m BaseMetric) AddAddons(
 
 		// Assemble containers that addons provide, also as specs
 		assembleContainers := a.AssembleContainers()
+
+		// Sidecar containers
 		for _, assembleContainer := range assembleContainers {
 
 			// Any container specs that need to be created later as config maps are kept in cms
@@ -186,11 +188,12 @@ func (m BaseMetric) AddAddons(
 	for _, rj := range rjs {
 
 		// We also include the addon volumes, which generally need mount points
-		rjContainers, err := getReplicatedJobContainers(spec, rj, containers, volumes)
+		rjContainers, initContainers, err := getReplicatedJobContainers(spec, rj, containers, volumes)
 		if err != nil {
 			return cms, err
 		}
 		rj.Template.Spec.Template.Spec.Containers = rjContainers
+		rj.Template.Spec.Template.Spec.InitContainers = initContainers
 
 		// And volumes!
 		// containerSpecs are used to generate our metric entrypoint volumes

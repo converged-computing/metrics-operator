@@ -25,7 +25,8 @@ There is a [nice tutorial here](https://www.open-mpi.org/projects/hwloc/tutorial
 |-----|-------------|------------|------|
 | command | Change the default command to something else. | string | lstopo architecture.png && hwloc-ls machine.xml |
 
-The above saves a png image, and the machine data to xml.
+The above saves a png image, and the machine data to xml. Note that if you need to copy the data post-run, you
+likely want to set `interactive: true` to keep it running.
 
 
 ### perf-sysstat

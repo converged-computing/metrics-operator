@@ -21,17 +21,18 @@ var (
 	capPtrace = corev1.Capability("SYS_PTRACE")
 )
 
-// getReplicatedJobContainers gets containers for the replicated job
-// also generating needed mounts, etc.
+// getReplicatedJobContainers gets containers (sidecar and init)
+// for the replicated job, also generating needed mounts, etc.
 func getReplicatedJobContainers(
 	set *api.MetricSet,
 	rj *jobset.ReplicatedJob,
 	containerSpecs []specs.ContainerSpec,
 	volumes []specs.VolumeSpec,
-) ([]corev1.Container, error) {
+) ([]corev1.Container, []corev1.Container, error) {
 
 	// We only generate containers from specs that match the replicated job name
 	containers := []corev1.Container{}
+	initContainers := []corev1.Container{}
 
 	// Assume we can pull once for now, this could be changed to allow pull always
 	pullPolicy := corev1.PullIfNotPresent
@@ -54,7 +55,7 @@ func getReplicatedJobContainers(
 		hasPrivileged = hasPrivileged || cs.Attributes.SecurityContext.Privileged
 		resources, err := getContainerResources(cs.Resources)
 		if err != nil {
-			return containers, err
+			return containers, initContainers, err
 		}
 
 		// If a command is provided, use it first
@@ -99,8 +100,16 @@ func getReplicatedJobContainers(
 		newContainer.Ports = ports
 		newContainer.Env = envars
 		newContainer.Resources = resources
-		containers = append(containers, newContainer)
+
+		// Add as an init container, or a sidecar container
+		if cs.InitContainer {
+			initContainers = append(initContainers, newContainer)
+
+		} else {
+			containers = append(containers, newContainer)
+		}
 	}
+	logger.Infof("🟪️ Adding %d init containers\n", len(initContainers))
 	logger.Infof("🟪️ Adding %d containers\n", len(containers))
-	return containers, nil
+	return containers, initContainers, nil
 }
