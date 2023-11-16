@@ -1,0 +1,18 @@
+name: docs-test metrics-operator
+on:
+  pull_request: []
+
+jobs:
+  generate-docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Create conda environment
+      run: conda create --quiet -c conda-forge --name docs sphinx-material
+    - name: Generate Docs
+      run: |     
+        export PATH="/usr/share/miniconda/bin:$PATH"
+        source activate docs
+        cd ./docs
+        pip install -r requirements.txt
+        make html
