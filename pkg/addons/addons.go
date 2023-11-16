@@ -46,6 +46,7 @@ type Addon interface {
 	// What addons can control:
 	AssembleVolumes() []specs.VolumeSpec
 	AssembleContainers() []specs.ContainerSpec
+
 	CustomizeEntrypoints([]*specs.ContainerSpec, []*jobset.ReplicatedJob)
 
 	// Instead of exposing individual pieces (volumes, settings, etc)

@@ -57,6 +57,7 @@ func (a *MPITrace) SetOptions(metric *api.MetricAddon, m *api.MetricSet) {
 	a.VolumeName = "mpitrace"
 	a.Identifier = mpitraceIdentifier
 	a.SpackViewContainer = "mpitrace"
+	a.InitContainer = true
 
 	mount, ok := metric.Options["mount"]
 	if ok {

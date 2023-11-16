@@ -26,6 +26,7 @@ type SpackView struct {
 	VolumeName         string
 	EntrypointPath     string
 	Mount              string
+	InitContainer      bool
 }
 
 // Generate a container spec that will map to a listing of containers for the replicated job
@@ -54,20 +55,22 @@ cp -R /opt/software $viewroot/
 
 # This is a marker to indicate the copy is done
 touch $viewroot/metrics-operator-done.txt
-
-# Sleep forever, the application needs to run and end
-echo "Sleeping forever so %s can be shared and use for %s."
-sleep infinity
 `
 	script := fmt.Sprintf(
 		template,
 		a.Setup,
 		a.Mount,
 		a.Mount,
-		a.Mount,
-		a.Identifier,
 	)
 
+	// If it's not an initContainer, needs to sleep forever to stay running
+	if !a.InitContainer {
+		template += fmt.Sprintf(`
+# Sleep forever, the application needs to run and end
+echo "Sleeping forever so %s can be shared and use for %s."
+sleep infinity`, a.Mount, a.Identifier)
+
+	}
 	// Leave the name empty to generate in the namespace of the metric set (e.g., set.Name)
 	entrypoint := specs.EntrypointScript{
 		Name:   a.VolumeName,
@@ -85,6 +88,7 @@ sleep infinity
 			Image:            a.image,
 			Name:             a.SpackViewContainer,
 			EntrypointScript: entrypoint,
+			InitContainer:    a.InitContainer,
 			Resources:        &api.ContainerResources{},
 			Attributes: &api.ContainerSpec{
 				SecurityContext: api.SecurityContext{

@@ -35,6 +35,20 @@ class MetricsOperator:
         self._core_v1 = utils.make_k8s_client(kubeconfig)
         config.load_kube_config(config_file=kubeconfig)
 
+    def get_parser(self, metric_name=None, container_name=None):
+        """
+        Get a knownn parser, either that handles raw logs or parsed
+        """
+        if metric_name:
+            parser = mutils.get_metric(metric_name)(
+                self.spec, container_name=container_name, kubeconfig=self.kubeconfig
+            )
+        else:
+            parser = mutils.get_metric()(
+                self.spec, container_name=container_name, kubeconfig=self.kubeconfig
+            )
+        return parser
+
     def watch(self, raw_logs=False, pod_prefix=None, container_name=None):
         """
         Wait for (and yield parsed) metric logs.
@@ -43,15 +57,9 @@ class MetricsOperator:
             raise ValueError("You must provide a pod_prefix to ask for raw logs.")
 
         for metric in self.spec["spec"]["metrics"]:
-            if raw_logs:
-                parser = mutils.get_metric()(
-                    self.spec, container_name=container_name, kubeconfig=self.kubeconfig
-                )
-            else:
-                parser = mutils.get_metric(metric["name"])(
-                    self.spec, container_name=container_name, kubeconfig=self.kubeconfig
-                )
             print("Watching %s" % metric["name"])
+            metric_name = None if raw_logs else metric["name"]
+            parser = self.get_parser(metric_name, container_name)
             for pod, container in parser.logging_containers(pod_prefix=pod_prefix):
                 yield parser.parse(pod=pod, container=container)
 
