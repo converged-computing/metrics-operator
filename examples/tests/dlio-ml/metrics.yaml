@@ -1,0 +1,37 @@
+apiVersion: flux-framework.org/v1alpha2
+kind: MetricSet
+metadata:
+  labels:
+    app.kubernetes.io/name: metricset
+    app.kubernetes.io/instance: metricset-sample
+  name: metricset-sample
+spec:
+  # kubectl apply -f metrics.yaml
+  # kubectl logs <launcher-pod> -f
+  pods: 1
+
+  metrics:
+   - name: io-ior
+     options:
+      command: mpirun --allow-run-as-root -np 10 dlio_benchmark workload=resnet50 ++workload.dataset.data_folder=/dlio/data ++workload.output.folder=/dlio/output
+      workdir: /dlio/data
+     addons:
+       - name: commands
+         options:
+           preBlock: |
+             apt-get update && apt-get install -y python3 python3-pip openmpi-bin openmpi-common libopenmpi-dev hwloc libhwloc-dev default-jre
+             #python3 -m pip install git+https://github.com/hariharan-devarajan/dlio-profiler.git
+             #python3 -m pip install git+https://github.com/argonne-lcf/dlio_benchmark.git
+             python3 -m pip install "dlio_benchmark[dlio_profiler] @ git+https://github.com/argonne-lcf/dlio_benchmark.git"
+             mkdir -p /dlio/data /dlio/output /dlio/logs
+             export DLIO_PROFILER_ENABLE=0
+             mpirun -np 10 --allow-run-as-root dlio_benchmark workload=resnet50 ++workload.dataset.data_folder=/dlio/data ++workload.output.folder=/dlio/output ++workload.workflow.generate_data=True ++workload.workflow.train=False
+             export DLIO_PROFILER_LOG_LEVEL=ERROR
+             export DLIO_PROFILER_ENABLE=1
+             export DLIO_PROFILER_INC_METADATA=1
+             cd /dlio/data
+           postBlock: |
+             gzip -d /dlio/output/.trace*.pfw.gz
+             cat /dlio/output/.trace*.pfw
+             sleep infinity
+
