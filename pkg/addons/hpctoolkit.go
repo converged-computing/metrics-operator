@@ -80,6 +80,7 @@ func (a *HPCToolkit) SetOptions(metric *api.MetricAddon, m *api.MetricSet) {
 	a.postAnalysis = true
 	a.Identifier = hpctoolkitIdentifier
 	a.SpackViewContainer = "hpctoolkit"
+	a.InitContainer = true
 
 	// UseColor set to anything means to use it
 	output, ok := metric.Options["output"]
