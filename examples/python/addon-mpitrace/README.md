@@ -18,11 +18,3 @@ Then run the script, and target the files:
 ```bash
 $ python parse-metric.py ../../addons/mpitrace-lammps/ --prefix mpi_profile
 ```
-
-
-
-## Example Plots
-
-Here is a small example - 5 run with 2 pods!
-
-![img/lammps_lammps.png](img/lammps_lammps.png)
