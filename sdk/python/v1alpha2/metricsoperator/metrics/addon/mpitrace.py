@@ -13,18 +13,16 @@ class mpitrace(MetricBase):
     for a single log. Each log should be one process.
     """
 
-    def parse_row(self, row):
-        """
-        Given a row of two values with spaces, parse.
-        """
-        row = row.split(" ", 1)
-        return [x.strip() for x in row]
-
     def parse_log(self, lines):
         """
         Given lines of output, parse and return json
         """
         result = {}
+
+        # change avg. bytes average_bytes, and others more readable
+        lines = lines.replace("avg. bytes", "average_bytes")
+        lines = lines.replace("#calls", "number_calls")
+        lines = lines.replace("time(sec)", "time_seconds")
         lines = lines.strip().split("\n")
         while lines:
             line = lines.pop(0)
@@ -131,7 +129,7 @@ def parse_message_sizes(lines):
 
         # This is the row of a new table
         else:
-            if routine is not None:
+            if routine:
                 tables[routine] = rows
             rows = []
             # This is the header

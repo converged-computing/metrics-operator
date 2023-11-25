@@ -91,10 +91,9 @@
         "message_size_distributions": {
             "MPI_Send": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     9,
@@ -147,15 +146,11 @@
                     0.0
                 ]
             ],
-            "": [
-                []
-            ],
             "MPI_Irecv": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     10,
@@ -205,10 +200,9 @@
             ],
             "MPI_Sendrecv": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     36,
@@ -218,10 +212,9 @@
             ],
             "MPI_Bcast": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     80,
@@ -286,10 +279,9 @@
             ],
             "MPI_Reduce": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     1,
@@ -304,10 +296,9 @@
             ],
             "MPI_Allreduce": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     14,
@@ -337,10 +328,9 @@
             ],
             "MPI_Allgather": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     1,
@@ -442,10 +432,9 @@
         "message_size_distributions": {
             "MPI_Send": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     8,
@@ -498,15 +487,11 @@
                     0.0
                 ]
             ],
-            "": [
-                []
-            ],
             "MPI_Irecv": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     7,
@@ -561,10 +546,9 @@
             ],
             "MPI_Sendrecv": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     36,
@@ -574,10 +558,9 @@
             ],
             "MPI_Bcast": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     80,
@@ -642,10 +625,9 @@
             ],
             "MPI_Reduce": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     1,
@@ -660,10 +642,9 @@
             ],
             "MPI_Allreduce": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     14,
@@ -693,10 +674,9 @@
             ],
             "MPI_Allgather": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     1,
@@ -798,10 +778,9 @@
         "message_size_distributions": {
             "MPI_Send": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     7,
@@ -854,15 +833,11 @@
                     0.0
                 ]
             ],
-            "": [
-                []
-            ],
             "MPI_Irecv": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     8,
@@ -917,10 +892,9 @@
             ],
             "MPI_Sendrecv": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     36,
@@ -930,10 +904,9 @@
             ],
             "MPI_Bcast": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     80,
@@ -998,10 +971,9 @@
             ],
             "MPI_Reduce": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     1,
@@ -1016,10 +988,9 @@
             ],
             "MPI_Allreduce": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     14,
@@ -1049,10 +1020,9 @@
             ],
             "MPI_Allgather": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     1,
@@ -1062,10 +1032,9 @@
             ],
             "MPI_Allgatherv": [
                 [
-                    "#calls",
-                    "avg.",
-                    "bytes",
-                    "time(sec)"
+                    "number_calls",
+                    "average_bytes",
+                    "time_seconds"
                 ],
                 [
                     1,
