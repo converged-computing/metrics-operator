@@ -2,6 +2,7 @@
 # (c.f. AUTHORS, NOTICE.LLNS, COPYING)
 
 import re
+
 from metricsoperator.metrics.base import MetricBase
 
 
