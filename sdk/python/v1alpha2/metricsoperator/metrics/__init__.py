@@ -1,6 +1,7 @@
 # Copyright 2023 Lawrence Livermore National Security, LLC
 # (c.f. AUTHORS, NOTICE.LLNS, COPYING)
 
+import metricsoperator.metrics.addon as addons
 import metricsoperator.metrics.app as apps
 import metricsoperator.metrics.base as base
 import metricsoperator.metrics.network as network
@@ -15,6 +16,7 @@ metrics = {
     "io-fio": storage.io_fio,
     "app-lammps": apps.app_lammps,
     "app-amg": apps.app_amg,
+    "addon-mpitrace": addons.mpitrace,
 }
 
 
@@ -25,5 +27,6 @@ def get_metric(name=None):
     metric = metrics.get(name)
     # If we don't have a matching metric, return base (for raw logs)
     if not metric:
+        print(f"Warning: {name} is not a known metric, returning raw parser")
         return base.MetricBase
     return metric

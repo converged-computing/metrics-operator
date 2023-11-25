@@ -14,10 +14,11 @@ VERSION=v0.2.0
 kubectl apply --server-side -f https://github.com/kubernetes-sigs/jobset/releases/download/$VERSION/manifests.yaml
 ```
 
-Install the operator (from the development manifest here):
+Install the operator (from the development manifest here) or the production release:
 
 ```bash
 kubectl apply -f ../../dist/metrics-operator-dev.yaml
+kubectl apply -f https://raw.githubusercontent.com/converged-computing/metrics-operator/main/examples/dist/metrics-operator.yaml
 ```
 
 How to see metrics operator logs:
