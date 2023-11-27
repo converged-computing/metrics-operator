@@ -527,6 +527,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#app-cabanapic" class="md-nav__link">
+    <span title="/getting_started/metrics.md#app-cabanapic (reference label)" class="md-ellipsis">app-<wbr>cabana<wbr>PIC</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#app-quicksilver" class="md-nav__link">
     <span title="/getting_started/metrics.md#app-quicksilver (reference label)" class="md-ellipsis">app-<wbr>quicksilver</span>
   </a>
@@ -1324,6 +1331,39 @@ mpirun<span class="w"> </span>--hostfile<span class="w"> </span>./hostlist.txt<s
 <p><strong>NOTE</strong> that the Python parser was written for the test case, and likely we need to extend it to problem 2 or larger sized problems. If you
 run a larger problem and the parser does not work as expected, please <a class="reference external" href="https://github.com/converged-computing/metrics-operator/issues">send us the output</a> and we will provide an updated parser.
 See <a class="reference external" href="https://asc.llnl.gov/sites/asc/files/2020-09/AMG_Summary_v1_7.pdf">this guide</a> for more detail.</p>
+<h3 id="app-cabanapic">app-cabanaPIC<a class="headerlink" href="#app-cabanapic" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-cabanaPIC">app-cabanaPIC</a></em></p></li>
+</ul>
+<p>This is a <a class="reference external" href="https://github.com/ECP-copa/CabanaPIC/issues/3">particle in cell</a> simulation that is experimental because it does not
+seem to support multiple nodes yet (but should).</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Option Key</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>command</td>
+<td>The full command to run</td>
+<td>options-&gt;command</td>
+<td>string</td>
+<td>cbnpic</td>
+</tr>
+<tr>
+<td>workdir</td>
+<td>The working directory for the command</td>
+<td>options-&gt;workdir</td>
+<td>string</td>
+<td>/opt/cabanaPIC/build</td>
+</tr>
+</tbody>
+</table>
 <h3 id="app-quicksilver">app-quicksilver<a class="headerlink" href="#app-quicksilver" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><em><a class="reference external" href="https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-quicksilver">app-quicksilver</a></em></p></li>
@@ -1799,7 +1839,7 @@ repository (with <code class="docutils literal notranslate"><span class="pre">Do
   <small>
     
       Last update:
-      Nov 25, 2023
+      Nov 27, 2023
     
   </small>
 </div>

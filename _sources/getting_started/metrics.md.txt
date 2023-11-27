@@ -330,6 +330,18 @@ More likely you want an actual problem size on a specific number of node and tas
 run a larger problem and the parser does not work as expected, please [send us the output](https://github.com/converged-computing/metrics-operator/issues) and we will provide an updated parser.
 See [this guide](https://asc.llnl.gov/sites/asc/files/2020-09/AMG_Summary_v1_7.pdf) for more detail.
 
+### app-cabanaPIC
+
+ - *[app-cabanaPIC](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-cabanaPIC)*
+
+This is a [particle in cell](https://github.com/ECP-copa/CabanaPIC/issues/3) simulation that is experimental because it does not
+seem to support multiple nodes yet (but should).
+
+| Name | Description | Option Key | Type | Default |
+|-----|-------------|------------|------|---------|
+| command | The full command to run | options->command | string | cbnpic |
+| workdir | The working directory for the command | options->workdir | string | /opt/cabanaPIC/build |
+
 ### app-quicksilver
 
  - *[app-quicksilver](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-quicksilver)*
