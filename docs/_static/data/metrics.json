@@ -14,6 +14,13 @@
   "url": "https://asc.llnl.gov/sites/asc/files/2020-09/BDAS_Summary_b4bcf27_0.pdf"
  },
  {
+  "name": "app-cabanapic",
+  "description": "structured PIC (particle in cell) proxy app",
+  "family": "simulation",
+  "image": "ghcr.io/converged-computing/metric-cabanapic:latest",
+  "url": "https://github.com/ECP-copa/CabanaPIC"
+ },
+ {
   "name": "app-hpl",
   "description": "High-Performance Linpack (HPL)",
   "family": "solver",
