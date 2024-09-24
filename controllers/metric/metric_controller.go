@@ -129,7 +129,7 @@ func (r *MetricSetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 
 	// Ensure the metricset is mapped to a JobSet. For design:
 	// 1. If an application is provided, we pair the application at some scale with each metric as a contaienr
-	// 2. If storage is provided, we create the volumes for the metric containers
+	// 2. If storage or other addons are provided, we create the volumes for the metric containers
 	result, err := r.ensureMetricSet(ctx, &spec, &set)
 	if err != nil {
 		r.Log.Error(err, "🟥️ Issue ensuring metric set")

@@ -8,6 +8,8 @@ SPDX-License-Identifier: MIT
 package metrics
 
 import (
+	"fmt"
+
 	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"github.com/converged-computing/metrics-operator/pkg/addons"
 	"github.com/converged-computing/metrics-operator/pkg/specs"
@@ -116,6 +118,8 @@ func (m *BaseMetric) ReplicatedJobs(spec *api.MetricSet) ([]*jobset.ReplicatedJo
 }
 
 // SetDefaultOptions that are shared (possibly)
+// TODO this doesn't do anything given an interface and needs
+// a different placement.
 func (m BaseMetric) SetDefaultOptions(metric *api.Metric) {
 	st, ok := metric.Options["soleTenancy"]
 	if ok && st.StrVal == "false" || st.StrVal == "no" {
@@ -170,6 +174,7 @@ func (m BaseMetric) AddAddons(
 			addonContainers = append(addonContainers, assembleContainer)
 		}
 
+		fmt.Println(addonContainers)
 		// Allow the addons to customize the container entrypoints, specific to the job name
 		// It's important that this set does not include other addon container specs
 		a.CustomizeEntrypoints(containerSpecs, rjs)

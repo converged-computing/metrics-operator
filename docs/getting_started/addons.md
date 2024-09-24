@@ -270,7 +270,7 @@ wrapper to the actual executable.
 
 ### perf-mpitrace
 
- - *[perf-mpitrace](https://github.com/converged-computing/metrics-operator/tree/main/examples/addons/perf-mpitrace)*
+ - *[perf-mpitrace](https://github.com/converged-computing/metrics-operator/tree/main/examples/addons/mpitrace-lammps)*
 
 This metric provides [mpitrace](https://github.com/IBM/mpitrace) to wrap an MPI application. The setup is the same as hpctoolkit, and we
 currently only provide a rocky base (please let us know if you need another). It works by way of wrapping the mpirun command with `LD_PRELOAD`.
