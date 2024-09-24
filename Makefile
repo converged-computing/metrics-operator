@@ -173,6 +173,19 @@ deploy: manifests kustomize ## Deploy controller to the K8s cluster specified in
 undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
 	$(KUSTOMIZE) build config/default | kubectl delete --ignore-not-found=$(ignore-not-found) -f -
 
+
+.PHONY: test-deploy
+test-deploy: manifests kustomize
+	docker build --no-cache -t ${DEVIMG} .
+	docker push ${DEVIMG}
+	cd config/manager && $(KUSTOMIZE) edit set image controller=${DEVIMG}
+	$(KUSTOMIZE) build config/default > examples/dist/metrics-operator-dev.yaml
+
+.PHONY: test-deploy-recreate
+test-deploy-recreate: test-deploy
+	kubectl delete -f ./examples/dist/metrics-operator-dev.yaml || echo "Already deleted"
+	kubectl apply -f ./examples/dist/metrics-operator-dev.yaml
+
 ##@ Build Dependencies
 
 ## Location to install dependencies to
@@ -187,7 +200,7 @@ ENVTEST ?= $(LOCALBIN)/setup-envtest
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v3.8.7
-CONTROLLER_TOOLS_VERSION ?= v0.11.1
+CONTROLLER_TOOLS_VERSION ?= v0.14.0
 
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 .PHONY: kustomize
@@ -204,6 +217,7 @@ controller-gen: $(CONTROLLER_GEN) ## Download controller-gen locally if necessar
 $(CONTROLLER_GEN): $(LOCALBIN)
 	test -s $(LOCALBIN)/controller-gen && $(LOCALBIN)/controller-gen --version | grep -q $(CONTROLLER_TOOLS_VERSION) || \
 	GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)
+
 
 .PHONY: envtest
 envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.

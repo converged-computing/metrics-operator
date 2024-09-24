@@ -21,6 +21,13 @@
   "url": "https://github.com/ECP-copa/CabanaPIC"
  },
  {
+  "name": "app-custom",
+  "description": "Provide a custom application for MPI trace",
+  "family": "proxyapp",
+  "image": "",
+  "url": "https://converged-computing.github.io/metrics-operator"
+ },
+ {
   "name": "app-hpl",
   "description": "High-Performance Linpack (HPL)",
   "family": "solver",

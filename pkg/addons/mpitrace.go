@@ -93,7 +93,10 @@ func (a *MPITrace) CustomizeEntrypoints(
 	cs []*specs.ContainerSpec,
 	rjs []*jobset.ReplicatedJob,
 ) {
+	logger.Infof("🟧️ Customizing entrypoints for %s\n", rjs)
+
 	for _, rj := range rjs {
+		logger.Infof("🟧️ Comparing job target %s vs job name %s\n", a.target, rj.Name)
 
 		// Only customize if the replicated job name matches the target
 		if a.target != "" && a.target != rj.Name {
@@ -101,7 +104,6 @@ func (a *MPITrace) CustomizeEntrypoints(
 		}
 		a.customizeEntrypoint(cs, rj)
 	}
-
 }
 
 // CustomizeEntrypoint for a single replicated job
@@ -120,7 +122,7 @@ echo "%s"
 wget -q https://github.com/converged-computing/goshare/releases/download/2023-09-06/wait-fs
 chmod +x ./wait-fs
 mv ./wait-fs /usr/bin/goshare-wait-fs
-	
+
 # Ensure spack view is on the path, wherever it is mounted
 viewbase="%s"
 software="${viewbase}/software"
@@ -205,6 +207,6 @@ func init() {
 	}
 	app := ApplicationAddon{AddonBase: base}
 	spack := SpackView{ApplicationAddon: app}
-	toolkit := MPITrace{SpackView: spack}
-	Register(&toolkit)
+	tracer := MPITrace{SpackView: spack}
+	Register(&tracer)
 }

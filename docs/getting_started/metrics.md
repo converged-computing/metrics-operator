@@ -251,6 +251,49 @@ Here are some useful resources for the benchmarks:
  - [HPC Council](https://hpcadvisorycouncil.atlassian.net/wiki/spaces/HPCWORKS/pages/1284538459/OSU+Benchmark+Tuning+for+2nd+Gen+AMD+EPYC+using+HDR+InfiniBand+over+HPC-X+MPI)
  - [AWS Tutorials](https://www.hpcworkshops.com/08-efa/04-complie-run-osu.html)
 
+### app-custom
+
+A custom application can support any application to be used as a metric app. For the following parameters, "command" and "container" are required.
+
+| Name | Description | Option Key | Type | Default |
+|-----|-------------|------------|------|---------|
+| command | The full mpirun command | options->command |string | unset |
+| workdir | The working directory for the command | options->workdir | string | unset |
+| soleTenancy | require each pod to have sole tenancy | command->soleTenancy | string | "false" |
+
+As an example, here is running mpitrace (an addon) with a custom container.
+
+```yaml
+apiVersion: flux-framework.org/v1alpha2
+kind: MetricSet
+metadata:
+  labels:
+    app.kubernetes.io/name: metricset
+    app.kubernetes.io/instance: metricset-sample
+  name: metricset-sample
+spec:
+  # Number of pods for lammps (one launcher, the rest workers)
+  pods: 4
+  metrics:
+   - name: app-custom
+     image: ghcr.io/converged-computing/<your-container>
+     options:
+       command: mpirun --hostfile ./hostlist.txt -mca orte_keep_fqdn_hostnames t -np 4 --map-by socket <app> <options>
+       workdir: <workdir>
+
+     # Add on hpctoolkit, will mount a volume and wrap lammps
+     addons:
+       - name: perf-mpitrace
+         options:
+           mount: /opt/mnt
+           image: ghcr.io/converged-computing/metric-mpitrace:ubuntu-jammy
+           workdir: <workdir>
+           # this is the target of the replicated job "l" means launcher
+           target: l          
+           # This is the target container, with full name "launcher"
+           containerTarget: launcher
+```
+
 ### app-lammps
 
  - *[app-lammps](https://github.com/converged-computing/metrics-operator/tree/main/examples/tests/app-lammps)*

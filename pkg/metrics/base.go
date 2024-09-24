@@ -116,6 +116,8 @@ func (m *BaseMetric) ReplicatedJobs(spec *api.MetricSet) ([]*jobset.ReplicatedJo
 }
 
 // SetDefaultOptions that are shared (possibly)
+// TODO this doesn't do anything given an interface and needs
+// a different placement.
 func (m BaseMetric) SetDefaultOptions(metric *api.Metric) {
 	st, ok := metric.Options["soleTenancy"]
 	if ok && st.StrVal == "false" || st.StrVal == "no" {
