@@ -288,6 +288,9 @@ spec:
            mount: /opt/mnt
            image: ghcr.io/converged-computing/metric-mpitrace:ubuntu-jammy
            workdir: <workdir>
+           # this is the target of the replicated job "l" means launcher
+           target: l          
+           # This is the target container, with full name "launcher"
            containerTarget: launcher
 ```
 

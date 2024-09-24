@@ -8,8 +8,6 @@ SPDX-License-Identifier: MIT
 package metrics
 
 import (
-	"fmt"
-
 	api "github.com/converged-computing/metrics-operator/api/v1alpha2"
 	"github.com/converged-computing/metrics-operator/pkg/addons"
 	"github.com/converged-computing/metrics-operator/pkg/specs"
@@ -174,7 +172,6 @@ func (m BaseMetric) AddAddons(
 			addonContainers = append(addonContainers, assembleContainer)
 		}
 
-		fmt.Println(addonContainers)
 		// Allow the addons to customize the container entrypoints, specific to the job name
 		// It's important that this set does not include other addon container specs
 		a.CustomizeEntrypoints(containerSpecs, rjs)

@@ -96,7 +96,7 @@ func (a *MPITrace) CustomizeEntrypoints(
 	logger.Infof("🟧️ Customizing entrypoints for %s\n", rjs)
 
 	for _, rj := range rjs {
-		logger.Infof("🟧️ Comparing %s vs %s\n", a.target, rj.Name)
+		logger.Infof("🟧️ Comparing job target %s vs job name %s\n", a.target, rj.Name)
 
 		// Only customize if the replicated job name matches the target
 		if a.target != "" && a.target != rj.Name {
